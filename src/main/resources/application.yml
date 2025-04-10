@@ -12,3 +12,8 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+
+api:
+  checker:
+    storage:
+      filepath: ${user.home}/api-status.json
