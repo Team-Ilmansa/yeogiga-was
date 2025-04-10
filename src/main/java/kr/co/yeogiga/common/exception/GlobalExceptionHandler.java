@@ -36,21 +36,8 @@ public class GlobalExceptionHandler {
         log.error("[Error Occurred] {}", errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse.builder()
                 .code(CommonErrorType.VALIDATION_ERROR.getCode())
-                .message(this.getValidationErrorMessage(errors))
+                .errors(errors)
                 .build());
-    }
-
-    private String getValidationErrorMessage(Map<String, String> errors) {
-        StringBuilder message = new StringBuilder();
-        errors.forEach((key, value) -> message
-                .append("[")
-                .append(key)
-                .append("] ")
-                .append(value)
-                .append(" ")
-        );
-
-        return message.toString();
     }
 
     /* 일반 예외 처리 */
