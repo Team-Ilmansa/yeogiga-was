@@ -5,8 +5,8 @@ import org.springframework.http.HttpStatus;
 
 @RequiredArgsConstructor
 public enum CommonErrorType implements BaseErrorType {
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "C001", "서버 내부 에러입니다."),
-    VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "C002", "유효성 검증에 실패하였습니다."),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "G001", "서버 내부 에러입니다."),
+    VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "G002", "유효성 검증에 실패하였습니다."),
     ;
 
     private final HttpStatus status;
