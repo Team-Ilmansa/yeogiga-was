@@ -35,16 +35,17 @@ public class User extends BaseTimeEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Role role = Role.USER;
+    private Role role;
 
     @Column(name = "deleted_At")
     private LocalDateTime deletedAt;
 
     @Builder
-    public User(String username, String password, String nickname, String email) {
+    public User(String username, String password, String nickname, String email ,Role role) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
+        this.role = role;
     }
 }
