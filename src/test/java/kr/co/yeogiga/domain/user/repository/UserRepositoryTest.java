@@ -4,6 +4,7 @@ import kr.co.yeogiga.domain.oauth.entity.OAuth;
 import kr.co.yeogiga.domain.oauth.repository.OAuthRepository;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.oauth.type.Platform;
+import kr.co.yeogiga.domain.user.type.Role;
 import kr.co.yeogiga.infrastructure.config.JpaConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,7 @@ public class UserRepositoryTest {
                 .username("tester")
                 .nickname("test")
                 .password("testpw")
+                .role(Role.USER)
                 .build();
 
         // when
@@ -53,6 +55,7 @@ public class UserRepositoryTest {
         User relatedUser = User.builder()
                 .email("fromPlatformt@test.com")
                 .nickname("tempNickname")
+                .role(Role.USER)
                 .build();
 
         OAuth oauth = OAuth.builder()
