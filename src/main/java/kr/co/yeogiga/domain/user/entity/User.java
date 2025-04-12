@@ -1,6 +1,7 @@
 package kr.co.yeogiga.domain.user.entity;
 
 import jakarta.persistence.*;
+import kr.co.yeogiga.domain.common.entity.BaseTimeEntity;
 import kr.co.yeogiga.domain.user.type.Role;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -9,20 +10,14 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "user")
+@Entity
 @DynamicUpdate
 @SQLRestriction("deleted_at IS NULL")
 @SQLDelete(sql = "UPDATE user SET deleted_at = NOW() WHERE id = ?")
-@EntityListeners(AuditingEntityListener.class)
-public class User {
+public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,17 +35,6 @@ public class User {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
-
-    @CreatedDate
-    @Column(name = "created_At", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "modified_At")
-    private LocalDateTime modifiedAt;
-
-    @Column(name = "deleted_At")
-    private LocalDateTime deletedAt;
 
     @Builder
     public User(String username, String password, String nickname, String email) {
