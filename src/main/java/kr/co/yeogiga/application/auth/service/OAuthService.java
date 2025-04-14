@@ -11,6 +11,7 @@ import kr.co.yeogiga.domain.user.type.Role;
 import kr.co.yeogiga.infrastructure.oauth.OAuthClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,32 +20,35 @@ public class OAuthService {
     private final OAuthDomainService oAuthDomainService;
     private final UserService userService;
 
+    @Transactional
     public void signIn(OAuthPlatform platform, String code) {
         OAuthClient oAuthClient = oAuthClientFactory.getOAuthClient(platform);
 
         String accessToken = oAuthClient.fetchAccessToken(code);
         UserInfoDto userInfo = oAuthClient.fetchUserInfo(accessToken);
 
-        UserStatusDto userStatus = getUserStatus(platform, userInfo.platformId());
+        UserStatusDto userStatus = getUserStatus(platform, userInfo);
 
         // HACK: JWT 적용 시 로직 추가
     }
 
-    private UserStatusDto getUserStatus(OAuthPlatform platform, String platformId) {
-        return userService.readByPlatformAndPlatformId(platform, platformId)
+
+    private UserStatusDto getUserStatus(OAuthPlatform platform, UserInfoDto userInfo) {
+        return userService.readByPlatformAndPlatformId(platform, userInfo.platformId())
                 .map(user -> UserStatusDto.from(user, false))
-                .orElseGet(() -> UserStatusDto.from(registerUser(platform, platformId), true));
+                .orElseGet(() -> UserStatusDto.from(registerUser(platform, userInfo), true));
     }
 
-    private User registerUser(OAuthPlatform platform, String platformId) {
+    private User registerUser(OAuthPlatform platform, UserInfoDto userInfo) {
         User user = User.builder()
+                .email(userInfo.email())
                 .role(Role.USER)
-                .nickname(platform + " " + platformId)
+                .nickname(platform + " " + userInfo.platformId())
                 .build();
 
         OAuth oauth = OAuth.builder()
                 .platform(platform)
-                .platformId(platformId)
+                .platformId(userInfo.platformId())
                 .user(user)
                 .build();
 
