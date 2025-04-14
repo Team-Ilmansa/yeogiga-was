@@ -3,7 +3,7 @@ package kr.co.yeogiga.application.auth.service;
 import kr.co.yeogiga.application.auth.dto.UserInfoDto;
 import kr.co.yeogiga.application.auth.dto.UserStatusDto;
 import kr.co.yeogiga.domain.oauth.entity.OAuth;
-import kr.co.yeogiga.domain.oauth.service.OAuthDomainService;
+import kr.co.yeogiga.domain.oauth.service.OAuthService;
 import kr.co.yeogiga.domain.oauth.type.OAuthPlatform;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.service.UserService;
@@ -15,9 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class OAuthService {
+public class OAuthManagementService {
     private final OAuthClientFactory oAuthClientFactory;
-    private final OAuthDomainService oAuthDomainService;
+    private final OAuthService oAuthService;
     private final UserService userService;
 
     @Transactional
@@ -52,7 +52,7 @@ public class OAuthService {
                 .user(user)
                 .build();
 
-        oAuthDomainService.save(oauth);
+        oAuthService.save(oauth);
 
         return user;
     }
