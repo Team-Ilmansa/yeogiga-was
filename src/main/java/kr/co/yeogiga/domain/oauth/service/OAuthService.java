@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class OAuthDomainService {
+public class OAuthService {
     private final OAuthRepository oauthRepository;
 
     public OAuth save(OAuth oauth) {
