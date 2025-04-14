@@ -6,7 +6,7 @@ public record UserStatusDto(
         User user,
         boolean shouldSignUp
 ) {
-    public static UserStatusDto from(User user, boolean shouldSignUp) {
+    public static UserStatusDto of(User user, boolean shouldSignUp) {
         return new UserStatusDto(user, shouldSignUp);
     }
 }

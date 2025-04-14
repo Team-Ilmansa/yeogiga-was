@@ -35,8 +35,8 @@ public class OAuthService {
 
     private UserStatusDto getUserStatus(OAuthPlatform platform, UserInfoDto userInfo) {
         return userService.readByPlatformAndPlatformId(platform, userInfo.platformId())
-                .map(user -> UserStatusDto.from(user, false))
-                .orElseGet(() -> UserStatusDto.from(registerUser(platform, userInfo), true));
+                .map(user -> UserStatusDto.of(user, false))
+                .orElseGet(() -> UserStatusDto.of(registerUser(platform, userInfo), true));
     }
 
     private User registerUser(OAuthPlatform platform, UserInfoDto userInfo) {
