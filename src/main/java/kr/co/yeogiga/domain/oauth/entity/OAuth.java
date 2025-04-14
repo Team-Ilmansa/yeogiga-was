@@ -2,7 +2,7 @@ package kr.co.yeogiga.domain.oauth.entity;
 
 import jakarta.persistence.*;
 import kr.co.yeogiga.domain.user.entity.User;
-import kr.co.yeogiga.domain.oauth.type.Platform;
+import kr.co.yeogiga.domain.oauth.type.OAuthPlatform;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +18,7 @@ public class OAuth {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Platform platform;
+    private OAuthPlatform platform;
 
     @Column(name = "platform_id", nullable = false)
     private String platformId;
@@ -28,7 +28,7 @@ public class OAuth {
     private User user;
 
     @Builder
-    public OAuth(Platform platform, String platformId, User user) {
+    public OAuth(OAuthPlatform platform, String platformId, User user) {
         this.platform = platform;
         this.platformId = platformId;
         this.user = user;
