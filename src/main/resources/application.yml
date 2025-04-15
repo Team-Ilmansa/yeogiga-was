@@ -1,28 +1,20 @@
 spring:
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DATABASE_HOST:localhost}:${DATABASE_PORT:3306}/${DATABASE_NAME:yeogiga}
-    username: ${DATABASE_USER:root}
-    password: ${DATABASE_PASS:password}
+  profiles:
+    active: ${PROFILE:dev}
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
-
+--- # servlet multipart
   servlet:
     multipart:
       max-file-size: 20MB
       max-request-size: 20MB
 
+--- # api link checker
 api:
   checker:
     storage:
       filepath: ${user.home}/api-status.json
 
+--- # aws s3
 cloud:
   aws:
     credentials:
@@ -34,3 +26,18 @@ cloud:
       auto: false
     s3:
       bucket-name: ${S3_BUCKET_NAME}
+
+--- # OAuth2
+oauth2:
+  naver:
+    client-id: ${NAVER_CLIENT_ID}
+    client-secret: ${NAVER_CLIENT_SECRET}
+    redirect-uri: ${NAVER_REDIRECT_URI}
+    token-uri: ${NAVER_TOKEN_URI}
+    user-info-uri: ${NAVER_USER_INFO_URI}
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID}
+    client-secret: ${KAKAO_CLIENT_SECRET}
+    redirect-uri: ${KAKAO_REDIRECT_URI}
+    token-uri: ${KAKAO_TOKEN_URI}
+    user-info-uri: ${KAKAO_USER_INFO_URI}
