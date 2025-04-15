@@ -2,7 +2,23 @@ spring:
   profiles:
     active: ${PROFILE:dev}
 
+--- # api link checker
 api:
   checker:
     storage:
       filepath: ${user.home}/api-status.json
+
+--- # OAuth2
+oauth2:
+  naver:
+    client-id: ${NAVER_CLIENT_ID}
+    client-secret: ${NAVER_CLIENT_SECRET}
+    redirect-uri: ${NAVER_REDIRECT_URI}
+    token-uri: ${NAVER_TOKEN_URI}
+    user-info-uri: ${NAVER_USER_INFO_URI}
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID}
+    client-secret: ${KAKAO_CLIENT_SECRET}
+    redirect-uri: ${KAKAO_REDIRECT_URI}
+    token-uri: ${KAKAO_TOKEN_URI}
+    user-info-uri: ${KAKAO_USER_INFO_URI}

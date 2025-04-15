@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum Platform {
+public enum OAuthPlatform {
     KAKAO("KAKAO"),
     NAVER("NAVER"),
     ;
