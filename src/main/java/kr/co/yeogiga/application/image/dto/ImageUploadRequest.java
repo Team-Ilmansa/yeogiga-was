@@ -11,7 +11,7 @@ public record ImageUploadRequest(
         long size,
         Long tripId
 ) {
-    public static ImageUploadRequest of(MultipartFile file, Long tripId) throws IOException {
+    public static ImageUploadRequest from(MultipartFile file, Long tripId) throws IOException {
         return new ImageUploadRequest(file.getBytes(), file.getOriginalFilename(), file.getContentType(), file.getSize(), tripId);
     }
 }
