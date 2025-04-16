@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ImageUploadProcessor {
-    private final ImageUploadAndMetadataService imageUploadAndMetadataService;
+    private final ImageProcessingService imageProcessingService;
 
     /**
      * MultipartFile 이미지 리스트를 받아 각각 비동기 업로드 및 메타데이터 추출을 요청메서드
@@ -25,14 +25,8 @@ public class ImageUploadProcessor {
     public void process(List<MultipartFile> images, Long tripId) {
         for (MultipartFile image : images) {
             try {
-                byte[] bytes = image.getBytes();
-                String originalFilename = image.getOriginalFilename();
-                String contentType = image.getContentType();
-                long size = image.getSize();
-
-                imageUploadAndMetadataService.uploadAndExtractMetadata(
-                        ImageUploadRequest.createInstance(bytes, originalFilename, contentType, size, tripId)
-                );
+                ImageUploadRequest imageUploadRequest = ImageUploadRequest.of(image, tripId);
+                imageProcessingService.processImage(imageUploadRequest);
             } catch (IOException e) {
                 log.error("Failed to process image - filename: {}", image.getOriginalFilename(), e);
             }
