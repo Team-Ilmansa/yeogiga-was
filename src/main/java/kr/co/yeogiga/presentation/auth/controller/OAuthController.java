@@ -2,8 +2,10 @@ package kr.co.yeogiga.presentation.auth.controller;
 
 import kr.co.yeogiga.application.auth.dto.OAuthSignInDto;
 import kr.co.yeogiga.application.auth.service.OAuthManagementService;
+import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.domain.oauth.type.OAuthPlatform;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,10 +21,8 @@ public class OAuthController {
 
     @PostMapping("/sign-in/{platform}")
     public ResponseEntity<?> signUp(@PathVariable OAuthPlatform platform, @RequestBody OAuthSignInDto.Request request) {
-        oAuthManagementService.signIn(platform, request.code());
-
-        // HACK: JWT 적용 시 응답 수정
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(SuccessResponse.from(oAuthManagementService.signIn(platform, request.code())));
     }
 }
 
