@@ -24,6 +24,13 @@ public class OAuthManagementService {
     private final JwtHelper jwtHelper;
     private final UserService userService;
 
+    /**
+     * OAuth2 로그인
+     *
+     * @param platform      OAuth 로그인 플랫폼
+     * @param code          OAuth 리소스 서버 제공 인증 코드
+     * @return              로그인 응답 정보 (JWT, 추가 정보 입력 필요 여부)
+     */
     @Transactional
     public SignInDto.Response signIn(OAuthPlatform platform, String code) {
         OAuthClient oAuthClient = oAuthClientFactory.getOAuthClient(platform);
@@ -36,12 +43,26 @@ public class OAuthManagementService {
         return getSignInDto(userStatus);
     }
 
+    /**
+     * User 및 추가정보 입력 필요 여부 반환 메서드
+     *
+     * @param platform      OAuth 로그인 플랫폼
+     * @param userInfo      OAuth 리소스 서버 제공 사용자 정보
+     * @return              User, 추가 정보 입력 필요 여부
+     */
     private UserStatusDto getUserStatus(OAuthPlatform platform, UserInfoDto userInfo) {
         return userService.readByPlatformAndPlatformId(platform, userInfo.platformId())
                 .map(user -> UserStatusDto.of(user, false))
                 .orElseGet(() -> UserStatusDto.of(registerUser(platform, userInfo), true));
     }
 
+    /**
+     * User 및 OAuth 저장 메서드
+     *
+     * @param platform      OAuth 로그인 플랫폼
+     * @param userInfo      OAuth 리소스 서버 제공 유저 사용자 정보
+     * @return              User
+     */
     private User registerUser(OAuthPlatform platform, UserInfoDto userInfo) {
         User user = User.builder()
                 .email(userInfo.email())
@@ -60,6 +81,12 @@ public class OAuthManagementService {
         return user;
     }
 
+    /**
+     * 로그인 요청 응답 DTO 생성 메서드
+     *
+     * @param userStatus    User, 추가 정보 입력 여부
+     * @return              로그인 응답 정보 (JWT, 추가 정보 입력 필요 여부)
+     */
     private SignInDto.Response getSignInDto(UserStatusDto userStatus) {
         if (!userStatus.shouldSignUp()) {
             User user = userStatus.user();
