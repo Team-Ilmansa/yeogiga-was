@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 public enum CommonErrorType implements BaseErrorType {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "G001", "서버 내부 에러입니다."),
     VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "G002", "유효성 검증에 실패하였습니다."),
+    PATH_VARIABLE_VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "G003", "지원하지 않는 Path Variable 값입니다.")
     ;
 
     private final HttpStatus status;
