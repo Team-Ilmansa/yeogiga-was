@@ -21,4 +21,13 @@ public class SignInDto {
             boolean shouldSignup
     ) {
     }
+
+    public record ResponseToWeb(
+            String accessToken,
+            boolean shouldSignup
+    ) {
+        public static ResponseToWeb from(Response response) {
+            return new ResponseToWeb(response.token.accessToken(), response.shouldSignup());
+        }
+    }
 }
