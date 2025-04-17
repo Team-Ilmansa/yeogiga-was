@@ -3,7 +3,6 @@ package kr.co.yeogiga.presentation.auth.controller;
 import jakarta.validation.Valid;
 import kr.co.yeogiga.application.auth.constant.AuthConstants;
 import kr.co.yeogiga.application.auth.dto.SignInDto;
-import kr.co.yeogiga.application.auth.dto.TokenDto;
 import kr.co.yeogiga.application.auth.service.OAuthManagementService;
 import kr.co.yeogiga.application.auth.type.Device;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
@@ -37,29 +36,14 @@ public class OAuthController implements OAuthApi {
     }
 
     private ResponseEntity<?> createSignInResponse(Device device, SignInDto.Response response) {
-        if (response.shouldSignup()) {
-            return ResponseEntity.ok(SuccessResponse.from(response));
-        }
-
         return switch (device) {
             case MOBILE -> ResponseEntity.ok(SuccessResponse.from(response));
-            case WEB -> {
-                TokenDto token = TokenDto.builder()
-                        .accessToken(response.token().accessToken())
-                        .build();
-
-                String cookie = CookieUtil.createCookie(
-                        AuthConstants.REFRESH_TOKEN_PREFIX.getValue(),
-                        response.token().refreshToken(),
-                        Duration.ofDays(7).toSeconds()).toString();
-
-                yield ResponseEntity.ok()
-                        .header(HttpHeaders.SET_COOKIE, cookie)
-                        .body(SuccessResponse.from(SignInDto.Response.builder()
-                                .token(token)
-                                .build()
-                        ));
-            }
+            case WEB -> ResponseEntity.ok()
+                        .header(HttpHeaders.SET_COOKIE, CookieUtil.createCookie(
+                                AuthConstants.REFRESH_TOKEN_PREFIX.getValue(),
+                                response.token().refreshToken(),
+                                Duration.ofDays(7).toSeconds()).toString())
+                        .body(SuccessResponse.from(response.toWebResponse()));
         };
     }
 }
