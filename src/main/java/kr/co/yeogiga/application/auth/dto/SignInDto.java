@@ -22,12 +22,12 @@ public class SignInDto {
     ) {
     }
 
-    public record ResponseToWeb(
+    public record ResponseForWeb(
             String accessToken,
             boolean shouldSignup
     ) {
-        public static ResponseToWeb from(Response response) {
-            return new ResponseToWeb(response.token.accessToken(), response.shouldSignup());
+        public static ResponseForWeb from(Response response) {
+            return new ResponseForWeb(response.token.accessToken(), response.shouldSignup());
         }
     }
 }
