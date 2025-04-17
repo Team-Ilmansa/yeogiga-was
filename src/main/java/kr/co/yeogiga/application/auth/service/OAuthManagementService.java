@@ -53,9 +53,9 @@ public class OAuthManagementService {
      */
     private UserStatusDto getUserStatus(OAuthPlatform platform, UserInfoDto userInfo) {
         return userService.readByPlatformAndPlatformId(platform, userInfo.platformId())
-                .map(user -> Objects.isNull(user.getPassword())
-                        ? UserStatusDto.of(user, true)
-                        : UserStatusDto.of(user, false)
+                .map(user -> user.isSignedUp()
+                        ? UserStatusDto.of(user, false)
+                        : UserStatusDto.of(user, true)
                 )
                 .orElseGet(() -> UserStatusDto.of(registerUser(platform, userInfo), true));
     }
@@ -102,7 +102,7 @@ public class OAuthManagementService {
             TokenDto token = jwtService.generateToken(username, nickname, userId);
 
             return SignInDto.Response.builder()
-                    .token(TokenDto.of(token.accessToken(), token.refreshToken()))
+                    .token(token)
                     .shouldSignup(userStatus.shouldSignUp())
                     .build();
         }
