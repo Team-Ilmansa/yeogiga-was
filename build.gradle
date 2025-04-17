@@ -47,7 +47,7 @@ dependencies {
     testRuntimeOnly 'com.h2database:h2'
 
     /* Docs */
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
     implementation 'io.github.daeyoung0726:api-link-checker:0.1.1'
 
     /* Image Metadata Extractor */
