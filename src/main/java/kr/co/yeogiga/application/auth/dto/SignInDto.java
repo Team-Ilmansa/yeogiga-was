@@ -20,5 +20,13 @@ public class SignInDto {
             TokenDto token,
             boolean shouldSignup
     ) {
+        public Response toWebResponse() {
+            return Response.builder()
+                    .token(TokenDto.builder()
+                            .accessToken(this.token.accessToken())
+                            .build())
+                    .shouldSignup(this.shouldSignup)
+                    .build();
+        }
     }
 }
