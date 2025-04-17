@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class OAuthManagementService {
@@ -51,7 +53,10 @@ public class OAuthManagementService {
      */
     private UserStatusDto getUserStatus(OAuthPlatform platform, UserInfoDto userInfo) {
         return userService.readByPlatformAndPlatformId(platform, userInfo.platformId())
-                .map(user -> UserStatusDto.of(user, false))
+                .map(user -> Objects.isNull(user.getPassword())
+                        ? UserStatusDto.of(user, true)
+                        : UserStatusDto.of(user, false)
+                )
                 .orElseGet(() -> UserStatusDto.of(registerUser(platform, userInfo), true));
     }
 
