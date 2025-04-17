@@ -39,7 +39,20 @@ public interface OAuthApi {
                                             }
                                         }
                                     """),
-                            @ExampleObject(name = "기존 회원가입된 사용자(웹)", value = """
+                            @ExampleObject(name = "기존 회원가입되지 않은 사용자(모바일)",  description = "추가 정보 입력(회원가입) 후 토큰 갱신 필요", value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다.",
+                                            "data": {
+                                                "token": {
+                                                    "accessToken": "xxxxx.xxxxx.xxxxx",
+                                                    "refreshToken": "xxxxx.xxxxx.xxxxx"
+                                                },
+                                                "shouldSignup": true
+                                            }
+                                        }
+                                    """),
+                            @ExampleObject(name = "기존 회원가입된 사용자(웹)", description = "웹은 refresh token이 쿠키로 전달", value = """
                                         {
                                              "code": 200,
                                              "message": "요청이 성공하였습니다.",
@@ -51,15 +64,17 @@ public interface OAuthApi {
                                              }
                                          }
                                     """),
-                            @ExampleObject(name = "첫 로그인 사용자", value = """
+                            @ExampleObject(name = "기존 회원가입되지 않은 사용자(웹)", description = "추가 정보 입력(회원가입) 후 토큰 갱신 필요 / 웹은 refresh token이 쿠키로 전달", value = """
                                         {
                                              "code": 200,
                                              "message": "요청이 성공하였습니다.",
                                              "data": {
-                                                 "token": null,
+                                                 "token": {
+                                                     "accessToken": "xxxxx.xxxxx.xxxxx"
+                                                 },
                                                  "shouldSignup": true
                                              }
-                                        }
+                                         }
                                     """)
                     })),
             @ApiResponse(responseCode = "400", description = "유효성 검사 실패",
