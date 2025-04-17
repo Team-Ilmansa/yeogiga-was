@@ -6,6 +6,7 @@ import kr.co.yeogiga.application.image.service.ImageUploadProcessor;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.presentation.image.api.ImageApi;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +31,7 @@ public class ImageController implements ImageApi {
     public ResponseEntity<?> uploadImages(@RequestPart(value = "images", required = false) List<MultipartFile> images,
                                           @PathVariable Long tripId) {
         imageUploadProcessor.process(images, tripId);
-        return ResponseEntity.ok(SuccessResponse.ok());
+        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.ok());
     }
 
     @Override
