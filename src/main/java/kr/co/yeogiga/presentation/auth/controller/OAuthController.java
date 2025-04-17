@@ -28,9 +28,9 @@ public class OAuthController implements OAuthApi {
     private final OAuthManagementService oAuthManagementService;
 
     @PostMapping("/sign-in/{platform}")
-    public ResponseEntity<?> signUp(
+    public ResponseEntity<?> signIn(
             @RequestHeader(value = "device") Device device,
-            @PathVariable OAuthPlatform platform,
+            @PathVariable(name = "platform") OAuthPlatform platform,
             @Valid @RequestBody SignInDto.OAuthRequest request) {
         return createSignInResponse(device, oAuthManagementService.signIn(platform, request.code()));
     }

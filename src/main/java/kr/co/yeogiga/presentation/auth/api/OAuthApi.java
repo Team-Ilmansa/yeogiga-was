@@ -95,5 +95,5 @@ public interface OAuthApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> signUp(@RequestHeader(value = "device") Device device, @PathVariable OAuthPlatform platform, @Valid @RequestBody SignInDto.OAuthRequest request);
+    ResponseEntity<?> signIn(@RequestHeader(value = "device") Device device, @PathVariable(name = "platform") OAuthPlatform platform, @Valid @RequestBody SignInDto.OAuthRequest request);
 }
