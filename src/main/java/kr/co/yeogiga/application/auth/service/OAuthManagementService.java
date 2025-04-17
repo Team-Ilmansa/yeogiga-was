@@ -15,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
-
 @Service
 @RequiredArgsConstructor
 public class OAuthManagementService {
@@ -41,7 +39,7 @@ public class OAuthManagementService {
 
         UserStatusDto userStatus = getUserStatus(platform, userInfo);
 
-        return getSignInDto(userStatus);
+        return getSignInResponse(userStatus);
     }
 
     /**
@@ -70,7 +68,7 @@ public class OAuthManagementService {
     private User registerUser(OAuthPlatform platform, UserInfoDto userInfo) {
         User user = User.builder()
                 .email(userInfo.email())
-                .role(Role.USER)
+                .role(Role.GUEST)
                 .username(platform + " " + userInfo.platformId())
                 .nickname(platform + " " + userInfo.platformId())
                 .build();
@@ -92,23 +90,18 @@ public class OAuthManagementService {
      * @param userStatus    User, 추가 정보 입력 여부
      * @return              로그인 응답 정보 (JWT, 추가 정보 입력 필요 여부)
      */
-    private SignInDto.Response getSignInDto(UserStatusDto userStatus) {
-        if (!userStatus.shouldSignUp()) {
-            User user = userStatus.user();
-            String username = user.getUsername();
-            String nickname = user.getNickname();
-            Long userId = user.getId();
+    private SignInDto.Response getSignInResponse(UserStatusDto userStatus) {
+        User user = userStatus.user();
+        String username = user.getUsername();
+        String nickname = user.getNickname();
+        Long userId = user.getId();
 
-            TokenDto token = jwtService.generateToken(username, nickname, userId);
-
-            return SignInDto.Response.builder()
-                    .token(token)
-                    .shouldSignup(userStatus.shouldSignUp())
-                    .build();
-        }
+        TokenDto token = jwtService.generateToken(username, nickname, userId);
 
         return SignInDto.Response.builder()
+                .token(token)
                 .shouldSignup(userStatus.shouldSignUp())
                 .build();
+
     }
 }
