@@ -26,7 +26,7 @@ public interface OAuthApi {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그인 성공",
                     content = @Content(mediaType = "application/json", examples = {
-                            @ExampleObject(name = "기존 회원가입된 사용자", value = """
+                            @ExampleObject(name = "기존 회원가입된 사용자(모바일)", value = """
                                         {
                                             "code": 200,
                                             "message": "요청이 성공하였습니다.",
@@ -38,6 +38,18 @@ public interface OAuthApi {
                                                 "shouldSignup": false
                                             }
                                         }
+                                    """),
+                            @ExampleObject(name = "기존 회원가입된 사용자(웹)", value = """
+                                        {
+                                             "code": 200,
+                                             "message": "요청이 성공하였습니다.",
+                                             "data": {
+                                                 "token": {
+                                                     "accessToken": "xxxxx.xxxxx.xxxxx"
+                                                 },
+                                                 "shouldSignup": false
+                                             }
+                                         }
                                     """),
                             @ExampleObject(name = "첫 로그인 사용자", value = """
                                         {
