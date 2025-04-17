@@ -37,6 +37,11 @@ public class OAuthController implements OAuthApi {
     }
 
     private ResponseEntity<?> createSignInResponse(Device device, SignInDto.Response response) {
+
+        if (response.shouldSignup()) {
+            return ResponseEntity.ok(response);
+        }
+
         return switch(device) {
             case MOBILE -> ResponseEntity.ok(SuccessResponse.from(response));
             case WEB -> ResponseEntity.ok()
@@ -46,7 +51,7 @@ public class OAuthController implements OAuthApi {
                                         response.token().refreshToken(),
                                         Duration.ofDays(7).toSeconds()
                                     ).toString()
-                    ).body(SuccessResponse.from(SignInDto.ResponseToWeb.from(response)));
+                    ).body(SuccessResponse.from(SignInDto.ResponseForWeb.from(response)));
         };
     }
 }
