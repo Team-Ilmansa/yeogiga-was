@@ -68,6 +68,7 @@ public class OAuthManagementService {
                 .email(userInfo.email())
                 .role(Role.USER)
                 .username(platform + " " + userInfo.platformId())
+                .nickname(platform + " " + userInfo.platformId())
                 .build();
 
         OAuth oauth = OAuth.builder()
