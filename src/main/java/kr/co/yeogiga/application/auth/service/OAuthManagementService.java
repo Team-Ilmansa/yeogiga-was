@@ -4,7 +4,6 @@ import kr.co.yeogiga.application.auth.dto.SignInDto;
 import kr.co.yeogiga.application.auth.dto.TokenDto;
 import kr.co.yeogiga.application.auth.dto.UserInfoDto;
 import kr.co.yeogiga.application.auth.dto.UserStatusDto;
-import kr.co.yeogiga.common.jwt.JwtHelper;
 import kr.co.yeogiga.domain.oauth.entity.OAuth;
 import kr.co.yeogiga.domain.oauth.service.OAuthService;
 import kr.co.yeogiga.domain.oauth.type.OAuthPlatform;
@@ -21,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OAuthManagementService {
     private final OAuthClientFactory oAuthClientFactory;
     private final OAuthService oAuthService;
-    private final JwtHelper jwtHelper;
+    private final JwtService jwtService;
     private final UserService userService;
 
     /**
@@ -95,11 +94,10 @@ public class OAuthManagementService {
             String nickname = user.getNickname();
             Long userId = user.getId();
 
-            String accessToken = jwtHelper.generateAccessToken(username, nickname, userId);
-            String refreshToken = jwtHelper.generateRefreshToken(username, nickname, userId);
+            TokenDto token = jwtService.generateToken(username, nickname, userId);
 
             return SignInDto.Response.builder()
-                    .token(TokenDto.of(accessToken, refreshToken))
+                    .token(TokenDto.of(token.accessToken(), token.refreshToken()))
                     .shouldSignup(userStatus.shouldSignUp())
                     .build();
         }
