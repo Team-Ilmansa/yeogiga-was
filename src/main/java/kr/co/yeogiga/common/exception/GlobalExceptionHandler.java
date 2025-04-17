@@ -10,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +39,14 @@ public class GlobalExceptionHandler {
                 .code(CommonErrorType.VALIDATION_ERROR.getCode())
                 .errors(errors)
                 .build());
+    }
+
+    /* Path Variable 예외 처리 */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    protected ResponseEntity<?> handleValidationException(final MethodArgumentTypeMismatchException e) {
+        log.error("[Error Occurred] {}", e.getMessage());
+        BaseErrorType error = CommonErrorType.PATH_VARIABLE_VALIDATION_ERROR;
+        return ResponseEntity.status(error.getHttpStatus()).body(ErrorResponse.from(error));
     }
 
     /* 일반 예외 처리 */

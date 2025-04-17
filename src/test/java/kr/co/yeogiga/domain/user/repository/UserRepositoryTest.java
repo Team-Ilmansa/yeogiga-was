@@ -54,6 +54,7 @@ public class UserRepositoryTest {
         // given
         User relatedUser = User.builder()
                 .email("fromPlatformt@test.com")
+                .username("fromPlatform")
                 .nickname("tempNickname")
                 .role(Role.USER)
                 .build();

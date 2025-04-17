@@ -42,3 +42,11 @@ oauth2:
     redirect-uri: ${KAKAO_REDIRECT_URI}
     token-uri: ${KAKAO_TOKEN_URI}
     user-info-uri: ${KAKAO_USER_INFO_URI}
+
+--- # jwt
+jwt:
+  secret-key: ${JWT_KEY:exampleSecretKeyForIlmansaSystemAccessSecretKeyTestForPadding}
+  issuer: ${JWT_ISSUER:ilmansa}
+  expiration:
+    access-token: ${JWT_AT_EXPIRATION:1800000}
+    refresh-token: ${JWT_RT_EXPIRATION:86400000}

@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -23,6 +24,7 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String username;
 
     private String password;
@@ -32,6 +34,10 @@ public class User extends BaseTimeEntity {
 
     @Column(nullable = false)
     private String nickname;
+
+    @ColumnDefault("false")
+    @Column(name = "signed_up", nullable = false)
+    private boolean signedUp;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
