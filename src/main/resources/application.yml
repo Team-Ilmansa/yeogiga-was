@@ -3,6 +3,7 @@ spring:
     active: ${PROFILE:dev}
 
 --- # servlet multipart
+spring:
   servlet:
     multipart:
       max-file-size: 20MB
