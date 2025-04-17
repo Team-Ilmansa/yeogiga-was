@@ -10,10 +10,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.co.yeogiga.application.auth.dto.SignInDto;
+import kr.co.yeogiga.application.auth.type.Device;
 import kr.co.yeogiga.domain.oauth.type.OAuthPlatform;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @ApiGroup(value = "[OAuth2 인증 API]")
 @Tag(name = "[OAuth2 인증 API]", description = "OAuth2 인증 관련 API")
@@ -66,5 +68,5 @@ public interface OAuthApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> signUp(@PathVariable OAuthPlatform platform, @Valid @RequestBody SignInDto.OAuthRequest request);
+    ResponseEntity<?> signUp(@RequestHeader(value = "device") Device device, @PathVariable OAuthPlatform platform, @Valid @RequestBody SignInDto.OAuthRequest request);
 }
