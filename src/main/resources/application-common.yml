@@ -12,3 +12,12 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+
+  data:
+    mongodb:
+      host: ${MONGODB_HOST:localhost}
+      port: ${MONGODB_PORT:27017}
+      authentication-database: ${MONGODB_AUTH_DB:admin}
+      database: ${MONGODB_DATABASE:test}
+      username: ${MONGODB_USERNAME:root}
+      password: ${MONGODB_PASSWORD:password}
