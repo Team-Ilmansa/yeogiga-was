@@ -8,9 +8,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity(name = "oauth")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity(name = "oauth")
 public class OAuth {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
