@@ -1,16 +1,13 @@
 package kr.co.yeogiga.domain.tripplace.entity;
 
 import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Place {
     private String id;
     private String name;
