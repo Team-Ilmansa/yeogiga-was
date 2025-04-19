@@ -12,7 +12,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Document(collation = "trip_day_place")
+@Document(collection = "trip_day_place")
 public class TripDayPlace {
     @Id
     private String id;
