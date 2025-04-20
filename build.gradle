@@ -60,8 +60,9 @@ dependencies {
     /* MongoDB */
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
-//    implementation 'org.springframework.boot:spring-boot-starter-security'
-//    testImplementation 'org.springframework.security:spring-security-test'
+    /* Spring Security */
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
 }
 
 tasks.named('test') {
