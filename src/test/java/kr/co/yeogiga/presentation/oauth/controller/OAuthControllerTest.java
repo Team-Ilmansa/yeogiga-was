@@ -9,7 +9,6 @@ import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.domain.oauth.type.OAuthPlatform;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
 import kr.co.yeogiga.presentation.auth.controller.OAuthController;
-import kr.co.yeogiga.presentation.image.controller.ImageController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
