@@ -29,7 +29,6 @@ public class NaverClient extends OAuthClient {
                 .queryParam("client_id", properties.getClientId())
                 .queryParam("client_secret", properties.getClientSecret())
                 .queryParam("code", code)
-                .queryParam("state", "flase")
                 .toUriString();
 
         HttpEntity<String> request = new HttpEntity<>(new HttpHeaders());
