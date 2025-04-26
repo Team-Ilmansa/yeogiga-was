@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.co.yeogiga.common.response.error.ErrorResponse;
 import kr.co.yeogiga.common.response.error.type.BaseErrorType;
-import kr.co.yeogiga.common.response.error.type.CommonErrorType;
+import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,13 +31,13 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) {
-            setJwtExceptionResponse(response, CommonErrorType.TOKEN_EXPIRED);
+            setJwtExceptionResponse(response, AuthErrorType.TOKEN_EXPIRED);
         } catch (MalformedJwtException e) {
-            setJwtExceptionResponse(response, CommonErrorType.INVALID_TOKEN);
+            setJwtExceptionResponse(response, AuthErrorType.INVALID_TOKEN);
         } catch (SignatureException e) {
-            setJwtExceptionResponse(response, CommonErrorType.INVALID_TOKEN_SIGNATURE);
+            setJwtExceptionResponse(response, AuthErrorType.INVALID_TOKEN_SIGNATURE);
         } catch (JwtException e) {
-            setJwtExceptionResponse(response, CommonErrorType.UNKNOWN_TOKEN_ERROR);
+            setJwtExceptionResponse(response, AuthErrorType.UNKNOWN_TOKEN_ERROR);
         }
     }
 
