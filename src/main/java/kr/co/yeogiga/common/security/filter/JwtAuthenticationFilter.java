@@ -39,10 +39,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * 토큰 유효성 검사 메서드
+     *
+     * @param authToken     사용자가 보낸 토큰
+     * @return              토큰 유효 여부
+     */
     private boolean isValidToken(String authToken) {
         return authToken != null && authToken.startsWith(TOKEN_TYPE);
     }
 
+    /**
+     * 토큰에서 추출한 사용자 정보를 통해 Authentication 구현체를 반환하는 메서드
+     *
+     * @param token         사용자가 보낸 토큰
+     * @return              Authentication 구현체 - UsernamePasswordAuthenticationToken
+     */
     private Authentication getAuthentication(String token) {
         Long userId = jwtService.extractUserId(token);
 

@@ -41,6 +41,12 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * 예외 발생 시 응답값 설정 메서드
+     *
+     * @param response          HttpServletResponse
+     * @param errorType         발생한 에러 타입
+     */
     private void setJwtExceptionResponse(HttpServletResponse response, BaseErrorType errorType) throws IOException {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
