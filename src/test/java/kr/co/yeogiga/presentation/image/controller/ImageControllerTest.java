@@ -4,14 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.image.dto.ImageUrlDto;
 import kr.co.yeogiga.application.image.service.ImageDeleteProcessor;
 import kr.co.yeogiga.application.image.service.ImageUploadProcessor;
+import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
+import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -25,7 +30,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ImageController.class)
+@WebMvcTest(
+        controllers = ImageController.class,
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {SecurityConfig.class, JwtAuthenticationFilter.class})
+        }
+)
 public class ImageControllerTest {
 
     @Autowired

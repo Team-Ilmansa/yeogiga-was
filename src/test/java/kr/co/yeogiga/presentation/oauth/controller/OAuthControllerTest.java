@@ -5,14 +5,19 @@ import kr.co.yeogiga.application.auth.dto.SignInDto;
 import kr.co.yeogiga.application.auth.dto.TokenDto;
 import kr.co.yeogiga.application.auth.service.OAuthManagementService;
 import kr.co.yeogiga.application.auth.type.Device;
+import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.domain.oauth.type.OAuthPlatform;
+import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
 import kr.co.yeogiga.presentation.auth.controller.OAuthController;
+import kr.co.yeogiga.presentation.image.controller.ImageController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -27,7 +32,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(OAuthController.class)
+@WebMvcTest(
+        controllers = OAuthController.class,
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {SecurityConfig.class, JwtAuthenticationFilter.class})
+        }
+)
 public class OAuthControllerTest {
 
     @Autowired
