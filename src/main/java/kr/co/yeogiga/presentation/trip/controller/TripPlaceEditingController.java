@@ -3,6 +3,7 @@ package kr.co.yeogiga.presentation.trip.controller;
 import kr.co.yeogiga.application.trip.dto.TripPlaceDto;
 import kr.co.yeogiga.application.trip.service.TripPlaceEditingService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
+import kr.co.yeogiga.presentation.trip.api.TripPlaceEditingApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,9 +20,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/trip")
 @RequiredArgsConstructor
-public class TripPlaceEditingController {
+public class TripPlaceEditingController implements TripPlaceEditingApi {
     private final TripPlaceEditingService tripPlaceEditingService;
 
+    @Override
     @PostMapping("/{tripId}/days/{day}/places")
     public ResponseEntity<?> addPlace(@PathVariable Long tripId,
                                       @PathVariable int day,
@@ -31,7 +33,7 @@ public class TripPlaceEditingController {
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
-
+    @Override
     @GetMapping("/{tripId}/days/{day}/places")
     public ResponseEntity<?> getPlaces(@PathVariable Long tripId, @PathVariable int day) {
         return ResponseEntity.ok(
@@ -39,6 +41,7 @@ public class TripPlaceEditingController {
         );
     }
 
+    @Override
     @PutMapping("/{tripId}/days/{day}/places")
     public ResponseEntity<?> updatePlaces(@PathVariable Long tripId,
                                           @PathVariable int day,
@@ -48,6 +51,7 @@ public class TripPlaceEditingController {
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
+    @Override
     @DeleteMapping("/{tripId}/days/{day}/places/{placeId}")
     public ResponseEntity<?> deletePlace(@PathVariable Long tripId,
                                          @PathVariable int day,
