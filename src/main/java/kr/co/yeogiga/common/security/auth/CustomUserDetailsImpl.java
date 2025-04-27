@@ -21,6 +21,11 @@ public class CustomUserDetailsImpl implements CustomUserDetails {
     }
 
     @Override
+    public Long getUserId() {
+        return user.getId();
+    }
+
+    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(user.getRole().name()));
@@ -29,7 +34,7 @@ public class CustomUserDetailsImpl implements CustomUserDetails {
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return null;
     }
 
     @Override
