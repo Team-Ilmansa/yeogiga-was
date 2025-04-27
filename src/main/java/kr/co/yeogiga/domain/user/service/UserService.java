@@ -16,4 +16,8 @@ public class UserService {
     public Optional<User> readByPlatformAndPlatformId(OAuthPlatform platform, String platformId) {
         return userRepository.findByPlatformAndPlatformId(platform, platformId);
     }
+
+    public Optional<User> readById(Long id) {
+        return userRepository.findById(id);
+    }
 }

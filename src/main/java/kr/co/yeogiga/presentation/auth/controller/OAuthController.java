@@ -1,7 +1,6 @@
 package kr.co.yeogiga.presentation.auth.controller;
 
 import jakarta.validation.Valid;
-import kr.co.yeogiga.application.auth.constant.AuthConstants;
 import kr.co.yeogiga.application.auth.dto.SignInDto;
 import kr.co.yeogiga.application.auth.service.OAuthManagementService;
 import kr.co.yeogiga.application.auth.type.Device;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
+import static kr.co.yeogiga.application.auth.constant.AuthConstants.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,7 +40,7 @@ public class OAuthController implements OAuthApi {
             case MOBILE -> ResponseEntity.ok(SuccessResponse.from(response));
             case WEB -> ResponseEntity.ok()
                         .header(HttpHeaders.SET_COOKIE, CookieUtil.createCookie(
-                                AuthConstants.REFRESH_TOKEN_PREFIX.getValue(),
+                                REFRESH_TOKEN_PREFIX,
                                 response.token().refreshToken(),
                                 Duration.ofDays(7).toSeconds()).toString())
                         .body(SuccessResponse.from(response.toWebResponse()));

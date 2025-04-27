@@ -1,13 +1,8 @@
 package kr.co.yeogiga.application.auth.constant;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+public final class AuthConstants {
+    private AuthConstants() { }
 
-@Getter
-@RequiredArgsConstructor
-public enum AuthConstants {
-    REFRESH_TOKEN_PREFIX("refreshToken");
-
-    private final String value;
-
+    public static final String TOKEN_TYPE = "Bearer";
+    public static final String REFRESH_TOKEN_PREFIX = "refreshToken";
 }

@@ -15,4 +15,9 @@ public class JwtService {
                 jwtHelper.generateAccessToken(username, nickname, userId),
                 jwtHelper.generateRefreshToken(username, nickname, userId));
     }
+
+    public Long extractUserId(String token) {
+        return jwtHelper.parseClaims(token)
+                .userId();
+    }
 }
