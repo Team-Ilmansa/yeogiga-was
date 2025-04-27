@@ -5,7 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.co.yeogiga.application.auth.service.JwtService;
-import kr.co.yeogiga.common.jwt.JwtHelper;
+import kr.co.yeogiga.common.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (isValidToken(authToken)) {
-            String accessToken = JwtHelper.resolveToken(authToken);
+            String accessToken = JwtUtil.resolveToken(authToken);
             Authentication authentication = getAuthentication(accessToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
