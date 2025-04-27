@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 public enum TripErrorType implements BaseErrorType {
 
     INVALID_PLACE(HttpStatus.BAD_REQUEST, "T001", "지원하지 않는 카테고리입니다."),
+    ALREADY_ADDED_PLACE(HttpStatus.CONFLICT, "T002", "이미 추가된 장소입니다."),
     ;
 
     private final HttpStatus httpStatus;
