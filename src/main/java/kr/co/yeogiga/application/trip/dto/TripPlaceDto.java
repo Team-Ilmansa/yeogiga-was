@@ -37,7 +37,9 @@ public class TripPlaceDto {
             String placeCategory
     ) { }
 
+    @Schema(name = "TripPlaceDto.CompleteRequest", description = "여행 목적지 선택 완료 요청 DTO")
     public record CompleteRequest(
+            @Schema(description = "편집 완료된 마지막 일차", example = "5")
             int lastDay
     ) { }
 }
