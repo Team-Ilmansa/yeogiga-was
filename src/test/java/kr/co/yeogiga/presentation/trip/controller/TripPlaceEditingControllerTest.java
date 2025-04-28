@@ -165,7 +165,7 @@ public class TripPlaceEditingControllerTest {
     void getPlacesSuccess() throws Exception {
         // given
         List<TripPlaceDto.StoredFormat> mockPlaces = List.of(
-                new TripPlaceDto.StoredFormat("place-id", "목적지1", 33.123, 126.456, PlaceCategory.CAFE)
+                new TripPlaceDto.StoredFormat("place-id", "목적지1", 33.123, 126.456, PlaceCategory.CAFE.getGroupName())
         );
         given(tripPlaceEditingService.getPlaces(tripId, day)).willReturn(mockPlaces);
 
@@ -179,6 +179,6 @@ public class TripPlaceEditingControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].name").value("목적지1"))
-                .andExpect(jsonPath("$.data[0].placeCategory").value("CAFE"));
+                .andExpect(jsonPath("$.data[0].placeCategory").value("식당"));
     }
 }

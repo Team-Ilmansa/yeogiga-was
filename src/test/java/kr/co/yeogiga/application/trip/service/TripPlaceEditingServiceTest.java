@@ -83,12 +83,13 @@ public class TripPlaceEditingServiceTest {
     class DeletePlaceTest {
 
         private final String placeId = "place-id";
+
         @Test
         @DisplayName("목적지 삭제 성공")
         void deletePlaceInEditingSuccess() {
             // given
             TripPlaceDto.StoredFormat place = new TripPlaceDto.StoredFormat(
-                    placeId, "목적지1", 33.123, 126.456, PlaceCategory.RESTAURANT
+                    placeId, "목적지1", 33.123, 126.456, PlaceCategory.RESTAURANT.getGroupName()
             );
 
             given(redisRepository.getList(anyString(), eq(TripPlaceDto.StoredFormat.class)))
@@ -143,7 +144,7 @@ public class TripPlaceEditingServiceTest {
     void getPlacesInEditingSuccess() {
         // given
         List<TripPlaceDto.StoredFormat> mockPlaces = List.of(
-                new TripPlaceDto.StoredFormat("place-id", "목적지1", 33.123, 126.456, PlaceCategory.CAFE)
+                new TripPlaceDto.StoredFormat("place-id", "목적지1", 33.123, 126.456, PlaceCategory.CAFE.getGroupName())
         );
 
         given(redisRepository.getList(anyString(), eq(TripPlaceDto.StoredFormat.class))).willReturn(mockPlaces);
@@ -154,6 +155,6 @@ public class TripPlaceEditingServiceTest {
         // then
         assertEquals(1, result.size());
         assertEquals("목적지1", result.get(0).name());
-        assertEquals(PlaceCategory.CAFE, result.get(0).placeCategory());
+        assertEquals(PlaceCategory.CAFE.getGroupName(), result.get(0).placeCategory());
     }
 }
