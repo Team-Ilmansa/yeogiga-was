@@ -31,7 +31,7 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
                                       @RequestBody TripPlaceDto.Request request) {
 
         tripPlaceEditingService.addPlace(tripId, day, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.ok());
+        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
     @Override

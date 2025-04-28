@@ -25,6 +25,6 @@ public class TripPlaceSavingController implements TripPlaceSavingApi {
                                           @RequestBody TripPlaceDto.CompleteRequest request) {
 
         tripPlaceSavingService.completeTrip(tripId, request.lastDay());
-        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.ok());
+        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 }
