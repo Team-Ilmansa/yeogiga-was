@@ -54,7 +54,7 @@ public class TripPlaceEditingServiceTest {
             given(redisRepository.existsInSet(eq(setKey), anyString())).willReturn(false);
 
             // when
-            tripPlaceEditingService.addPlaceInEditing(tripId, day, place);
+            tripPlaceEditingService.addPlace(tripId, day, place);
 
             // then
             verify(redisRepository, times(1)).setList(anyString(), any(TripPlaceDto.StoredFormat.class));
@@ -70,7 +70,7 @@ public class TripPlaceEditingServiceTest {
 
             // when
             CustomException exception = assertThrows(CustomException.class, () ->
-                    tripPlaceEditingService.addPlaceInEditing(tripId, day, place)
+                    tripPlaceEditingService.addPlace(tripId, day, place)
             );
 
             // then
@@ -95,7 +95,7 @@ public class TripPlaceEditingServiceTest {
                     .willReturn(List.of(place));
 
             // when
-            tripPlaceEditingService.deletePlaceInEditing(tripId, day, placeId);
+            tripPlaceEditingService.deletePlace(tripId, day, placeId);
 
             // then
             verify(redisRepository, times(1)).removeFromList(anyString(), eq(place));
@@ -110,7 +110,7 @@ public class TripPlaceEditingServiceTest {
                     .willReturn(List.of());
 
             // when
-            assertDoesNotThrow(() -> tripPlaceEditingService.deletePlaceInEditing(tripId, day, placeId));
+            assertDoesNotThrow(() -> tripPlaceEditingService.deletePlace(tripId, day, placeId));
 
             // then
             verify(redisRepository, never()).removeFromList(anyString(), any());
@@ -130,7 +130,7 @@ public class TripPlaceEditingServiceTest {
         List<TripPlaceDto.Request> newPlaces = List.of(place2, place1);
 
         // when
-        tripPlaceEditingService.updatePlacesInEditing(tripId, day, newPlaces);
+        tripPlaceEditingService.updatePlaces(tripId, day, newPlaces);
 
         // then
         verify(redisRepository, times(2)).del(anyString());
@@ -149,7 +149,7 @@ public class TripPlaceEditingServiceTest {
         given(redisRepository.getList(anyString(), eq(TripPlaceDto.StoredFormat.class))).willReturn(mockPlaces);
 
         // when
-        List<TripPlaceDto.StoredFormat> result = tripPlaceEditingService.getPlacesInEditing(tripId, day);
+        List<TripPlaceDto.StoredFormat> result = tripPlaceEditingService.getPlaces(tripId, day);
 
         // then
         assertEquals(1, result.size());

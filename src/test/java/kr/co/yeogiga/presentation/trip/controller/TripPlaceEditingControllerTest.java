@@ -78,7 +78,7 @@ public class TripPlaceEditingControllerTest {
         @DisplayName("성공")
         void addPlaceSuccess() throws Exception {
             // given
-            doNothing().when(tripPlaceEditingService).addPlaceInEditing(anyLong(), anyInt(), any());
+            doNothing().when(tripPlaceEditingService).addPlace(anyLong(), anyInt(), any());
 
             // when
             ResultActions resultActions = mockMvc.perform(
@@ -90,7 +90,7 @@ public class TripPlaceEditingControllerTest {
             // then
             resultActions
                     .andDo(print())
-                    .andExpect(status().isOk())
+                    .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
         }
 
@@ -99,7 +99,7 @@ public class TripPlaceEditingControllerTest {
         void addPlaceFailAlreadyAdded() throws Exception {
             // given
             doThrow(new CustomException(TripErrorType.ALREADY_ADDED_PLACE))
-                    .when(tripPlaceEditingService).addPlaceInEditing(anyLong(), anyInt(), any());
+                    .when(tripPlaceEditingService).addPlace(anyLong(), anyInt(), any());
 
             // when
             ResultActions resultActions = mockMvc.perform(
@@ -126,7 +126,7 @@ public class TripPlaceEditingControllerTest {
                 new TripPlaceDto.Request("목적지2", 33.1234, 126.5678, "카페")
         );
 
-        doNothing().when(tripPlaceEditingService).updatePlacesInEditing(anyLong(), anyInt(), Mockito.anyList());
+        doNothing().when(tripPlaceEditingService).updatePlaces(anyLong(), anyInt(), Mockito.anyList());
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -146,7 +146,7 @@ public class TripPlaceEditingControllerTest {
     @DisplayName("목적지 삭제 성공")
     void deletePlaceSuccess() throws Exception {
         // given
-        doNothing().when(tripPlaceEditingService).deletePlaceInEditing(anyLong(), anyInt(), Mockito.anyString());
+        doNothing().when(tripPlaceEditingService).deletePlace(anyLong(), anyInt(), Mockito.anyString());
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -167,7 +167,7 @@ public class TripPlaceEditingControllerTest {
         List<TripPlaceDto.StoredFormat> mockPlaces = List.of(
                 new TripPlaceDto.StoredFormat("place-id", "목적지1", 33.123, 126.456, PlaceCategory.CAFE)
         );
-        given(tripPlaceEditingService.getPlacesInEditing(tripId, day)).willReturn(mockPlaces);
+        given(tripPlaceEditingService.getPlaces(tripId, day)).willReturn(mockPlaces);
 
         // when
         ResultActions resultActions = mockMvc.perform(
