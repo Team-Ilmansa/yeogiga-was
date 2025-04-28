@@ -21,6 +21,7 @@ public class OAuthManagementService {
     private final OAuthClientFactory oAuthClientFactory;
     private final OAuthService oAuthService;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
     private final UserService userService;
 
     /**
@@ -86,6 +87,7 @@ public class OAuthManagementService {
 
     /**
      * 로그인 요청 응답 DTO 생성 메서드
+     * - 토큰 생성 시, 리프레시 토큰 저장
      *
      * @param userStatus    User, 추가 정보 입력 여부
      * @return              로그인 응답 정보 (JWT, 추가 정보 입력 필요 여부)
@@ -97,6 +99,7 @@ public class OAuthManagementService {
         Long userId = user.getId();
 
         TokenDto token = jwtService.generateToken(username, nickname, userId);
+        refreshTokenService.save(userId, token.refreshToken());
 
         return SignInDto.Response.builder()
                 .token(token)
