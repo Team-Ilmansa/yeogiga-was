@@ -27,7 +27,7 @@ public class TripPlaceEditingService {
      * @param day    : 여행 일차 (1일차, 2일차 등)
      * @return : 저장된 TripPlaceDto.StoredFormat 리스트
      */
-    public List<TripPlaceDto.StoredFormat> getPlacesInEditing(Long tripId, int day) {
+    public List<TripPlaceDto.StoredFormat> getPlaces(Long tripId, int day) {
         String listKey = PlaceConstant.listKey(tripId, day);
         return redisRepository.getList(listKey, TripPlaceDto.StoredFormat.class);
     }
@@ -42,7 +42,7 @@ public class TripPlaceEditingService {
      * @param place  : 추가할 TripPlaceDto.Request 객체
      * @throws CustomException ALREADY_ADDED_PLACE : 이미 목적지를 추가한 경우
      */
-    public void addPlaceInEditing(Long tripId, int day, TripPlaceDto.Request place) {
+    public void addPlace(Long tripId, int day, TripPlaceDto.Request place) {
         String listKey = PlaceConstant.listKey(tripId, day);
         String setKey = PlaceConstant.setKey(tripId, day);
 
@@ -64,7 +64,7 @@ public class TripPlaceEditingService {
      * @param day     : 여행 일차
      * @param placeId : 삭제할 목적지 ID
      */
-    public void deletePlaceInEditing(Long tripId, int day, String placeId) {
+    public void deletePlace(Long tripId, int day, String placeId) {
         String listKey = PlaceConstant.listKey(tripId, day);
         String setKey = PlaceConstant.setKey(tripId, day);
 
@@ -94,7 +94,7 @@ public class TripPlaceEditingService {
      * @param day    : 여행 일차
      * @param places : 새로운 순서의 TripPlaceDto.Request 리스트
      */
-    public void updatePlacesInEditing(Long tripId, int day, List<TripPlaceDto.Request> places) {
+    public void updatePlaces(Long tripId, int day, List<TripPlaceDto.Request> places) {
         String listKey = PlaceConstant.listKey(tripId, day);
         String setKey = PlaceConstant.setKey(tripId, day);
 

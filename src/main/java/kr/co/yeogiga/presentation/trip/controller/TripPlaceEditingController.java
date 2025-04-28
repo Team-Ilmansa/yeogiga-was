@@ -30,7 +30,7 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
                                       @PathVariable int day,
                                       @RequestBody TripPlaceDto.Request request) {
 
-        tripPlaceEditingService.addPlaceInEditing(tripId, day, request);
+        tripPlaceEditingService.addPlace(tripId, day, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.ok());
     }
 
@@ -38,7 +38,7 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
     @GetMapping("/{tripId}/days/{day}/places")
     public ResponseEntity<?> getPlaces(@PathVariable Long tripId, @PathVariable int day) {
         return ResponseEntity.ok(
-                SuccessResponse.from(tripPlaceEditingService.getPlacesInEditing(tripId, day))
+                SuccessResponse.from(tripPlaceEditingService.getPlaces(tripId, day))
         );
     }
 
@@ -48,7 +48,7 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
                                           @PathVariable int day,
                                           @RequestBody List<TripPlaceDto.Request> requests) {
 
-        tripPlaceEditingService.updatePlacesInEditing(tripId, day, requests);
+        tripPlaceEditingService.updatePlaces(tripId, day, requests);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
@@ -58,7 +58,7 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
                                          @PathVariable int day,
                                          @PathVariable String placeId) {
 
-        tripPlaceEditingService.deletePlaceInEditing(tripId, day, placeId);
+        tripPlaceEditingService.deletePlace(tripId, day, placeId);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 }
