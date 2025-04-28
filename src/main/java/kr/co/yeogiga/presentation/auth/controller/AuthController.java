@@ -7,6 +7,7 @@ import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.util.CookieUtil;
 import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
+import kr.co.yeogiga.presentation.auth.api.AuthApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ import static kr.co.yeogiga.application.auth.constant.AuthConstants.REFRESH_TOKE
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
-public class AuthController {
+public class AuthController implements AuthApi {
     private final AuthService authService;
 
     @GetMapping("/reissue")
