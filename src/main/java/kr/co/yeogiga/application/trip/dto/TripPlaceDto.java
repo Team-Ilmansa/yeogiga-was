@@ -24,7 +24,7 @@ public class TripPlaceDto {
                     name,
                     latitude,
                     longitude,
-                    PlaceCategory.fromLabel(placeType)
+                    PlaceCategory.fromLabel(placeType).getGroupName()
             );
         }
     }
@@ -34,6 +34,6 @@ public class TripPlaceDto {
             String name,
             double latitude,
             double longitude,
-            PlaceCategory placeCategory
+            String placeCategory
     ) { }
 }
