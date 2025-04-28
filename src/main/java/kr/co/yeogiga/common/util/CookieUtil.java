@@ -12,4 +12,14 @@ public class CookieUtil {
                 .sameSite("None")
                 .build();
     }
+
+    public static ResponseCookie removeCookie(String key) {
+        return ResponseCookie.from(key, "")
+                .path("/")
+                .httpOnly(true)
+                .maxAge(0)
+                .secure(true)
+                .sameSite("None")
+                .build();
+    }
 }
