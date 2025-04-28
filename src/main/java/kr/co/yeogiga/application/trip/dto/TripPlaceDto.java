@@ -36,4 +36,8 @@ public class TripPlaceDto {
             double longitude,
             String placeCategory
     ) { }
+
+    public record CompleteRequest(
+            int lastDay
+    ) { }
 }
