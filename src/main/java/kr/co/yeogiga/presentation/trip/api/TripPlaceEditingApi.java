@@ -26,7 +26,7 @@ public interface TripPlaceEditingApi {
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(value = """
                                         {
-                                            "code": 200,
+                                            "code": 201,
                                             "message": "요청이 성공하였습니다."
                                         }
                                     """)

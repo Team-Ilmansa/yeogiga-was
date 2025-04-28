@@ -18,6 +18,13 @@ public record SuccessResponse<T>(
                 .build();
     }
 
+    public static SuccessResponse<?> created() {
+        return SuccessResponse.builder()
+                .code(HttpStatus.CREATED.value())
+                .message("요청이 성공하였습니다.")
+                .build();
+    }
+
     public static <T> SuccessResponse<?> from(T data) {
         return SuccessResponse.builder()
                 .code(HttpStatus.OK.value())
