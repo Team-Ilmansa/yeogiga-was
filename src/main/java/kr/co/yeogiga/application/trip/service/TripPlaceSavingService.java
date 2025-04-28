@@ -81,7 +81,7 @@ public class TripPlaceSavingService {
                 .latitude(stored.latitude())
                 .longitude(stored.longitude())
                 .placeType(stored.placeCategory())
-                .order(index * 10.0)
+                .order((index + 1) * 10.0)
                 .build();
     }
 }
