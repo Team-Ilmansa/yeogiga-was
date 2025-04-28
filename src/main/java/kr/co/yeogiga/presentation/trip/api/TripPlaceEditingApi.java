@@ -22,7 +22,7 @@ public interface TripPlaceEditingApi {
     @TrackApi(description = "목적지 추가")
     @Operation(summary = "목적지 추가", description = "목적지 추가하는 API입니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "목적지 추가 성공",
+            @ApiResponse(responseCode = "201", description = "목적지 추가 성공",
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(value = """
                                         {

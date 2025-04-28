@@ -5,6 +5,7 @@ import kr.co.yeogiga.application.trip.service.TripPlaceEditingService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.presentation.trip.api.TripPlaceEditingApi;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,7 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
                                       @RequestBody TripPlaceDto.Request request) {
 
         tripPlaceEditingService.addPlaceInEditing(tripId, day, request);
-        return ResponseEntity.ok(SuccessResponse.ok());
+        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.ok());
     }
 
     @Override
