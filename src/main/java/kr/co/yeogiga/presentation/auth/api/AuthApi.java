@@ -40,23 +40,11 @@ public interface AuthApi {
                                                  "refreshToken": "xxxxx.xxxxx.xxxxx"
                                              }
                                         }
-                                    """),
-                            @ExampleObject(name = "기존 회원가입된 사용자(웹)", description = "웹은 refresh token이 쿠키로 전달", value = """
-                                        {
-                                             "code": 200,
-                                             "message": "요청이 성공하였습니다.",
-                                             "data": {
-                                                 "token": {
-                                                     "accessToken": "xxxxx.xxxxx.xxxxx"
-                                                 },
-                                                 "shouldSignup": false
-                                             }
-                                         }
                                     """)
                     })),
-            @ApiResponse(responseCode = "404", description = "쿠키에 리프레시 토큰이 없을 경우",
+            @ApiResponse(responseCode = "404", description = "리프레시 토큰이 없을 경우",
                     content = @Content(mediaType = "application/json", examples = {
-                            @ExampleObject(name = "쿠키 내 리프레시 토큰 미포함", value = """
+                            @ExampleObject(name = "리프레시 토큰 미포함", value = """
                                         {
                                              "code": "A009",
                                              "message": "리프레시 토큰을 찾을 수 없습니다."
@@ -71,8 +59,9 @@ public interface AuthApi {
                     }))
     })
     ResponseEntity<?> reissueToken(
-            @RequestHeader(value = "device") Device device,
-            @CookieValue(name = "refreshToken", required = false) String refreshToken
+            @RequestHeader(name = "device") Device device,
+            @RequestHeader(name = "refreshToken", required = false) String refreshTokenInHeader,
+            @CookieValue(name = "refreshToken", required = false) String refreshTokenInCookie
     );
 
     @TrackApi(description = "로그아웃")
@@ -97,6 +86,10 @@ public interface AuthApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> signOut(@CookieValue(name = "refreshToken", required = false) String refreshToken);
+    ResponseEntity<?> signOut(
+            @RequestHeader(name = "device") Device device,
+            @RequestHeader(name = "refreshToken", required = false) String refreshTokenInHeader,
+            @CookieValue(name = "refreshToken", required = false) String refreshTokenInCookie
+    );
 
 }

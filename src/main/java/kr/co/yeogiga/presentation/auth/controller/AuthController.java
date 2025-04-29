@@ -1,5 +1,6 @@
 package kr.co.yeogiga.presentation.auth.controller;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.yeogiga.application.auth.dto.TokenDto;
 import kr.co.yeogiga.application.auth.service.AuthService;
 import kr.co.yeogiga.application.auth.type.Device;
@@ -30,20 +31,33 @@ public class AuthController implements AuthApi {
 
     @GetMapping("/reissue")
     public ResponseEntity<?> reissueToken(
-            @RequestHeader(value = "device") Device device,
-            @CookieValue(name = "refreshToken", required = false) String refreshToken
+            @RequestHeader(name = "device") Device device,
+            @RequestHeader(name = "refreshToken", required = false) String refreshTokenInHeader,
+            @CookieValue(name = "refreshToken", required = false) String refreshTokenInCookie
     ) {
-        if (refreshToken == null) {
+        if ((device.equals(Device.WEB) && refreshTokenInCookie == null)
+            || (device.equals(Device.MOBILE) && refreshTokenInHeader == null)) {
             throw new CustomException(AuthErrorType.REFRESH_TOKEN_NOT_FOUND);
         }
 
-        return createReissueTokenResponse(device, authService.reissueToken(refreshToken));
+        return switch (device) {
+            case MOBILE -> createReissueTokenResponse(device, authService.reissueToken(refreshTokenInHeader));
+            case WEB -> createReissueTokenResponse(device, authService.reissueToken(refreshTokenInCookie));
+        };
     }
 
     @GetMapping("/sign-out")
-    public ResponseEntity<?> signOut(@CookieValue(name = "refreshToken", required = false) String refreshToken) {
-        if (refreshToken != null) {
-            authService.signOut(refreshToken);
+    public ResponseEntity<?> signOut(
+            @RequestHeader(name = "device") Device device,
+            @RequestHeader(name = "refreshToken", required = false) String refreshTokenInHeader,
+            @CookieValue(name = "refreshToken", required = false) String refreshTokenInCookie
+    ) {
+        if (device.equals(Device.WEB) && refreshTokenInCookie != null) {
+            authService.signOut(refreshTokenInCookie);
+        }
+
+        if (device.equals(Device.MOBILE) && refreshTokenInHeader != null) {
+            authService.signOut(refreshTokenInHeader);
         }
 
         return ResponseEntity.ok()
