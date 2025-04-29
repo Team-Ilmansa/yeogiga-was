@@ -26,12 +26,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(
-        controllers = TripPlaceSavingController.class,
+        controllers = TripPlaceController.class,
         excludeFilters = {
                 @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {SecurityConfig.class, JwtAuthenticationFilter.class})
         }
 )
-public class TripPlaceSavingControllerTest {
+public class TripPlaceControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

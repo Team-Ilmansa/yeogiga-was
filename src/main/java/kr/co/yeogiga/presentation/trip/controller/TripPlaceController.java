@@ -3,7 +3,7 @@ package kr.co.yeogiga.presentation.trip.controller;
 import kr.co.yeogiga.application.trip.dto.TripPlaceDto;
 import kr.co.yeogiga.application.trip.service.TripPlaceSavingService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
-import kr.co.yeogiga.presentation.trip.api.TripPlaceSavingApi;
+import kr.co.yeogiga.presentation.trip.api.TripPlaceApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/trip")
 @RequiredArgsConstructor
-public class TripPlaceSavingController implements TripPlaceSavingApi {
+public class TripPlaceController implements TripPlaceApi {
     private final TripPlaceSavingService tripPlaceSavingService;
 
     @Override

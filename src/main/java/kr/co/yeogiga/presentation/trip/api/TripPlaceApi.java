@@ -13,9 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@ApiGroup(value = "[여행 목적지 확정 API]")
-@Tag(name = "[여행 목적지 확정 API]", description = "여행 목적지 확정 관련 API")
-public interface TripPlaceSavingApi {
+@ApiGroup(value = "[여행 목적지 API]")
+@Tag(name = "[여행 목적지 API]", description = "여행 목적지 관련 API")
+public interface TripPlaceApi {
 
     @TrackApi(description = "여행 목적지 확정")
     @Operation(summary = "여행 목적지 확정", description = "여행 목적지를 확정하는 API입니다.")
