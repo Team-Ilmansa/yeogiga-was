@@ -45,7 +45,8 @@ public class AuthControllerTest {
     @MockBean
     private AuthService authService;
 
-    private final Cookie refreshTokenCookie = new Cookie("refreshToken", "test-refresh-token");
+    private final Cookie refreshTokenInCookie = new Cookie("refreshToken", "test-refresh-token");
+    private final String refreshTokenInHeader = "test-refresh-token";
 
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext) {
@@ -55,27 +56,52 @@ public class AuthControllerTest {
                 .build();
     }
 
-    @Test
+    @Nested
     @DisplayName("로그아웃")
-    void successSignOut() throws Exception {
-        // given
-        doNothing().when(authService).signOut(refreshTokenCookie.toString());
+    class  SignOut {
 
-        // when
-        ResultActions result = mockMvc.perform(get("/api/v1/auth/sign-out")
-                .cookie(refreshTokenCookie)
-        );
+        @Test
+        @DisplayName("성공 - 모바일")
+        void successSignOutInMobile() throws Exception {
+            // given
+            doNothing().when(authService).signOut(refreshTokenInHeader);
 
-        // then
-        result
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/auth/sign-out")
+                            .header("refreshToken", refreshTokenInHeader)
+                            .header("device", Device.MOBILE)
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+        }
+
+        @Test
+        @DisplayName("성공 - 웹")
+        void successSignOutInWeb() throws Exception {
+            // given
+            doNothing().when(authService).signOut(refreshTokenInCookie.getValue());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/auth/sign-out")
+                            .cookie(refreshTokenInCookie)
+                            .header("device", Device.WEB)
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+        }
     }
 
     @Nested
     @DisplayName("토큰 재발급")
     class TokenReissue {
-
         private final TokenDto tokenDto = TokenDto.builder()
                 .accessToken("test-access-token")
                 .refreshToken("test-refresh-token")
@@ -85,16 +111,17 @@ public class AuthControllerTest {
         @DisplayName("성공 - 모바일")
         void successReissueTokenInMobile() throws Exception {
             // given
-            when(authService.reissueToken(refreshTokenCookie.getValue())).thenReturn(tokenDto);
+            when(authService.reissueToken(refreshTokenInCookie.getValue())).thenReturn(tokenDto);
 
             // when
-            ResultActions result = mockMvc.perform(get("/api/v1/auth/reissue")
-                    .header("device", Device.MOBILE.toString())
-                    .cookie(refreshTokenCookie)
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/auth/reissue")
+                        .header("device", Device.MOBILE.toString())
+                        .header("refreshToken", refreshTokenInHeader)
             );
 
             // then
-            result
+            resultActions
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data.accessToken").isNotEmpty())
                     .andExpect(jsonPath("$.data.refreshToken").isNotEmpty());
@@ -105,16 +132,17 @@ public class AuthControllerTest {
         @DisplayName("성공 - 웹")
         void successReissueTokenInWeb() throws Exception {
             // given
-            when(authService.reissueToken(refreshTokenCookie.getValue())).thenReturn(tokenDto);
+            when(authService.reissueToken(refreshTokenInCookie.getValue())).thenReturn(tokenDto);
 
             // when
-            ResultActions result = mockMvc.perform(get("/api/v1/auth/reissue")
-                    .header("device", Device.WEB.toString())
-                    .cookie(refreshTokenCookie)
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/auth/reissue")
+                        .header("device", Device.WEB.toString())
+                        .cookie(refreshTokenInCookie)
             );
 
             // then
-            result
+            resultActions
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data.accessToken").isNotEmpty())
                     .andExpect(cookie().exists(AuthConstants.REFRESH_TOKEN_PREFIX));
@@ -122,39 +150,82 @@ public class AuthControllerTest {
         }
 
         @Test
-        @DisplayName("실패 - 쿠키 미포함")
-        void failReissueToken() throws Exception {
+        @DisplayName("실패 - 웹 리프레시 토큰 미포함")
+        void failReissueTokenInWeb() throws Exception {
             // given
-            when(authService.reissueToken(refreshTokenCookie.getValue())).thenReturn(tokenDto);
+            when(authService.reissueToken(refreshTokenInCookie.getValue())).thenReturn(tokenDto);
 
             // when
 
-            ResultActions result = mockMvc.perform(get("/api/v1/auth/reissue")
-                    .header("device", Device.WEB)
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/auth/reissue")
+                            .header("device", Device.WEB)
             );
 
             // then
-            result
+            resultActions
                     .andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.code").value("A009"));
 
         }
 
         @Test
-        @DisplayName("실패 - 리프레시 토큰 만료")
-        void failReissueTokenExpiredToken() throws Exception {
+        @DisplayName("실패 - 모바일 리프레시 토큰 미포함")
+        void failReissueTokenInMobile() throws Exception {
             // given
-            when(authService.reissueToken(refreshTokenCookie.getValue())).thenThrow(new CustomException(AuthErrorType.REFRESH_TOKEN_EXPIRED));
+            when(authService.reissueToken(refreshTokenInHeader)).thenReturn(tokenDto);
 
             // when
 
-            ResultActions result = mockMvc.perform(get("/api/v1/auth/reissue")
-                    .header("device", Device.WEB)
-                    .cookie(refreshTokenCookie)
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/auth/reissue")
+                            .header("device", Device.WEB)
             );
 
             // then
-            result
+            resultActions
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value("A009"));
+
+        }
+
+        @Test
+        @DisplayName("실패 - 웹 리프레시 토큰 만료")
+        void failReissueTokenExpiredTokenInWeb() throws Exception {
+            // given
+            when(authService.reissueToken(refreshTokenInCookie.getValue())).thenThrow(new CustomException(AuthErrorType.REFRESH_TOKEN_EXPIRED));
+
+            // when
+
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/auth/reissue")
+                        .header("device", Device.WEB)
+                        .cookie(refreshTokenInCookie)
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value("A008"));
+
+        }
+
+        @Test
+        @DisplayName("실패 - 모바일 리프레시 토큰 만료")
+        void failReissueTokenExpiredTokenInMobile() throws Exception {
+            // given
+            when(authService.reissueToken(refreshTokenInHeader)).thenThrow(new CustomException(AuthErrorType.REFRESH_TOKEN_EXPIRED));
+
+            // when
+
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/auth/reissue")
+                            .header("device", Device.MOBILE)
+                            .header("refreshToken", refreshTokenInHeader)
+            );
+
+            // then
+            resultActions
                     .andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.code").value("A008"));
 

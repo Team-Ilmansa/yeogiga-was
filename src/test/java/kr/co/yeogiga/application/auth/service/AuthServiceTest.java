@@ -69,7 +69,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("토큰 재발급 - 실패")
+    @DisplayName("토큰 재발급 - 실패: 리프레시 토큰 만료")
     void failReissueToken() {
         // given
         when(jwtService.extractUserId(any())).thenReturn(userId);
