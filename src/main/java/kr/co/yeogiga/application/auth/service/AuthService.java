@@ -16,6 +16,12 @@ public class AuthService {
     private final UserService userService;
     private final JwtService jwtService;
 
+    /**
+     * 토큰 재발급 메서드
+     *
+     * @param refreshToken  리프레시 토큰
+     * @return              신규 발급 토큰(accessToken, refreshToken)
+     */
     public TokenDto reissueToken(String refreshToken) {
         Long userId = jwtService.extractUserId(refreshToken);
 
@@ -32,6 +38,11 @@ public class AuthService {
         return reissuedToken;
     }
 
+    /**
+     * 로그아웃 메서드
+     *
+     * @param refreshToken  리프레시 토큰
+     */
     public void signOut(String refreshToken) {
         Long userId = jwtService.extractUserId(refreshToken);
         refreshTokenService.delete(userId);

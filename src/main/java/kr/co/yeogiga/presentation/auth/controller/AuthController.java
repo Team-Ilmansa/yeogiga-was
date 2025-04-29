@@ -51,6 +51,14 @@ public class AuthController implements AuthApi {
                 .body(SuccessResponse.ok());
     }
 
+    /**
+     * 토큰 재발급 시 HTTP 응답 생성 메서드
+     *
+     * @param device            사용자 장치(WEB, MOBILE)
+     * @param reissuedToken     신규 발급 토큰(accessToken, refreshToken)
+     * @return                  MOBILE -> accessToken(body), refreshToken(body)
+     *                          WEB    -> accessToken(body), refreshToken(cookie)
+     */
     private ResponseEntity<?> createReissueTokenResponse(Device device, TokenDto reissuedToken) {
         return switch (device) {
             case MOBILE -> ResponseEntity.ok(SuccessResponse.from(reissuedToken));
