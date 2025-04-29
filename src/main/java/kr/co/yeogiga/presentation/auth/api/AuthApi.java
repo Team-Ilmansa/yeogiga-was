@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-@ApiGroup(value = "[OAuth2 인증 API]")
+@ApiGroup(value = "[인증 API]")
 @Tag(name = "[인증 API]", description = "인증 관련 API")
 public interface AuthApi {
 
