@@ -1,6 +1,5 @@
 package kr.co.yeogiga.presentation.auth.controller;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.yeogiga.application.auth.dto.TokenDto;
 import kr.co.yeogiga.application.auth.service.AuthService;
 import kr.co.yeogiga.application.auth.type.Device;
