@@ -58,7 +58,7 @@ public class AuthControllerTest {
 
     @Nested
     @DisplayName("로그아웃")
-    class  SignOut {
+    class SignOut {
 
         @Test
         @DisplayName("성공 - 모바일")
