@@ -1,8 +1,10 @@
 package kr.co.yeogiga.application.trip.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
 
+import java.util.List;
 import java.util.UUID;
 
 public class TripPlaceDto {
@@ -41,5 +43,29 @@ public class TripPlaceDto {
     public record CompleteRequest(
             @Schema(description = "편집 완료된 마지막 일차", example = "5")
             int lastDay
+    ) { }
+
+    public record InsertRequest(
+            String name,
+            double latitude,
+            double longitude,
+            String placeType,
+            String prevPlaceId,
+            String nextPlaceId
+    ) {
+        public Place toEntity(Double order) {
+            return Place.builder()
+                    .id(UUID.randomUUID().toString())
+                    .name(name)
+                    .latitude(latitude)
+                    .longitude(longitude)
+                    .order(order)
+                    .placeType(PlaceCategory.fromLabel(placeType).getGroupName())
+                    .build();
+        }
+    }
+
+    public record ReorderRequest(
+            List<String> orderedPlaceIds
     ) { }
 }
