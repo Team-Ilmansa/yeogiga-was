@@ -1,4 +1,4 @@
-package kr.co.yeogiga.domain.tripplace;
+package kr.co.yeogiga.domain.tripplace.repository;
 
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 import org.springframework.data.mongodb.repository.MongoRepository;
