@@ -12,6 +12,7 @@ public enum TripErrorType implements BaseErrorType {
 
     INVALID_PLACE(HttpStatus.BAD_REQUEST, "T001", "지원하지 않는 카테고리입니다."),
     ALREADY_ADDED_PLACE(HttpStatus.CONFLICT, "T002", "이미 추가된 장소입니다."),
+    DAY_PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "T003", "해당 여행 일차 정보가 존재하지 않습니다.")
     ;
 
     private final HttpStatus httpStatus;
