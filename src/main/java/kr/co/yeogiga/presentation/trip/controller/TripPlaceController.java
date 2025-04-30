@@ -32,6 +32,7 @@ public class TripPlaceController implements TripPlaceApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
+    @Override
     @PostMapping("/{tripId}/day-place/{tripDayPlaceId}/places")
     public ResponseEntity<?> addNewPlace(@PathVariable String tripId,
                                          @PathVariable String tripDayPlaceId,
@@ -41,6 +42,7 @@ public class TripPlaceController implements TripPlaceApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
+    @Override
     @PutMapping("/{tripId}/day-place/{tripDayPlaceId}/places/order")
     public ResponseEntity<?> reorderPlaces(@PathVariable String tripId,
                                            @PathVariable String tripDayPlaceId,
@@ -49,7 +51,7 @@ public class TripPlaceController implements TripPlaceApi {
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
-
+    @Override
     @DeleteMapping("/{tripId}/day-place/{tripDayPlaceId}/places/{placeId}")
     public ResponseEntity<?> deletePlace(@PathVariable String tripId,
                                          @PathVariable String tripDayPlaceId,
