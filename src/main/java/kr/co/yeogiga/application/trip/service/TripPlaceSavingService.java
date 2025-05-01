@@ -1,7 +1,7 @@
 package kr.co.yeogiga.application.trip.service;
 
 import kr.co.yeogiga.application.trip.dto.TripPlaceDto;
-import kr.co.yeogiga.domain.tripplace.TripDayPlaceService;
+import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;

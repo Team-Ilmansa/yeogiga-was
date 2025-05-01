@@ -43,8 +43,12 @@ public class TripPlaceEditingServiceTest {
     @DisplayName("목적지 추가 테스트")
     class AddPlaceTest {
 
-        private final TripPlaceDto.Request place =
-                new TripPlaceDto.Request("목적지1", 33.1234, 126.5678, "카페");
+        private final TripPlaceDto.Request place = TripPlaceDto.Request.builder()
+                .name("목적지1")
+                .latitude(0.0)
+                .longitude(0.0)
+                .placeType("카페")
+                .build();
 
         @Test
         @DisplayName("성공")
@@ -123,10 +127,19 @@ public class TripPlaceEditingServiceTest {
     @DisplayName("목적지 순서 수정 성공")
     void updatePlacesInEditingSuccess() {
         // given
-        TripPlaceDto.Request place1 =
-                new TripPlaceDto.Request("목적지1", 33.123, 126.456, "카페");
-        TripPlaceDto.Request place2 =
-                new TripPlaceDto.Request("목적지2", 33.789, 126.987, "관광명소");
+        TripPlaceDto.Request place1 = TripPlaceDto.Request.builder()
+                .name("목적지1")
+                .latitude(0.0)
+                .longitude(0.0)
+                .placeType("카페")
+                .build();
+
+        TripPlaceDto.Request place2 = TripPlaceDto.Request.builder()
+                .name("목적지2")
+                .latitude(0.0)
+                .longitude(0.0)
+                .placeType("카페")
+                .build();
 
         List<TripPlaceDto.Request> newPlaces = List.of(place2, place1);
 

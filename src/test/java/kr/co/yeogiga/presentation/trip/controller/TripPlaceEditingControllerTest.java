@@ -71,8 +71,12 @@ public class TripPlaceEditingControllerTest {
     @DisplayName("목적지 추가 테스트")
     class AddPlaceTest {
 
-        private final TripPlaceDto.Request request =
-                new TripPlaceDto.Request("목적지1", 33.1234, 126.5678, "카페");
+        private final TripPlaceDto.Request request = TripPlaceDto.Request.builder()
+                .name("목적지1")
+                .latitude(0.0)
+                .longitude(0.0)
+                .placeType("카페")
+                .build();
 
         @Test
         @DisplayName("성공")
@@ -122,8 +126,8 @@ public class TripPlaceEditingControllerTest {
     void updatePlacesSuccess() throws Exception {
         // given
         List<TripPlaceDto.Request> requests = List.of(
-                new TripPlaceDto.Request("목적지1", 33.4567, 126.7890, "관광명소"),
-                new TripPlaceDto.Request("목적지2", 33.1234, 126.5678, "카페")
+                TripPlaceDto.Request.builder().name("목적지1").latitude(0.0).longitude(0.0).placeType("관광명소").build(),
+                TripPlaceDto.Request.builder().name("목적지2").latitude(0.0).longitude(0.0).placeType("카페").build()
         );
 
         doNothing().when(tripPlaceEditingService).updatePlaces(anyLong(), anyInt(), Mockito.anyList());

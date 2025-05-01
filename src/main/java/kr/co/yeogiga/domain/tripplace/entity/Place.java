@@ -26,4 +26,8 @@ public class Place {
         this.order = order;
         this.visitedAt = visitedAt;
     }
+
+    public void updateOrder(double order) {
+        this.order = order;
+    }
 }

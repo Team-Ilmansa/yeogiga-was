@@ -28,4 +28,8 @@ public class TripDayPlace {
         this.date = date;
         this.places = places;
     }
+
+    public void updatePlaces(List<Place> places) {
+        this.places = places;
+    }
 }
