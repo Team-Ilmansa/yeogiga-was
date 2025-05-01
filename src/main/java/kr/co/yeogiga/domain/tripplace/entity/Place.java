@@ -3,6 +3,9 @@ package kr.co.yeogiga.domain.tripplace.entity;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 public class Place {
     private String id;
@@ -11,6 +14,7 @@ public class Place {
     private double longitude;
     private String placeType;
     private double order;
+    private List<Image> images;
 
     @Builder
     public Place(String id, String name, double latitude,
@@ -21,9 +25,14 @@ public class Place {
         this.longitude = longitude;
         this.placeType = placeType;
         this.order = order;
+        this.images = new ArrayList<>();
     }
 
     public void updateOrder(double order) {
         this.order = order;
+    }
+
+    public void addImage(Image image) {
+        this.images.add(image);
     }
 }
