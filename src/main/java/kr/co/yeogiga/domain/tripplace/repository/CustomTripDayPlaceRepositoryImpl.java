@@ -36,6 +36,10 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
         query.fields().include("places.$");
         TripDayPlace result = mongoTemplate.findOne(query, TripDayPlace.class);
 
+        if (result == null || result.getPlaces().isEmpty()) {
+            throw new RuntimeException("Place not found");
+        }
+
         return result.getPlaces().get(0).getOrder();
     }
 
