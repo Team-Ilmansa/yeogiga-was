@@ -45,6 +45,7 @@ public class TripPlaceController implements TripPlaceApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
+    @Override
     @GetMapping("/{tripId}/day-place/places")
     public ResponseEntity<?> getTripDayPlacesInfo(@PathVariable Long tripId) {
         return ResponseEntity.ok(
@@ -52,6 +53,7 @@ public class TripPlaceController implements TripPlaceApi {
         );
     }
 
+    @Override
     @GetMapping("/{tripId}/day-place/{tripDayPlaceId}/places")
     public ResponseEntity<?> getPlaceDetailsInfo(@PathVariable Long tripId,
                                                  @PathVariable String tripDayPlaceId) {
