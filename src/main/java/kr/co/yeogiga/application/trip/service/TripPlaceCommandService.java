@@ -41,13 +41,13 @@ public class TripPlaceCommandService {
      * 목적지의 순서(order)를 반환하는 메서드
      * - 주어진 placeId가 존재할 경우, 해당 place의 order 값을 반환
      *
-     * @param tripId  여행 일차 ID
-     * @param placeId 참조할 목적지 ID (nullable)
+     * @param tripPlaceId 여행 일차 ID
+     * @param placeId     참조할 목적지 ID (nullable)
      * @return order 값 또는 null
      */
-    private Double getPlaceOrder(String tripId, String placeId) {
+    private Double getPlaceOrder(String tripPlaceId, String placeId) {
         if (placeId != null) {
-            return tripDayPlaceService.readOrderByIdAndPlaceId(tripId, placeId);
+            return tripDayPlaceService.readOrderByIdAndPlaceId(tripPlaceId, placeId);
         }
 
         return null;
