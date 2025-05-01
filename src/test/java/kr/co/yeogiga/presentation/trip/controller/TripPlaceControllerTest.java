@@ -89,8 +89,14 @@ public class TripPlaceControllerTest {
     @DisplayName("목적지 추가 성공")
     void addNewPlaceSuccess() throws Exception {
         // given
-        TripPlaceDto.InsertRequest insertRequest =
-                new TripPlaceDto.InsertRequest("목적지1", 0.0, 0.0, "카페", "prevId", "nextId");
+        TripPlaceDto.InsertRequest insertRequest = TripPlaceDto.InsertRequest.builder()
+                .name("목적지1")
+                .latitude(0.0)
+                .longitude(0.0)
+                .placeType("카페")
+                .prevPlaceId("prevId")
+                .nextPlaceId("nextId")
+                .build();
         doNothing().when(tripPlaceCommandService).addNewPlace(tripDayPlaceId, insertRequest);
 
         // when

@@ -3,12 +3,14 @@ package kr.co.yeogiga.application.trip.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
+import lombok.Builder;
 
 import java.util.List;
 import java.util.UUID;
 
 public class TripPlaceDto {
 
+    @Builder
     @Schema(name = "TripPlaceDto.Request", description = "여행 목적지 추가 DTO")
     public record Request(
             @Schema(description = "목적지 이름", example = "광화문")
@@ -45,6 +47,7 @@ public class TripPlaceDto {
             int lastDay
     ) { }
 
+    @Builder
     @Schema(name = "TripPlaceDto.InsertRequest", description = "삽입 위치를 포함한 새로운 목적지 추가 요청 DTO")
     public record InsertRequest(
             @Schema(description = "목적지 이름", example = "광화문")

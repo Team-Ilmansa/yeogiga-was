@@ -49,8 +49,12 @@ public class TripPlaceCommandServiceTest {
         @DisplayName("가장 처음 추가되는 경우 - 기존에 목적지 없는 상태")
         void addPlaceFirst() {
             // given
-            TripPlaceDto.InsertRequest insertRequest =
-                    new TripPlaceDto.InsertRequest("목적지1", 0.0, 0.0, "카페", null, null);
+            TripPlaceDto.InsertRequest insertRequest = TripPlaceDto.InsertRequest.builder()
+                    .name("목적지1")
+                    .latitude(0.0)
+                    .longitude(0.0)
+                    .placeType("카페")
+                    .build();
 
             // when
             tripPlaceCommandService.addNewPlace(tripDayPlaceId, insertRequest);
@@ -67,8 +71,13 @@ public class TripPlaceCommandServiceTest {
         void addPlaceFront() {
             // given
             given(tripDayPlaceService.readOrderByIdAndPlaceId(tripDayPlaceId, "nextId")).willReturn(20.0);
-            TripPlaceDto.InsertRequest insertRequest =
-                    new TripPlaceDto.InsertRequest("목적지1", 0.0, 0.0, "카페", null, "nextId");
+            TripPlaceDto.InsertRequest insertRequest = TripPlaceDto.InsertRequest.builder()
+                    .name("목적지1")
+                    .latitude(0.0)
+                    .longitude(0.0)
+                    .placeType("카페")
+                    .nextPlaceId("nextId")
+                    .build();
 
             // when
             tripPlaceCommandService.addNewPlace(tripDayPlaceId, insertRequest);
@@ -85,8 +94,13 @@ public class TripPlaceCommandServiceTest {
         void addPlaceBack() {
             // given
             given(tripDayPlaceService.readOrderByIdAndPlaceId(tripDayPlaceId, "prevId")).willReturn(20.0);
-            TripPlaceDto.InsertRequest insertRequest =
-                    new TripPlaceDto.InsertRequest("목적지1", 0.0, 0.0, "카페", "prevId", null);
+            TripPlaceDto.InsertRequest insertRequest = TripPlaceDto.InsertRequest.builder()
+                    .name("목적지1")
+                    .latitude(0.0)
+                    .longitude(0.0)
+                    .placeType("카페")
+                    .prevPlaceId("prevId")
+                    .build();
 
             // when
             tripPlaceCommandService.addNewPlace(tripDayPlaceId, insertRequest);
@@ -105,8 +119,14 @@ public class TripPlaceCommandServiceTest {
             given(tripDayPlaceService.readOrderByIdAndPlaceId(tripDayPlaceId, "prevId")).willReturn(10.0);
             given(tripDayPlaceService.readOrderByIdAndPlaceId(tripDayPlaceId, "nextId")).willReturn(30.0);
 
-            TripPlaceDto.InsertRequest insertRequest =
-                    new TripPlaceDto.InsertRequest("목적지1", 0.0, 0.0, "카페", "prevId", "nextId");
+            TripPlaceDto.InsertRequest insertRequest = TripPlaceDto.InsertRequest.builder()
+                    .name("목적지1")
+                    .latitude(0.0)
+                    .longitude(0.0)
+                    .placeType("카페")
+                    .prevPlaceId("prevId")
+                    .nextPlaceId("nextId")
+                    .build();
 
             // when
             tripPlaceCommandService.addNewPlace(tripDayPlaceId, insertRequest);
