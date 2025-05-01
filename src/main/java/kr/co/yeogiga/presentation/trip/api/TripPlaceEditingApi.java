@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.yeogiga.application.trip.dto.TripPlaceDto;
+import kr.co.yeogiga.application.trip.dto.TripPlaceReq;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,7 +43,7 @@ public interface TripPlaceEditingApi {
     })
     ResponseEntity<?> addPlace(@PathVariable Long tripId,
                                @PathVariable int day,
-                               @RequestBody TripPlaceDto.Request request);
+                               @RequestBody TripPlaceReq.Request request);
 
     @TrackApi(description = "일자별 목적지 조회")
     @Operation(summary = "일자별 목적지 조회", description = "일자별 목적지 조회하는 API입니다.")
@@ -91,7 +91,7 @@ public interface TripPlaceEditingApi {
     })
     ResponseEntity<?> updatePlaces(@PathVariable Long tripId,
                                    @PathVariable int day,
-                                   @RequestBody List<TripPlaceDto.Request> requests);
+                                   @RequestBody List<TripPlaceReq.Request> requests);
 
     @TrackApi(description = "목적지 삭제")
     @Operation(summary = "목적지 삭제", description = "목적지 삭제하는 API입니다.")

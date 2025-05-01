@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.yeogiga.application.trip.dto.TripPlaceDto;
+import kr.co.yeogiga.application.trip.dto.TripPlaceReq;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,7 +31,7 @@ public interface TripPlaceApi {
                     }))
     })
     ResponseEntity<?> completeTrip(@PathVariable Long tripId,
-                                   @RequestBody TripPlaceDto.CompleteRequest request);
+                                   @RequestBody TripPlaceReq.CompleteRequest request);
 
     @TrackApi(description = "여행 목적지 추가")
     @Operation(summary = "여행 목적지 추가", description = "여행 목적지를 추가하는 API입니다.")
@@ -46,9 +46,93 @@ public interface TripPlaceApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> addNewPlace(@PathVariable String tripId,
+    ResponseEntity<?> addNewPlace(@PathVariable Long tripId,
                                   @PathVariable String tripDayPlaceId,
-                                  @RequestBody TripPlaceDto.InsertRequest insertRequest);
+                                  @RequestBody TripPlaceReq.InsertRequest insertRequest);
+
+    @TrackApi(description = "여행 일정 정보 불러오기")
+    @Operation(summary = "여행 일정 정보 불러오기", description = "여행 일정 정보를 불러오는 API입니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "여행 일정 정보 불러오기",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다.",
+                                            "data": [
+                                                    {
+                                                        "id": "tripDayPlace1-id",
+                                                        "day": 1,
+                                                        "places": [
+                                                            {
+                                                                "id": "place1-id",
+                                                                "name": "목적지1",
+                                                                "placeType": "식당",
+                                                                "order": 0.0
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "id": "tripDayPlace2-id",
+                                                        "day": 2,
+                                                        "places": [
+                                                            {
+                                                                "id": "place2-id",
+                                                                "name": "목적지2",
+                                                                "placeType": "식당",
+                                                                "order": 10.0
+                                                            }
+                                                        ]
+                                                    }
+                                            ]
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> getTripDayPlacesInfo(@PathVariable Long tripId);
+
+    @TrackApi(description = "목적지 상세 정보 불러오기")
+    @Operation(summary = "목적지 상세 정보 불러오기", description = "여행 목적지 상세 정보를 불러오는 API입니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "여행 목적지 상세 정보 불러오기",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다.",
+                                            "data": [
+                                                    {
+                                                        "id": "place1-id",
+                                                        "name": "목적지1",
+                                                        "latitude": 11.22,
+                                                        "longitude": 33.44,
+                                                        "placeType": "식당",
+                                                        "order": 10.0
+                                                    },
+                                                    {
+                                                        "id": "place2-id",
+                                                        "name": "목적지 2",
+                                                        "latitude": 55.66,
+                                                        "longitude": 77.88,
+                                                        "placeType": "식당",
+                                                        "order": 15.0
+                                                    }
+                                                ]
+                                        }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "여행 일차 존재하지 않음",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                            "code": "T003",
+                                            "message": "해당 여행 일차 정보가 존재하지 않습니다."
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> getPlaceDetailsInfo(@PathVariable Long tripId,
+                                          @PathVariable String tripDayPlaceId);
 
     @TrackApi(description = "여행 목적지 순서 변경")
     @Operation(summary = "여행 목적지 순서 변경", description = "여행 목적지 순서를 변경하는 API입니다.")
@@ -72,9 +156,9 @@ public interface TripPlaceApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> reorderPlaces(@PathVariable String tripId,
+    ResponseEntity<?> reorderPlaces(@PathVariable Long tripId,
                                     @PathVariable String tripDayPlaceId,
-                                    @RequestBody TripPlaceDto.ReorderRequest reorderRequest);
+                                    @RequestBody TripPlaceReq.ReorderRequest reorderRequest);
 
     @TrackApi(description = "여행 목적지 삭제")
     @Operation(summary = "여행 목적지 삭제", description = "여행 목적지를 삭제하는 API입니다.")
@@ -89,7 +173,7 @@ public interface TripPlaceApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> deletePlace(@PathVariable String tripId,
+    ResponseEntity<?> deletePlace(@PathVariable Long tripId,
                                   @PathVariable String tripDayPlaceId,
                                   @PathVariable String placeId);
 }

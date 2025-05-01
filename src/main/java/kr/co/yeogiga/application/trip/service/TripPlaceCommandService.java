@@ -1,6 +1,6 @@
 package kr.co.yeogiga.application.trip.service;
 
-import kr.co.yeogiga.application.trip.dto.TripPlaceDto;
+import kr.co.yeogiga.application.trip.dto.TripPlaceReq;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
@@ -27,7 +27,7 @@ public class TripPlaceCommandService {
      * @param tripPlaceId   여행 일차(TripDayPlace)의 ID
      * @param insertRequest 삽입할 장소 정보 및 위치 기준 정보
      */
-    public void addNewPlace(String tripPlaceId, TripPlaceDto.InsertRequest insertRequest) {
+    public void addNewPlace(String tripPlaceId, TripPlaceReq.InsertRequest insertRequest) {
         Double prevPlaceOrder = getPlaceOrder(tripPlaceId, insertRequest.prevPlaceId());
         Double nextPlaceOrder = getPlaceOrder(tripPlaceId, insertRequest.nextPlaceId());
 
@@ -66,7 +66,7 @@ public class TripPlaceCommandService {
      * @param nextPlaceOrder 다음 목적지의 order 값 (nullable)
      * @return 생성된 Place 객체
      */
-    private Place createPlace(TripPlaceDto.InsertRequest insertRequest, Double prevPlaceOrder, Double nextPlaceOrder) {
+    private Place createPlace(TripPlaceReq.InsertRequest insertRequest, Double prevPlaceOrder, Double nextPlaceOrder) {
         if (prevPlaceOrder == null && nextPlaceOrder == null) {
             return insertRequest.toEntity(10.0);
         }
@@ -89,7 +89,7 @@ public class TripPlaceCommandService {
      * @param tripDayPlaceId 여행 일차(TripDayPlace)의 ID
      * @param reorderRequest 재정렬할 목적지 ID 리스트
      */
-    public void reorderPlaces(String tripDayPlaceId, TripPlaceDto.ReorderRequest reorderRequest) {
+    public void reorderPlaces(String tripDayPlaceId, TripPlaceReq.ReorderRequest reorderRequest) {
         TripDayPlace tripDayPlace = tripDayPlaceService.readById(tripDayPlaceId)
                 .orElseThrow(() -> new CustomException(TripErrorType.DAY_PLACE_NOT_FOUND));
 
