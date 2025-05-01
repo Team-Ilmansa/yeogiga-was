@@ -1,6 +1,6 @@
 package kr.co.yeogiga.presentation.trip.controller;
 
-import kr.co.yeogiga.application.trip.dto.TripPlaceDto;
+import kr.co.yeogiga.application.trip.dto.TripPlaceReq;
 import kr.co.yeogiga.application.trip.service.TripPlaceEditingService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.presentation.trip.api.TripPlaceEditingApi;
@@ -28,7 +28,7 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
     @PostMapping("/{tripId}/days/{day}/places")
     public ResponseEntity<?> addPlace(@PathVariable Long tripId,
                                       @PathVariable int day,
-                                      @RequestBody TripPlaceDto.Request request) {
+                                      @RequestBody TripPlaceReq.Request request) {
 
         tripPlaceEditingService.addPlace(tripId, day, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
@@ -46,7 +46,7 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
     @PutMapping("/{tripId}/days/{day}/places")
     public ResponseEntity<?> updatePlaces(@PathVariable Long tripId,
                                           @PathVariable int day,
-                                          @RequestBody List<TripPlaceDto.Request> requests) {
+                                          @RequestBody List<TripPlaceReq.Request> requests) {
 
         tripPlaceEditingService.updatePlaces(tripId, day, requests);
         return ResponseEntity.ok(SuccessResponse.ok());

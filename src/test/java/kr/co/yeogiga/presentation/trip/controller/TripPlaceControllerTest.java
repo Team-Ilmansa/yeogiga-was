@@ -1,7 +1,7 @@
 package kr.co.yeogiga.presentation.trip.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.yeogiga.application.trip.dto.TripPlaceDto;
+import kr.co.yeogiga.application.trip.dto.TripPlaceReq;
 import kr.co.yeogiga.application.trip.service.TripPlaceCommandService;
 import kr.co.yeogiga.application.trip.service.TripPlaceSavingService;
 import kr.co.yeogiga.common.exception.CustomException;
@@ -68,7 +68,7 @@ public class TripPlaceControllerTest {
     @DisplayName("여행 목적지 확정 완료")
     void completeTripSuccess() throws Exception {
         // given
-        TripPlaceDto.CompleteRequest completeRequest = new TripPlaceDto.CompleteRequest(2);
+        TripPlaceReq.CompleteRequest completeRequest = new TripPlaceReq.CompleteRequest(2);
         doNothing().when(tripPlaceSavingService).completeTrip(tripId, completeRequest.lastDay());
 
         // when
@@ -89,7 +89,7 @@ public class TripPlaceControllerTest {
     @DisplayName("목적지 추가 성공")
     void addNewPlaceSuccess() throws Exception {
         // given
-        TripPlaceDto.InsertRequest insertRequest = TripPlaceDto.InsertRequest.builder()
+        TripPlaceReq.InsertRequest insertRequest = TripPlaceReq.InsertRequest.builder()
                 .name("목적지1")
                 .latitude(0.0)
                 .longitude(0.0)
@@ -117,7 +117,7 @@ public class TripPlaceControllerTest {
     @DisplayName("목적지 정렬 성공")
     void reorderPlacesSuccess() throws Exception {
         // given
-        TripPlaceDto.ReorderRequest reorderRequest = new TripPlaceDto.ReorderRequest(List.of("id1", "id2", "id3"));
+        TripPlaceReq.ReorderRequest reorderRequest = new TripPlaceReq.ReorderRequest(List.of("id1", "id2", "id3"));
         doNothing().when(tripPlaceCommandService).reorderPlaces(tripDayPlaceId, reorderRequest);
 
         // when
@@ -138,7 +138,7 @@ public class TripPlaceControllerTest {
     @DisplayName("목적지 정렬 실패 - 일차가 존재하지 않음")
     void reorderPlacesFailDayPlaceNotFound() throws Exception {
         // given
-        TripPlaceDto.ReorderRequest reorderRequest = new TripPlaceDto.ReorderRequest(List.of("id1", "id2"));
+        TripPlaceReq.ReorderRequest reorderRequest = new TripPlaceReq.ReorderRequest(List.of("id1", "id2"));
         doThrow(new CustomException(TripErrorType.DAY_PLACE_NOT_FOUND))
                 .when(tripPlaceCommandService).reorderPlaces(tripDayPlaceId, reorderRequest);
 

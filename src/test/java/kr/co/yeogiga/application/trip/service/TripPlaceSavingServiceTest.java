@@ -1,6 +1,6 @@
 package kr.co.yeogiga.application.trip.service;
 
-import kr.co.yeogiga.application.trip.dto.TripPlaceDto;
+import kr.co.yeogiga.application.trip.dto.TripPlaceReq;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;
 import kr.co.yeogiga.infrastructure.redis.constant.PlaceConstant;
@@ -39,14 +39,14 @@ public class TripPlaceSavingServiceTest {
     @DisplayName("여행 생성 완료 성공")
     void completeTripSuccess() {
         // given
-        TripPlaceDto.StoredFormat place1 = new TripPlaceDto.StoredFormat(
+        TripPlaceReq.StoredFormat place1 = new TripPlaceReq.StoredFormat(
                 "id1", "장소1", 33.123, 126.456, "관광지"
         );
-        TripPlaceDto.StoredFormat place2 = new TripPlaceDto.StoredFormat(
+        TripPlaceReq.StoredFormat place2 = new TripPlaceReq.StoredFormat(
                 "id2", "장소2", 33.789, 126.987, "식당"
         );
 
-        when(redisRepository.getList(anyString(), eq(TripPlaceDto.StoredFormat.class)))
+        when(redisRepository.getList(anyString(), eq(TripPlaceReq.StoredFormat.class)))
                 .thenReturn(List.of(place1))
                 .thenReturn(List.of(place2));
 
@@ -54,7 +54,7 @@ public class TripPlaceSavingServiceTest {
         tripPlaceSavingService.completeTrip(tripId, lastDay);
 
         // then
-        verify(redisRepository, times(2)).getList(anyString(), eq(TripPlaceDto.StoredFormat.class));
+        verify(redisRepository, times(2)).getList(anyString(), eq(TripPlaceReq.StoredFormat.class));
         verify(tripDayPlaceService, times(1)).saveAll(any());
         verify(redisRepository, times(1)).del(PlaceConstant.listKey(tripId, 1));
         verify(redisRepository, times(1)).del(PlaceConstant.setKey(tripId, 1));

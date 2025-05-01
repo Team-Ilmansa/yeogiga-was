@@ -8,7 +8,7 @@ import lombok.Builder;
 import java.util.List;
 import java.util.UUID;
 
-public class TripPlaceDto {
+public class TripPlaceReq {
 
     @Builder
     @Schema(name = "TripPlaceDto.Request", description = "여행 목적지 추가 DTO")

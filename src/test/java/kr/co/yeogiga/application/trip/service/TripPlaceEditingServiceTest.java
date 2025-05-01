@@ -1,6 +1,6 @@
 package kr.co.yeogiga.application.trip.service;
 
-import kr.co.yeogiga.application.trip.dto.TripPlaceDto;
+import kr.co.yeogiga.application.trip.dto.TripPlaceReq;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
@@ -43,7 +43,7 @@ public class TripPlaceEditingServiceTest {
     @DisplayName("목적지 추가 테스트")
     class AddPlaceTest {
 
-        private final TripPlaceDto.Request place = TripPlaceDto.Request.builder()
+        private final TripPlaceReq.Request place = TripPlaceReq.Request.builder()
                 .name("목적지1")
                 .latitude(0.0)
                 .longitude(0.0)
@@ -61,7 +61,7 @@ public class TripPlaceEditingServiceTest {
             tripPlaceEditingService.addPlace(tripId, day, place);
 
             // then
-            verify(redisRepository, times(1)).setList(anyString(), any(TripPlaceDto.StoredFormat.class));
+            verify(redisRepository, times(1)).setList(anyString(), any(TripPlaceReq.StoredFormat.class));
             verify(redisRepository, times(1)).addToSet(eq(setKey), anyString());
         }
 
@@ -92,11 +92,11 @@ public class TripPlaceEditingServiceTest {
         @DisplayName("목적지 삭제 성공")
         void deletePlaceInEditingSuccess() {
             // given
-            TripPlaceDto.StoredFormat place = new TripPlaceDto.StoredFormat(
+            TripPlaceReq.StoredFormat place = new TripPlaceReq.StoredFormat(
                     placeId, "목적지1", 33.123, 126.456, PlaceCategory.RESTAURANT.getGroupName()
             );
 
-            given(redisRepository.getList(anyString(), eq(TripPlaceDto.StoredFormat.class)))
+            given(redisRepository.getList(anyString(), eq(TripPlaceReq.StoredFormat.class)))
                     .willReturn(List.of(place));
 
             // when
@@ -111,7 +111,7 @@ public class TripPlaceEditingServiceTest {
         @DisplayName("목적지 삭제 실패 - 존재하지 않음")
         void deletePlaceInEditingNotFound() {
             // given
-            given(redisRepository.getList(anyString(), eq(TripPlaceDto.StoredFormat.class)))
+            given(redisRepository.getList(anyString(), eq(TripPlaceReq.StoredFormat.class)))
                     .willReturn(List.of());
 
             // when
@@ -127,28 +127,28 @@ public class TripPlaceEditingServiceTest {
     @DisplayName("목적지 순서 수정 성공")
     void updatePlacesInEditingSuccess() {
         // given
-        TripPlaceDto.Request place1 = TripPlaceDto.Request.builder()
+        TripPlaceReq.Request place1 = TripPlaceReq.Request.builder()
                 .name("목적지1")
                 .latitude(0.0)
                 .longitude(0.0)
                 .placeType("카페")
                 .build();
 
-        TripPlaceDto.Request place2 = TripPlaceDto.Request.builder()
+        TripPlaceReq.Request place2 = TripPlaceReq.Request.builder()
                 .name("목적지2")
                 .latitude(0.0)
                 .longitude(0.0)
                 .placeType("카페")
                 .build();
 
-        List<TripPlaceDto.Request> newPlaces = List.of(place2, place1);
+        List<TripPlaceReq.Request> newPlaces = List.of(place2, place1);
 
         // when
         tripPlaceEditingService.updatePlaces(tripId, day, newPlaces);
 
         // then
         verify(redisRepository, times(2)).del(anyString());
-        verify(redisRepository, times(2)).setList(anyString(), any(TripPlaceDto.StoredFormat.class));
+        verify(redisRepository, times(2)).setList(anyString(), any(TripPlaceReq.StoredFormat.class));
         verify(redisRepository, times(2)).addToSet(anyString(), anyString());
     }
 
@@ -156,14 +156,14 @@ public class TripPlaceEditingServiceTest {
     @DisplayName("편집 중인 여행 일정 조회 성공")
     void getPlacesInEditingSuccess() {
         // given
-        List<TripPlaceDto.StoredFormat> mockPlaces = List.of(
-                new TripPlaceDto.StoredFormat("place-id", "목적지1", 33.123, 126.456, PlaceCategory.CAFE.getGroupName())
+        List<TripPlaceReq.StoredFormat> mockPlaces = List.of(
+                new TripPlaceReq.StoredFormat("place-id", "목적지1", 33.123, 126.456, PlaceCategory.CAFE.getGroupName())
         );
 
-        given(redisRepository.getList(anyString(), eq(TripPlaceDto.StoredFormat.class))).willReturn(mockPlaces);
+        given(redisRepository.getList(anyString(), eq(TripPlaceReq.StoredFormat.class))).willReturn(mockPlaces);
 
         // when
-        List<TripPlaceDto.StoredFormat> result = tripPlaceEditingService.getPlaces(tripId, day);
+        List<TripPlaceReq.StoredFormat> result = tripPlaceEditingService.getPlaces(tripId, day);
 
         // then
         assertEquals(1, result.size());

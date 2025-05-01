@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.yeogiga.application.trip.dto.TripPlaceDto;
+import kr.co.yeogiga.application.trip.dto.TripPlaceReq;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,7 +31,7 @@ public interface TripPlaceApi {
                     }))
     })
     ResponseEntity<?> completeTrip(@PathVariable Long tripId,
-                                   @RequestBody TripPlaceDto.CompleteRequest request);
+                                   @RequestBody TripPlaceReq.CompleteRequest request);
 
     @TrackApi(description = "여행 목적지 추가")
     @Operation(summary = "여행 목적지 추가", description = "여행 목적지를 추가하는 API입니다.")
@@ -48,7 +48,7 @@ public interface TripPlaceApi {
     })
     ResponseEntity<?> addNewPlace(@PathVariable String tripId,
                                   @PathVariable String tripDayPlaceId,
-                                  @RequestBody TripPlaceDto.InsertRequest insertRequest);
+                                  @RequestBody TripPlaceReq.InsertRequest insertRequest);
 
     @TrackApi(description = "여행 목적지 순서 변경")
     @Operation(summary = "여행 목적지 순서 변경", description = "여행 목적지 순서를 변경하는 API입니다.")
@@ -74,7 +74,7 @@ public interface TripPlaceApi {
     })
     ResponseEntity<?> reorderPlaces(@PathVariable String tripId,
                                     @PathVariable String tripDayPlaceId,
-                                    @RequestBody TripPlaceDto.ReorderRequest reorderRequest);
+                                    @RequestBody TripPlaceReq.ReorderRequest reorderRequest);
 
     @TrackApi(description = "여행 목적지 삭제")
     @Operation(summary = "여행 목적지 삭제", description = "여행 목적지를 삭제하는 API입니다.")

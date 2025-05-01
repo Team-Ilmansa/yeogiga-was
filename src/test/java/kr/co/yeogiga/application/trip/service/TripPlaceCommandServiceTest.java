@@ -1,6 +1,6 @@
 package kr.co.yeogiga.application.trip.service;
 
-import kr.co.yeogiga.application.trip.dto.TripPlaceDto;
+import kr.co.yeogiga.application.trip.dto.TripPlaceReq;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
@@ -49,7 +49,7 @@ public class TripPlaceCommandServiceTest {
         @DisplayName("가장 처음 추가되는 경우 - 기존에 목적지 없는 상태")
         void addPlaceFirst() {
             // given
-            TripPlaceDto.InsertRequest insertRequest = TripPlaceDto.InsertRequest.builder()
+            TripPlaceReq.InsertRequest insertRequest = TripPlaceReq.InsertRequest.builder()
                     .name("목적지1")
                     .latitude(0.0)
                     .longitude(0.0)
@@ -71,7 +71,7 @@ public class TripPlaceCommandServiceTest {
         void addPlaceFront() {
             // given
             given(tripDayPlaceService.readOrderByIdAndPlaceId(tripDayPlaceId, "nextId")).willReturn(20.0);
-            TripPlaceDto.InsertRequest insertRequest = TripPlaceDto.InsertRequest.builder()
+            TripPlaceReq.InsertRequest insertRequest = TripPlaceReq.InsertRequest.builder()
                     .name("목적지1")
                     .latitude(0.0)
                     .longitude(0.0)
@@ -94,7 +94,7 @@ public class TripPlaceCommandServiceTest {
         void addPlaceBack() {
             // given
             given(tripDayPlaceService.readOrderByIdAndPlaceId(tripDayPlaceId, "prevId")).willReturn(20.0);
-            TripPlaceDto.InsertRequest insertRequest = TripPlaceDto.InsertRequest.builder()
+            TripPlaceReq.InsertRequest insertRequest = TripPlaceReq.InsertRequest.builder()
                     .name("목적지1")
                     .latitude(0.0)
                     .longitude(0.0)
@@ -119,7 +119,7 @@ public class TripPlaceCommandServiceTest {
             given(tripDayPlaceService.readOrderByIdAndPlaceId(tripDayPlaceId, "prevId")).willReturn(10.0);
             given(tripDayPlaceService.readOrderByIdAndPlaceId(tripDayPlaceId, "nextId")).willReturn(30.0);
 
-            TripPlaceDto.InsertRequest insertRequest = TripPlaceDto.InsertRequest.builder()
+            TripPlaceReq.InsertRequest insertRequest = TripPlaceReq.InsertRequest.builder()
                     .name("목적지1")
                     .latitude(0.0)
                     .longitude(0.0)
@@ -154,7 +154,7 @@ public class TripPlaceCommandServiceTest {
                     Place.builder().id("id3").name("목적지3").latitude(0.0).longitude(0.0).placeType("식당").order(30.0).build()
             );
             TripDayPlace tripDayPlace = TripDayPlace.builder().day(1).places(places).build();
-            TripPlaceDto.ReorderRequest reorderRequest = new TripPlaceDto.ReorderRequest(List.of("id3", "id1", "id2"));
+            TripPlaceReq.ReorderRequest reorderRequest = new TripPlaceReq.ReorderRequest(List.of("id3", "id1", "id2"));
 
             given(tripDayPlaceService.readById(tripDayPlaceId)).willReturn(Optional.of(tripDayPlace));
 
@@ -174,7 +174,7 @@ public class TripPlaceCommandServiceTest {
             // given
             given(tripDayPlaceService.readById(tripDayPlaceId)).willReturn(Optional.empty());
 
-            TripPlaceDto.ReorderRequest reorderRequest = new TripPlaceDto.ReorderRequest(List.of("a"));
+            TripPlaceReq.ReorderRequest reorderRequest = new TripPlaceReq.ReorderRequest(List.of("a"));
 
             // when
             CustomException e = assertThrows(CustomException.class, () ->

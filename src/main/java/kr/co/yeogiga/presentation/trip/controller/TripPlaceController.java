@@ -1,6 +1,6 @@
 package kr.co.yeogiga.presentation.trip.controller;
 
-import kr.co.yeogiga.application.trip.dto.TripPlaceDto;
+import kr.co.yeogiga.application.trip.dto.TripPlaceReq;
 import kr.co.yeogiga.application.trip.service.TripPlaceCommandService;
 import kr.co.yeogiga.application.trip.service.TripPlaceSavingService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
@@ -26,7 +26,7 @@ public class TripPlaceController implements TripPlaceApi {
     @Override
     @PostMapping("/{tripId}/complete")
     public ResponseEntity<?> completeTrip(@PathVariable Long tripId,
-                                          @RequestBody TripPlaceDto.CompleteRequest request) {
+                                          @RequestBody TripPlaceReq.CompleteRequest request) {
 
         tripPlaceSavingService.completeTrip(tripId, request.lastDay());
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
@@ -36,7 +36,7 @@ public class TripPlaceController implements TripPlaceApi {
     @PostMapping("/{tripId}/day-place/{tripDayPlaceId}/places")
     public ResponseEntity<?> addNewPlace(@PathVariable String tripId,
                                          @PathVariable String tripDayPlaceId,
-                                         @RequestBody TripPlaceDto.InsertRequest insertRequest) {
+                                         @RequestBody TripPlaceReq.InsertRequest insertRequest) {
 
         tripPlaceCommandService.addNewPlace(tripDayPlaceId, insertRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
@@ -46,7 +46,7 @@ public class TripPlaceController implements TripPlaceApi {
     @PutMapping("/{tripId}/day-place/{tripDayPlaceId}/places/order")
     public ResponseEntity<?> reorderPlaces(@PathVariable String tripId,
                                            @PathVariable String tripDayPlaceId,
-                                           @RequestBody TripPlaceDto.ReorderRequest reorderRequest) {
+                                           @RequestBody TripPlaceReq.ReorderRequest reorderRequest) {
         tripPlaceCommandService.reorderPlaces(tripDayPlaceId, reorderRequest);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
