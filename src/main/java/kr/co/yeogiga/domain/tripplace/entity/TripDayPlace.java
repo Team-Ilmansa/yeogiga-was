@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -20,6 +21,7 @@ public class TripDayPlace {
     private int day;
     private LocalDate date;
     private List<Place> places;
+    private List<Image> unmatchedImages;
 
     @Builder
     public TripDayPlace(Long tripId, int day, LocalDate date, List<Place> places) {
@@ -27,9 +29,14 @@ public class TripDayPlace {
         this.day = day;
         this.date = date;
         this.places = places;
+        this.unmatchedImages = new ArrayList<>();
     }
 
     public void updatePlaces(List<Place> places) {
         this.places = places;
+    }
+
+    public void addUnmatchedImage(Image image) {
+        this.unmatchedImages.add(image);
     }
 }
