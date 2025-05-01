@@ -1,7 +1,7 @@
 package kr.co.yeogiga.presentation.trip.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.yeogiga.application.trip.dto.TripPlaceDto;
+import kr.co.yeogiga.application.trip.dto.TripPlaceReq;
 import kr.co.yeogiga.application.trip.service.TripPlaceEditingService;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
@@ -71,7 +71,7 @@ public class TripPlaceEditingControllerTest {
     @DisplayName("목적지 추가 테스트")
     class AddPlaceTest {
 
-        private final TripPlaceDto.Request request = TripPlaceDto.Request.builder()
+        private final TripPlaceReq.Request request = TripPlaceReq.Request.builder()
                 .name("목적지1")
                 .latitude(0.0)
                 .longitude(0.0)
@@ -125,9 +125,9 @@ public class TripPlaceEditingControllerTest {
     @DisplayName("목적지 수정 성공")
     void updatePlacesSuccess() throws Exception {
         // given
-        List<TripPlaceDto.Request> requests = List.of(
-                TripPlaceDto.Request.builder().name("목적지1").latitude(0.0).longitude(0.0).placeType("관광명소").build(),
-                TripPlaceDto.Request.builder().name("목적지2").latitude(0.0).longitude(0.0).placeType("카페").build()
+        List<TripPlaceReq.Request> requests = List.of(
+                TripPlaceReq.Request.builder().name("목적지1").latitude(0.0).longitude(0.0).placeType("관광명소").build(),
+                TripPlaceReq.Request.builder().name("목적지2").latitude(0.0).longitude(0.0).placeType("카페").build()
         );
 
         doNothing().when(tripPlaceEditingService).updatePlaces(anyLong(), anyInt(), Mockito.anyList());
@@ -168,8 +168,8 @@ public class TripPlaceEditingControllerTest {
     @DisplayName("목적지 조회 성공")
     void getPlacesSuccess() throws Exception {
         // given
-        List<TripPlaceDto.StoredFormat> mockPlaces = List.of(
-                new TripPlaceDto.StoredFormat("place-id", "목적지1", 33.123, 126.456, PlaceCategory.CAFE.getGroupName())
+        List<TripPlaceReq.StoredFormat> mockPlaces = List.of(
+                new TripPlaceReq.StoredFormat("place-id", "목적지1", 33.123, 126.456, PlaceCategory.CAFE.getGroupName())
         );
         given(tripPlaceEditingService.getPlaces(tripId, day)).willReturn(mockPlaces);
 

@@ -1,8 +1,10 @@
 package kr.co.yeogiga.presentation.trip.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.yeogiga.application.trip.dto.TripPlaceDto;
+import kr.co.yeogiga.application.trip.dto.TripPlaceReq;
+import kr.co.yeogiga.application.trip.dto.TripPlaceRes;
 import kr.co.yeogiga.application.trip.service.TripPlaceCommandService;
+import kr.co.yeogiga.application.trip.service.TripPlaceQueryService;
 import kr.co.yeogiga.application.trip.service.TripPlaceSavingService;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
@@ -24,9 +26,11 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -53,6 +57,9 @@ public class TripPlaceControllerTest {
     @MockBean
     private TripPlaceCommandService tripPlaceCommandService;
 
+    @MockBean
+    private TripPlaceQueryService tripPlaceQueryService;
+
     private final Long tripId = 1L;
     private final String tripDayPlaceId = "dayId";
     private final String placeId = "placeId";
@@ -68,7 +75,7 @@ public class TripPlaceControllerTest {
     @DisplayName("여행 목적지 확정 완료")
     void completeTripSuccess() throws Exception {
         // given
-        TripPlaceDto.CompleteRequest completeRequest = new TripPlaceDto.CompleteRequest(2);
+        TripPlaceReq.CompleteRequest completeRequest = new TripPlaceReq.CompleteRequest(2);
         doNothing().when(tripPlaceSavingService).completeTrip(tripId, completeRequest.lastDay());
 
         // when
@@ -89,7 +96,7 @@ public class TripPlaceControllerTest {
     @DisplayName("목적지 추가 성공")
     void addNewPlaceSuccess() throws Exception {
         // given
-        TripPlaceDto.InsertRequest insertRequest = TripPlaceDto.InsertRequest.builder()
+        TripPlaceReq.InsertRequest insertRequest = TripPlaceReq.InsertRequest.builder()
                 .name("목적지1")
                 .latitude(0.0)
                 .longitude(0.0)
@@ -114,10 +121,50 @@ public class TripPlaceControllerTest {
     }
 
     @Test
+    @DisplayName("여행 일차별 목적지 요약 정보 조회 성공")
+    void getTripDayPlacesInfoSuccess() throws Exception {
+        // given
+        TripPlaceRes.TripDayPlaceInfo info = new TripPlaceRes.TripDayPlaceInfo("day1", 1, List.of());
+        given(tripPlaceQueryService.getTripDayPlacesInfo(tripId)).willReturn(List.of(info));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/trip/{tripId}/day-place/places", tripId)
+        );
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
+    }
+
+    @Test
+    @DisplayName("여행 일차 목적지 상세 정보 조회 성공")
+    void getPlaceDetailsInfoSuccess() throws Exception {
+        // given
+        TripPlaceRes.PlaceDetails details =
+                new TripPlaceRes.PlaceDetails("place1", "목적지1", 0.0, 0.0, "카페", 10.0);
+        given(tripPlaceQueryService.getPlaceDetailsInfo(tripDayPlaceId)).willReturn(List.of(details));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/places", tripId, tripDayPlaceId)
+        );
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
+    }
+
+
+    @Test
     @DisplayName("목적지 정렬 성공")
     void reorderPlacesSuccess() throws Exception {
         // given
-        TripPlaceDto.ReorderRequest reorderRequest = new TripPlaceDto.ReorderRequest(List.of("id1", "id2", "id3"));
+        TripPlaceReq.ReorderRequest reorderRequest = new TripPlaceReq.ReorderRequest(List.of("id1", "id2", "id3"));
         doNothing().when(tripPlaceCommandService).reorderPlaces(tripDayPlaceId, reorderRequest);
 
         // when
@@ -138,7 +185,7 @@ public class TripPlaceControllerTest {
     @DisplayName("목적지 정렬 실패 - 일차가 존재하지 않음")
     void reorderPlacesFailDayPlaceNotFound() throws Exception {
         // given
-        TripPlaceDto.ReorderRequest reorderRequest = new TripPlaceDto.ReorderRequest(List.of("id1", "id2"));
+        TripPlaceReq.ReorderRequest reorderRequest = new TripPlaceReq.ReorderRequest(List.of("id1", "id2"));
         doThrow(new CustomException(TripErrorType.DAY_PLACE_NOT_FOUND))
                 .when(tripPlaceCommandService).reorderPlaces(tripDayPlaceId, reorderRequest);
 

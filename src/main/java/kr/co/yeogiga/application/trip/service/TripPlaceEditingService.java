@@ -1,6 +1,6 @@
 package kr.co.yeogiga.application.trip.service;
 
-import kr.co.yeogiga.application.trip.dto.TripPlaceDto;
+import kr.co.yeogiga.application.trip.dto.TripPlaceReq;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;
@@ -27,9 +27,9 @@ public class TripPlaceEditingService {
      * @param day    : 여행 일차 (1일차, 2일차 등)
      * @return : 저장된 TripPlaceDto.StoredFormat 리스트
      */
-    public List<TripPlaceDto.StoredFormat> getPlaces(Long tripId, int day) {
+    public List<TripPlaceReq.StoredFormat> getPlaces(Long tripId, int day) {
         String listKey = PlaceConstant.listKey(tripId, day);
-        return redisRepository.getList(listKey, TripPlaceDto.StoredFormat.class);
+        return redisRepository.getList(listKey, TripPlaceReq.StoredFormat.class);
     }
 
     /**
@@ -42,7 +42,7 @@ public class TripPlaceEditingService {
      * @param place  : 추가할 TripPlaceDto.Request 객체
      * @throws CustomException ALREADY_ADDED_PLACE : 이미 목적지를 추가한 경우
      */
-    public void addPlace(Long tripId, int day, TripPlaceDto.Request place) {
+    public void addPlace(Long tripId, int day, TripPlaceReq.Request place) {
         String listKey = PlaceConstant.listKey(tripId, day);
         String setKey = PlaceConstant.setKey(tripId, day);
 
@@ -68,9 +68,9 @@ public class TripPlaceEditingService {
         String listKey = PlaceConstant.listKey(tripId, day);
         String setKey = PlaceConstant.setKey(tripId, day);
 
-        List<TripPlaceDto.StoredFormat> places = redisRepository.getList(listKey, TripPlaceDto.StoredFormat.class);
+        List<TripPlaceReq.StoredFormat> places = redisRepository.getList(listKey, TripPlaceReq.StoredFormat.class);
 
-        TripPlaceDto.StoredFormat target = places.stream()
+        TripPlaceReq.StoredFormat target = places.stream()
                 .filter(p -> placeId.equals(p.id()))
                 .findFirst()
                 .orElse(null);
@@ -94,14 +94,14 @@ public class TripPlaceEditingService {
      * @param day    : 여행 일차
      * @param places : 새로운 순서의 TripPlaceDto.Request 리스트
      */
-    public void updatePlaces(Long tripId, int day, List<TripPlaceDto.Request> places) {
+    public void updatePlaces(Long tripId, int day, List<TripPlaceReq.Request> places) {
         String listKey = PlaceConstant.listKey(tripId, day);
         String setKey = PlaceConstant.setKey(tripId, day);
 
         redisRepository.del(listKey);
         redisRepository.del(setKey);
 
-        for (TripPlaceDto.Request place : places) {
+        for (TripPlaceReq.Request place : places) {
             redisRepository.setList(listKey, place.toStoredFormat());
             String placeUniqueKey = makeUniqueKey(place.name(), place.latitude(), place.longitude());
             redisRepository.addToSet(setKey, placeUniqueKey);

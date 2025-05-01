@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,15 +18,13 @@ public class TripDayPlace {
     private String id;
     private Long tripId;
     private int day;
-    private LocalDate date;
     private List<Place> places;
     private List<Image> unmatchedImages;
 
     @Builder
-    public TripDayPlace(Long tripId, int day, LocalDate date, List<Place> places) {
+    public TripDayPlace(Long tripId, int day, List<Place> places) {
         this.tripId = tripId;
         this.day = day;
-        this.date = date;
         this.places = places;
         this.unmatchedImages = new ArrayList<>();
     }
