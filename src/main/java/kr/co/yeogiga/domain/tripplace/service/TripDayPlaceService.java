@@ -30,6 +30,10 @@ public class TripDayPlaceService {
         return tripDayPlaceRepository.findById(id);
     }
 
+    public List<TripDayPlace> readByTripId(Long tripId) {
+        return tripDayPlaceRepository.findByTripId(tripId);
+    }
+
     public Double readOrderByIdAndPlaceId(String id, String placeId) {
         return tripDayPlaceRepository.findOrderByIdAndPlaceId(id, placeId);
     }
