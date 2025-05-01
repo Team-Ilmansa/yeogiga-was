@@ -2,6 +2,7 @@ package kr.co.yeogiga.presentation.trip.controller;
 
 import kr.co.yeogiga.application.trip.dto.TripPlaceReq;
 import kr.co.yeogiga.application.trip.service.TripPlaceCommandService;
+import kr.co.yeogiga.application.trip.service.TripPlaceQueryService;
 import kr.co.yeogiga.application.trip.service.TripPlaceSavingService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.presentation.trip.api.TripPlaceApi;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TripPlaceController implements TripPlaceApi {
     private final TripPlaceSavingService tripPlaceSavingService;
     private final TripPlaceCommandService tripPlaceCommandService;
+    private final TripPlaceQueryService tripPlaceQueryService;
 
     @Override
     @PostMapping("/{tripId}/complete")
@@ -40,6 +43,22 @@ public class TripPlaceController implements TripPlaceApi {
 
         tripPlaceCommandService.addNewPlace(tripDayPlaceId, insertRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
+    }
+
+    @GetMapping("/{tripId}/day-place/places")
+    public ResponseEntity<?> getTripDayPlacesInfo(@PathVariable Long tripId) {
+        return ResponseEntity.ok(
+                SuccessResponse.from(tripPlaceQueryService.getTripDayPlacesInfo(tripId))
+        );
+    }
+
+    @GetMapping("/{tripId}/day-place/{tripDayPlaceId}/places")
+    public ResponseEntity<?> getPlaceDetailsInfo(@PathVariable Long tripId,
+                                                 @PathVariable String tripDayPlaceId) {
+
+        return ResponseEntity.ok(
+                SuccessResponse.from(tripPlaceQueryService.getPlaceDetailsInfo(tripDayPlaceId))
+        );
     }
 
     @Override
