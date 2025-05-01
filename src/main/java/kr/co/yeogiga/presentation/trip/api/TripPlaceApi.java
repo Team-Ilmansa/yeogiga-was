@@ -46,7 +46,7 @@ public interface TripPlaceApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> addNewPlace(@PathVariable String tripId,
+    ResponseEntity<?> addNewPlace(@PathVariable Long tripId,
                                   @PathVariable String tripDayPlaceId,
                                   @RequestBody TripPlaceReq.InsertRequest insertRequest);
 
@@ -72,7 +72,7 @@ public interface TripPlaceApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> reorderPlaces(@PathVariable String tripId,
+    ResponseEntity<?> reorderPlaces(@PathVariable Long tripId,
                                     @PathVariable String tripDayPlaceId,
                                     @RequestBody TripPlaceReq.ReorderRequest reorderRequest);
 
@@ -89,7 +89,7 @@ public interface TripPlaceApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> deletePlace(@PathVariable String tripId,
+    ResponseEntity<?> deletePlace(@PathVariable Long tripId,
                                   @PathVariable String tripDayPlaceId,
                                   @PathVariable String placeId);
 }
