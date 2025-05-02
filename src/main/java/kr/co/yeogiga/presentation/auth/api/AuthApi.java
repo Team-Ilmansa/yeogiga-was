@@ -8,21 +8,106 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import kr.co.yeogiga.application.auth.dto.SignInDto;
+import kr.co.yeogiga.application.auth.dto.SignUpDto;
 import kr.co.yeogiga.application.auth.type.Device;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 @ApiGroup(value = "[인증 API]")
 @Tag(name = "[인증 API]", description = "인증 관련 API")
 public interface AuthApi {
 
+    @TrackApi(description = "회원가입")
+    @Operation(summary = "회원가입", description = "회원가입 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "회원가입 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "회원가입 성공", value = """
+                                        {
+                                             "code": 201,
+                                             "message": "요청이 성공하였습니다."
+                                        }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "400", description = "유효성 검증 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "유효성 검증 실패", description = "이메일의 경우 입력 여부 및 형식 검사", value = """
+                                        {
+                                            "code": "G002",
+                                            "errors": {
+                                                "password": "비밀번호는 필수 입력값입니다.",
+                                                "nickname": "닉네임은 필수 입력값입니다.",
+                                                "email": "잘못된 이메일 형식입니다.",
+                                                "username": "아이디는 필수 입력값입니다."
+                                            }
+                                        }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "409", description = "회원가입 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "회원가입 실패 - 이미 존재하는 아이디", value = """
+                                        {
+                                            "code": "U001",
+                                            "message": "이미 존재하는 아이디입니다."
+                                        }
+                                    """)
+                    }))
+    })
+    public ResponseEntity<?> signUp(@Valid @RequestBody SignUpDto.Request request);
+
+    @TrackApi(description = "일반 로그인")
+    @Operation(summary = "일반 로그인", description = "일반 로그인 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "로그인 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "로그인 성공(웹)", description = "웹은 리프레시 토큰이 쿠키로 전달", value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다.",
+                                            "data": {
+                                                "accessToken": "xxxxx.xxxxx.xxxxx"
+                                            }
+                                        }
+                                    """),
+                            @ExampleObject(name = "로그인 성공(모바일)", value = """
+                                        {
+                                             "code": 200,
+                                             "message": "요청이 성공하였습니다.",
+                                             "data": {
+                                                 "accessToken": "xxxxx.xxxxx.xxxxx",
+                                                 "refreshToken": "xxxxx.xxxxx.xxxxx"
+                                             }
+                                        }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "400", description = "유효성 검증 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "유효성 검증 실패", value = """
+                                        {
+                                             "code": "G002",
+                                             "errors": {
+                                                 "password": "비밀번호는 필수 입력값입니다.",
+                                                 "username": "아이디는 필수 입력값입니다."
+                                             }
+                                        }
+                                    """)
+                    }))
+    })
+    public ResponseEntity<?> signIn(
+            @RequestHeader(name = "device") Device device,
+            @Valid @RequestBody SignInDto.Request request
+    );
+
     @TrackApi(description = "토큰 재발급")
     @Operation(summary = "토큰 재발급", description = "토큰(access token, refresh token) 재발급 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "토큰 재발급 성공",
                     content = @Content(mediaType = "application/json", examples = {
-                            @ExampleObject(name = "토큰 재발급 성공(웹)", value = """
+                            @ExampleObject(name = "토큰 재발급 성공(웹)", description = "웹은 리프레시 토큰이 쿠키로 전달", value = """
                                         {
                                             "code": 200,
                                             "message": "요청이 성공하였습니다.",

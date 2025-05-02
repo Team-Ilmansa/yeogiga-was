@@ -9,11 +9,11 @@ public class SignInDto {
     @Builder
     @Schema(name = "SingInDto.Request", description = "일반 로그인 요청 DTO")
     public record Request(
-            @Schema(name = "아이디")
+            @Schema(name = "아이디", example = "testid")
             @NotBlank(message = "아이디는 필수 입력값입니다.")
             String username,
 
-            @Schema(name = "비밀번호")
+            @Schema(name = "비밀번호", example = "testpw")
             @NotBlank(message = "비밀번호는 필수 입력값입니다.")
             String password
     ) {
