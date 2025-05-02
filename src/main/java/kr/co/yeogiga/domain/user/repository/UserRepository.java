@@ -14,4 +14,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "JOIN oauth o ON u.id = o.user.id " +
             "WHERE o.platform = :platform AND o.platformId = :platformId")
     Optional<User> findByPlatformAndPlatformId(@Param("platform") OAuthPlatform platform, @Param("platformId") String platformId);
+
+    Optional<User> findByUsername(String username);
+
+    boolean existsByUsername(String username);
 }
