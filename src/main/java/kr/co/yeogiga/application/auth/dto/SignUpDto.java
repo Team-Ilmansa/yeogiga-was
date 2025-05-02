@@ -5,10 +5,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.type.Role;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class SignUpDto {
+    @Builder
     @Schema(name = "SignUpDto.Request", description = "회원가입 요청 DTO")
     public record Request(
             @Schema(name = "아이디", example = "testid")
