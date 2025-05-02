@@ -30,7 +30,7 @@ public class SignUpDto {
             @NotBlank(message = "닉네임은 필수 입력값입니다.")
             String nickname
     ) {
-        public User toUserEntity(String encodedPassword) {
+        public User toEntity(String encodedPassword) {
             return User.builder()
                     .username(username)
                     .password(encodedPassword)

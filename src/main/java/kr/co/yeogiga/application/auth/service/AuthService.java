@@ -33,7 +33,7 @@ public class AuthService {
             throw new CustomException(UserErrorType.ALREADY_EXIST_USERNAME);
         }
 
-        User newUser = request.toUserEntity(passwordEncoder.encode(request.password()));
+        User newUser = request.toEntity(passwordEncoder.encode(request.password()));
 
         newUser.upgradeRoleToUser();
         userService.save(newUser);
@@ -55,10 +55,7 @@ public class AuthService {
             throw new CustomException(AuthErrorType.AUTHENTICATION_FAIL);
         }
 
-        TokenDto token = jwtService.generateToken(user.getUsername(), user.getNickname(), user.getId());
-        refreshTokenService.save(user.getId(), token.refreshToken());
-
-        return token;
+        return jwtService.generateToken(user.getUsername(), user.getNickname(), user.getId());
     }
 
     /**
@@ -77,10 +74,7 @@ public class AuthService {
         User user = userService.readById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
 
-        TokenDto reissuedToken = jwtService.generateToken(user.getUsername(), user.getNickname(), user.getId());
-        refreshTokenService.save(userId, reissuedToken.refreshToken());
-
-        return reissuedToken;
+        return jwtService.generateToken(user.getUsername(), user.getNickname(), user.getId());
     }
 
     /**
