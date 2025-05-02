@@ -99,7 +99,6 @@ public class OAuthManagementService {
         Long userId = user.getId();
 
         TokenDto token = jwtService.generateToken(username, nickname, userId);
-        refreshTokenService.save(userId, token.refreshToken());
 
         return SignInDto.Response.builder()
                 .token(token)
