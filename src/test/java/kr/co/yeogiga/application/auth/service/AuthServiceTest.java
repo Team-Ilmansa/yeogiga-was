@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -70,13 +69,12 @@ public class AuthServiceTest {
         when(refreshTokenService.exists(userId)).thenReturn(true);
         when(userService.readById(userId)).thenReturn(Optional.ofNullable(user));
         when(jwtService.generateToken(any(), any(), any())).thenReturn(tokenDto);
-        doNothing().when(refreshTokenService).save(userId, tokenDto.refreshToken());
 
         // when
         TokenDto reissuedToken = authService.reissueToken("old-refresh-token");
 
         // then
-        verify(refreshTokenService).save(userId, reissuedToken.refreshToken());
+        assertEquals(tokenDto, reissuedToken);
     }
 
     @Test
@@ -171,7 +169,6 @@ public class AuthServiceTest {
             when(userService.readByUsername(request.username())).thenReturn(Optional.of(newUser));
             when(passwordEncoder.matches(request.password(), newUser.getPassword())).thenReturn(true);
             when(jwtService.generateToken(any(), any(), any())).thenReturn(tokenDto);
-            doNothing().when(refreshTokenService).save(newUser.getId(), tokenDto.refreshToken());
 
             // when
             TokenDto token = authService.signIn(request);
