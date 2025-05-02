@@ -20,4 +20,16 @@ public class UserService {
     public Optional<User> readById(Long id) {
         return userRepository.findById(id);
     }
+
+    public Optional<User> readByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    public User save(User user) {
+        return userRepository.save(user);
+    }
 }
