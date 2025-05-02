@@ -20,6 +20,12 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * 일반 회원가입 메서드
+     *
+     * @param request           회원가입 요청 dto(username, password, email, nickname)
+     * @throws CustomException  UserErrorType.ALREADY_EXISTS_USERNAME 이미 존재하는 아이디
+     */
     public void signUp(SignUpDto.Request request) {
         String username = request.username();
 
@@ -33,6 +39,13 @@ public class AuthService {
         userService.save(newUser);
     }
 
+    /**
+     * 일반 로그인 메서드
+     *
+     * @param request               로그인 요청 dto(username, password)
+     * @throws CustomException      AuthErrorType.AUTHENTICATION_FAIL 아이디 및 비밀번호 불일치
+     * @return                      토큰(access token, refresh token)
+     */
     public TokenDto signIn(SignInDto.Request request) {
         User user = userService.readByUsername(request.username())
                 .orElseThrow(() -> new CustomException(AuthErrorType.AUTHENTICATION_FAIL));
