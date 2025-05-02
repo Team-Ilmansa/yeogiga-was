@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
  */
 @RequiredArgsConstructor
 public enum UserErrorType implements BaseErrorType {
-    NOT_FOUND(HttpStatus.NOT_FOUND, "U000", "존재하지 않는 사용자입니다.");
+    NOT_FOUND(HttpStatus.NOT_FOUND, "U000", "존재하지 않는 사용자입니다."),
+    ALREADY_EXIST_USERNAME(HttpStatus.CONFLICT, "U001", "이미 존재하는 아이디입니다.");
 
 
     private final HttpStatus httpStatus;

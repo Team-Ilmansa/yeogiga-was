@@ -13,11 +13,23 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
 
-    public Optional<User> readByPlatformAndPlatformId(OAuthPlatform platform, String platformId) {
-        return userRepository.findByPlatformAndPlatformId(platform, platformId);
+    public void save(User user) {
+        userRepository.save(user);
     }
 
     public Optional<User> readById(Long id) {
         return userRepository.findById(id);
+    }
+
+    public Optional<User> readByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public Optional<User> readByPlatformAndPlatformId(OAuthPlatform platform, String platformId) {
+        return userRepository.findByPlatformAndPlatformId(platform, platformId);
+    }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
     }
 }

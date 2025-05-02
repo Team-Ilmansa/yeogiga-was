@@ -1,24 +1,31 @@
 package kr.co.yeogiga.application.auth.service;
 
+import kr.co.yeogiga.application.auth.dto.SignInDto;
+import kr.co.yeogiga.application.auth.dto.SignUpDto;
 import kr.co.yeogiga.application.auth.dto.TokenDto;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
 import kr.co.yeogiga.domain.user.entity.User;
+import kr.co.yeogiga.domain.user.exception.UserErrorType;
 import kr.co.yeogiga.domain.user.service.UserService;
 import kr.co.yeogiga.domain.user.type.Role;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,6 +39,9 @@ public class AuthServiceTest {
 
     @Mock
     private JwtService jwtService;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private AuthService authService;
@@ -59,13 +69,12 @@ public class AuthServiceTest {
         when(refreshTokenService.exists(userId)).thenReturn(true);
         when(userService.readById(userId)).thenReturn(Optional.ofNullable(user));
         when(jwtService.generateToken(any(), any(), any())).thenReturn(tokenDto);
-        doNothing().when(refreshTokenService).save(userId, tokenDto.refreshToken());
 
         // when
         TokenDto reissuedToken = authService.reissueToken("old-refresh-token");
 
         // then
-        verify(refreshTokenService).save(userId, reissuedToken.refreshToken());
+        assertEquals(tokenDto, reissuedToken);
     }
 
     @Test
@@ -84,4 +93,122 @@ public class AuthServiceTest {
         assertEquals(AuthErrorType.REFRESH_TOKEN_EXPIRED, exception.getErrorType());
     }
 
+    @Nested
+    @DisplayName("회원가입 테스트")
+    class SignUp {
+
+        @Captor
+        private ArgumentCaptor<User> userCaptor;
+
+        @Test
+        @DisplayName("성공")
+        void successSignUp() {
+            // given
+            SignUpDto.Request request = SignUpDto.Request.builder()
+                    .username("testid")
+                    .email("test@test.com")
+                    .nickname("testnick")
+                    .password("testpw")
+                    .build();
+
+            when(userService.existsByUsername(request.username())).thenReturn(false);
+            when(passwordEncoder.encode(request.password())).thenReturn("encodedPassword");
+
+            // when
+            authService.signUp(request);
+
+            // then
+            verify(userService).save(userCaptor.capture());
+
+            assertEquals(request.username(), userCaptor.getValue().getUsername());
+            assertEquals(userCaptor.getValue().isSignedUp(), true);
+            assertEquals(userCaptor.getValue().getRole(), Role.USER);
+        }
+
+        @Test
+        @DisplayName("실패 - 이미 존재하는 유저")
+        void failSignUp() {
+            // given
+            SignUpDto.Request request = SignUpDto.Request.builder()
+                    .username("testid")
+                    .email("test@test.com")
+                    .nickname("testnick")
+                    .password("testpw")
+                    .build();
+
+            when(userService.existsByUsername(request.username())).thenReturn(true);
+
+            // when
+            CustomException exception = assertThrows(CustomException.class, () -> authService.signUp(request));
+
+            // then
+            assertEquals(exception.getErrorType(), UserErrorType.ALREADY_EXIST_USERNAME);
+        }
+
+    }
+
+    @Nested
+    @DisplayName("로그인 테스트")
+    class SignIn {
+        private SignInDto.Request request = SignInDto.Request.builder()
+                .username("testid")
+                .password("testpw")
+                .build();
+
+        @Test
+        @DisplayName("성공")
+        void successSignInInWeb() {
+            // given
+            User newUser = User.builder()
+                    .username("testid")
+                    .email("test@test.com")
+                    .nickname("testnick")
+                    .password("testpw")
+                    .build();
+
+            when(userService.readByUsername(request.username())).thenReturn(Optional.of(newUser));
+            when(passwordEncoder.matches(request.password(), newUser.getPassword())).thenReturn(true);
+            when(jwtService.generateToken(any(), any(), any())).thenReturn(tokenDto);
+
+            // when
+            TokenDto token = authService.signIn(request);
+
+            // then
+            assertNotNull(token);
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 아이디")
+        void failSignInNotFountId() {
+            // given
+            when(userService.readByUsername(request.username())).thenReturn(Optional.ofNullable(null));
+
+            // when
+            CustomException exception = assertThrows(CustomException.class, () -> authService.signIn(request));
+
+            // then
+            assertEquals(exception.getErrorType(), AuthErrorType.AUTHENTICATION_FAIL);
+        }
+
+        @Test
+        @DisplayName("실패 - 패스워드 불일치")
+        void failSignInPasswordMisMatch() {
+            // given
+            User newUser = User.builder()
+                    .username("testid")
+                    .email("test@test.com")
+                    .nickname("testnick")
+                    .password("testpw")
+                    .build();
+
+            when(userService.readByUsername(request.username())).thenReturn(Optional.of(newUser));
+            when(passwordEncoder.matches(request.password(), newUser.getPassword())).thenReturn(false);
+
+            // when
+            CustomException exception = assertThrows(CustomException.class, () -> authService.signIn(request));
+
+            // then
+            assertEquals(exception.getErrorType(), AuthErrorType.AUTHENTICATION_FAIL);
+        }
+    }
 }

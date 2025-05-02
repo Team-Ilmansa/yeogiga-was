@@ -7,6 +7,19 @@ import lombok.Builder;
 public class SignInDto {
 
     @Builder
+    @Schema(name = "SingInDto.Request", description = "일반 로그인 요청 DTO")
+    public record Request(
+            @Schema(name = "아이디", example = "testid")
+            @NotBlank(message = "아이디는 필수 입력값입니다.")
+            String username,
+
+            @Schema(name = "비밀번호", example = "testpw")
+            @NotBlank(message = "비밀번호는 필수 입력값입니다.")
+            String password
+    ) {
+    }
+
+    @Builder
     @Schema(name = "OAuthRequest", description = "OAuth 로그인 요청 DTO")
     public record OAuthRequest(
             @Schema(description = "OAuth 리소스 서버에서 발급받은 인증 코드", example = "abcd123")

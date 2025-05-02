@@ -9,11 +9,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class JwtService {
     private final JwtHelper jwtHelper;
+    private final RefreshTokenService refreshTokenService;
 
     public TokenDto generateToken(String username, String nickname, Long userId) {
-        return TokenDto.of(
-                jwtHelper.generateAccessToken(username, nickname, userId),
-                jwtHelper.generateRefreshToken(username, nickname, userId));
+        String accessToken = jwtHelper.generateAccessToken(username, nickname, userId);
+        String refreshToken = jwtHelper.generateRefreshToken(username, nickname, userId);
+        refreshTokenService.save(userId, refreshToken);
+
+        return TokenDto.of(accessToken, refreshToken);
     }
 
     public Long extractUserId(String token) {
