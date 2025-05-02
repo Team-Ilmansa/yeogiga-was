@@ -18,8 +18,9 @@ public enum AuthErrorType implements BaseErrorType {
     INVALID_TOKEN_SIGNATURE(HttpStatus.UNAUTHORIZED, "A006", "토큰 서명이 잘못되었습니다."),
     UNKNOWN_TOKEN_ERROR(HttpStatus.UNAUTHORIZED, "A007", "토큰 인증 과정 중 에러가 발생하였습니다."),
     REFRESH_TOKEN_EXPIRED(HttpStatus.NOT_FOUND, "A008", "리프레시 토큰이 만료되었습니다. 재로그인 해주세요."),
-    REFRESH_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "A009", "리프레시 토큰을 찾을 수 없습니다.")
-    ;
+    REFRESH_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "A009", "리프레시 토큰을 찾을 수 없습니다."),
+
+    AUTHENTICATION_FAIL(HttpStatus.BAD_REQUEST, "A010", "로그인에 실패하였습니다. 아이디 또는 비밀번호를 확인해주세요.");
 
 
     private final HttpStatus httpStatus;
