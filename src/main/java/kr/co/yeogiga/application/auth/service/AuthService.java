@@ -44,7 +44,7 @@ public class AuthService {
      *
      * @param request               로그인 요청 dto(username, password)
      * @throws CustomException      AuthErrorType.AUTHENTICATION_FAIL 아이디 및 비밀번호 불일치
-     * @return                      토큰(access token, refresh token)
+     * @return                      토큰(accessToken, refreshToken)
      */
     public TokenDto signIn(SignInDto.Request request) {
         User user = userService.readByUsername(request.username())
