@@ -186,7 +186,6 @@ public class AuthServiceTest {
             // given
             when(userService.readByUsername(request.username())).thenReturn(Optional.ofNullable(null));
 
-
             // when
             CustomException exception = assertThrows(CustomException.class, () -> authService.signIn(request));
 
@@ -207,7 +206,6 @@ public class AuthServiceTest {
 
             when(userService.readByUsername(request.username())).thenReturn(Optional.of(newUser));
             when(passwordEncoder.matches(request.password(), newUser.getPassword())).thenReturn(false);
-
 
             // when
             CustomException exception = assertThrows(CustomException.class, () -> authService.signIn(request));
