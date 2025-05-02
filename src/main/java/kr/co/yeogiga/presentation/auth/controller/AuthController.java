@@ -34,12 +34,14 @@ import static kr.co.yeogiga.application.auth.constant.AuthConstants.REFRESH_TOKE
 public class AuthController implements AuthApi {
     private final AuthService authService;
 
+    @Override
     @PostMapping("/sign-up")
     public ResponseEntity<?> signUp(@Valid @RequestBody SignUpDto.Request request) {
         authService.signUp(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
+    @Override
     @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(
             @RequestHeader(name = "device") Device device,
@@ -49,6 +51,7 @@ public class AuthController implements AuthApi {
         return createTokenResponse(device, token);
     }
 
+    @Override
     @GetMapping("/reissue")
     public ResponseEntity<?> reissueToken(
             @RequestHeader(name = "device") Device device,
@@ -66,6 +69,7 @@ public class AuthController implements AuthApi {
         };
     }
 
+    @Override
     @GetMapping("/sign-out")
     public ResponseEntity<?> signOut(
             @RequestHeader(name = "device") Device device,
