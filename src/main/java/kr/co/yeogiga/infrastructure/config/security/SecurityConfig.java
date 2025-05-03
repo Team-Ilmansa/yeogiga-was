@@ -48,6 +48,7 @@ public class SecurityConfig {
                         authorize
                                 .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                                 .requestMatchers(USER_ENDPOINTS).hasAuthority(Role.USER.name())
+                                .requestMatchers(GUEST_ENDPOINTS).hasAuthority(Role.GUEST.name())
                                 .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class)
