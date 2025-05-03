@@ -19,14 +19,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
-import static kr.co.yeogiga.application.auth.constant.AuthConstants.*;
+import static kr.co.yeogiga.application.auth.constant.AuthConstants.REFRESH_TOKEN_PREFIX;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/auth/oauth")
+@RequestMapping("/api/v1/oauth")
 public class OAuthController implements OAuthApi {
     private final OAuthManagementService oAuthManagementService;
 
+    @Override
     @PostMapping("/sign-in/{platform}")
     public ResponseEntity<?> signIn(
             @RequestHeader(value = "device") Device device,
