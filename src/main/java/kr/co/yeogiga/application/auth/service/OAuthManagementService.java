@@ -45,6 +45,12 @@ public class OAuthManagementService {
         return getSignInResponse(userStatus);
     }
 
+    /**
+     * GUEST 사용자의 권한 승격을 위한 회원 등록 메서드
+     *
+     * @param userId        사용자 ID
+     * @param request       회원 등록 요청 dto (nickname)
+     */
     @Transactional
     public void register(Long userId, SignUpDto.Register request) {
         User user = userService.readById(userId)
