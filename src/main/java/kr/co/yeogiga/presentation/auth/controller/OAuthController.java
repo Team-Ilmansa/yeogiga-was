@@ -40,11 +40,11 @@ public class OAuthController implements OAuthApi {
         return createSignInResponse(device, oAuthManagementService.signIn(platform, request.code()));
     }
 
-
+    @Override
     @PutMapping("/register")
     public ResponseEntity<?> register(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody SignUpDto.Register request) {
+            @Valid @RequestBody SignUpDto.Register request) {
         oAuthManagementService.register(userDetails.getUserId(), request);
         return ResponseEntity.ok(SuccessResponse.ok());
     }

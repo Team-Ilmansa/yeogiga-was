@@ -10,9 +10,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.co.yeogiga.application.auth.dto.SignInDto;
+import kr.co.yeogiga.application.auth.dto.SignUpDto;
 import kr.co.yeogiga.application.auth.type.Device;
+import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.domain.oauth.type.OAuthPlatform;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -96,4 +99,40 @@ public interface OAuthApi {
                     }))
     })
     ResponseEntity<?> signIn(@RequestHeader(value = "device") Device device, @PathVariable(name = "platform") OAuthPlatform platform, @Valid @RequestBody SignInDto.OAuthRequest request);
+
+    @TrackApi(description = "게스트 회원 등록")
+    @Operation(summary = "게스트 회원 등록", description = "게스트 사용자 회원 등록을 위한 API 입니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 등록 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "회원 등록 성공", value = """
+                                        {
+                                             "code": 200,
+                                             "message": "요청이 성공하였습니다."
+                                         }
+                                    """),
+                    })),
+            @ApiResponse(responseCode = "400", description = "유효성 검증 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "유효성 검증 실패", value = """
+                                        {
+                                            "code": "G002",
+                                            "errors": {
+                                                "nickname": "닉네임은 필수 입력값입니다."
+                                            }
+                                        }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "403", description = "접근 권한 오류",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "접근 권한 오류", value = """
+                                        {
+                                             "code": "A000",
+                                             "message": "접근 권한이 없습니다."
+                                        }
+                                    """)
+                    }))
+
+    })
+    ResponseEntity<?> register(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody SignUpDto.Register request);
 }
