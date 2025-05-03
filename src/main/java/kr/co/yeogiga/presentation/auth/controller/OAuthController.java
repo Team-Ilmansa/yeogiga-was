@@ -46,7 +46,7 @@ public class OAuthController implements OAuthApi {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody SignUpDto.Register request) {
         oAuthManagementService.register(userDetails.getUserId(), request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(SuccessResponse.ok());
     }
 
     private ResponseEntity<?> createSignInResponse(Device device, SignInDto.Response response) {
