@@ -42,6 +42,7 @@ public class SignUpDto {
     }
 
     public record Register(
+            @Schema(name = "닉네임", example = "testnick")
             @NotBlank(message = "닉네임은 필수 입력값입니다.")
             String nickname
     ) {
