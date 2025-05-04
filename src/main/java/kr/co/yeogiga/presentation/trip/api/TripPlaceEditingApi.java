@@ -106,7 +106,7 @@ public interface TripPlaceEditingApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> deletePlace(@PathVariable Long tripId,
+    ResponseEntity<?> deleteAssignedPlace(@PathVariable Long tripId,
                                   @PathVariable int day,
                                   @PathVariable String placeId);
 }

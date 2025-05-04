@@ -150,7 +150,7 @@ public class TripPlaceEditingControllerTest {
     @DisplayName("목적지 삭제 성공")
     void deletePlaceSuccess() throws Exception {
         // given
-        doNothing().when(tripPlaceEditingService).deletePlace(anyLong(), anyInt(), Mockito.anyString());
+        doNothing().when(tripPlaceEditingService).deleteAssignedPlace(anyLong(), anyInt(), Mockito.anyString());
 
         // when
         ResultActions resultActions = mockMvc.perform(

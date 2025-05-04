@@ -100,7 +100,7 @@ public class TripPlaceEditingServiceTest {
                     .willReturn(List.of(place));
 
             // when
-            tripPlaceEditingService.deletePlace(tripId, day, placeId);
+            tripPlaceEditingService.deleteAssignedPlace(tripId, day, placeId);
 
             // then
             verify(redisRepository, times(1)).removeFromList(anyString(), eq(place));
@@ -115,7 +115,7 @@ public class TripPlaceEditingServiceTest {
                     .willReturn(List.of());
 
             // when
-            assertDoesNotThrow(() -> tripPlaceEditingService.deletePlace(tripId, day, placeId));
+            assertDoesNotThrow(() -> tripPlaceEditingService.deleteAssignedPlace(tripId, day, placeId));
 
             // then
             verify(redisRepository, never()).removeFromList(anyString(), any());

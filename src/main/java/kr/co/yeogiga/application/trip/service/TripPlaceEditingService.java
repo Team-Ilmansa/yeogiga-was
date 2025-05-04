@@ -20,16 +20,16 @@ import java.util.List;
 public class TripPlaceEditingService {
     private final RedisRepository redisRepository;
 
+
     /**
-     * 특정 여행(tripId)과 일차(day)에 저장된 목적지 리스트를 조회하는 메서드
+     * 일정에 분배되기 전, 임시 목적지 목록에 장소를 추가하는 메서드
      *
-     * @param tripId : 여행 ID
-     * @param day    : 여행 일차 (1일차, 2일차 등)
-     * @return : 저장된 TripPlaceDto.StoredFormat 리스트
+     * @param tripId  : 여행 ID
+     * @param place   : 추가할 장소 정보
+     * @throws CustomException ALREADY_ADDED_PLACE : 이미 추가된 장소인 경우
      */
-    public List<TripPlaceReq.StoredFormat> getAssignedPlaces(Long tripId, int day) {
-        String listKey = PlaceConstant.listKey(tripId, day);
-        return redisRepository.getList(listKey, TripPlaceReq.StoredFormat.class);
+    public void addTempPlace(Long tripId, TripPlaceReq.Request place) {
+
     }
 
     /**
@@ -56,6 +56,18 @@ public class TripPlaceEditingService {
     }
 
     /**
+     * 특정 여행(tripId)과 일차(day)에 저장된 목적지 리스트를 조회하는 메서드
+     *
+     * @param tripId : 여행 ID
+     * @param day    : 여행 일차 (1일차, 2일차 등)
+     * @return : 저장된 TripPlaceDto.StoredFormat 리스트
+     */
+    public List<TripPlaceReq.StoredFormat> getAssignedPlaces(Long tripId, int day) {
+        String listKey = PlaceConstant.listKey(tripId, day);
+        return redisRepository.getList(listKey, TripPlaceReq.StoredFormat.class);
+    }
+
+    /**
      * 편집 중인 여행 일정에서 특정 목적지를 삭제하는 메서드
      * - List에서 id에 해당하는 목적지 조회
      * - 찾은 경우 List & Set에 삭제
@@ -64,7 +76,7 @@ public class TripPlaceEditingService {
      * @param day     : 여행 일차
      * @param placeId : 삭제할 목적지 ID
      */
-    public void deletePlace(Long tripId, int day, String placeId) {
+    public void deleteAssignedPlace(Long tripId, int day, String placeId) {
         String listKey = PlaceConstant.listKey(tripId, day);
         String setKey = PlaceConstant.setKey(tripId, day);
 

@@ -54,11 +54,11 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
 
     @Override
     @DeleteMapping("/{tripId}/days/{day}/places/{placeId}")
-    public ResponseEntity<?> deletePlace(@PathVariable Long tripId,
+    public ResponseEntity<?> deleteAssignedPlace(@PathVariable Long tripId,
                                          @PathVariable int day,
                                          @PathVariable String placeId) {
 
-        tripPlaceEditingService.deletePlace(tripId, day, placeId);
+        tripPlaceEditingService.deleteAssignedPlace(tripId, day, placeId);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 }
