@@ -69,7 +69,7 @@ public class TripPlaceEditingControllerTest {
 
     @Nested
     @DisplayName("목적지 추가 테스트")
-    class AddPlaceTest {
+    class AssignPlaceToDayTest {
 
         private final TripPlaceReq.Request request = TripPlaceReq.Request.builder()
                 .name("목적지1")
@@ -77,6 +77,8 @@ public class TripPlaceEditingControllerTest {
                 .longitude(0.0)
                 .placeType("카페")
                 .build();
+
+        private final String placeId = "place-id";
 
         @Test
         @DisplayName("성공")
@@ -86,7 +88,7 @@ public class TripPlaceEditingControllerTest {
 
             // when
             ResultActions resultActions = mockMvc.perform(
-                    post("/api/v1/trip/{tripId}/days/{day}/places", tripId, day)
+                    post("/api/v1/trip/{tripId}/days/{day}/places/{placeId}", tripId, day, placeId)
                             .contentType(APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
             );
@@ -107,7 +109,7 @@ public class TripPlaceEditingControllerTest {
 
             // when
             ResultActions resultActions = mockMvc.perform(
-                    post("/api/v1/trip/{tripId}/days/{day}/places", tripId, day)
+                    post("/api/v1/trip/{tripId}/days/{day}/places/{placeId}", tripId, day, placeId)
                             .contentType(APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
             );
@@ -166,7 +168,7 @@ public class TripPlaceEditingControllerTest {
 
     @Test
     @DisplayName("목적지 조회 성공")
-    void getPlacesSuccess() throws Exception {
+    void getAssignedPlacesSuccess() throws Exception {
         // given
         List<TripPlaceReq.StoredFormat> mockPlaces = List.of(
                 new TripPlaceReq.StoredFormat("place-id", "목적지1", 33.123, 126.456, PlaceCategory.CAFE.getGroupName())

@@ -42,8 +42,8 @@ public interface TripPlaceEditingApi {
                     })),
     })
     ResponseEntity<?> assignPlaceToDay(@PathVariable Long tripId,
-                               @PathVariable int day,
-                               @RequestBody TripPlaceReq.Request request);
+                                       @PathVariable int day,
+                                       @PathVariable String placeId);
 
     @TrackApi(description = "일자별 목적지 조회")
     @Operation(summary = "일자별 목적지 조회", description = "일자별 목적지 조회하는 API입니다.")
@@ -107,6 +107,6 @@ public interface TripPlaceEditingApi {
                     }))
     })
     ResponseEntity<?> deleteAssignedPlace(@PathVariable Long tripId,
-                                  @PathVariable int day,
-                                  @PathVariable String placeId);
+                                          @PathVariable int day,
+                                          @PathVariable String placeId);
 }

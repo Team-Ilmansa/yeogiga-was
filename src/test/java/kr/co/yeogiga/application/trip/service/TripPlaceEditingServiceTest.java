@@ -14,12 +14,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -41,40 +43,66 @@ public class TripPlaceEditingServiceTest {
 
     @Nested
     @DisplayName("목적지 추가 테스트")
-    class AddPlaceTest {
+    class AssignPlaceToDayTest {
 
-        private final TripPlaceReq.Request place = TripPlaceReq.Request.builder()
-                .name("목적지1")
-                .latitude(0.0)
-                .longitude(0.0)
-                .placeType("카페")
-                .build();
+        private final String placeId = "place-id";
 
         @Test
         @DisplayName("성공")
         void addPlaceInEditingSuccess() {
             // given
-            String setKey = PlaceConstant.setKey(tripId, day);
-            given(redisRepository.existsInSet(eq(setKey), anyString())).willReturn(false);
+            String tempListKey = PlaceConstant.tempListKey(tripId);
+            List<TripPlaceReq.StoredFormat> mockPlaces = List.of(
+                    new TripPlaceReq.StoredFormat("place-id", "목적지1", 33.123, 126.456, PlaceCategory.CAFE.getGroupName())
+            );
+            given(redisRepository.getList(eq(tempListKey), eq(TripPlaceReq.StoredFormat.class)))
+                    .willReturn(mockPlaces);
+
+            String dayPlaceSetKey = PlaceConstant.dayPlaceSetKey(tripId, day);
+            given(redisRepository.existsInSet(eq(dayPlaceSetKey), anyString())).willReturn(false);
 
             // when
-            tripPlaceEditingService.assignPlaceToDay(tripId, day, place);
+            tripPlaceEditingService.assignPlaceToDay(tripId, day, placeId);
 
             // then
             verify(redisRepository, times(1)).setList(anyString(), any(TripPlaceReq.StoredFormat.class));
-            verify(redisRepository, times(1)).addToSet(eq(setKey), anyString());
+            verify(redisRepository, times(1)).addToSet(eq(dayPlaceSetKey), anyString());
+        }
+
+        @Test
+        @DisplayName("실패 - 담겨져 있지 않은 목적지")
+        void addPlaceInEditingFailNotFoundPlace() {
+            String tempListKey = PlaceConstant.tempListKey(tripId);
+            given(redisRepository.getList(eq(tempListKey), eq(TripPlaceReq.StoredFormat.class)))
+                    .willReturn(Collections.emptyList());
+
+
+            // when
+            CustomException exception = assertThrows(CustomException.class, () ->
+                    tripPlaceEditingService.assignPlaceToDay(tripId, day, placeId)
+            );
+
+            // then
+            assertEquals(TripErrorType.NOT_FOUND_TEMP_PLACE, exception.getErrorType());
         }
 
         @Test
         @DisplayName("실패 - 중복")
         void addPlaceInEditingFailAlreadyAdded() {
             // given
-            String setKey = PlaceConstant.setKey(tripId, day);
-            given(redisRepository.existsInSet(eq(setKey), anyString())).willReturn(true);
+            String tempListKey = PlaceConstant.tempListKey(tripId);
+            List<TripPlaceReq.StoredFormat> mockPlaces = List.of(
+                    new TripPlaceReq.StoredFormat("place-id", "목적지1", 33.123, 126.456, PlaceCategory.CAFE.getGroupName())
+            );
+            given(redisRepository.getList(eq(tempListKey), eq(TripPlaceReq.StoredFormat.class)))
+                    .willReturn(mockPlaces);
+
+            String dayPlaceSetKey = PlaceConstant.dayPlaceSetKey(tripId, day);
+            given(redisRepository.existsInSet(eq(dayPlaceSetKey), anyString())).willReturn(true);
 
             // when
             CustomException exception = assertThrows(CustomException.class, () ->
-                    tripPlaceEditingService.assignPlaceToDay(tripId, day, place)
+                    tripPlaceEditingService.assignPlaceToDay(tripId, day, placeId)
             );
 
             // then

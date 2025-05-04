@@ -56,9 +56,9 @@ public class TripPlaceSavingServiceTest {
         // then
         verify(redisRepository, times(2)).getList(anyString(), eq(TripPlaceReq.StoredFormat.class));
         verify(tripDayPlaceService, times(1)).saveAll(any());
-        verify(redisRepository, times(1)).del(PlaceConstant.listKey(tripId, 1));
-        verify(redisRepository, times(1)).del(PlaceConstant.setKey(tripId, 1));
-        verify(redisRepository, times(1)).del(PlaceConstant.listKey(tripId, 2));
-        verify(redisRepository, times(1)).del(PlaceConstant.setKey(tripId, 2));
+        verify(redisRepository, times(1)).del(PlaceConstant.dayPlacesKey(tripId, 1));
+        verify(redisRepository, times(1)).del(PlaceConstant.dayPlaceSetKey(tripId, 1));
+        verify(redisRepository, times(1)).del(PlaceConstant.dayPlacesKey(tripId, 2));
+        verify(redisRepository, times(1)).del(PlaceConstant.dayPlaceSetKey(tripId, 2));
     }
 }

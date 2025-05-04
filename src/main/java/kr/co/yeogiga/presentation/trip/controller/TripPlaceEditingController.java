@@ -25,12 +25,12 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
     private final TripPlaceEditingService tripPlaceEditingService;
 
     @Override
-    @PostMapping("/{tripId}/days/{day}/places")
+    @PostMapping("/{tripId}/days/{day}/places/{placeId}")
     public ResponseEntity<?> assignPlaceToDay(@PathVariable Long tripId,
-                                      @PathVariable int day,
-                                      @RequestBody TripPlaceReq.Request request) {
+                                              @PathVariable int day,
+                                              @PathVariable String placeId) {
 
-        tripPlaceEditingService.assignPlaceToDay(tripId, day, request);
+        tripPlaceEditingService.assignPlaceToDay(tripId, day, placeId);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
@@ -55,8 +55,8 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
     @Override
     @DeleteMapping("/{tripId}/days/{day}/places/{placeId}")
     public ResponseEntity<?> deleteAssignedPlace(@PathVariable Long tripId,
-                                         @PathVariable int day,
-                                         @PathVariable String placeId) {
+                                                 @PathVariable int day,
+                                                 @PathVariable String placeId) {
 
         tripPlaceEditingService.deleteAssignedPlace(tripId, day, placeId);
         return ResponseEntity.ok(SuccessResponse.ok());
