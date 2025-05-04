@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -42,7 +41,87 @@ public class TripPlaceEditingServiceTest {
     private final int day = 1;
 
     @Nested
-    @DisplayName("목적지 추가 테스트")
+    @DisplayName("임시 저장소 목적지 테스트")
+    class TempPlaceTest {
+
+        private final String placeId = "place-id";
+
+        @Test
+        @DisplayName("임시 저장소에 목적지 추가 성공")
+        void addTempPlaceSuccess() {
+            // given
+            TripPlaceReq.Request request = TripPlaceReq.Request.builder()
+                    .name("목적지1")
+                    .latitude(0.0)
+                    .longitude(0.0)
+                    .placeType("카페")
+                    .build();
+
+            // when
+            tripPlaceEditingService.addTempPlace(tripId, request);
+
+            // then
+            verify(redisRepository, times(1)).setList(anyString(), any());
+        }
+
+        @Test
+        @DisplayName("임시 저장소 목적지 목록 조회 성공")
+        void getTempPlacesSuccess() {
+            // given
+            TripPlaceReq.StoredFormat storedPlace = new TripPlaceReq.StoredFormat(
+                    placeId, "목적지1", 0.0, 0.0, "식당"
+            );
+
+            String tempListKey = PlaceConstant.tempListKey(tripId);
+            given(redisRepository.getList(eq(tempListKey), eq(TripPlaceReq.StoredFormat.class)))
+                    .willReturn(List.of(storedPlace));
+
+            // when
+            List<TripPlaceReq.StoredFormat> result = tripPlaceEditingService.getTempPlaces(tripId);
+
+            // then
+            assertEquals(1, result.size());
+            assertEquals("목적지1", result.get(0).name());
+            assertEquals("식당", result.get(0).placeCategory());
+        }
+
+        @Test
+        @DisplayName("임시 저장소에서 목적지 삭제 성공")
+        void deleteTempPlaceSuccess() {
+            // given
+            TripPlaceReq.StoredFormat storedPlace = new TripPlaceReq.StoredFormat(
+                    placeId, "목적지1", 0.0, 0.0, "식당"
+            );
+
+            String tempListKey = PlaceConstant.tempListKey(tripId);
+            given(redisRepository.getList(eq(tempListKey), eq(TripPlaceReq.StoredFormat.class)))
+                    .willReturn(List.of(storedPlace));
+
+            // when
+            tripPlaceEditingService.deleteTempPlace(tripId, placeId);
+
+            // then
+            verify(redisRepository).removeFromList(eq(tempListKey), eq(storedPlace));
+        }
+
+        @Test
+        @DisplayName("임시 저장소에서 목적지 삭제 실패 - 존재하지 않음")
+        void deleteTempPlaceNotFound() {
+            // given
+            String key = PlaceConstant.tempListKey(tripId);
+            given(redisRepository.getList(eq(key), eq(TripPlaceReq.StoredFormat.class)))
+                    .willReturn(List.of());
+
+            // when
+            assertDoesNotThrow(() -> tripPlaceEditingService.deleteTempPlace(tripId, placeId));
+
+            // then
+            verify(redisRepository, never()).removeFromList(anyString(), any());
+        }
+    }
+
+    @Nested
+    @DisplayName("일정에 목적지 담기 테스트")
     class AssignPlaceToDayTest {
 
         private final String placeId = "place-id";
