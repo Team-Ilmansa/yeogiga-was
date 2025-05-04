@@ -86,7 +86,7 @@ public class OAuthControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/auth/oauth/sign-in/{platform}", oAuthPlatform)
+                post("/api/v1/oauth/sign-in/{platform}", oAuthPlatform)
                         .header("device", device.name())
                         .content(objectMapper.writeValueAsBytes(request))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -110,7 +110,7 @@ public class OAuthControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/auth/oauth/sign-in/{platform}", oAuthPlatform)
+                post("/api/v1/oauth/sign-in/{platform}", oAuthPlatform)
                         .header("device", device.name())
                         .content(objectMapper.writeValueAsBytes(request))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -135,7 +135,7 @@ public class OAuthControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/auth/oauth/sign-in/{platform}", oAuthPlatform)
+                post("/api/v1/oauth/sign-in/{platform}", oAuthPlatform)
                         .header("device", device.name())
                         .content(objectMapper.writeValueAsBytes(request))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -159,7 +159,7 @@ public class OAuthControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/auth/oauth/sign-in/{platform}", oAuthPlatform)
+                post("/api/v1/oauth/sign-in/{platform}", oAuthPlatform)
                         .header("device", device.name())
                         .content(objectMapper.writeValueAsBytes(request))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -188,7 +188,7 @@ public class OAuthControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/auth/oauth/sign-in/{platform}", oAuthPlatform)
+                post("/api/v1/oauth/sign-in/{platform}", oAuthPlatform)
                         .header("device", device.name())
                         .content(objectMapper.writeValueAsBytes(req))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -215,7 +215,7 @@ public class OAuthControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/auth/oauth/sign-in/{platform}", oAuthPlatform)
+                post("/api/v1/oauth/sign-in/{platform}", oAuthPlatform)
                         .header("device", device.name())
                         .content(objectMapper.writeValueAsBytes(req))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -236,7 +236,7 @@ public class OAuthControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/auth/oauth/sign-in/{platform}", "MISS_VALUE")
+                post("/api/v1/oauth/sign-in/{platform}", "MISS_VALUE")
                         .header("device", device.name())
                         .content(objectMapper.writeValueAsBytes(request))
                         .contentType(MediaType.APPLICATION_JSON)

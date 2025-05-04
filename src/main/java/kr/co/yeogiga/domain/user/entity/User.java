@@ -59,4 +59,8 @@ public class User extends BaseTimeEntity {
         signedUp = true;
         role = Role.USER;
     }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }

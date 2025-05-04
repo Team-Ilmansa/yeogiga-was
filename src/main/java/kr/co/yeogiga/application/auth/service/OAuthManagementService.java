@@ -1,13 +1,16 @@
 package kr.co.yeogiga.application.auth.service;
 
 import kr.co.yeogiga.application.auth.dto.SignInDto;
+import kr.co.yeogiga.application.auth.dto.SignUpDto;
 import kr.co.yeogiga.application.auth.dto.TokenDto;
 import kr.co.yeogiga.application.auth.dto.UserInfoDto;
 import kr.co.yeogiga.application.auth.dto.UserStatusDto;
+import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.oauth.entity.OAuth;
 import kr.co.yeogiga.domain.oauth.service.OAuthService;
 import kr.co.yeogiga.domain.oauth.type.OAuthPlatform;
 import kr.co.yeogiga.domain.user.entity.User;
+import kr.co.yeogiga.domain.user.exception.UserErrorType;
 import kr.co.yeogiga.domain.user.service.UserService;
 import kr.co.yeogiga.domain.user.type.Role;
 import kr.co.yeogiga.infrastructure.oauth.OAuthClient;
@@ -21,7 +24,6 @@ public class OAuthManagementService {
     private final OAuthClientFactory oAuthClientFactory;
     private final OAuthService oAuthService;
     private final JwtService jwtService;
-    private final RefreshTokenService refreshTokenService;
     private final UserService userService;
 
     /**
@@ -41,6 +43,21 @@ public class OAuthManagementService {
         UserStatusDto userStatus = getUserStatus(platform, userInfo);
 
         return getSignInResponse(userStatus);
+    }
+
+    /**
+     * GUEST 사용자의 권한 승격을 위한 회원 등록 메서드
+     *
+     * @param userId        사용자 ID
+     * @param request       회원 등록 요청 dto (nickname)
+     */
+    @Transactional
+    public void register(Long userId, SignUpDto.Register request) {
+        User user = userService.readById(userId)
+                .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
+
+        user.updateNickname(request.nickname());
+        user.upgradeRoleToUser();
     }
 
     /**
@@ -104,6 +121,5 @@ public class OAuthManagementService {
                 .token(token)
                 .shouldSignup(userStatus.shouldSignUp())
                 .build();
-
     }
 }
