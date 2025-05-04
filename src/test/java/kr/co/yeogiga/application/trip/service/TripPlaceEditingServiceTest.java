@@ -58,7 +58,7 @@ public class TripPlaceEditingServiceTest {
             given(redisRepository.existsInSet(eq(setKey), anyString())).willReturn(false);
 
             // when
-            tripPlaceEditingService.addPlace(tripId, day, place);
+            tripPlaceEditingService.assignPlaceToDay(tripId, day, place);
 
             // then
             verify(redisRepository, times(1)).setList(anyString(), any(TripPlaceReq.StoredFormat.class));
@@ -74,7 +74,7 @@ public class TripPlaceEditingServiceTest {
 
             // when
             CustomException exception = assertThrows(CustomException.class, () ->
-                    tripPlaceEditingService.addPlace(tripId, day, place)
+                    tripPlaceEditingService.assignPlaceToDay(tripId, day, place)
             );
 
             // then
@@ -163,7 +163,7 @@ public class TripPlaceEditingServiceTest {
         given(redisRepository.getList(anyString(), eq(TripPlaceReq.StoredFormat.class))).willReturn(mockPlaces);
 
         // when
-        List<TripPlaceReq.StoredFormat> result = tripPlaceEditingService.getPlaces(tripId, day);
+        List<TripPlaceReq.StoredFormat> result = tripPlaceEditingService.getAssignedPlaces(tripId, day);
 
         // then
         assertEquals(1, result.size());

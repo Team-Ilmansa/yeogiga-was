@@ -41,7 +41,7 @@ public interface TripPlaceEditingApi {
                                     """)
                     })),
     })
-    ResponseEntity<?> addPlace(@PathVariable Long tripId,
+    ResponseEntity<?> assignPlaceToDay(@PathVariable Long tripId,
                                @PathVariable int day,
                                @RequestBody TripPlaceReq.Request request);
 
@@ -74,7 +74,7 @@ public interface TripPlaceEditingApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> getPlaces(@PathVariable Long tripId, @PathVariable int day);
+    ResponseEntity<?> getAssignedPlaces(@PathVariable Long tripId, @PathVariable int day);
 
     @TrackApi(description = "목적지 수정")
     @Operation(summary = "목적지 수정", description = "목적지 수정하는 API입니다.")

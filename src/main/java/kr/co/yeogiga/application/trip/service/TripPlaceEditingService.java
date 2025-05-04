@@ -27,7 +27,7 @@ public class TripPlaceEditingService {
      * @param day    : 여행 일차 (1일차, 2일차 등)
      * @return : 저장된 TripPlaceDto.StoredFormat 리스트
      */
-    public List<TripPlaceReq.StoredFormat> getPlaces(Long tripId, int day) {
+    public List<TripPlaceReq.StoredFormat> getAssignedPlaces(Long tripId, int day) {
         String listKey = PlaceConstant.listKey(tripId, day);
         return redisRepository.getList(listKey, TripPlaceReq.StoredFormat.class);
     }
@@ -42,7 +42,7 @@ public class TripPlaceEditingService {
      * @param place  : 추가할 TripPlaceDto.Request 객체
      * @throws CustomException ALREADY_ADDED_PLACE : 이미 목적지를 추가한 경우
      */
-    public void addPlace(Long tripId, int day, TripPlaceReq.Request place) {
+    public void assignPlaceToDay(Long tripId, int day, TripPlaceReq.Request place) {
         String listKey = PlaceConstant.listKey(tripId, day);
         String setKey = PlaceConstant.setKey(tripId, day);
 

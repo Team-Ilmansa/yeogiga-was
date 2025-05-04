@@ -82,7 +82,7 @@ public class TripPlaceEditingControllerTest {
         @DisplayName("성공")
         void addPlaceSuccess() throws Exception {
             // given
-            doNothing().when(tripPlaceEditingService).addPlace(anyLong(), anyInt(), any());
+            doNothing().when(tripPlaceEditingService).assignPlaceToDay(anyLong(), anyInt(), any());
 
             // when
             ResultActions resultActions = mockMvc.perform(
@@ -103,7 +103,7 @@ public class TripPlaceEditingControllerTest {
         void addPlaceFailAlreadyAdded() throws Exception {
             // given
             doThrow(new CustomException(TripErrorType.ALREADY_ADDED_PLACE))
-                    .when(tripPlaceEditingService).addPlace(anyLong(), anyInt(), any());
+                    .when(tripPlaceEditingService).assignPlaceToDay(anyLong(), anyInt(), any());
 
             // when
             ResultActions resultActions = mockMvc.perform(
@@ -171,7 +171,7 @@ public class TripPlaceEditingControllerTest {
         List<TripPlaceReq.StoredFormat> mockPlaces = List.of(
                 new TripPlaceReq.StoredFormat("place-id", "목적지1", 33.123, 126.456, PlaceCategory.CAFE.getGroupName())
         );
-        given(tripPlaceEditingService.getPlaces(tripId, day)).willReturn(mockPlaces);
+        given(tripPlaceEditingService.getAssignedPlaces(tripId, day)).willReturn(mockPlaces);
 
         // when
         ResultActions resultActions = mockMvc.perform(

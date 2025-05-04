@@ -26,19 +26,19 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
 
     @Override
     @PostMapping("/{tripId}/days/{day}/places")
-    public ResponseEntity<?> addPlace(@PathVariable Long tripId,
+    public ResponseEntity<?> assignPlaceToDay(@PathVariable Long tripId,
                                       @PathVariable int day,
                                       @RequestBody TripPlaceReq.Request request) {
 
-        tripPlaceEditingService.addPlace(tripId, day, request);
+        tripPlaceEditingService.assignPlaceToDay(tripId, day, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
     @Override
     @GetMapping("/{tripId}/days/{day}/places")
-    public ResponseEntity<?> getPlaces(@PathVariable Long tripId, @PathVariable int day) {
+    public ResponseEntity<?> getAssignedPlaces(@PathVariable Long tripId, @PathVariable int day) {
         return ResponseEntity.ok(
-                SuccessResponse.from(tripPlaceEditingService.getPlaces(tripId, day))
+                SuccessResponse.from(tripPlaceEditingService.getAssignedPlaces(tripId, day))
         );
     }
 
