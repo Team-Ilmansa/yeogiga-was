@@ -27,9 +27,9 @@ public class TripPlaceEditingService {
      * @param place  : 추가할 TripPlaceDto.Request 객체
      */
     public void addTempPlace(Long tripId, TripPlaceReq.Request place) {
-        String listKey = PlaceConstant.tempListKey(tripId);
+        String tempListKey = PlaceConstant.tempListKey(tripId);
 
-        redisRepository.setList(listKey, place.toStoredFormat());
+        redisRepository.setList(tempListKey, place.toStoredFormat());
     }
 
     /**
@@ -39,8 +39,8 @@ public class TripPlaceEditingService {
      * @return : 임시 저장된 장소 리스트
      */
     public List<TripPlaceReq.StoredFormat> getTempPlaces(Long tripId) {
-        String listKey = PlaceConstant.tempListKey(tripId);
-        return redisRepository.getList(listKey, TripPlaceReq.StoredFormat.class);
+        String tempListKey = PlaceConstant.tempListKey(tripId);
+        return redisRepository.getList(tempListKey, TripPlaceReq.StoredFormat.class);
     }
 
     /**
