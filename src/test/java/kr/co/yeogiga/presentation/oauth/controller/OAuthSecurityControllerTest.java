@@ -61,8 +61,7 @@ public class OAuthSecurityControllerTest {
         this.mockMvc = MockMvcBuilders
                 .webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
-                .defaultRequest(get("/**").with(csrf()))
-                .defaultRequest(post("/**").with(csrf()))
+                .defaultRequest(put("/**").with(csrf()))
                 .alwaysDo(print())
                 .build();
     }
