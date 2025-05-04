@@ -24,6 +24,7 @@ import java.util.List;
 public class TripPlaceEditingController implements TripPlaceEditingApi {
     private final TripPlaceEditingService tripPlaceEditingService;
 
+    @Override
     @PostMapping("/{tripId}/temp-places")
     public ResponseEntity<?> addTempPlace(@PathVariable Long tripId,
                                           @RequestBody TripPlaceReq.Request request) {
@@ -31,6 +32,7 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
+    @Override
     @GetMapping("/{tripId}/temp-places")
     public ResponseEntity<?> getTempPlaces(@PathVariable Long tripId) {
         return ResponseEntity.ok(
@@ -38,6 +40,7 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
         );
     }
 
+    @Override
     @DeleteMapping("/{tripId}/temp-places/{placeId}")
     public ResponseEntity<?> deleteTempPlace(@PathVariable Long tripId,
                                              @PathVariable String placeId) {
