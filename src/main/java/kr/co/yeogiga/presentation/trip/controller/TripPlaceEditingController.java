@@ -25,20 +25,44 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
     private final TripPlaceEditingService tripPlaceEditingService;
 
     @Override
-    @PostMapping("/{tripId}/days/{day}/places")
-    public ResponseEntity<?> addPlace(@PathVariable Long tripId,
-                                      @PathVariable int day,
-                                      @RequestBody TripPlaceReq.Request request) {
+    @PostMapping("/{tripId}/temp-places")
+    public ResponseEntity<?> addTempPlace(@PathVariable Long tripId,
+                                          @RequestBody TripPlaceReq.Request request) {
+        tripPlaceEditingService.addTempPlace(tripId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
+    }
 
-        tripPlaceEditingService.addPlace(tripId, day, request);
+    @Override
+    @GetMapping("/{tripId}/temp-places")
+    public ResponseEntity<?> getTempPlaces(@PathVariable Long tripId) {
+        return ResponseEntity.ok(
+                SuccessResponse.from(tripPlaceEditingService.getTempPlaces(tripId))
+        );
+    }
+
+    @Override
+    @DeleteMapping("/{tripId}/temp-places/{placeId}")
+    public ResponseEntity<?> deleteTempPlace(@PathVariable Long tripId,
+                                             @PathVariable String placeId) {
+        tripPlaceEditingService.deleteTempPlace(tripId, placeId);
+        return ResponseEntity.ok(SuccessResponse.ok());
+    }
+
+    @Override
+    @PostMapping("/{tripId}/days/{day}/places/{placeId}")
+    public ResponseEntity<?> assignPlaceToDay(@PathVariable Long tripId,
+                                              @PathVariable int day,
+                                              @PathVariable String placeId) {
+
+        tripPlaceEditingService.assignPlaceToDay(tripId, day, placeId);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
     @Override
     @GetMapping("/{tripId}/days/{day}/places")
-    public ResponseEntity<?> getPlaces(@PathVariable Long tripId, @PathVariable int day) {
+    public ResponseEntity<?> getAssignedPlaces(@PathVariable Long tripId, @PathVariable int day) {
         return ResponseEntity.ok(
-                SuccessResponse.from(tripPlaceEditingService.getPlaces(tripId, day))
+                SuccessResponse.from(tripPlaceEditingService.getAssignedPlaces(tripId, day))
         );
     }
 
@@ -54,11 +78,11 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
 
     @Override
     @DeleteMapping("/{tripId}/days/{day}/places/{placeId}")
-    public ResponseEntity<?> deletePlace(@PathVariable Long tripId,
-                                         @PathVariable int day,
-                                         @PathVariable String placeId) {
+    public ResponseEntity<?> deleteAssignedPlace(@PathVariable Long tripId,
+                                                 @PathVariable int day,
+                                                 @PathVariable String placeId) {
 
-        tripPlaceEditingService.deletePlace(tripId, day, placeId);
+        tripPlaceEditingService.deleteAssignedPlace(tripId, day, placeId);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 }

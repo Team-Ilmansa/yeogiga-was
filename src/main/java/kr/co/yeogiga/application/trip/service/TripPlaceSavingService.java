@@ -34,8 +34,8 @@ public class TripPlaceSavingService {
             tripDayPlaces.add(createTripDayPlace(tripId, day));
 
             // Redis에 임시 저장된 데이터 삭제
-            redisRepository.del(PlaceConstant.listKey(tripId, day));
-            redisRepository.del(PlaceConstant.setKey(tripId, day));
+            redisRepository.del(PlaceConstant.dayPlacesKey(tripId, day));
+            redisRepository.del(PlaceConstant.dayPlaceSetKey(tripId, day));
         }
 
         tripDayPlaceService.saveAll(tripDayPlaces);
@@ -49,9 +49,9 @@ public class TripPlaceSavingService {
      * @return : 생성된 TripDayPlace
      */
     private TripDayPlace createTripDayPlace(Long tripId, int day) {
-        String listKey = PlaceConstant.listKey(tripId, day);
+        String dayPlacesKey = PlaceConstant.dayPlacesKey(tripId, day);
         List<TripPlaceReq.StoredFormat> storedPlaces
-                = redisRepository.getList(listKey, TripPlaceReq.StoredFormat.class);
+                = redisRepository.getList(dayPlacesKey, TripPlaceReq.StoredFormat.class);
 
         List<Place> places = new ArrayList<>();
         for (int i = 0; i < storedPlaces.size(); i++) {

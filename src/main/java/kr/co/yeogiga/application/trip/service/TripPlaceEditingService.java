@@ -21,38 +21,85 @@ public class TripPlaceEditingService {
     private final RedisRepository redisRepository;
 
     /**
+     * 일정에 배정되기 전 임시 저장소에 장소를 추가하는 메서드
+     *
+     * @param tripId : 여행 ID
+     * @param place  : 추가할 TripPlaceDto.Request 객체
+     */
+    public void addTempPlace(Long tripId, TripPlaceReq.Request place) {
+        String tempListKey = PlaceConstant.tempListKey(tripId);
+
+        redisRepository.setList(tempListKey, place.toStoredFormat());
+    }
+
+    /**
+     * 일정에 배정되기 전 임시 저장소에 있는 장소 목록을 조회하는 메서드
+     *
+     * @param tripId : 여행 ID
+     * @return : 임시 저장된 장소 리스트
+     */
+    public List<TripPlaceReq.StoredFormat> getTempPlaces(Long tripId) {
+        String tempListKey = PlaceConstant.tempListKey(tripId);
+        return redisRepository.getList(tempListKey, TripPlaceReq.StoredFormat.class);
+    }
+
+    /**
+     * 임시 저장소에서 장소를 꺼내와 특정 일차에 배정하는 메서드
+     * - 이미 해당 일차에 존재하는 경우 예외 발생
+     * - 배정 후 임시 저장소에서 해당 장소는 제거됨
+     *
+     * @param tripId  : 여행 ID
+     * @param day     : 배정할 일차
+     * @param placeId : 배정할 장소의 ID (임시 저장소 기준)
+     */
+    public void assignPlaceToDay(Long tripId, int day, String placeId) {
+        String tempListKey = PlaceConstant.tempListKey(tripId);
+        String dayPlacesKey = PlaceConstant.dayPlacesKey(tripId, day);
+        String dayPlaceSetKey = PlaceConstant.dayPlaceSetKey(tripId, day);
+
+        TripPlaceReq.StoredFormat place = findPlaceInList(tempListKey, placeId);
+        if (place == null) {
+            throw new CustomException(TripErrorType.NOT_FOUND_TEMP_PLACE);
+        }
+
+        String placeUniqueKey = makeUniqueKey(place.name(), place.latitude(), place.longitude());
+        if (redisRepository.existsInSet(dayPlaceSetKey, placeUniqueKey)) {
+            throw new CustomException(TripErrorType.ALREADY_ADDED_PLACE);
+        }
+
+        redisRepository.setList(dayPlacesKey, place);
+        redisRepository.addToSet(dayPlaceSetKey, placeUniqueKey);
+
+        deleteTempPlace(tripId, placeId);
+    }
+
+    /**
      * 특정 여행(tripId)과 일차(day)에 저장된 목적지 리스트를 조회하는 메서드
      *
      * @param tripId : 여행 ID
      * @param day    : 여행 일차 (1일차, 2일차 등)
      * @return : 저장된 TripPlaceDto.StoredFormat 리스트
      */
-    public List<TripPlaceReq.StoredFormat> getPlaces(Long tripId, int day) {
-        String listKey = PlaceConstant.listKey(tripId, day);
-        return redisRepository.getList(listKey, TripPlaceReq.StoredFormat.class);
+    public List<TripPlaceReq.StoredFormat> getAssignedPlaces(Long tripId, int day) {
+        String dayPlacesKey = PlaceConstant.dayPlacesKey(tripId, day);
+        return redisRepository.getList(dayPlacesKey, TripPlaceReq.StoredFormat.class);
     }
 
     /**
-     * 편집 중인 여행 일정에 새로운 목적지를 추가하는 메서드
-     * - Set을 통해 이미 추가된 장소인지 확인
-     * - 중복이 없다면 List & Set에 추가 (저장 포맷에 맞게 변환 후 저장)
+     * 일정에 배정되기 전 임시 저장소에서 장소를 삭제하는 메서드
      *
-     * @param tripId : 여행 ID
-     * @param day    : 여행 일차
-     * @param place  : 추가할 TripPlaceDto.Request 객체
-     * @throws CustomException ALREADY_ADDED_PLACE : 이미 목적지를 추가한 경우
+     * @param tripId  : 여행 ID
+     * @param placeId : 삭제할 장소 ID
      */
-    public void addPlace(Long tripId, int day, TripPlaceReq.Request place) {
-        String listKey = PlaceConstant.listKey(tripId, day);
-        String setKey = PlaceConstant.setKey(tripId, day);
+    public void deleteTempPlace(Long tripId, String placeId) {
+        String listKey = PlaceConstant.tempListKey(tripId);
 
-        String placeUniqueKey = makeUniqueKey(place.name(), place.latitude(), place.longitude());
-        if (redisRepository.existsInSet(setKey, placeUniqueKey)) {
-            throw new CustomException(TripErrorType.ALREADY_ADDED_PLACE);
+        TripPlaceReq.StoredFormat target = findPlaceInList(listKey, placeId);
+        if (target == null) {
+            return;
         }
 
-        redisRepository.setList(listKey, place.toStoredFormat());
-        redisRepository.addToSet(setKey, placeUniqueKey);
+        redisRepository.removeFromList(listKey, target);
     }
 
     /**
@@ -64,25 +111,35 @@ public class TripPlaceEditingService {
      * @param day     : 여행 일차
      * @param placeId : 삭제할 목적지 ID
      */
-    public void deletePlace(Long tripId, int day, String placeId) {
-        String listKey = PlaceConstant.listKey(tripId, day);
-        String setKey = PlaceConstant.setKey(tripId, day);
+    public void deleteAssignedPlace(Long tripId, int day, String placeId) {
+        String dayPlacesKey = PlaceConstant.dayPlacesKey(tripId, day);
+        String dayPlaceSetKey = PlaceConstant.dayPlaceSetKey(tripId, day);
 
-        List<TripPlaceReq.StoredFormat> places = redisRepository.getList(listKey, TripPlaceReq.StoredFormat.class);
-
-        TripPlaceReq.StoredFormat target = places.stream()
-                .filter(p -> placeId.equals(p.id()))
-                .findFirst()
-                .orElse(null);
-
+        TripPlaceReq.StoredFormat target = findPlaceInList(dayPlacesKey, placeId);
         if (target == null) {
             return;
         }
 
-        redisRepository.removeFromList(listKey, target);
+        redisRepository.removeFromList(dayPlacesKey, target);
 
         String placeUniqueKey = makeUniqueKey(target.name(), target.latitude(), target.longitude());
-        redisRepository.removeFromSet(setKey, placeUniqueKey);
+        redisRepository.removeFromSet(dayPlaceSetKey, placeUniqueKey);
+    }
+
+    /**
+     * Redis 리스트에서 주어진 placeId에 해당하는 장소를 찾아 반환하는 메서드
+     *
+     * @param listKey  : Redis에 저장된 장소 리스트의 키
+     * @param placeId  : 조회할 장소의 ID
+     * @return         : 일치하는 장소가 존재하면 해당 객체, 없으면 null 반환
+     */
+    private TripPlaceReq.StoredFormat findPlaceInList(String listKey, String placeId) {
+        List<TripPlaceReq.StoredFormat> places = redisRepository.getList(listKey, TripPlaceReq.StoredFormat.class);
+
+        return places.stream()
+                .filter(p -> placeId.equals(p.id()))
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -95,16 +152,16 @@ public class TripPlaceEditingService {
      * @param places : 새로운 순서의 TripPlaceDto.Request 리스트
      */
     public void updatePlaces(Long tripId, int day, List<TripPlaceReq.Request> places) {
-        String listKey = PlaceConstant.listKey(tripId, day);
-        String setKey = PlaceConstant.setKey(tripId, day);
+        String dayPlacesKey = PlaceConstant.dayPlacesKey(tripId, day);
+        String dayPlaceSetKey = PlaceConstant.dayPlaceSetKey(tripId, day);
 
-        redisRepository.del(listKey);
-        redisRepository.del(setKey);
+        redisRepository.del(dayPlacesKey);
+        redisRepository.del(dayPlaceSetKey);
 
         for (TripPlaceReq.Request place : places) {
-            redisRepository.setList(listKey, place.toStoredFormat());
+            redisRepository.setList(dayPlacesKey, place.toStoredFormat());
             String placeUniqueKey = makeUniqueKey(place.name(), place.latitude(), place.longitude());
-            redisRepository.addToSet(setKey, placeUniqueKey);
+            redisRepository.addToSet(dayPlaceSetKey, placeUniqueKey);
         }
     }
 

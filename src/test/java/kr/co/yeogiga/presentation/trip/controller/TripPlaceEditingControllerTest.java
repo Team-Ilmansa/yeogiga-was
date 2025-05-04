@@ -68,8 +68,8 @@ public class TripPlaceEditingControllerTest {
     }
 
     @Nested
-    @DisplayName("목적지 추가 테스트")
-    class AddPlaceTest {
+    @DisplayName("임시 저장소 목적지 테스트")
+    class TempPlaceTest {
 
         private final TripPlaceReq.Request request = TripPlaceReq.Request.builder()
                 .name("목적지1")
@@ -78,15 +78,89 @@ public class TripPlaceEditingControllerTest {
                 .placeType("카페")
                 .build();
 
+        private final String placeId = "place-id";
+
+        @Test
+        @DisplayName("추가 성공")
+        void addTempPlaceSuccess() throws Exception {
+            // given
+            doNothing().when(tripPlaceEditingService).addTempPlace(anyLong(), any());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    post("/api/v1/trip/{tripId}/temp-places", tripId)
+                            .contentType(APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+            );
+
+            // then
+            resultActions.andDo(print())
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
+        }
+
+        @Test
+        @DisplayName("조회 성공")
+        void getTempPlacesSuccess() throws Exception {
+            // given
+
+            List<TripPlaceReq.StoredFormat> tempPlaces = List.of(
+                    new TripPlaceReq.StoredFormat(placeId, "목적지1", 0.0, 0.0, "식당")
+            );
+            given(tripPlaceEditingService.getTempPlaces(tripId)).willReturn(tempPlaces);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/{tripId}/temp-places", tripId)
+            );
+
+            // then
+            resultActions.andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data[0].name").value("목적지1"))
+                    .andExpect(jsonPath("$.data[0].placeCategory").value("식당"));
+        }
+
+        @Test
+        @DisplayName("삭제 성공")
+        void deleteTempPlaceSuccess() throws Exception {
+            // given
+            doNothing().when(tripPlaceEditingService).deleteTempPlace(anyLong(), any());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    delete("/api/v1/trip/{tripId}/temp-places/{placeId}", tripId, placeId)
+            );
+
+            // then
+            resultActions.andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
+        }
+    }
+
+    @Nested
+    @DisplayName("목적지 추가 테스트")
+    class AssignPlaceToDayTest {
+
+        private final TripPlaceReq.Request request = TripPlaceReq.Request.builder()
+                .name("목적지1")
+                .latitude(0.0)
+                .longitude(0.0)
+                .placeType("카페")
+                .build();
+
+        private final String placeId = "place-id";
+
         @Test
         @DisplayName("성공")
         void addPlaceSuccess() throws Exception {
             // given
-            doNothing().when(tripPlaceEditingService).addPlace(anyLong(), anyInt(), any());
+            doNothing().when(tripPlaceEditingService).assignPlaceToDay(anyLong(), anyInt(), any());
 
             // when
             ResultActions resultActions = mockMvc.perform(
-                    post("/api/v1/trip/{tripId}/days/{day}/places", tripId, day)
+                    post("/api/v1/trip/{tripId}/days/{day}/places/{placeId}", tripId, day, placeId)
                             .contentType(APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
             );
@@ -103,11 +177,11 @@ public class TripPlaceEditingControllerTest {
         void addPlaceFailAlreadyAdded() throws Exception {
             // given
             doThrow(new CustomException(TripErrorType.ALREADY_ADDED_PLACE))
-                    .when(tripPlaceEditingService).addPlace(anyLong(), anyInt(), any());
+                    .when(tripPlaceEditingService).assignPlaceToDay(anyLong(), anyInt(), any());
 
             // when
             ResultActions resultActions = mockMvc.perform(
-                    post("/api/v1/trip/{tripId}/days/{day}/places", tripId, day)
+                    post("/api/v1/trip/{tripId}/days/{day}/places/{placeId}", tripId, day, placeId)
                             .contentType(APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
             );
@@ -150,7 +224,7 @@ public class TripPlaceEditingControllerTest {
     @DisplayName("목적지 삭제 성공")
     void deletePlaceSuccess() throws Exception {
         // given
-        doNothing().when(tripPlaceEditingService).deletePlace(anyLong(), anyInt(), Mockito.anyString());
+        doNothing().when(tripPlaceEditingService).deleteAssignedPlace(anyLong(), anyInt(), Mockito.anyString());
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -166,12 +240,12 @@ public class TripPlaceEditingControllerTest {
 
     @Test
     @DisplayName("목적지 조회 성공")
-    void getPlacesSuccess() throws Exception {
+    void getAssignedPlacesSuccess() throws Exception {
         // given
         List<TripPlaceReq.StoredFormat> mockPlaces = List.of(
                 new TripPlaceReq.StoredFormat("place-id", "목적지1", 33.123, 126.456, PlaceCategory.CAFE.getGroupName())
         );
-        given(tripPlaceEditingService.getPlaces(tripId, day)).willReturn(mockPlaces);
+        given(tripPlaceEditingService.getAssignedPlaces(tripId, day)).willReturn(mockPlaces);
 
         // when
         ResultActions resultActions = mockMvc.perform(
