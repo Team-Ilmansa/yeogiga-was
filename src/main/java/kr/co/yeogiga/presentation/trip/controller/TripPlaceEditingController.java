@@ -24,6 +24,27 @@ import java.util.List;
 public class TripPlaceEditingController implements TripPlaceEditingApi {
     private final TripPlaceEditingService tripPlaceEditingService;
 
+    @PostMapping("/{tripId}/temp-places")
+    public ResponseEntity<?> addTempPlace(@PathVariable Long tripId,
+                                          @RequestBody TripPlaceReq.Request request) {
+        tripPlaceEditingService.addTempPlace(tripId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
+    }
+
+    @GetMapping("/{tripId}/temp-places")
+    public ResponseEntity<?> getTempPlaces(@PathVariable Long tripId) {
+        return ResponseEntity.ok(
+                SuccessResponse.from(tripPlaceEditingService.getTempPlaces(tripId))
+        );
+    }
+
+    @DeleteMapping("/{tripId}/temp-places/{placeId}")
+    public ResponseEntity<?> deleteTempPlace(@PathVariable Long tripId,
+                                             @PathVariable String placeId) {
+        tripPlaceEditingService.deleteTempPlace(tripId, placeId);
+        return ResponseEntity.ok(SuccessResponse.ok());
+    }
+
     @Override
     @PostMapping("/{tripId}/days/{day}/places/{placeId}")
     public ResponseEntity<?> assignPlaceToDay(@PathVariable Long tripId,
