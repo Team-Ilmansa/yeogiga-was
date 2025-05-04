@@ -20,16 +20,27 @@ import java.util.List;
 public class TripPlaceEditingService {
     private final RedisRepository redisRepository;
 
-
     /**
-     * 일정에 분배되기 전, 임시 목적지 목록에 장소를 추가하는 메서드
+     * 일정에 배정되기 전 임시 저장소에 장소를 추가하는 메서드
      *
-     * @param tripId  : 여행 ID
-     * @param place   : 추가할 장소 정보
-     * @throws CustomException ALREADY_ADDED_PLACE : 이미 추가된 장소인 경우
+     * @param tripId : 여행 ID
+     * @param place  : 추가할 TripPlaceDto.Request 객체
      */
     public void addTempPlace(Long tripId, TripPlaceReq.Request place) {
+        String listKey = PlaceConstant.tempListKey(tripId);
 
+        redisRepository.setList(listKey, place.toStoredFormat());
+    }
+
+    /**
+     * 일정에 배정되기 전 임시 저장소에 있는 장소 목록을 조회하는 메서드
+     *
+     * @param tripId : 여행 ID
+     * @return : 임시 저장된 장소 리스트
+     */
+    public List<TripPlaceReq.StoredFormat> getTempPlaces(Long tripId) {
+        String listKey = PlaceConstant.tempListKey(tripId);
+        return redisRepository.getList(listKey, TripPlaceReq.StoredFormat.class);
     }
 
     /**
@@ -68,6 +79,23 @@ public class TripPlaceEditingService {
     }
 
     /**
+     * 일정에 배정되기 전 임시 저장소에서 장소를 삭제하는 메서드
+     *
+     * @param tripId  : 여행 ID
+     * @param placeId : 삭제할 장소 ID
+     */
+    public void deleteTempPlace(Long tripId, String placeId) {
+        String listKey = PlaceConstant.tempListKey(tripId);
+
+        TripPlaceReq.StoredFormat target = findPlaceInList(listKey, placeId);
+        if (target == null) {
+            return;
+        }
+
+        redisRepository.removeFromList(listKey, target);
+    }
+
+    /**
      * 편집 중인 여행 일정에서 특정 목적지를 삭제하는 메서드
      * - List에서 id에 해당하는 목적지 조회
      * - 찾은 경우 List & Set에 삭제
@@ -80,13 +108,7 @@ public class TripPlaceEditingService {
         String listKey = PlaceConstant.listKey(tripId, day);
         String setKey = PlaceConstant.setKey(tripId, day);
 
-        List<TripPlaceReq.StoredFormat> places = redisRepository.getList(listKey, TripPlaceReq.StoredFormat.class);
-
-        TripPlaceReq.StoredFormat target = places.stream()
-                .filter(p -> placeId.equals(p.id()))
-                .findFirst()
-                .orElse(null);
-
+        TripPlaceReq.StoredFormat target = findPlaceInList(listKey, placeId);
         if (target == null) {
             return;
         }
@@ -95,6 +117,22 @@ public class TripPlaceEditingService {
 
         String placeUniqueKey = makeUniqueKey(target.name(), target.latitude(), target.longitude());
         redisRepository.removeFromSet(setKey, placeUniqueKey);
+    }
+
+    /**
+     * Redis 리스트에서 주어진 placeId에 해당하는 장소를 찾아 반환하는 메서드
+     *
+     * @param listKey  : Redis에 저장된 장소 리스트의 키
+     * @param placeId  : 조회할 장소의 ID
+     * @return         : 일치하는 장소가 존재하면 해당 객체, 없으면 null 반환
+     */
+    private TripPlaceReq.StoredFormat findPlaceInList(String listKey, String placeId) {
+        List<TripPlaceReq.StoredFormat> places = redisRepository.getList(listKey, TripPlaceReq.StoredFormat.class);
+
+        return places.stream()
+                .filter(p -> placeId.equals(p.id()))
+                .findFirst()
+                .orElse(null);
     }
 
     /**
