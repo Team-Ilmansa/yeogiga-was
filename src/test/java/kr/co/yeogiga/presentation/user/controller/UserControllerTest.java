@@ -89,7 +89,7 @@ public class UserControllerTest {
 
         private final Long userId = 1L;
 
-        private PasswordUpdateReq request = new PasswordUpdateReq("newPassword");
+        private PasswordUpdateReq request = new PasswordUpdateReq("originalPassword", "newPassword");
 
         @Test
         @DisplayName("성공")
@@ -138,7 +138,7 @@ public class UserControllerTest {
             // given
             setUpUserDetails(Role.USER);
             doNothing().when(userManagementService).updatePassword(userId, request);
-            PasswordUpdateReq request = new PasswordUpdateReq(" ");
+            PasswordUpdateReq request = new PasswordUpdateReq(" ", "  ");
 
             // when
             ResultActions resultActions = mockMvc.perform(
