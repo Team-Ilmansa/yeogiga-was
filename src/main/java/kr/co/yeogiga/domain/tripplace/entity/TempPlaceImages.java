@@ -16,12 +16,12 @@ import java.util.List;
 public class TempPlaceImages {
     @Id
     private String id;
-    private String placeId;
+    private String tripDayPlaceId;
     private List<Image> images;
 
     @Builder
-    public TempPlaceImages(String placeId) {
-        this.placeId = placeId;
+    public TempPlaceImages(String tripDayPlaceId) {
+        this.tripDayPlaceId = tripDayPlaceId;
         this.images = new ArrayList<>();
     }
 
