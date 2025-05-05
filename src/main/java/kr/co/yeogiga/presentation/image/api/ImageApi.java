@@ -35,7 +35,8 @@ public interface ImageApi {
                     }))
     })
     ResponseEntity<?> uploadImages(@RequestPart(value = "images", required = false) List<MultipartFile> images,
-                                   @PathVariable Long tripId);
+                                   @PathVariable Long tripId,
+                                   @PathVariable String tripDayPlaceId);
 
     @TrackApi(description = "이미지 삭제")
     @Operation(summary = "이미지 삭제", description = "이미지 삭제하는 API입니다.")

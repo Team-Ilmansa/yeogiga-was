@@ -65,6 +65,10 @@ dependencies {
 
     /* Redis */
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    /* JAXB */
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+    implementation 'com.sun.xml.bind:jaxb-impl:2.3.1'
 }
 
 tasks.named('test') {
