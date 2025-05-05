@@ -16,6 +16,13 @@ public class UserManagementService {
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
 
+    /**
+     * 사용자 비밀번호 갱신 메서드
+     *
+     * @param userId            사용자 ID
+     * @param passwordReq       비밀번호 갱신 요청 dto(password)
+     * @throws CustomException  UserErrorType.SAME_PASSWORD - 기존 비밀번호와 동일할 경우
+     */
     @Transactional
     public void updatePassword(Long userId, PasswordUpdateReq passwordReq) {
         User user = userService.readById(userId)
