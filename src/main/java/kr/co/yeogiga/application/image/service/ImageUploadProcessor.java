@@ -19,14 +19,14 @@ public class ImageUploadProcessor {
      * MultipartFile 이미지 리스트를 받아 각각 비동기 업로드 및 메타데이터 추출을 요청메서드
      * 스프링에서 MultipartFile의 경우 요청 범위 내에서만 유효하기 비동기 처리를 위해서 데이터 추출
      *
-     * @param images  : 업로드 대상 이미지 리스트
-     * @param tripId  : 이미지가 속한 여행 ID
-     * @param placeId : 이미지가 속할 목적지 ID
+     * @param images         : 업로드 대상 이미지 리스트
+     * @param tripId         : 이미지가 속한 여행 ID
+     * @param tripDayPlaceId : 이미지가 속할 여행 일차 ID
      */
-    public void process(List<MultipartFile> images, Long tripId, String placeId) {
+    public void process(List<MultipartFile> images, Long tripId, String tripDayPlaceId) {
         for (MultipartFile image : images) {
             try {
-                ImageUploadRequest imageUploadRequest = ImageUploadRequest.from(image, tripId, placeId);
+                ImageUploadRequest imageUploadRequest = ImageUploadRequest.from(image, tripId, tripDayPlaceId);
                 imageProcessingService.processImageUpload(imageUploadRequest);
             } catch (IOException e) {
                 log.error("Failed to process image - filename: {}", image.getOriginalFilename(), e);

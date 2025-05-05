@@ -13,10 +13,10 @@ public class TempPlaceImagesCommandService {
     /**
      * 지정된 placeId를 가진 TempPlaceImages 문서에 이미지를 추가하는 메서드
      *
-     * @param placeId 추가할 이미지가 속할 목적지 ID
-     * @param image   MongoDB에 저장할 이미지 객체
+     * @param tripDayPlaceId 추가할 이미지가 속할 여행일차 ID
+     * @param image          MongoDB에 저장할 이미지 객체
      */
-    public void addImageToPlace(String placeId, Image image) {
-        tempPlaceImagesService.saveImage(placeId, image);
+    public void addImageToPlace(String tripDayPlaceId, Image image) {
+        tempPlaceImagesService.saveImage(tripDayPlaceId, image);
     }
 }

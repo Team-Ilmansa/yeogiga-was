@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class TempPlaceImagesService {
     private final TempPlaceImagesRepository tempPlaceImagesRepository;
 
-    public void saveImage(String placeId, Image image) {
-        tempPlaceImagesRepository.saveImage(placeId, image);
+    public void saveImage(String tripDayPlaceId, Image image) {
+        tempPlaceImagesRepository.saveImage(tripDayPlaceId, image);
     }
 }

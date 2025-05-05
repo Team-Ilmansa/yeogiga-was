@@ -10,13 +10,13 @@ public record ImageUploadRequest(
         String contentType,
         long size,
         Long tripId,
-        String placeId
+        String tripDayPlaceId
 ) {
-    public static ImageUploadRequest from(MultipartFile file, Long tripId, String placeId) throws IOException {
+    public static ImageUploadRequest from(MultipartFile file, Long tripId, String tripDayPlaceId) throws IOException {
         return new ImageUploadRequest(
                 file.getBytes(), file.getOriginalFilename(),
                 file.getContentType(), file.getSize(),
-                tripId, placeId
+                tripId, tripDayPlaceId
         );
     }
 }

@@ -17,12 +17,12 @@ public class CustomTempPlaceImagesRepositoryImpl implements CustomTempPlaceImage
      * - 문서가 존재하지 않으면 새로 생성함 (upsert)
      * - 기존 문서가 존재하면 images 필드에 새 이미지 객체를 push
      *
-     * @param placeId 이미지를 추가할 목적지 식별자
-     * @param image   추가할 이미지 객체
+     * @param tripDayPlaceId 이미지를 추가할 여행일차 식별자
+     * @param image          추가할 이미지 객체
      */
     @Override
-    public void saveImage(String placeId, Image image) {
-        Query query = new Query(Criteria.where("placeId").is(placeId));
+    public void saveImage(String tripDayPlaceId, Image image) {
+        Query query = new Query(Criteria.where("tripDayPlaceId").is(tripDayPlaceId));
         Update update = new Update().push("images", image);
 
         mongoTemplate.upsert(query, update, TempPlaceImages.class);

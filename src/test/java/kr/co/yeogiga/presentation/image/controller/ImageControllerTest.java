@@ -50,7 +50,7 @@ public class ImageControllerTest {
     private ImageDeleteProcessor imageDeleteProcessor;
 
     private final Long tripId = 1L;
-    private final String placeId = "place-id";
+    private final String tripDayPlaceId = "trip-day-place-id";
 
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext) {
@@ -72,7 +72,7 @@ public class ImageControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                multipart("/api/v1/trip/{tripId}/images/{placeId}", tripId, placeId)
+                multipart("/api/v1/trip/{tripId}/images/{tripDayPlaceId}", tripId, tripDayPlaceId)
                         .file(mockImage)
                         .with(request -> {
                             request.setMethod("POST");

@@ -27,11 +27,11 @@ public class ImageController implements ImageApi {
     private final ImageDeleteProcessor imageDeleteProcessor;
 
     @Override
-    @PostMapping("/{tripId}/images/{placeId}")
+    @PostMapping("/{tripId}/images/{tripDayPlaceId}")
     public ResponseEntity<?> uploadImages(@RequestPart(value = "images", required = false) List<MultipartFile> images,
                                           @PathVariable Long tripId,
-                                          @PathVariable String placeId) {
-        imageUploadProcessor.process(images, tripId, placeId);
+                                          @PathVariable String tripDayPlaceId) {
+        imageUploadProcessor.process(images, tripId, tripDayPlaceId);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 

@@ -43,7 +43,7 @@ public class ImageProcessingService {
                     .date(metadata.date())
                     .build();
 
-            tempPlaceImagesCommandService.addImageToPlace(imageUploadRequest.placeId(), image);
+            tempPlaceImagesCommandService.addImageToPlace(imageUploadRequest.tripDayPlaceId(), image);
 
         } catch (Exception e) {
             log.error("Error processing image - filename: {}", imageUploadRequest.originalFilename(), e);
