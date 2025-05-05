@@ -20,18 +20,23 @@ public class UserManagementService {
      * 사용자 비밀번호 갱신 메서드
      *
      * @param userId            사용자 ID
-     * @param passwordReq       비밀번호 갱신 요청 dto(password)
-     * @throws CustomException  UserErrorType.SAME_PASSWORD - 기존 비밀번호와 동일할 경우
+     * @param passwordReq       비밀번호 갱신 요청 dto(originalPassword, newPassword)
+     * @throws CustomException  UserErrorType.PASSWORD_MISMATCH - 기존 비밀번호가 불일치할 경우
+     * @throws CustomException  UserErrorType.SAME_PASSWORD - 새로운 비밀번호가 기존 비밀번호와 동일할 경우
      */
     @Transactional
     public void updatePassword(Long userId, PasswordUpdateReq passwordReq) {
         User user = userService.readById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
 
-        if (passwordEncoder.matches(passwordReq.password(), user.getPassword())) {
+        if (!passwordEncoder.matches(passwordReq.originalPassword(), user.getPassword())) {
+            throw new CustomException(UserErrorType.PASSWORD_MISMATCH);
+        }
+
+        if (passwordEncoder.matches(passwordReq.newPassword(), user.getPassword())) {
             throw new CustomException(UserErrorType.SAME_PASSWORD);
         }
 
-        user.updatePassword(passwordEncoder.encode(passwordReq.password()));
+        user.updatePassword(passwordEncoder.encode(passwordReq.newPassword()));
     }
 }
