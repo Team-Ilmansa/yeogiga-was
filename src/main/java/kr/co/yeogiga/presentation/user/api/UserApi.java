@@ -31,6 +31,23 @@ public interface UserApi {
                                         }
                                     """)
                     })),
+            @ApiResponse(responseCode = "400", description = "비밀번호 갱신 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "기존 비밀번호 불일치", value = """
+                                        {
+                                            "code": "U003",
+                                            "message": "비밀번호가 불일치합니다."
+                                        }
+                                    """),
+                            @ExampleObject(name = "유효성 검증 실패", value = """
+                                        {
+                                            "code": "G002",
+                                            "errors": {
+                                                "originalPassword": "기존 비밀번호는 필수 입력값입니다."
+                                            }
+                                        }
+                                    """)
+                    })),
             @ApiResponse(responseCode = "401", description = "비밀번호 갱신 실패",
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(name = "토큰 미포함", value = """
