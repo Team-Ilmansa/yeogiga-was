@@ -56,7 +56,7 @@ public class UserManagementServiceTest {
         void success() {
             // given
             when(userService.readById(eq(userId))).thenReturn(Optional.of(user));
-            when(passwordEncoder.matches(eq(request.originalPassword()), eq(user.getPassword()))).thenReturn(false);
+            when(passwordEncoder.matches(eq(request.originalPassword()), eq(user.getPassword()))).thenReturn(true);
             when(passwordEncoder.matches(eq(request.newPassword()), eq(user.getPassword()))).thenReturn(false);
             when(passwordEncoder.encode(eq(request.newPassword()))).thenReturn("BcryptPassword");
 
@@ -72,7 +72,7 @@ public class UserManagementServiceTest {
         void failIfPasswordAlreadyUsed() {
             // given
             when(userService.readById(eq(userId))).thenReturn(Optional.of(user));
-            when(passwordEncoder.matches(eq(request.originalPassword()), eq(user.getPassword()))).thenReturn(false);
+            when(passwordEncoder.matches(eq(request.originalPassword()), eq(user.getPassword()))).thenReturn(true);
             when(passwordEncoder.matches(eq(request.newPassword()), eq(user.getPassword()))).thenReturn(true);
 
             // when
@@ -87,7 +87,7 @@ public class UserManagementServiceTest {
         void failIfOriginalPasswordNotMatch() {
             // given
             when(userService.readById(eq(userId))).thenReturn(Optional.of(user));
-            when(passwordEncoder.matches(eq(request.originalPassword()), eq(user.getPassword()))).thenReturn(true);
+            when(passwordEncoder.matches(eq(request.originalPassword()), eq(user.getPassword()))).thenReturn(false);
 
             // when
             CustomException exception = assertThrows(CustomException.class, () -> userManagementService.updatePassword(userId, request));
