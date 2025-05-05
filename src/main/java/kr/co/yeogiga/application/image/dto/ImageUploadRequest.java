@@ -9,9 +9,14 @@ public record ImageUploadRequest(
         String originalFilename,
         String contentType,
         long size,
-        Long tripId
+        Long tripId,
+        String placeId
 ) {
-    public static ImageUploadRequest from(MultipartFile file, Long tripId) throws IOException {
-        return new ImageUploadRequest(file.getBytes(), file.getOriginalFilename(), file.getContentType(), file.getSize(), tripId);
+    public static ImageUploadRequest from(MultipartFile file, Long tripId, String placeId) throws IOException {
+        return new ImageUploadRequest(
+                file.getBytes(), file.getOriginalFilename(),
+                file.getContentType(), file.getSize(),
+                tripId, placeId
+        );
     }
 }
