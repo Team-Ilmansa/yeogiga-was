@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.image.dto.ImageUrlDto;
 import kr.co.yeogiga.application.image.service.ImageDeleteProcessor;
 import kr.co.yeogiga.application.image.service.ImageUploadProcessor;
+import kr.co.yeogiga.application.trip.service.TripPlaceImageService;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +50,9 @@ public class ImageControllerTest {
     @MockBean
     private ImageDeleteProcessor imageDeleteProcessor;
 
+    @MockBean
+    private TripPlaceImageService tripPlaceImageService;
+
     private final Long tripId = 1L;
     private final String tripDayPlaceId = "trip-day-place-id";
 
@@ -84,6 +88,24 @@ public class ImageControllerTest {
         resultActions
                 .andDo(print())
                 .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
+    }
+
+    @Test
+    @DisplayName("이미지 매칭 테스트")
+    void assigneImageTest() throws Exception {
+        // given
+
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                multipart("/api/v1/trip/{tripId}/images/{tripDayPlaceId}/assign", tripId, tripDayPlaceId)
+        );
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
     }
 
