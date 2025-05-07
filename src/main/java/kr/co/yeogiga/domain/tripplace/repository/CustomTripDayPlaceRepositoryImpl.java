@@ -53,7 +53,7 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
     public Optional<TripDayPlace> findByIdSorted(String id) {
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("_id").is(id)),
-                Aggregation.unwind("places"),
+                Aggregation.unwind("places", true),
                 Aggregation.sort(Sort.by(Sort.Direction.ASC, "places.order")),
                 Aggregation.group("_id")
                         .first("tripId").as("tripId")
@@ -72,12 +72,13 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
     public List<TripDayPlace> findByTripIdSorted(Long tripId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("tripId").is(tripId)),
-                Aggregation.unwind("places"),
+                Aggregation.unwind("places", true),
                 Aggregation.sort(Sort.by(Sort.Direction.ASC, "places.order")),
                 Aggregation.group("_id")
                         .first("tripId").as("tripId")
                         .first("day").as("day")
-                        .push("places").as("places")
+                        .push("places").as("places"),
+                Aggregation.sort(Sort.by(Sort.Direction.ASC, "day"))
         );
 
         AggregationResults<TripDayPlace> results =
