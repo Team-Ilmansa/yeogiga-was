@@ -33,7 +33,7 @@ public class TripDayPlace {
         this.places = places;
     }
 
-    public void addUnmatchedImage(Image image) {
-        this.unmatchedImages.add(image);
+    public void addUnmatchedImages(List<Image> images) {
+        this.unmatchedImages.addAll(images);
     }
 }
