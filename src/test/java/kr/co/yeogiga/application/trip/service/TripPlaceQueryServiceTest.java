@@ -46,7 +46,7 @@ public class TripPlaceQueryServiceTest {
                 .places(places)
                 .build();
 
-        given(tripDayPlaceService.readByTripId(tripId)).willReturn(List.of(tripDayPlace));
+        given(tripDayPlaceService.readByTripIdSortedByOrder(tripId)).willReturn(List.of(tripDayPlace));
 
         // when
         List<TripPlaceRes.TripDayPlaceInfo> result = tripPlaceQueryService.getTripDayPlacesInfo(tripId);
@@ -74,7 +74,7 @@ public class TripPlaceQueryServiceTest {
                     .places(places)
                     .build();
 
-            given(tripDayPlaceService.readById(tripDayPlaceId)).willReturn(Optional.of(tripDayPlace));
+            given(tripDayPlaceService.readByIdSortedByOrder(tripDayPlaceId)).willReturn(Optional.of(tripDayPlace));
 
             // when
             List<TripPlaceRes.PlaceDetails> result = tripPlaceQueryService.getPlaceDetailsInfo(tripDayPlaceId);
@@ -91,7 +91,7 @@ public class TripPlaceQueryServiceTest {
         void getPlaceDetailsInfoFail() {
             // given
             String tripDayPlaceId = "non-existent";
-            given(tripDayPlaceService.readById(tripDayPlaceId)).willReturn(Optional.empty());
+            given(tripDayPlaceService.readByIdSortedByOrder(tripDayPlaceId)).willReturn(Optional.empty());
 
             // when
             CustomException e = assertThrows(CustomException.class, () ->
