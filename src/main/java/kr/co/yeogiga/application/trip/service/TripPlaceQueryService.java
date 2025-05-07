@@ -23,7 +23,7 @@ public class TripPlaceQueryService {
      * @return TripDayPlace 요약 정보 리스트
      */
     public List<TripPlaceRes.TripDayPlaceInfo> getTripDayPlacesInfo(Long tripId) {
-        List<TripDayPlace> tripDayPlaces = tripDayPlaceService.readByTripId(tripId);
+        List<TripDayPlace> tripDayPlaces = tripDayPlaceService.readByTripIdSortedByOrder(tripId);
 
         return tripDayPlaces.stream()
                 .map(TripPlaceRes.TripDayPlaceInfo::from)
@@ -38,7 +38,7 @@ public class TripPlaceQueryService {
      * @return 목적지 상세 정보 리스트
      */
     public List<TripPlaceRes.PlaceDetails> getPlaceDetailsInfo(String tripDayPlaceId) {
-        TripDayPlace tripDayPlace = tripDayPlaceService.readById(tripDayPlaceId)
+        TripDayPlace tripDayPlace = tripDayPlaceService.readByIdSortedByOrder(tripDayPlaceId)
                 .orElseThrow(() -> new CustomException(TripErrorType.DAY_PLACE_NOT_FOUND));
 
         return tripDayPlace.getPlaces().stream()

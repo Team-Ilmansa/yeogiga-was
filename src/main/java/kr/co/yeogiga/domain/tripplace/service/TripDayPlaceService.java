@@ -27,10 +27,14 @@ public class TripDayPlaceService {
     }
 
     public Optional<TripDayPlace> readById(String id) {
+        return tripDayPlaceRepository.findById(id);
+    }
+
+    public Optional<TripDayPlace> readByIdSortedByOrder(String id) {
         return tripDayPlaceRepository.findByIdSorted(id);
     }
 
-    public List<TripDayPlace> readByTripId(Long tripId) {
+    public List<TripDayPlace> readByTripIdSortedByOrder(Long tripId) {
         return tripDayPlaceRepository.findByTripIdSorted(tripId);
     }
 
