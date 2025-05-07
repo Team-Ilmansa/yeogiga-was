@@ -37,6 +37,7 @@ public class ImageController implements ImageApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
+    @Override
     @PostMapping("/{tripId}/images/{tripDayPlaceId}/assign")
     public ResponseEntity<?> assignImages(@PathVariable Long tripId,
                                           @PathVariable String tripDayPlaceId) {
