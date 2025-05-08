@@ -4,10 +4,7 @@ import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
-import kr.co.yeogiga.domain.tripplace.entity.TempPlaceImages;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
-import kr.co.yeogiga.domain.tripplace.exception.ImageErrorType;
-import kr.co.yeogiga.domain.tripplace.service.TempPlaceImagesService;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,27 +19,23 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class TripPlaceImageService {
     private final TripDayPlaceService tripDayPlaceService;
-    private final TempPlaceImagesService tempPlaceImagesService;
 
     /**
-     * 임시 저장된 이미지 메타데이터를 불러와 해당 TripDayPlace에 할당하는 메서드
+     * 이미지 메타데이터를 불러와 해당 TripDayPlace에 할당하는 메서드
      * - 위도/경도가 있을 경우 가장 가까운 목적지(Place)에 연결
      * - 위도/경도가 없거나 목적지가 없을 경우 기타(unmatchedImages)로 분류
      *
      * @param tripDayPlaceId TripDayPlace의 ID
      */
-    public void assignImageToTripDayPlace(String tripDayPlaceId) {
+    public void assignImageToTripDayPlace(String tripDayPlaceId, List<Image> images) {
         TripDayPlace tripDayPlace = tripDayPlaceService.readById(tripDayPlaceId)
                 .orElseThrow(() -> new CustomException(TripErrorType.DAY_PLACE_NOT_FOUND));
-
-        TempPlaceImages tempPlaceImages = tempPlaceImagesService.readByTripDayPlaceId(tripDayPlaceId)
-                .orElseThrow(() -> new CustomException(ImageErrorType.NOT_FOUND_TEMP_IMAGE_STORE));
 
         // GPS 정보를 기준으로 가장 가까운 장소별로 이미지 그룹핑
         List<Image> unmatchedImages = new ArrayList<>();
         Map<String, List<Image>> placeImageMap = groupImagesByNearestPlace(
                 tripDayPlace.getPlaces(),
-                tempPlaceImages.getImages(),
+                images,
                 unmatchedImages
         );
 
@@ -50,7 +43,6 @@ public class TripPlaceImageService {
         assignGroupedImagesToTripDayPlace(tripDayPlace, placeImageMap, unmatchedImages);
 
         tripDayPlaceService.save(tripDayPlace);
-        tempPlaceImagesService.deleteById(tempPlaceImages.getId());
     }
 
     /**
