@@ -1,8 +1,8 @@
 package kr.co.yeogiga.presentation.trip.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.yeogiga.application.trip.dto.TripPlaceReq;
-import kr.co.yeogiga.application.trip.service.TripPlaceEditingService;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.service.TripPlaceEditingService;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;

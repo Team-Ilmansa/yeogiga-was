@@ -1,9 +1,9 @@
 package kr.co.yeogiga.presentation.trip.controller;
 
-import kr.co.yeogiga.application.trip.dto.TripPlaceReq;
-import kr.co.yeogiga.application.trip.service.TripPlaceCommandService;
-import kr.co.yeogiga.application.trip.service.TripPlaceQueryService;
-import kr.co.yeogiga.application.trip.service.TripPlaceSavingService;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.service.TripPlaceCommandService;
+import kr.co.yeogiga.application.tripplace.service.TripPlaceQueryService;
+import kr.co.yeogiga.application.tripplace.service.TripPlaceSavingService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.presentation.trip.api.TripPlaceApi;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package kr.co.yeogiga.application.image.service;
 
-import kr.co.yeogiga.application.trip.service.TripPlaceImageService;
+import kr.co.yeogiga.application.tripplace.service.TripPlaceImageService;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.tripplace.entity.TempPlaceImages;
 import kr.co.yeogiga.domain.tripplace.exception.ImageErrorType;
