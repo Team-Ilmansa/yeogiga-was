@@ -4,10 +4,7 @@ import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
-import kr.co.yeogiga.domain.tripplace.entity.TempPlaceImages;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
-import kr.co.yeogiga.domain.tripplace.exception.ImageErrorType;
-import kr.co.yeogiga.domain.tripplace.service.TempPlaceImagesService;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,9 +31,6 @@ class TripPlaceImageServiceTest {
 
     @Mock
     private TripDayPlaceService tripDayPlaceService;
-
-    @Mock
-    private TempPlaceImagesService tempPlaceImagesService;
 
     @InjectMocks
     private TripPlaceImageService tripPlaceImageService;
@@ -91,16 +85,10 @@ class TripPlaceImageServiceTest {
         tempImages.add(imgWithGps);
         tempImages.add(imgWithoutGps);
 
-        TempPlaceImages tempPlaceImages = TempPlaceImages.builder()
-                .tripDayPlaceId(tripDayPlaceId)
-                .build();
-        tempPlaceImages.getImages().addAll(tempImages);
-
         given(tripDayPlaceService.readById(tripDayPlaceId)).willReturn(Optional.of(tripDayPlace));
-        given(tempPlaceImagesService.readByTripDayPlaceId(tripDayPlaceId)).willReturn(Optional.of(tempPlaceImages));
 
         // when
-        tripPlaceImageService.assignImageToTripDayPlace(tripDayPlaceId);
+        tripPlaceImageService.assignImageToTripDayPlace(tripDayPlaceId, tempImages);
 
         // then
         assertEquals(1, tripDayPlace.getPlaces().get(0).getImages().size());
@@ -116,25 +104,10 @@ class TripPlaceImageServiceTest {
 
         // when
         CustomException exception = assertThrows(CustomException.class,
-                () -> tripPlaceImageService.assignImageToTripDayPlace(tripDayPlaceId));
+                () -> tripPlaceImageService.assignImageToTripDayPlace(tripDayPlaceId, tempImages));
 
         // then
         assertEquals(TripErrorType.DAY_PLACE_NOT_FOUND, exception.getErrorType());
-    }
-
-    @Test
-    @DisplayName("예외 - TempPlaceImages 존재 x")
-    void assignImageFailTempImagesNotFound() {
-        // given
-        given(tripDayPlaceService.readById(tripDayPlaceId)).willReturn(Optional.of(tripDayPlace));
-        given(tempPlaceImagesService.readByTripDayPlaceId(tripDayPlaceId)).willReturn(Optional.empty());
-
-        // when
-        CustomException exception = assertThrows(CustomException.class,
-                () -> tripPlaceImageService.assignImageToTripDayPlace(tripDayPlaceId));
-
-        // then
-        assertEquals(ImageErrorType.NOT_FOUND_TEMP_IMAGE_STORE, exception.getErrorType());
     }
 }
 
