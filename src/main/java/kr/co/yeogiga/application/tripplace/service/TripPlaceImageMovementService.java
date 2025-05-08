@@ -99,6 +99,6 @@ public class TripPlaceImageMovementService {
      */
     private TripDayPlace getTripDayPlaceById(String tripDayPlaceId) {
         return tripDayPlaceService.readById(tripDayPlaceId)
-                .orElseThrow(() -> new CustomException(TripErrorType.DAY_PLACE_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_PLACE_NOT_FOUND));
     }
 }

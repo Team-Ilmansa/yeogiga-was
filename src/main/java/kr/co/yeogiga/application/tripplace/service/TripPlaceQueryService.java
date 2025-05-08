@@ -39,7 +39,7 @@ public class TripPlaceQueryService {
      */
     public List<TripPlaceRes.PlaceDetails> getPlaceDetailsInfo(String tripDayPlaceId) {
         TripDayPlace tripDayPlace = tripDayPlaceService.readByIdSortedByOrder(tripDayPlaceId)
-                .orElseThrow(() -> new CustomException(TripErrorType.DAY_PLACE_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_PLACE_NOT_FOUND));
 
         return tripDayPlace.getPlaces().stream()
                 .map(TripPlaceRes.PlaceDetails::from)

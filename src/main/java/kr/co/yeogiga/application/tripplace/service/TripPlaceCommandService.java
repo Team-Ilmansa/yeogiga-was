@@ -91,7 +91,7 @@ public class TripPlaceCommandService {
      */
     public void reorderPlaces(String tripDayPlaceId, TripPlaceReq.ReorderRequest reorderRequest) {
         TripDayPlace tripDayPlace = tripDayPlaceService.readById(tripDayPlaceId)
-                .orElseThrow(() -> new CustomException(TripErrorType.DAY_PLACE_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_PLACE_NOT_FOUND));
 
         Map<String, Place> placeMap = tripDayPlace.getPlaces().stream()
                 .collect(Collectors.toMap(Place::getId, Function.identity()));

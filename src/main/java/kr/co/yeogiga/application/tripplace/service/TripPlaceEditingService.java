@@ -59,7 +59,7 @@ public class TripPlaceEditingService {
 
         TripPlaceReq.StoredFormat place = findPlaceInList(tempListKey, placeId);
         if (place == null) {
-            throw new CustomException(TripErrorType.NOT_FOUND_TEMP_PLACE);
+            throw new CustomException(TripErrorType.TEMP_PLACE_NOT_FOUND);
         }
 
         String placeUniqueKey = makeUniqueKey(place.name(), place.latitude(), place.longitude());

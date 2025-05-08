@@ -22,7 +22,7 @@ public class TempImageAssignProcessor {
      */
     public void assignFromTempStorage(String tripDayPlaceId) {
         TempPlaceImages tempPlaceImages = tempPlaceImagesService.readByTripDayPlaceId(tripDayPlaceId)
-                .orElseThrow(() -> new CustomException(ImageErrorType.NOT_FOUND_TEMP_IMAGE_STORE));
+                .orElseThrow(() -> new CustomException(ImageErrorType.TEMP_IMAGE_STORE_NOT_FOUND));
 
         tripPlaceImageAssignmentService.assignImageToTripDayPlace(tripDayPlaceId, tempPlaceImages.getImages());
 

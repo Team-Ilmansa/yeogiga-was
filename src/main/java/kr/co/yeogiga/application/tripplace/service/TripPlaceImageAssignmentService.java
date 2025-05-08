@@ -29,7 +29,7 @@ public class TripPlaceImageAssignmentService {
      */
     public void assignImageToTripDayPlace(String tripDayPlaceId, List<Image> images) {
         TripDayPlace tripDayPlace = tripDayPlaceService.readById(tripDayPlaceId)
-                .orElseThrow(() -> new CustomException(TripErrorType.DAY_PLACE_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_PLACE_NOT_FOUND));
 
         // GPS 정보를 기준으로 가장 가까운 장소별로 이미지 그룹핑
         List<Image> unmatchedImages = new ArrayList<>();
