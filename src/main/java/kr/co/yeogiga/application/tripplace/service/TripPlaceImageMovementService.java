@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class TripPlaceImageCommandService {
+public class TripPlaceImageMovementService {
     private final TripDayPlaceService tripDayPlaceService;
 
     /**
