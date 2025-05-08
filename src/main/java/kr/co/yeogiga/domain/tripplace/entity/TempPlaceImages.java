@@ -24,8 +24,4 @@ public class TempPlaceImages {
         this.tripDayPlaceId = tripDayPlaceId;
         this.images = new ArrayList<>();
     }
-
-    public void addImage(Image image) {
-        this.images.add(image);
-    }
 }

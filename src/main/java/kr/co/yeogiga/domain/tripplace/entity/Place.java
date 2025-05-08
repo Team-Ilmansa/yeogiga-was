@@ -32,7 +32,7 @@ public class Place {
         this.order = order;
     }
 
-    public void addImage(Image image) {
-        this.images.add(image);
+    public void addImages(List<Image> images) {
+        this.images.addAll(images);
     }
 }

@@ -3,6 +3,7 @@ package kr.co.yeogiga.presentation.image.controller;
 import kr.co.yeogiga.application.image.dto.ImageUrlDto;
 import kr.co.yeogiga.application.image.service.ImageDeleteProcessor;
 import kr.co.yeogiga.application.image.service.ImageUploadProcessor;
+import kr.co.yeogiga.application.image.service.TempImageAssignProcessor;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.presentation.image.api.ImageApi;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import java.util.List;
 public class ImageController implements ImageApi {
     private final ImageUploadProcessor imageUploadProcessor;
     private final ImageDeleteProcessor imageDeleteProcessor;
+    private final TempImageAssignProcessor tempImageAssignProcessor;
 
     @Override
     @PostMapping("/{tripId}/images/{tripDayPlaceId}")
@@ -33,6 +35,14 @@ public class ImageController implements ImageApi {
                                           @PathVariable String tripDayPlaceId) {
         imageUploadProcessor.process(images, tripId, tripDayPlaceId);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
+    }
+
+    @Override
+    @PostMapping("/{tripId}/images/{tripDayPlaceId}/assign")
+    public ResponseEntity<?> assignImages(@PathVariable Long tripId,
+                                          @PathVariable String tripDayPlaceId) {
+        tempImageAssignProcessor.assignFromTempStorage(tripDayPlaceId);
+        return ResponseEntity.ok(SuccessResponse.ok());
     }
 
     @Override

@@ -38,6 +38,37 @@ public interface ImageApi {
                                    @PathVariable Long tripId,
                                    @PathVariable String tripDayPlaceId);
 
+    @TrackApi(description = "이미지 목적지 매핑")
+    @Operation(summary = "이미지 목적지 매핑", description = "이미지 목적지 매핑하는 API입니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "이미지 목적지 매핑 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다."
+                                        }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "찾을 수 없는 경우",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "임시 저장된 이미지가 없음", value = """
+                                        {
+                                             "code": "I000",
+                                             "message": "임시 저장된 이미지가 존재하지 않습니다."
+                                        }
+                                    """),
+                            @ExampleObject(name = "여행 일차 존재하지 않음", value = """
+                                        {
+                                            "code": "T003",
+                                            "message": "해당 여행 일차 정보가 존재하지 않습니다."
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> assignImages(@PathVariable Long tripId,
+                                   @PathVariable String tripDayPlaceId);
+
     @TrackApi(description = "이미지 삭제")
     @Operation(summary = "이미지 삭제", description = "이미지 삭제하는 API입니다.")
     @ApiResponses({
