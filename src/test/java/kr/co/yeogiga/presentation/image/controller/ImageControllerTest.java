@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.image.dto.ImageUrlDto;
 import kr.co.yeogiga.application.image.service.ImageDeleteProcessor;
 import kr.co.yeogiga.application.image.service.ImageUploadProcessor;
-import kr.co.yeogiga.application.trip.service.TripPlaceImageService;
+import kr.co.yeogiga.application.image.service.TempImageAssignProcessor;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,7 +51,7 @@ public class ImageControllerTest {
     private ImageDeleteProcessor imageDeleteProcessor;
 
     @MockBean
-    private TripPlaceImageService tripPlaceImageService;
+    private TempImageAssignProcessor tempImageAssignProcessor;
 
     private final Long tripId = 1L;
     private final String tripDayPlaceId = "trip-day-place-id";
@@ -95,7 +95,6 @@ public class ImageControllerTest {
     @DisplayName("이미지 매칭 테스트")
     void assigneImageTest() throws Exception {
         // given
-
 
         // when
         ResultActions resultActions = mockMvc.perform(
