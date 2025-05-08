@@ -1,5 +1,6 @@
 package kr.co.yeogiga.domain.tripplace.service;
 
+import kr.co.yeogiga.domain.tripplace.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 import kr.co.yeogiga.domain.tripplace.repository.TripDayPlaceRepository;
@@ -26,6 +27,14 @@ public class TripDayPlaceService {
         tripDayPlaceRepository.savePlace(id, place);
     }
 
+    public void saveImage(String id, String placeId, Image image) {
+        tripDayPlaceRepository.saveImage(id, placeId, image);
+    }
+
+    public void saveImageToUnmatched(String id, Image image) {
+        tripDayPlaceRepository.saveImageToUnmatched(id, image);
+    }
+
     public Optional<TripDayPlace> readById(String id) {
         return tripDayPlaceRepository.findById(id);
     }
@@ -44,5 +53,13 @@ public class TripDayPlaceService {
 
     public void deletePlace(String id, String placeId) {
         tripDayPlaceRepository.deletePlace(id, placeId);
+    }
+
+    public void deleteImage(String id, String placeId, String imageId) {
+        tripDayPlaceRepository.deleteImage(id, placeId, imageId);
+    }
+
+    public void deleteImageFromUnMatched(String id, String imageId) {
+        tripDayPlaceRepository.deleteImageFromUnMatched(id, imageId);
     }
 }
