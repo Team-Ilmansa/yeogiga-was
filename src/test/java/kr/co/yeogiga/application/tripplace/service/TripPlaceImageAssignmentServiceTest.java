@@ -107,7 +107,7 @@ class TripPlaceImageAssignmentServiceTest {
                 () -> tripPlaceImageAssignmentService.assignImageToTripDayPlace(tripDayPlaceId, tempImages));
 
         // then
-        assertEquals(TripErrorType.DAY_PLACE_NOT_FOUND, exception.getErrorType());
+        assertEquals(TripErrorType.TRIP_PLACE_NOT_FOUND, exception.getErrorType());
     }
 }
 

@@ -162,7 +162,7 @@ public class TripPlaceEditingServiceTest {
             );
 
             // then
-            assertEquals(TripErrorType.NOT_FOUND_TEMP_PLACE, exception.getErrorType());
+            assertEquals(TripErrorType.TEMP_PLACE_NOT_FOUND, exception.getErrorType());
         }
 
         @Test

@@ -181,7 +181,7 @@ public class TripPlaceCommandServiceTest {
                     tripPlaceCommandService.reorderPlaces(tripDayPlaceId, reorderRequest));
 
             // then
-            assertEquals(TripErrorType.DAY_PLACE_NOT_FOUND, e.getErrorType());
+            assertEquals(TripErrorType.TRIP_PLACE_NOT_FOUND, e.getErrorType());
         }
     }
 

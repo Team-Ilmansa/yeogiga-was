@@ -186,7 +186,7 @@ public class TripPlaceControllerTest {
     void reorderPlacesFailDayPlaceNotFound() throws Exception {
         // given
         TripPlaceReq.ReorderRequest reorderRequest = new TripPlaceReq.ReorderRequest(List.of("id1", "id2"));
-        doThrow(new CustomException(TripErrorType.DAY_PLACE_NOT_FOUND))
+        doThrow(new CustomException(TripErrorType.TRIP_PLACE_NOT_FOUND))
                 .when(tripPlaceCommandService).reorderPlaces(tripDayPlaceId, reorderRequest);
 
         // when
@@ -200,8 +200,8 @@ public class TripPlaceControllerTest {
         resultActions
                 .andDo(print())
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.code").value(TripErrorType.DAY_PLACE_NOT_FOUND.getCode()))
-                .andExpect(jsonPath("$.message").value(TripErrorType.DAY_PLACE_NOT_FOUND.getMessage()));
+                .andExpect(jsonPath("$.code").value(TripErrorType.TRIP_PLACE_NOT_FOUND.getCode()))
+                .andExpect(jsonPath("$.message").value(TripErrorType.TRIP_PLACE_NOT_FOUND.getMessage()));
     }
 
     @Test

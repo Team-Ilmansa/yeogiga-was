@@ -101,7 +101,7 @@ public class TripPlaceImageMovementServiceTest {
             );
 
             // then
-            assertEquals(TripErrorType.DAY_PLACE_NOT_FOUND, exception.getErrorType());
+            assertEquals(TripErrorType.TRIP_PLACE_NOT_FOUND, exception.getErrorType());
         }
 
         @Test
