@@ -27,13 +27,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class TripPlaceImageServiceTest {
+class TripPlaceImageAssignmentServiceTest {
 
     @Mock
     private TripDayPlaceService tripDayPlaceService;
 
     @InjectMocks
-    private TripPlaceImageService tripPlaceImageService;
+    private TripPlaceImageAssignmentService tripPlaceImageAssignmentService;
 
     private final String tripDayPlaceId = "tripDayPlaceId";
 
@@ -88,7 +88,7 @@ class TripPlaceImageServiceTest {
         given(tripDayPlaceService.readById(tripDayPlaceId)).willReturn(Optional.of(tripDayPlace));
 
         // when
-        tripPlaceImageService.assignImageToTripDayPlace(tripDayPlaceId, tempImages);
+        tripPlaceImageAssignmentService.assignImageToTripDayPlace(tripDayPlaceId, tempImages);
 
         // then
         assertEquals(1, tripDayPlace.getPlaces().get(0).getImages().size());
@@ -104,7 +104,7 @@ class TripPlaceImageServiceTest {
 
         // when
         CustomException exception = assertThrows(CustomException.class,
-                () -> tripPlaceImageService.assignImageToTripDayPlace(tripDayPlaceId, tempImages));
+                () -> tripPlaceImageAssignmentService.assignImageToTripDayPlace(tripDayPlaceId, tempImages));
 
         // then
         assertEquals(TripErrorType.DAY_PLACE_NOT_FOUND, exception.getErrorType());
