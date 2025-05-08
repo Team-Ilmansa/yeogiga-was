@@ -41,7 +41,7 @@ public interface ImageApi {
     @TrackApi(description = "이미지 목적지 매핑")
     @Operation(summary = "이미지 목적지 매핑", description = "이미지 목적지 매핑하는 API입니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "이미지 목적지 매핑 성공",
+            @ApiResponse(responseCode = "200", description = "이미지 목적지 매핑 성공",
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(value = """
                                         {
