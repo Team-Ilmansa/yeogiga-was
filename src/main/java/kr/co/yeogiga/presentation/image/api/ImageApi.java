@@ -49,6 +49,21 @@ public interface ImageApi {
                                             "message": "요청이 성공하였습니다."
                                         }
                                     """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "찾을 수 없는 경우",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "임시 저장된 이미지가 없음", value = """
+                                        {
+                                             "code": "I000",
+                                             "message": "임시 저장된 이미지가 존재하지 않습니다."
+                                        }
+                                    """),
+                            @ExampleObject(name = "여행 일차 존재하지 않음", value = """
+                                        {
+                                            "code": "T003",
+                                            "message": "해당 여행 일차 정보가 존재하지 않습니다."
+                                        }
+                                    """)
                     }))
     })
     ResponseEntity<?> assignImages(@PathVariable Long tripId,
