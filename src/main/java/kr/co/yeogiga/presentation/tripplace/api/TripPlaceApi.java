@@ -1,4 +1,4 @@
-package kr.co.yeogiga.presentation.trip.api;
+package kr.co.yeogiga.presentation.tripplace.api;
 
 import api.link.checker.annotation.ApiGroup;
 import api.link.checker.annotation.TrackApi;

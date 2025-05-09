@@ -1,4 +1,4 @@
-package kr.co.yeogiga.presentation.image.controller;
+package kr.co.yeogiga.presentation.tripplace.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDto;
@@ -8,6 +8,7 @@ import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.exception.ImageErrorType;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
+import kr.co.yeogiga.presentation.tripplace.image.controller.TripPlaceImageMovementController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

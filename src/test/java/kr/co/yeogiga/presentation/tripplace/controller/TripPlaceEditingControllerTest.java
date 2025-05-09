@@ -1,4 +1,4 @@
-package kr.co.yeogiga.presentation.trip.controller;
+package kr.co.yeogiga.presentation.tripplace.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;

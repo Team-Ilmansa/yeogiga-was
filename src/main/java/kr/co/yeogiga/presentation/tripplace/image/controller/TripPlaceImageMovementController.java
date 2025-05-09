@@ -1,9 +1,9 @@
-package kr.co.yeogiga.presentation.image.controller;
+package kr.co.yeogiga.presentation.tripplace.image.controller;
 
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDto;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageMovementService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
-import kr.co.yeogiga.presentation.image.api.TripPlaceImageMovementApi;
+import kr.co.yeogiga.presentation.tripplace.image.api.TripPlaceImageMovementApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;

@@ -1,11 +1,11 @@
-package kr.co.yeogiga.presentation.trip.controller;
+package kr.co.yeogiga.presentation.tripplace.controller;
 
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceCommandService;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceQueryService;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceSavingService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
-import kr.co.yeogiga.presentation.trip.api.TripPlaceApi;
+import kr.co.yeogiga.presentation.tripplace.api.TripPlaceApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
