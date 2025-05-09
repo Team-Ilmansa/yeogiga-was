@@ -11,6 +11,9 @@ import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * TripDayPlace 내 이미지 이동시키는 담당하는 서비스 클래스
+ */
 @Service
 @RequiredArgsConstructor
 public class TripPlaceImageMovementService {

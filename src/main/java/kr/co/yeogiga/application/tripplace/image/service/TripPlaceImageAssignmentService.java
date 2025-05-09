@@ -15,6 +15,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * TripDayPlace 내 목적지에 이미지를 매핑하는 서비스 클래스
+ */
 @Service
 @RequiredArgsConstructor
 public class TripPlaceImageAssignmentService {
