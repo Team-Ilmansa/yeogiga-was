@@ -62,4 +62,8 @@ public class TripDayPlaceService {
     public void deleteImageFromUnMatched(String id, String imageId) {
         tripDayPlaceRepository.deleteImageFromUnMatched(id, imageId);
     }
+
+    public void deleteImagesByTripId(Long tripId, List<String> imageIds) {
+        tripDayPlaceRepository.deleteImagesByTripId(tripId, imageIds);
+    }
 }
