@@ -1,6 +1,6 @@
 package kr.co.yeogiga.application.image.service;
 
-import kr.co.yeogiga.application.trip.service.TripPlaceImageService;
+import kr.co.yeogiga.application.tripplace.service.TripPlaceImageAssignmentService;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.tripplace.entity.TempPlaceImages;
 import kr.co.yeogiga.domain.tripplace.exception.ImageErrorType;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TempImageAssignProcessor {
     private final TempPlaceImagesService tempPlaceImagesService;
-    private final TripPlaceImageService tripPlaceImageService;
+    private final TripPlaceImageAssignmentService tripPlaceImageAssignmentService;
 
     /**
      * 임시 저장소로부터 이미지를 불러와 TripDayPlace에 할당하는 메서드
@@ -22,9 +22,9 @@ public class TempImageAssignProcessor {
      */
     public void assignFromTempStorage(String tripDayPlaceId) {
         TempPlaceImages tempPlaceImages = tempPlaceImagesService.readByTripDayPlaceId(tripDayPlaceId)
-                .orElseThrow(() -> new CustomException(ImageErrorType.NOT_FOUND_TEMP_IMAGE_STORE));
+                .orElseThrow(() -> new CustomException(ImageErrorType.TEMP_IMAGE_NOT_FOUND));
 
-        tripPlaceImageService.assignImageToTripDayPlace(tripDayPlaceId, tempPlaceImages.getImages());
+        tripPlaceImageAssignmentService.assignImageToTripDayPlace(tripDayPlaceId, tempPlaceImages.getImages());
 
         tempPlaceImagesService.deleteById(tempPlaceImages.getId());
     }

@@ -1,4 +1,4 @@
-package kr.co.yeogiga.application.trip.dto;
+package kr.co.yeogiga.application.tripplace.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.yeogiga.domain.tripplace.entity.Place;

@@ -10,7 +10,8 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ImageErrorType implements BaseErrorType {
 
-    NOT_FOUND_TEMP_IMAGE_STORE(HttpStatus.NOT_FOUND, "I000", "임시 저장된 이미지가 존재하지 않습니다.");
+    TEMP_IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "I000", "임시 저장된 이미지가 존재하지 않습니다."),
+    NOT_FOUND(HttpStatus.NOT_FOUND, "I001", "해당 이미지가 존재하지 않습니다.")
     ;
 
     private final HttpStatus httpStatus;

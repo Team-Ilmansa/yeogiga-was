@@ -1,5 +1,6 @@
 package kr.co.yeogiga.domain.tripplace.repository;
 
+import kr.co.yeogiga.domain.tripplace.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 
@@ -8,8 +9,12 @@ import java.util.Optional;
 
 public interface CustomTripDayPlaceRepository {
     void savePlace(String id, Place place);
-    void deletePlace(String id, String placeId);
+    void saveImage(String id, String placeId, Image image);
+    void saveImageToUnmatched(String id, Image image);
     Double findOrderByIdAndPlaceId(String id, String placeId);
     Optional<TripDayPlace> findByIdSorted(String id);
     List<TripDayPlace> findByTripIdSorted(Long tripId);
+    void deletePlace(String id, String placeId);
+    void deleteImage(String id, String placeId, String imageId);
+    void deleteImageFromUnMatched(String id, String imageId);
 }

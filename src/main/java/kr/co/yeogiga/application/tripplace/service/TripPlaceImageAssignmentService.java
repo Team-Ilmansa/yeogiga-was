@@ -1,4 +1,4 @@
-package kr.co.yeogiga.application.trip.service;
+package kr.co.yeogiga.application.tripplace.service;
 
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
@@ -17,7 +17,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class TripPlaceImageService {
+public class TripPlaceImageAssignmentService {
     private final TripDayPlaceService tripDayPlaceService;
 
     /**
@@ -29,7 +29,7 @@ public class TripPlaceImageService {
      */
     public void assignImageToTripDayPlace(String tripDayPlaceId, List<Image> images) {
         TripDayPlace tripDayPlace = tripDayPlaceService.readById(tripDayPlaceId)
-                .orElseThrow(() -> new CustomException(TripErrorType.DAY_PLACE_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_PLACE_NOT_FOUND));
 
         // GPS 정보를 기준으로 가장 가까운 장소별로 이미지 그룹핑
         List<Image> unmatchedImages = new ArrayList<>();

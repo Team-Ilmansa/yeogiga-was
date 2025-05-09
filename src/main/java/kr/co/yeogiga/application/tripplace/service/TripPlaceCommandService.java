@@ -1,6 +1,6 @@
-package kr.co.yeogiga.application.trip.service;
+package kr.co.yeogiga.application.tripplace.service;
 
-import kr.co.yeogiga.application.trip.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
@@ -91,7 +91,7 @@ public class TripPlaceCommandService {
      */
     public void reorderPlaces(String tripDayPlaceId, TripPlaceReq.ReorderRequest reorderRequest) {
         TripDayPlace tripDayPlace = tripDayPlaceService.readById(tripDayPlaceId)
-                .orElseThrow(() -> new CustomException(TripErrorType.DAY_PLACE_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_PLACE_NOT_FOUND));
 
         Map<String, Place> placeMap = tripDayPlace.getPlaces().stream()
                 .collect(Collectors.toMap(Place::getId, Function.identity()));

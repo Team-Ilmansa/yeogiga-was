@@ -1,6 +1,6 @@
-package kr.co.yeogiga.application.trip.service;
+package kr.co.yeogiga.application.tripplace.service;
 
-import kr.co.yeogiga.application.trip.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;
@@ -59,7 +59,7 @@ public class TripPlaceEditingService {
 
         TripPlaceReq.StoredFormat place = findPlaceInList(tempListKey, placeId);
         if (place == null) {
-            throw new CustomException(TripErrorType.NOT_FOUND_TEMP_PLACE);
+            throw new CustomException(TripErrorType.TEMP_PLACE_NOT_FOUND);
         }
 
         String placeUniqueKey = makeUniqueKey(place.name(), place.latitude(), place.longitude());

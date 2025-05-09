@@ -1,6 +1,6 @@
-package kr.co.yeogiga.application.trip.service;
+package kr.co.yeogiga.application.tripplace.service;
 
-import kr.co.yeogiga.application.trip.dto.TripPlaceRes;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
@@ -39,7 +39,7 @@ public class TripPlaceQueryService {
      */
     public List<TripPlaceRes.PlaceDetails> getPlaceDetailsInfo(String tripDayPlaceId) {
         TripDayPlace tripDayPlace = tripDayPlaceService.readByIdSortedByOrder(tripDayPlaceId)
-                .orElseThrow(() -> new CustomException(TripErrorType.DAY_PLACE_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_PLACE_NOT_FOUND));
 
         return tripDayPlace.getPlaces().stream()
                 .map(TripPlaceRes.PlaceDetails::from)

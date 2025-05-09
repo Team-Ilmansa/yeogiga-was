@@ -12,8 +12,9 @@ public enum TripErrorType implements BaseErrorType {
 
     INVALID_PLACE(HttpStatus.BAD_REQUEST, "T001", "지원하지 않는 카테고리입니다."),
     ALREADY_ADDED_PLACE(HttpStatus.CONFLICT, "T002", "이미 추가된 장소입니다."),
-    DAY_PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "T003", "해당 여행 일차 정보가 존재하지 않습니다."),
-    NOT_FOUND_TEMP_PLACE(HttpStatus.NOT_FOUND, "T004", "임시 저장소에 해당 장소가 존재하지 않습니다.")
+    TRIP_PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "T003", "해당 여행 일차 정보가 존재하지 않습니다."),
+    TEMP_PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "T004", "임시 저장소에 해당 장소가 존재하지 않습니다."),
+    PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "T005", "해당 목적지가 존재하지 않습니다")
     ;
 
     private final HttpStatus httpStatus;

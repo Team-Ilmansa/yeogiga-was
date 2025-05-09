@@ -1,5 +1,6 @@
 package kr.co.yeogiga.domain.tripplace.repository;
 
+import kr.co.yeogiga.domain.tripplace.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +27,19 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
     }
 
     @Override
-    public void deletePlace(String id, String placeId) {
-        Query query = new Query(Criteria.where("_id").is(id));
-        Update update = new Update().pull("places", Query.query(Criteria.where("id").is(placeId)));
+    public void saveImage(String id, String placeId, Image image) {
+        Query query = Query.query(
+                Criteria.where("_id").is(id)
+                        .and("places.id").is(placeId)
+        );
+        Update update = new Update().push("places.$.images", image);
+        mongoTemplate.updateFirst(query, update, TripDayPlace.class);
+    }
+
+    @Override
+    public void saveImageToUnmatched(String id, Image image) {
+        Query query = Query.query(Criteria.where("_id").is(id));
+        Update update = new Update().push("unmatchedImages", image);
         mongoTemplate.updateFirst(query, update, TripDayPlace.class);
     }
 
@@ -87,5 +98,29 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
         return results.getMappedResults();
     }
 
+    @Override
+    public void deletePlace(String id, String placeId) {
+        Query query = new Query(Criteria.where("_id").is(id));
+        Update update = new Update().pull("places", Query.query(Criteria.where("id").is(placeId)));
+        mongoTemplate.updateFirst(query, update, TripDayPlace.class);
+    }
 
+    @Override
+    public void deleteImage(String id, String placeId, String imageId) {
+        Query query = new Query(
+                Criteria.where("_id").is(id)
+                        .and("places.id").is(placeId)
+        );
+
+        Update update = new Update()
+                .pull("places.$.images", Query.query(Criteria.where("id").is(imageId)));
+        mongoTemplate.updateFirst(query, update, TripDayPlace.class);
+    }
+
+    @Override
+    public void deleteImageFromUnMatched(String id, String imageId) {
+        Query query = Query.query(Criteria.where("_id").is(id));
+        Update update = new Update().pull("unmatchedImages", Query.query(Criteria.where("id").is(imageId)));
+        mongoTemplate.updateFirst(query, update, TripDayPlace.class);
+    }
 }
