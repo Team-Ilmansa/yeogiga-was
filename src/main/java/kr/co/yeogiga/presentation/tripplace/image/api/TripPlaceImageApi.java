@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @ApiGroup(value = "[이미지 위치 이동 API]")
 @Tag(name = "[이미지 위치 이동 API]", description = "이미지 위치 이동 관련 API")
-public interface TripPlaceImageMovementApi {
+public interface TripPlaceImageApi {
 
     @TrackApi(description = "같은 날짜 목적지 to 목적지")
     @Operation(summary = "같은 날짜 목적지 to 목적지", description = "같은 날짜 목적지 to 목적지 이동하는 API입니다.")
