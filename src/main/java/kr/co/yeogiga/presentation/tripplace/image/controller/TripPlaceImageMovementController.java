@@ -1,7 +1,7 @@
 package kr.co.yeogiga.presentation.image.controller;
 
-import kr.co.yeogiga.application.tripplace.dto.TripPlaceImageDto;
-import kr.co.yeogiga.application.tripplace.service.TripPlaceImageMovementService;
+import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDto;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageMovementService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.presentation.image.api.TripPlaceImageMovementApi;
 import lombok.RequiredArgsConstructor;

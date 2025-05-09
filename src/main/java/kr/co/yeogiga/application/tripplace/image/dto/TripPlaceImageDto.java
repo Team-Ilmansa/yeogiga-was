@@ -1,4 +1,4 @@
-package kr.co.yeogiga.application.tripplace.dto;
+package kr.co.yeogiga.application.tripplace.image.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
