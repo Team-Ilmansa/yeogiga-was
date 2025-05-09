@@ -65,6 +65,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
+    @Override
     @DeleteMapping("/{tripId}/day-place/{tripDayPlaceId}/images/{imageId}")
     public ResponseEntity<?> deleteSingleImage(
             @PathVariable Long tripId,
@@ -76,6 +77,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
+    @Override
     @DeleteMapping("/{tripId}/images")
     public ResponseEntity<?> deleteMultipleImages(
             @PathVariable Long tripId,
