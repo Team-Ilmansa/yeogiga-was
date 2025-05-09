@@ -1,14 +1,15 @@
-package kr.co.yeogiga.presentation.tripplace.controller;
+package kr.co.yeogiga.presentation.tripplace.image.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDto;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageDeleteService;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageMovementService;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.exception.ImageErrorType;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
-import kr.co.yeogiga.presentation.tripplace.image.controller.TripPlaceImageController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,8 +25,11 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.List;
+
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -47,6 +51,9 @@ public class TripPlaceImageControllerTest {
 
     @MockBean
     private TripPlaceImageMovementService tripPlaceImageMovementService;
+
+    @MockBean
+    private TripPlaceImageDeleteService tripPlaceImageDeleteService;
 
     private final Long tripId = 1L;
     private final String tripDayPlaceId = "dayId";
@@ -217,5 +224,55 @@ public class TripPlaceImageControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
+    }
+
+    @Nested
+    @DisplayName("이미지 삭제 테스트")
+    class DeleteImageTest {
+
+        private final String placeId = "place-id";
+
+        @Test
+        @DisplayName("단일 이미지 삭제 성공")
+        void deleteSingleImageSuccess() throws Exception {
+            // given
+            TripPlaceImageDeleteDto.SingleDeleteReq deleteReq = new TripPlaceImageDeleteDto.SingleDeleteReq(
+                    TripPlaceImageDeleteDto.DeleteType.PLACE, placeId
+            );
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    delete("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/{imageId}", tripId, tripDayPlaceId, imageId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(deleteReq))
+            );
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
+        }
+
+
+        @Test
+        @DisplayName("다중 이미지 삭제 성공")
+        void deleteMultipleImagesSuccess() throws Exception {
+            // given
+            TripPlaceImageDeleteDto.MultiDeleteReq deleteReq = new TripPlaceImageDeleteDto.MultiDeleteReq(
+                    List.of("image1-id", "image2-id", "image3-id")
+            );
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    delete("/api/v1/trip/{tripId}/images", tripId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(deleteReq))
+            );
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
+        }
     }
 }
