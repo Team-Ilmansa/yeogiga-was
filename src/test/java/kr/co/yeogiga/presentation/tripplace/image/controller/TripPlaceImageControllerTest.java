@@ -83,7 +83,7 @@ public class TripPlaceImageControllerTest {
 
             // when
             ResultActions resultActions = mockMvc.perform(
-                    patch("/api/v1/trip/{tripId}/images/{tripDayPlaceId}/move", tripId, tripDayPlaceId)
+                    patch("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/move", tripId, tripDayPlaceId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(req))
             );
@@ -104,7 +104,7 @@ public class TripPlaceImageControllerTest {
 
             // when
             ResultActions resultActions = mockMvc.perform(
-                    patch("/api/v1/trip/{tripId}/images/{tripDayPlaceId}/move", tripId, tripDayPlaceId)
+                    patch("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/move", tripId, tripDayPlaceId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(req))
             );
@@ -126,7 +126,7 @@ public class TripPlaceImageControllerTest {
 
             // when
             ResultActions resultActions = mockMvc.perform(
-                    patch("/api/v1/trip/{tripId}/images/{tripDayPlaceId}/move", tripId, tripDayPlaceId)
+                    patch("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/move", tripId, tripDayPlaceId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(req))
             );
@@ -148,7 +148,7 @@ public class TripPlaceImageControllerTest {
 
             // when
             ResultActions resultActions = mockMvc.perform(
-                    patch("/api/v1/trip/{tripId}/images/{tripDayPlaceId}/move", tripId, tripDayPlaceId)
+                    patch("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/move", tripId, tripDayPlaceId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(req))
             );
@@ -172,7 +172,7 @@ public class TripPlaceImageControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/v1/trip/{tripId}/images/move-between-days", tripId)
+                patch("/api/v1/trip/{tripId}/images/move", tripId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req))
         );
@@ -193,7 +193,7 @@ public class TripPlaceImageControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/v1/trip/{tripId}/images/{tripDayPlaceId}/move-to-unmatched", tripId, tripDayPlaceId)
+                patch("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/unmatch", tripId, tripDayPlaceId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req))
         );
@@ -214,7 +214,7 @@ public class TripPlaceImageControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/v1/trip/{tripId}/images/{tripDayPlaceId}/move-from-unmatched", tripId, tripDayPlaceId)
+                patch("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/rematch", tripId, tripDayPlaceId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req))
         );

@@ -23,7 +23,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
     private final TripPlaceImageDeleteService tripPlaceImageDeleteService;
 
     @Override
-    @PatchMapping("/{tripId}/images/{tripDayPlaceId}/move")
+    @PatchMapping("/{tripId}/day-place/{tripDayPlaceId}/images/move")
     public ResponseEntity<?> moveImageToAnotherPlace(
             @PathVariable Long tripId,
             @PathVariable String tripDayPlaceId,
@@ -34,7 +34,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
     }
 
     @Override
-    @PatchMapping("/{tripId}/images/move-between-days")
+    @PatchMapping("/{tripId}/images/move")
     public ResponseEntity<?> moveImageBetweenDayPlaces(
             @PathVariable Long tripId,
             @RequestBody TripPlaceImageDto.ImageCrossDayMoveReq imageReq
@@ -44,7 +44,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
     }
 
     @Override
-    @PatchMapping("/{tripId}/images/{tripDayPlaceId}/move-to-unmatched")
+    @PatchMapping("/{tripId}/day-place/{tripDayPlaceId}/images/unmatch")
     public ResponseEntity<?> moveImageToUnmatched(
             @PathVariable Long tripId,
             @PathVariable String tripDayPlaceId,
@@ -55,7 +55,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
     }
 
     @Override
-    @PatchMapping("/{tripId}/images/{tripDayPlaceId}/move-from-unmatched")
+    @PatchMapping("/{tripId}/day-place/{tripDayPlaceId}/images/rematch")
     public ResponseEntity<?> moveImageFromUnmatched(
             @PathVariable Long tripId,
             @PathVariable String tripDayPlaceId,
