@@ -17,4 +17,5 @@ public interface CustomTripDayPlaceRepository {
     void deletePlace(String id, String placeId);
     void deleteImage(String id, String placeId, String imageId);
     void deleteImageFromUnMatched(String id, String imageId);
+    void deleteImagesByTripId(Long tripId, List<String> imageIds);
 }

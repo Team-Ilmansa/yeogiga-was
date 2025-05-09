@@ -29,7 +29,7 @@ public class ImageController implements ImageApi {
     private final TempImageAssignProcessor tempImageAssignProcessor;
 
     @Override
-    @PostMapping("/{tripId}/images/{tripDayPlaceId}")
+    @PostMapping("/{tripId}/day-place/{tripDayPlaceId}/images")
     public ResponseEntity<?> uploadImages(@RequestPart(value = "images", required = false) List<MultipartFile> images,
                                           @PathVariable Long tripId,
                                           @PathVariable String tripDayPlaceId) {
@@ -38,7 +38,7 @@ public class ImageController implements ImageApi {
     }
 
     @Override
-    @PostMapping("/{tripId}/images/{tripDayPlaceId}/assign")
+    @PostMapping("/{tripId}/day-place/{tripDayPlaceId}/images/assign")
     public ResponseEntity<?> assignImages(@PathVariable Long tripId,
                                           @PathVariable String tripDayPlaceId) {
         tempImageAssignProcessor.assignFromTempStorage(tripDayPlaceId);
@@ -46,7 +46,7 @@ public class ImageController implements ImageApi {
     }
 
     @Override
-    @DeleteMapping("/{tripId}/images")
+    @DeleteMapping("/{tripId}/imagess") // 변경 예정
     public ResponseEntity<?> deleteImage(@RequestBody ImageUrlDto imageUrlDto) {
         imageDeleteProcessor.process(imageUrlDto);
         return ResponseEntity.ok(SuccessResponse.ok());

@@ -1,4 +1,4 @@
-package kr.co.yeogiga.application.tripplace.service;
+package kr.co.yeogiga.application.tripplace.image.service;
 
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;

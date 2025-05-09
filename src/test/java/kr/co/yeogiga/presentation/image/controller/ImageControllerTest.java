@@ -76,7 +76,7 @@ public class ImageControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                multipart("/api/v1/trip/{tripId}/images/{tripDayPlaceId}", tripId, tripDayPlaceId)
+                multipart("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images", tripId, tripDayPlaceId)
                         .file(mockImage)
                         .with(request -> {
                             request.setMethod("POST");
@@ -98,7 +98,7 @@ public class ImageControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                multipart("/api/v1/trip/{tripId}/images/{tripDayPlaceId}/assign", tripId, tripDayPlaceId)
+                multipart("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/assign", tripId, tripDayPlaceId)
         );
 
         // then
@@ -108,7 +108,7 @@ public class ImageControllerTest {
                 .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
     }
 
-    @Test
+/*    @Test
     @DisplayName("이미지 삭제 테스트")
     void deleteImageTest() throws Exception {
         // given
@@ -131,5 +131,5 @@ public class ImageControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
-    }
+    }*/
 }

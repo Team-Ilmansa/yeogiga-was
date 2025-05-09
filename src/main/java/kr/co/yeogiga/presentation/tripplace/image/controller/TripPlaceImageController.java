@@ -1,11 +1,14 @@
-package kr.co.yeogiga.presentation.image.controller;
+package kr.co.yeogiga.presentation.tripplace.image.controller;
 
-import kr.co.yeogiga.application.tripplace.dto.TripPlaceImageDto;
-import kr.co.yeogiga.application.tripplace.service.TripPlaceImageMovementService;
+import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
+import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDto;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageDeleteService;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageMovementService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
-import kr.co.yeogiga.presentation.image.api.TripPlaceImageMovementApi;
+import kr.co.yeogiga.presentation.tripplace.image.api.TripPlaceImageApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,11 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/trip")
 @RequiredArgsConstructor
-public class TripPlaceImageMovementController implements TripPlaceImageMovementApi {
+public class TripPlaceImageController implements TripPlaceImageApi {
     private final TripPlaceImageMovementService tripPlaceImageMovementService;
+    private final TripPlaceImageDeleteService tripPlaceImageDeleteService;
 
     @Override
-    @PatchMapping("/{tripId}/images/{tripDayPlaceId}/move")
+    @PatchMapping("/{tripId}/day-place/{tripDayPlaceId}/images/move")
     public ResponseEntity<?> moveImageToAnotherPlace(
             @PathVariable Long tripId,
             @PathVariable String tripDayPlaceId,
@@ -30,7 +34,7 @@ public class TripPlaceImageMovementController implements TripPlaceImageMovementA
     }
 
     @Override
-    @PatchMapping("/{tripId}/images/move-between-days")
+    @PatchMapping("/{tripId}/images/move")
     public ResponseEntity<?> moveImageBetweenDayPlaces(
             @PathVariable Long tripId,
             @RequestBody TripPlaceImageDto.ImageCrossDayMoveReq imageReq
@@ -40,7 +44,7 @@ public class TripPlaceImageMovementController implements TripPlaceImageMovementA
     }
 
     @Override
-    @PatchMapping("/{tripId}/images/{tripDayPlaceId}/move-to-unmatched")
+    @PatchMapping("/{tripId}/day-place/{tripDayPlaceId}/images/unmatch")
     public ResponseEntity<?> moveImageToUnmatched(
             @PathVariable Long tripId,
             @PathVariable String tripDayPlaceId,
@@ -51,13 +55,35 @@ public class TripPlaceImageMovementController implements TripPlaceImageMovementA
     }
 
     @Override
-    @PatchMapping("/{tripId}/images/{tripDayPlaceId}/move-from-unmatched")
+    @PatchMapping("/{tripId}/day-place/{tripDayPlaceId}/images/rematch")
     public ResponseEntity<?> moveImageFromUnmatched(
             @PathVariable Long tripId,
             @PathVariable String tripDayPlaceId,
             @RequestBody TripPlaceImageDto.ImageUnmatchedMoveReq imageReq
     ) {
         tripPlaceImageMovementService.moveImageFromUnmatchedToPlace(tripDayPlaceId, imageReq);
+        return ResponseEntity.ok(SuccessResponse.ok());
+    }
+
+    @Override
+    @DeleteMapping("/{tripId}/day-place/{tripDayPlaceId}/images/{imageId}")
+    public ResponseEntity<?> deleteSingleImage(
+            @PathVariable Long tripId,
+            @PathVariable String tripDayPlaceId,
+            @PathVariable String imageId,
+            @RequestBody TripPlaceImageDeleteDto.SingleDeleteReq deleteReq
+    ) {
+        tripPlaceImageDeleteService.deleteSingleImage(tripDayPlaceId, imageId, deleteReq);
+        return ResponseEntity.ok(SuccessResponse.ok());
+    }
+
+    @Override
+    @DeleteMapping("/{tripId}/images")
+    public ResponseEntity<?> deleteMultipleImages(
+            @PathVariable Long tripId,
+            @RequestBody TripPlaceImageDeleteDto.MultiDeleteReq deleteReq
+    ) {
+        tripPlaceImageDeleteService.deleteMultipleImages(tripId, deleteReq);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 }

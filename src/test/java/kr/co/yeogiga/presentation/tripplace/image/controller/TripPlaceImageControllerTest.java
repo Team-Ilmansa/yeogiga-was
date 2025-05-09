@@ -1,8 +1,10 @@
-package kr.co.yeogiga.presentation.image.controller;
+package kr.co.yeogiga.presentation.tripplace.image.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.yeogiga.application.tripplace.dto.TripPlaceImageDto;
-import kr.co.yeogiga.application.tripplace.service.TripPlaceImageMovementService;
+import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
+import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDto;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageDeleteService;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageMovementService;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
@@ -23,20 +25,23 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.List;
+
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(
-        controllers = TripPlaceImageMovementController.class,
+        controllers = TripPlaceImageController.class,
         excludeFilters = {
                 @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {SecurityConfig.class, JwtAuthenticationFilter.class})
         }
 )
-public class TripPlaceImageMovementControllerTest {
+public class TripPlaceImageControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -46,6 +51,9 @@ public class TripPlaceImageMovementControllerTest {
 
     @MockBean
     private TripPlaceImageMovementService tripPlaceImageMovementService;
+
+    @MockBean
+    private TripPlaceImageDeleteService tripPlaceImageDeleteService;
 
     private final Long tripId = 1L;
     private final String tripDayPlaceId = "dayId";
@@ -75,7 +83,7 @@ public class TripPlaceImageMovementControllerTest {
 
             // when
             ResultActions resultActions = mockMvc.perform(
-                    patch("/api/v1/trip/{tripId}/images/{tripDayPlaceId}/move", tripId, tripDayPlaceId)
+                    patch("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/move", tripId, tripDayPlaceId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(req))
             );
@@ -96,7 +104,7 @@ public class TripPlaceImageMovementControllerTest {
 
             // when
             ResultActions resultActions = mockMvc.perform(
-                    patch("/api/v1/trip/{tripId}/images/{tripDayPlaceId}/move", tripId, tripDayPlaceId)
+                    patch("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/move", tripId, tripDayPlaceId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(req))
             );
@@ -118,7 +126,7 @@ public class TripPlaceImageMovementControllerTest {
 
             // when
             ResultActions resultActions = mockMvc.perform(
-                    patch("/api/v1/trip/{tripId}/images/{tripDayPlaceId}/move", tripId, tripDayPlaceId)
+                    patch("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/move", tripId, tripDayPlaceId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(req))
             );
@@ -140,7 +148,7 @@ public class TripPlaceImageMovementControllerTest {
 
             // when
             ResultActions resultActions = mockMvc.perform(
-                    patch("/api/v1/trip/{tripId}/images/{tripDayPlaceId}/move", tripId, tripDayPlaceId)
+                    patch("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/move", tripId, tripDayPlaceId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(req))
             );
@@ -164,7 +172,7 @@ public class TripPlaceImageMovementControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/v1/trip/{tripId}/images/move-between-days", tripId)
+                patch("/api/v1/trip/{tripId}/images/move", tripId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req))
         );
@@ -185,7 +193,7 @@ public class TripPlaceImageMovementControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/v1/trip/{tripId}/images/{tripDayPlaceId}/move-to-unmatched", tripId, tripDayPlaceId)
+                patch("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/unmatch", tripId, tripDayPlaceId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req))
         );
@@ -206,7 +214,7 @@ public class TripPlaceImageMovementControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/v1/trip/{tripId}/images/{tripDayPlaceId}/move-from-unmatched", tripId, tripDayPlaceId)
+                patch("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/rematch", tripId, tripDayPlaceId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req))
         );
@@ -216,5 +224,55 @@ public class TripPlaceImageMovementControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
+    }
+
+    @Nested
+    @DisplayName("이미지 삭제 테스트")
+    class DeleteImageTest {
+
+        private final String placeId = "place-id";
+
+        @Test
+        @DisplayName("단일 이미지 삭제 성공")
+        void deleteSingleImageSuccess() throws Exception {
+            // given
+            TripPlaceImageDeleteDto.SingleDeleteReq deleteReq = new TripPlaceImageDeleteDto.SingleDeleteReq(
+                    TripPlaceImageDeleteDto.DeleteType.PLACE, placeId
+            );
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    delete("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/{imageId}", tripId, tripDayPlaceId, imageId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(deleteReq))
+            );
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
+        }
+
+
+        @Test
+        @DisplayName("다중 이미지 삭제 성공")
+        void deleteMultipleImagesSuccess() throws Exception {
+            // given
+            TripPlaceImageDeleteDto.MultiDeleteReq deleteReq = new TripPlaceImageDeleteDto.MultiDeleteReq(
+                    List.of("image1-id", "image2-id", "image3-id")
+            );
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    delete("/api/v1/trip/{tripId}/images", tripId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(deleteReq))
+            );
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
+        }
     }
 }

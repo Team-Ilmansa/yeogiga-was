@@ -1,6 +1,6 @@
-package kr.co.yeogiga.application.tripplace.service;
+package kr.co.yeogiga.application.tripplace.image.service;
 
-import kr.co.yeogiga.application.tripplace.dto.TripPlaceImageDto;
+import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDto;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.entity.Image;
@@ -11,6 +11,9 @@ import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * TripDayPlace 내 이미지 이동시키는 담당하는 서비스 클래스
+ */
 @Service
 @RequiredArgsConstructor
 public class TripPlaceImageMovementService {

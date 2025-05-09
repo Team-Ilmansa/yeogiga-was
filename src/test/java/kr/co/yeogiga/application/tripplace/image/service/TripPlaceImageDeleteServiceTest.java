@@ -1,0 +1,83 @@
+package kr.co.yeogiga.application.tripplace.image.service;
+
+import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
+import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+@ExtendWith(MockitoExtension.class)
+public class TripPlaceImageDeleteServiceTest {
+
+    @Mock
+    private TripDayPlaceService tripDayPlaceService;
+
+    @InjectMocks
+    private TripPlaceImageDeleteService tripPlaceImageDeleteService;
+
+    private final String tripDayPlaceId = "day-1";
+    private final String placeId = "place-1";
+    private final String imageId = "image-123";
+
+    @Nested
+    @DisplayName("단일 이미지 삭제 테스트")
+    class DeleteSingleImageTest {
+
+        @Test
+        @DisplayName("성공 - PLACE 타입")
+        void deletePlaceImageSuccess() {
+            // given
+            TripPlaceImageDeleteDto.SingleDeleteReq req =
+                    new TripPlaceImageDeleteDto.SingleDeleteReq(
+                            TripPlaceImageDeleteDto.DeleteType.PLACE, placeId
+                    );
+
+            // when
+            tripPlaceImageDeleteService.deleteSingleImage(tripDayPlaceId, imageId, req);
+
+            // then
+            verify(tripDayPlaceService, times(1)).deleteImage(tripDayPlaceId, placeId, imageId);
+        }
+
+        @Test
+        @DisplayName("성공 - UNMATCHED 타입")
+        void deleteUnmatchedImageSuccess() {
+            // given
+            TripPlaceImageDeleteDto.SingleDeleteReq req =
+                    new TripPlaceImageDeleteDto.SingleDeleteReq(
+                            TripPlaceImageDeleteDto.DeleteType.UNMATCHED, null
+                    );
+
+            // when
+            tripPlaceImageDeleteService.deleteSingleImage(tripDayPlaceId, imageId, req);
+
+            // then
+            verify(tripDayPlaceService, times(1)).deleteImageFromUnMatched(tripDayPlaceId, imageId);
+        }
+    }
+
+    @Test
+    @DisplayName("다중 이미지 삭제 성공")
+    void deleteMultipleSuccess() {
+        // given
+        Long tripId = 1L;
+        List<String> imageIds = List.of("img1", "img2", "img3");
+        TripPlaceImageDeleteDto.MultiDeleteReq req =
+                new TripPlaceImageDeleteDto.MultiDeleteReq(imageIds);
+
+        // when
+        tripPlaceImageDeleteService.deleteMultipleImages(tripId, req);
+
+        // then
+        verify(tripDayPlaceService, times(1)).deleteImagesByTripId(tripId, imageIds);
+    }
+}

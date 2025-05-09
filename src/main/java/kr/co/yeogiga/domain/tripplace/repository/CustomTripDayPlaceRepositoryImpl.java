@@ -123,4 +123,15 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
         Update update = new Update().pull("unmatchedImages", Query.query(Criteria.where("id").is(imageId)));
         mongoTemplate.updateFirst(query, update, TripDayPlace.class);
     }
+
+    @Override
+    public void deleteImagesByTripId(Long tripId, List<String> imageIds) {
+        Query query = Query.query(Criteria.where("tripId").is(tripId));
+
+        Update update = new Update()
+                .pull("unmatchedImages", Query.query(Criteria.where("id").in(imageIds)))
+                .pull("places.$[].images", Query.query(Criteria.where("id").in(imageIds)));
+
+        mongoTemplate.updateMulti(query, update, TripDayPlace.class);
+    }
 }

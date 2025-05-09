@@ -1,4 +1,4 @@
-package kr.co.yeogiga.presentation.image.api;
+package kr.co.yeogiga.presentation.tripplace.image.api;
 
 import api.link.checker.annotation.ApiGroup;
 import api.link.checker.annotation.TrackApi;
@@ -8,14 +8,15 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.yeogiga.application.tripplace.dto.TripPlaceImageDto;
+import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
+import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@ApiGroup(value = "[이미지 위치 이동 API]")
-@Tag(name = "[이미지 위치 이동 API]", description = "이미지 위치 이동 관련 API")
-public interface TripPlaceImageMovementApi {
+@ApiGroup(value = "[이미지 매칭 후 이미지 API]")
+@Tag(name = "[이미지 매칭 후 이미지 API]", description = "이미지 매칭 후 이미지 관련 API")
+public interface TripPlaceImageApi {
 
     @TrackApi(description = "같은 날짜 목적지 to 목적지")
     @Operation(summary = "같은 날짜 목적지 to 목적지", description = "같은 날짜 목적지 to 목적지 이동하는 API입니다.")
@@ -174,5 +175,44 @@ public interface TripPlaceImageMovementApi {
             @PathVariable Long tripId,
             @PathVariable String tripDayPlaceId,
             @RequestBody TripPlaceImageDto.ImageUnmatchedMoveReq imageReq
+    );
+
+    @TrackApi(description = "이미지 단일 삭제")
+    @Operation(summary = "이미지 단일 삭제", description = "이미지 단일 삭제 API입니다." +
+            " 목적지 내 삭제인지, 기타 항목 삭제인지 요청값 DeleteType를 적절히 적어주세요.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "이미지 단일 삭제 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다."
+                                        }
+                                    """)
+                    })),
+    })
+    ResponseEntity<?> deleteSingleImage(
+            @PathVariable Long tripId,
+            @PathVariable String tripDayPlaceId,
+            @PathVariable String imageId,
+            @RequestBody TripPlaceImageDeleteDto.SingleDeleteReq deleteReq
+    );
+
+    @TrackApi(description = "이미지 벌크 삭제")
+    @Operation(summary = "이미지 벌크 삭제", description = "이미지 벌크 삭제 API입니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "이미지 단일 삭제 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다."
+                                        }
+                                    """)
+                    })),
+    })
+    ResponseEntity<?> deleteMultipleImages(
+            @PathVariable Long tripId,
+            @RequestBody TripPlaceImageDeleteDto.MultiDeleteReq deleteReq
     );
 }
