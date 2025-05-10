@@ -11,6 +11,9 @@ import kr.co.yeogiga.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +29,7 @@ public class AuthService {
      * @param request           회원가입 요청 dto(username, password, email, nickname)
      * @throws CustomException  UserErrorType.ALREADY_EXISTS_USERNAME 이미 존재하는 아이디
      */
+    @Transactional
     public void signUp(SignUpDto.Request request) {
         String username = request.username();
 
@@ -36,7 +40,6 @@ public class AuthService {
         User newUser = request.toEntity(passwordEncoder.encode(request.password()));
 
         newUser.upgradeRoleToUser();
-        userService.save(newUser);
     }
 
     /**
@@ -46,10 +49,14 @@ public class AuthService {
      * @throws CustomException      AuthErrorType.AUTHENTICATION_FAIL 아이디 및 비밀번호 불일치
      * @return                      토큰(accessToken, refreshToken)
      */
+    @Transactional
     public TokenDto signIn(SignInDto.Request request) {
-        User user = userService.readByUsername(request.username())
+        User user = userService.readIncludeDeletedUserByUsername(request.username())
                 .orElseThrow(() -> new CustomException(AuthErrorType.AUTHENTICATION_FAIL));
 
+        if (Objects.nonNull(user.getDeletedAt())) {
+            user.revertWithdrawal();
+        }
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new CustomException(AuthErrorType.AUTHENTICATION_FAIL);
