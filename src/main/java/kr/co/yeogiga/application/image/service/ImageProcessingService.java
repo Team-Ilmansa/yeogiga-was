@@ -9,8 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -43,22 +41,10 @@ public class ImageProcessingService {
                     .date(metadata.date())
                     .build();
 
-            tempPlaceImagesCommandService.addImageToPlace(imageUploadRequest.tripDayPlaceId(), image);
+            tempPlaceImagesCommandService.addImageToTripDayPlace(imageUploadRequest.tripDayPlaceId(), image);
 
         } catch (Exception e) {
             log.error("Error processing image - filename: {}", imageUploadRequest.originalFilename(), e);
-        }
-    }
-
-    /**
-     * 이미지 삭제를 비동기로 처리
-     *
-     * @param imageUrls : 이미지 url List
-     */
-    @Async
-    public void processImageDeletion(List<String> imageUrls) {
-        for (String url : imageUrls) {
-            awsS3Storage.deleteImage(url);
         }
     }
 }
