@@ -1,5 +1,6 @@
 package kr.co.yeogiga.application.user.service;
 
+import kr.co.yeogiga.application.auth.service.RefreshTokenService;
 import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.user.entity.User;
@@ -14,12 +15,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,6 +36,9 @@ public class UserManagementServiceTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private RefreshTokenService refreshTokenService;
 
     @InjectMocks
     private UserManagementService userManagementService;
@@ -95,5 +102,62 @@ public class UserManagementServiceTest {
             // then
             assertEquals(UserErrorType.PASSWORD_MISMATCH, exception.getErrorType());
         }
+    }
+
+    @Nested
+    @DisplayName("회원 탈퇴")
+    class Withdraw {
+        private final Long userId = 1L;
+        private final User user = User.builder()
+                .username("test")
+                .nickname("test")
+                .password("test")
+                .email("test@test.com")
+                .role(Role.USER)
+                .build();
+        @Test
+        @DisplayName("성공")
+        void success() {
+            // given
+            when(userService.readIncludeDeletedUserById(eq(userId))).thenReturn(Optional.of(user));
+            doNothing().when(refreshTokenService).delete(eq(userId));
+            doNothing().when(userService).deleteById(eq(userId));
+
+            // when
+            userManagementService.withdraw(userId);
+
+            // then
+            verify(userService, times(1)).readIncludeDeletedUserById(eq(userId));
+            verify(refreshTokenService, times(1)).delete(eq(userId));
+            verify(userService, times(1)).deleteById(eq(userId));
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 사용자")
+        void failUserNotFound() {
+            // given
+            when(userService.readIncludeDeletedUserById(eq(userId))).thenReturn(Optional.empty());
+            // when
+            CustomException exception = assertThrows(CustomException.class, () -> userManagementService.withdraw(userId));
+
+            // then
+            assertEquals(exception.getErrorType(), UserErrorType.NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("실패 - 이미 회원탈퇴를 진행한 경우")
+        void failAlreadyWithdraw() {
+            // given
+            when(userService.readIncludeDeletedUserById(eq(userId))).thenReturn(Optional.of(user));
+            ReflectionTestUtils.setField(user, "deletedAt", LocalDateTime.now());
+
+            // when
+            CustomException exception = assertThrows(CustomException.class, () -> userManagementService.withdraw(userId));
+
+            // then
+            assertEquals(exception.getErrorType(), UserErrorType.ALREADY_WITHDRAW);
+        }
+
+
     }
 }
