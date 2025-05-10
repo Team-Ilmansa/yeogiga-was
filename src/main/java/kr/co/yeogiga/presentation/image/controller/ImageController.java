@@ -46,11 +46,11 @@ public class ImageController implements ImageApi {
     }
 
     @Override
-    @DeleteMapping("/{tripId}/day-place/{tripDayPlaceId}/temp-images")
+    @DeleteMapping("/{tripId}/day-place/temp-images/{tempPlaceImageId}")
     public ResponseEntity<?> removeTempImages(@PathVariable Long tripId,
-                                              @PathVariable String tripDayPlaceId,
+                                              @PathVariable String tempPlaceImageId,
                                               @RequestBody ImageDeleteDto deleteDto) {
-        tempPlaceImagesCommandService.removeTempImages(tripDayPlaceId, deleteDto);
+        tempPlaceImagesCommandService.removeTempImages(tempPlaceImageId, deleteDto);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 }
