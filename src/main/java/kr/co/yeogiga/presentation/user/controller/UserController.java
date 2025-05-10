@@ -35,6 +35,7 @@ public class UserController implements UserApi {
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
+    @Override
     @DeleteMapping
     public ResponseEntity<?> withdraw(
             @AuthenticationPrincipal CustomUserDetails userDetails

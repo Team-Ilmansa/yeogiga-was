@@ -71,4 +71,39 @@ public interface UserApi {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody PasswordUpdateReq passwordUpdateReq
     );
+
+    @TrackApi(description = "회원 탈퇴")
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "회원 탈퇴 성공", value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다."
+                                        }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "400", description = "회원 탈퇴 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "이미 회원 탈퇴한 사용자", value = """
+                                        {
+                                            "code": "U004",
+                                            "message": "이미 회원탈퇴한 사용자입니다."
+                                        }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "회원 탈퇴 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "존재하지 않는 사용자", value = """
+                                        {
+                                            "code": "U000",
+                                            "message": "존재하지 않는 사용자입니다."
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> withdraw(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    );
 }
