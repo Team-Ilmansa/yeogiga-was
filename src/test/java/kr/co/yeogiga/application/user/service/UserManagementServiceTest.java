@@ -137,6 +137,7 @@ public class UserManagementServiceTest {
         void failUserNotFound() {
             // given
             when(userService.readIncludeDeletedUserById(eq(userId))).thenReturn(Optional.empty());
+
             // when
             CustomException exception = assertThrows(CustomException.class, () -> userManagementService.withdraw(userId));
 
