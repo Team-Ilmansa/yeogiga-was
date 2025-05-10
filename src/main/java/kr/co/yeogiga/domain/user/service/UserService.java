@@ -46,4 +46,13 @@ public class UserService {
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
     }
+
+
+    public void deleteById(Long userId) {
+        userRepository.deleteById(userId);
+    }
+
+    public void deleteHardAllByIds(List<Long> ids) {
+        userRepository.deleteHardAllByIds(ids);
+    }
 }
