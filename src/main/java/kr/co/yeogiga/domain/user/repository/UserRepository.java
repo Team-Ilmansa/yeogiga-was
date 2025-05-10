@@ -37,4 +37,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<Long> findDeletedUserIdBefore(@Param(value = "date") LocalDate date);
 
     boolean existsByUsername(String username);
+
+    @Modifying
+    @Query(value = "DELETE " +
+            "FROM users " +
+            "WHERE id IN :ids", nativeQuery = true)
+    void deleteHardAllByIds(List<Long> ids);
 }
