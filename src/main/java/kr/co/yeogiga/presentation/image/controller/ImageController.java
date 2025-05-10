@@ -1,9 +1,9 @@
 package kr.co.yeogiga.presentation.image.controller;
 
-import kr.co.yeogiga.application.image.dto.ImageUrlDto;
-import kr.co.yeogiga.application.image.service.ImageDeleteProcessor;
+import kr.co.yeogiga.application.image.dto.ImageDeleteDto;
 import kr.co.yeogiga.application.image.service.ImageUploadProcessor;
 import kr.co.yeogiga.application.image.service.TempImageAssignProcessor;
+import kr.co.yeogiga.application.image.service.TempPlaceImagesCommandService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.presentation.image.api.ImageApi;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +25,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ImageController implements ImageApi {
     private final ImageUploadProcessor imageUploadProcessor;
-    private final ImageDeleteProcessor imageDeleteProcessor;
     private final TempImageAssignProcessor tempImageAssignProcessor;
+    private final TempPlaceImagesCommandService tempPlaceImagesCommandService;
 
     @Override
     @PostMapping("/{tripId}/day-place/{tripDayPlaceId}/images")
@@ -46,9 +46,11 @@ public class ImageController implements ImageApi {
     }
 
     @Override
-    @DeleteMapping("/{tripId}/imagess") // 변경 예정
-    public ResponseEntity<?> deleteImage(@RequestBody ImageUrlDto imageUrlDto) {
-        imageDeleteProcessor.process(imageUrlDto);
+    @DeleteMapping("/{tripId}/day-place/{tripDayPlaceId}/temp-images")
+    public ResponseEntity<?> removeTempImages(@PathVariable Long tripId,
+                                              @PathVariable String tripDayPlaceId,
+                                              @RequestBody ImageDeleteDto deleteDto) {
+        tempPlaceImagesCommandService.removeTempImages(tripDayPlaceId, deleteDto);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 }
