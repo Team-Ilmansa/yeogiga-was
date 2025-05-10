@@ -1,5 +1,6 @@
 package kr.co.yeogiga.application.tripplace.image.service;
 
+import kr.co.yeogiga.application.image.service.ImageDeleteProcessor;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +22,9 @@ public class TripPlaceImageDeleteServiceTest {
     @Mock
     private TripDayPlaceService tripDayPlaceService;
 
+    @Mock
+    private ImageDeleteProcessor imageDeleteProcessor;
+
     @InjectMocks
     private TripPlaceImageDeleteService tripPlaceImageDeleteService;
 
@@ -38,7 +42,7 @@ public class TripPlaceImageDeleteServiceTest {
             // given
             TripPlaceImageDeleteDto.SingleDeleteReq req =
                     new TripPlaceImageDeleteDto.SingleDeleteReq(
-                            TripPlaceImageDeleteDto.DeleteType.PLACE, placeId
+                            "https://image.com", TripPlaceImageDeleteDto.DeleteType.PLACE, placeId
                     );
 
             // when
@@ -46,6 +50,7 @@ public class TripPlaceImageDeleteServiceTest {
 
             // then
             verify(tripDayPlaceService, times(1)).deleteImage(tripDayPlaceId, placeId, imageId);
+            verify(imageDeleteProcessor, times(1)).process(List.of(req.url()));
         }
 
         @Test
@@ -54,7 +59,7 @@ public class TripPlaceImageDeleteServiceTest {
             // given
             TripPlaceImageDeleteDto.SingleDeleteReq req =
                     new TripPlaceImageDeleteDto.SingleDeleteReq(
-                            TripPlaceImageDeleteDto.DeleteType.UNMATCHED, null
+                            "https://image.com", TripPlaceImageDeleteDto.DeleteType.UNMATCHED, null
                     );
 
             // when
@@ -62,6 +67,7 @@ public class TripPlaceImageDeleteServiceTest {
 
             // then
             verify(tripDayPlaceService, times(1)).deleteImageFromUnMatched(tripDayPlaceId, imageId);
+            verify(imageDeleteProcessor, times(1)).process(List.of(req.url()));
         }
     }
 
@@ -71,13 +77,15 @@ public class TripPlaceImageDeleteServiceTest {
         // given
         Long tripId = 1L;
         List<String> imageIds = List.of("img1", "img2", "img3");
+        List<String> urls = List.of("https://image1.com", "https://image2.com", "https://image3.com");
         TripPlaceImageDeleteDto.MultiDeleteReq req =
-                new TripPlaceImageDeleteDto.MultiDeleteReq(imageIds);
+                new TripPlaceImageDeleteDto.MultiDeleteReq(imageIds, urls);
 
         // when
         tripPlaceImageDeleteService.deleteMultipleImages(tripId, req);
 
         // then
         verify(tripDayPlaceService, times(1)).deleteImagesByTripId(tripId, imageIds);
+        verify(imageDeleteProcessor, times(1)).process(req.urls());
     }
 }

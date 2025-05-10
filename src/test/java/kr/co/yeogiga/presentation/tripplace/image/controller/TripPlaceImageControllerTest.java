@@ -231,13 +231,15 @@ public class TripPlaceImageControllerTest {
     class DeleteImageTest {
 
         private final String placeId = "place-id";
+        private final String url1 = "https://image1.com";
+        private final String url2 = "https://image2.com";
 
         @Test
         @DisplayName("단일 이미지 삭제 성공")
         void deleteSingleImageSuccess() throws Exception {
             // given
             TripPlaceImageDeleteDto.SingleDeleteReq deleteReq = new TripPlaceImageDeleteDto.SingleDeleteReq(
-                    TripPlaceImageDeleteDto.DeleteType.PLACE, placeId
+                    url1, TripPlaceImageDeleteDto.DeleteType.PLACE, placeId
             );
 
             // when
@@ -260,7 +262,7 @@ public class TripPlaceImageControllerTest {
         void deleteMultipleImagesSuccess() throws Exception {
             // given
             TripPlaceImageDeleteDto.MultiDeleteReq deleteReq = new TripPlaceImageDeleteDto.MultiDeleteReq(
-                    List.of("image1-id", "image2-id", "image3-id")
+                    List.of(url1, url2), List.of("image1-id", "image2-id")
             );
 
             // when

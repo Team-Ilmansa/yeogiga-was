@@ -1,9 +1,12 @@
 package kr.co.yeogiga.application.tripplace.image.service;
 
+import kr.co.yeogiga.application.image.service.ImageDeleteProcessor;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * TripDayPlace 내 이미지 삭제 기능을 담당하는 서비스 클래스
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TripPlaceImageDeleteService {
     private final TripDayPlaceService tripDayPlaceService;
+    private final ImageDeleteProcessor imageDeleteProcessor;
 
     /**
      * 단일 이미지를 삭제 메서드
@@ -33,6 +37,8 @@ public class TripPlaceImageDeleteService {
                     tripDayPlaceId, imageId
             );
         }
+
+        imageDeleteProcessor.process(List.of(deleteReq.url()));
     }
 
     /**
@@ -45,5 +51,6 @@ public class TripPlaceImageDeleteService {
 
     public void deleteMultipleImages(Long tripId, TripPlaceImageDeleteDto.MultiDeleteReq deleteReq) {
         tripDayPlaceService.deleteImagesByTripId(tripId, deleteReq.imageIds());
+        imageDeleteProcessor.process(deleteReq.urls());
     }
 }
