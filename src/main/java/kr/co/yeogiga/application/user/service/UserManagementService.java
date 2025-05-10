@@ -44,6 +44,11 @@ public class UserManagementService {
         user.updatePassword(passwordEncoder.encode(passwordReq.newPassword()));
     }
 
+    /**
+     * 회원탈퇴 메서드
+     *
+     * @param userId            사용자 ID
+     */
     @Transactional
     public void withdraw(Long userId) {
         User user = userService.readIncludeDeletedUserById(userId)
