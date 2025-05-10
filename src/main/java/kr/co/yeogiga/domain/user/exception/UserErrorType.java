@@ -12,7 +12,9 @@ public enum UserErrorType implements BaseErrorType {
     NOT_FOUND(HttpStatus.NOT_FOUND, "U000", "존재하지 않는 사용자입니다."),
     ALREADY_EXIST_USERNAME(HttpStatus.CONFLICT, "U001", "이미 존재하는 아이디입니다."),
     SAME_PASSWORD(HttpStatus.CONFLICT, "U002", "기존과 동일한 비밀번호입니다."),
-    PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "U003", "비밀번호가 불일치합니다.");
+    PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "U003", "비밀번호가 불일치합니다."),
+    ALREADY_WITHDRAW(HttpStatus.BAD_REQUEST, "U004", "이미 회원탈퇴한 사용자입니다.");
+
 
 
     private final HttpStatus httpStatus;
