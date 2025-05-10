@@ -6,6 +6,7 @@ import kr.co.yeogiga.domain.tripplace.repository.TempPlaceImagesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,5 +24,9 @@ public class TempPlaceImagesService {
 
     public void deleteById(String id) {
         tempPlaceImagesRepository.deleteById(id);
+    }
+
+    public void deleteImages(String id, List<String> imageIds) {
+        tempPlaceImagesRepository.deleteImages(id, imageIds);
     }
 }

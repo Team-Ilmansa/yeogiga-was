@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.yeogiga.application.image.dto.ImageUrlDto;
+import kr.co.yeogiga.application.image.dto.ImageDeleteDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,8 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@ApiGroup(value = "[이미지 API]")
-@Tag(name = "[이미지 API]", description = "이미지 관련 API")
+@ApiGroup(value = "[이미지 매칭 전 API]")
+@Tag(name = "[이미지 매칭 전 API]", description = "이미지 매칭 전 관련 API")
 public interface ImageApi {
 
     @TrackApi(description = "이미지 업로드")
@@ -69,10 +69,10 @@ public interface ImageApi {
     ResponseEntity<?> assignImages(@PathVariable Long tripId,
                                    @PathVariable String tripDayPlaceId);
 
-    @TrackApi(description = "이미지 삭제")
-    @Operation(summary = "이미지 삭제", description = "이미지 삭제하는 API입니다.")
+    @TrackApi(description = "임시 이미지 삭제")
+    @Operation(summary = "임시 이미지 삭제", description = "임시 이미지 삭제하는 API입니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "이미지 삭제 성공",
+            @ApiResponse(responseCode = "200", description = "임시 이미지 삭제 성공",
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(value = """
                                         {
@@ -82,5 +82,7 @@ public interface ImageApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> deleteImage(@RequestBody ImageUrlDto imageUrlDto);
+    ResponseEntity<?> removeTempImages(@PathVariable Long tripId,
+                                       @PathVariable String tripDayPlaceId,
+                                       @RequestBody ImageDeleteDto deleteDto);
 }

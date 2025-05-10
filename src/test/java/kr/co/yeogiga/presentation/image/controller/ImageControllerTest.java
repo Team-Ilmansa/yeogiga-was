@@ -1,10 +1,10 @@
 package kr.co.yeogiga.presentation.image.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.yeogiga.application.image.dto.ImageUrlDto;
-import kr.co.yeogiga.application.image.service.ImageDeleteProcessor;
+import kr.co.yeogiga.application.image.dto.ImageDeleteDto;
 import kr.co.yeogiga.application.image.service.ImageUploadProcessor;
 import kr.co.yeogiga.application.image.service.TempImageAssignProcessor;
+import kr.co.yeogiga.application.image.service.TempPlaceImagesCommandService;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,10 +48,10 @@ public class ImageControllerTest {
     private ImageUploadProcessor imageUploadProcessor;
 
     @MockBean
-    private ImageDeleteProcessor imageDeleteProcessor;
+    private TempImageAssignProcessor tempImageAssignProcessor;
 
     @MockBean
-    private TempImageAssignProcessor tempImageAssignProcessor;
+    private TempPlaceImagesCommandService tempPlaceImagesCommandService;
 
     private final Long tripId = 1L;
     private final String tripDayPlaceId = "trip-day-place-id";
@@ -108,21 +108,20 @@ public class ImageControllerTest {
                 .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
     }
 
-/*    @Test
+    @Test
     @DisplayName("이미지 삭제 테스트")
     void deleteImageTest() throws Exception {
         // given
-        List<String> urls = List.of(
-                "https://example-image1.com",
-                "https://example-image2.com",
-                "https://example-image3.com"
-        );
-        ImageUrlDto imageUrlDto = new ImageUrlDto(urls);
+        List<String> imageIds = List.of("image1-id", "image2-id");
+        List<String> urls = List.of("https://image1.com", "https://image2.com");
+
+        ImageDeleteDto deleteDto = new ImageDeleteDto(imageIds, urls);
+        String tempPlaceImageId = "tempPlaceImage-Id";
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                delete("/api/v1/trip/{tripId}/images", tripId)
-                        .content(objectMapper.writeValueAsBytes(imageUrlDto))
+                delete("/api/v1/trip/{tripId}/day-place/temp-images/{tempPlaceImageId}}", tripId, tempPlaceImageId)
+                        .content(objectMapper.writeValueAsBytes(deleteDto))
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
@@ -131,5 +130,5 @@ public class ImageControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
-    }*/
+    }
 }
