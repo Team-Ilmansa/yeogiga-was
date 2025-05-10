@@ -26,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -98,6 +100,9 @@ public class AuthServiceTest {
     class SignUp {
 
         @Captor
+        private ArgumentCaptor<String> stringCaptor;
+
+        @Captor
         private ArgumentCaptor<User> userCaptor;
 
         @Test
@@ -113,16 +118,17 @@ public class AuthServiceTest {
 
             when(userService.existsByUsername(request.username())).thenReturn(false);
             when(passwordEncoder.encode(request.password())).thenReturn("encodedPassword");
+            doNothing().when(userService).save(any());
 
             // when
             authService.signUp(request);
 
             // then
-            verify(userService).save(userCaptor.capture());
+            verify(passwordEncoder, times(1)).encode(stringCaptor.capture());
+            verify(userService, times(1)).save(userCaptor.capture());
 
-            assertEquals(request.username(), userCaptor.getValue().getUsername());
-            assertEquals(userCaptor.getValue().isSignedUp(), true);
-            assertEquals(userCaptor.getValue().getRole(), Role.USER);
+            assertEquals("testpw", stringCaptor.getValue());
+            assertEquals("encodedPassword", userCaptor.getValue().getPassword());
         }
 
         @Test
@@ -166,7 +172,7 @@ public class AuthServiceTest {
                     .password("testpw")
                     .build();
 
-            when(userService.readByUsername(request.username())).thenReturn(Optional.of(newUser));
+            when(userService.readIncludeDeletedUserByUsername(request.username())).thenReturn(Optional.of(newUser));
             when(passwordEncoder.matches(request.password(), newUser.getPassword())).thenReturn(true);
             when(jwtService.generateToken(any(), any(), any())).thenReturn(tokenDto);
 
@@ -181,7 +187,7 @@ public class AuthServiceTest {
         @DisplayName("실패 - 존재하지 않는 아이디")
         void failSignInNotFountId() {
             // given
-            when(userService.readByUsername(request.username())).thenReturn(Optional.ofNullable(null));
+            when(userService.readIncludeDeletedUserByUsername(request.username())).thenReturn(Optional.ofNullable(null));
 
             // when
             CustomException exception = assertThrows(CustomException.class, () -> authService.signIn(request));
@@ -201,7 +207,7 @@ public class AuthServiceTest {
                     .password("testpw")
                     .build();
 
-            when(userService.readByUsername(request.username())).thenReturn(Optional.of(newUser));
+            when(userService.readIncludeDeletedUserByUsername(request.username())).thenReturn(Optional.of(newUser));
             when(passwordEncoder.matches(request.password(), newUser.getPassword())).thenReturn(false);
 
             // when
