@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class CustomTempPlaceImagesRepositoryImpl implements CustomTempPlaceImagesRepository {
     private final MongoTemplate mongoTemplate;
@@ -26,5 +28,12 @@ public class CustomTempPlaceImagesRepositoryImpl implements CustomTempPlaceImage
         Update update = new Update().push("images", image);
 
         mongoTemplate.upsert(query, update, TempPlaceImages.class);
+    }
+
+    @Override
+    public void deleteImages(String id, List<String> imageIds) {
+        Query query = new Query(Criteria.where("_id").is(id));
+        Update update = new Update().pull("images", Query.query(Criteria.where("id").in(imageIds)));
+        mongoTemplate.updateFirst(query, update, TempPlaceImages.class);
     }
 }
