@@ -5,14 +5,19 @@ import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
 import kr.co.yeogiga.application.user.service.UserManagementService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
+import kr.co.yeogiga.common.util.CookieUtil;
 import kr.co.yeogiga.presentation.user.api.UserApi;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import static kr.co.yeogiga.application.auth.constant.AuthConstants.REFRESH_TOKEN_PREFIX;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -28,5 +33,16 @@ public class UserController implements UserApi {
     ) {
         userManagementService.updatePassword(userDetails.getUserId(), passwordUpdateReq);
         return ResponseEntity.ok(SuccessResponse.ok());
+    }
+
+    @Override
+    @DeleteMapping
+    public ResponseEntity<?> withdraw(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        userManagementService.withdraw(userDetails.getUserId());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, CookieUtil.removeCookie(REFRESH_TOKEN_PREFIX).toString())
+                .body(SuccessResponse.ok());
     }
 }

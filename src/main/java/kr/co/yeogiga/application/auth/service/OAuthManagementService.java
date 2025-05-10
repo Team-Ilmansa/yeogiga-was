@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class OAuthManagementService {
@@ -68,11 +70,16 @@ public class OAuthManagementService {
      * @return              User, 추가 정보 입력 필요 여부
      */
     private UserStatusDto getUserStatus(OAuthPlatform platform, UserInfoDto userInfo) {
-        return userService.readByPlatformAndPlatformId(platform, userInfo.platformId())
-                .map(user -> user.isSignedUp()
-                        ? UserStatusDto.of(user, false)
-                        : UserStatusDto.of(user, true)
-                )
+        return userService.readIncludeDeletedUserByPlatformAndPlatformId(platform, userInfo.platformId())
+                .map(user -> {
+                    if (!Objects.isNull(user.getDeletedAt())) {
+                        user.revertWithdrawal();
+                    }
+
+                    return user.isSignedUp()
+                            ? UserStatusDto.of(user, false)
+                            : UserStatusDto.of(user, true);
+                    })
                 .orElseGet(() -> UserStatusDto.of(registerUser(platform, userInfo), true));
     }
 

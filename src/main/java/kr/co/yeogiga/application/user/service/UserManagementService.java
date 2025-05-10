@@ -1,5 +1,6 @@
 package kr.co.yeogiga.application.user.service;
 
+import kr.co.yeogiga.application.auth.service.RefreshTokenService;
 import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.user.entity.User;
@@ -10,11 +11,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class UserManagementService {
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
 
     /**
      * 사용자 비밀번호 갱신 메서드
@@ -38,5 +42,23 @@ public class UserManagementService {
         }
 
         user.updatePassword(passwordEncoder.encode(passwordReq.newPassword()));
+    }
+
+    /**
+     * 회원탈퇴 메서드
+     *
+     * @param userId            사용자 ID
+     */
+    @Transactional
+    public void withdraw(Long userId) {
+        User user = userService.readIncludeDeletedUserById(userId)
+                .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
+
+        if (Objects.nonNull(user.getDeletedAt())) {
+            throw new CustomException(UserErrorType.ALREADY_WITHDRAW);
+        }
+
+        refreshTokenService.delete(userId);
+        userService.deleteById(userId);
     }
 }
