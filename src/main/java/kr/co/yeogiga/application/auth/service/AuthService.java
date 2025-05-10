@@ -40,6 +40,7 @@ public class AuthService {
         User newUser = request.toEntity(passwordEncoder.encode(request.password()));
 
         newUser.upgradeRoleToUser();
+        userService.save(newUser);
     }
 
     /**
