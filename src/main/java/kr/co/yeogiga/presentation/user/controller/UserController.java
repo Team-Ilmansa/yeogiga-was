@@ -47,6 +47,7 @@ public class UserController implements UserApi {
                 .body(SuccessResponse.ok());
     }
 
+    @Override
     @GetMapping("/my")
     public ResponseEntity<?> getUserInfo(
             @AuthenticationPrincipal CustomUserDetails userDetails

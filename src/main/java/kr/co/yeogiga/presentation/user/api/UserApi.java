@@ -13,6 +13,7 @@ import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @ApiGroup(value = "[사용자 관련 API]")
@@ -104,6 +105,48 @@ public interface UserApi {
                     }))
     })
     ResponseEntity<?> withdraw(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    );
+
+    @TrackApi(description = "회원 정보 조회")
+    @Operation(summary = "회원 정보 조회", description = "회원 정보 조회 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "소셜 로그인 사용자", value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다.",
+                                            "data": {
+                                                "nickname": "test",
+                                                "email": "test@test.com"
+                                            }
+                                        }
+                                    """),
+                            @ExampleObject(name = "일반 로그인 사용자", value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다.",
+                                            "data": {
+                                                "username": "test",
+                                                "nickname": "test",
+                                                "email": "test@test.com"
+                                            }
+                                        }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "회원 탈퇴 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "존재하지 않는 사용자", value = """
+                                        {
+                                            "code": "U000",
+                                            "message": "존재하지 않는 사용자입니다."
+                                        }
+                                    """)
+                    }))
+    })
+    @GetMapping("/my")
+    public ResponseEntity<?> getUserInfo(
             @AuthenticationPrincipal CustomUserDetails userDetails
     );
 }
