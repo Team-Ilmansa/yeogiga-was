@@ -131,6 +131,15 @@ public interface OAuthApi {
                                              "message": "접근 권한이 없습니다."
                                         }
                                     """)
+                    })),
+            @ApiResponse(responseCode = "409", description = "이미 사용 중인 닉네임 ",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "이미 사용 중인 닉네임", value = """
+                                        {
+                                            "code": "A012",
+                                            "message": "이미 사용 중인 닉네임입니다."
+                                        }
+                                    """)
                     }))
 
     })

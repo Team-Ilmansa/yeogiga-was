@@ -51,8 +51,14 @@ public interface AuthApi {
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(name = "회원가입 실패 - 이미 존재하는 아이디", value = """
                                         {
-                                            "code": "U001",
-                                            "message": "이미 존재하는 아이디입니다."
+                                            "code": "A011",
+                                            "message": "이미 사용 중인 아이디입니다."
+                                        }
+                                    """),
+                            @ExampleObject(name = "회원가입 실패 - 이미 존재하는 아이디", value = """
+                                        {
+                                            "code": "A012",
+                                            "message": "이미 사용 중인 닉네임입니다."
                                         }
                                     """)
                     }))
