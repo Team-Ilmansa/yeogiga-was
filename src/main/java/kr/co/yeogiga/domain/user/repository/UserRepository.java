@@ -38,6 +38,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByUsername(String username);
 
+    @Query(value = "SELECT id " +
+                   "FROM users " +
+                   "WHERE username = :username LIMIT 1", nativeQuery = true)
+    Optional<Long> findUserIdIncludeDeletedByUsername(@Param(value = "username") String username);
+
+    @Query(value = "SELECT id " +
+                   "FROM users " +
+                   "WHERE nickname = :nickname LIMIT 1", nativeQuery = true)
+    Optional<Long> findUserIdIncludeDeletedByNickname(@Param(value = "nickname") String nickname);
+
     @Modifying
     @Query(value = "DELETE " +
             "FROM users " +
