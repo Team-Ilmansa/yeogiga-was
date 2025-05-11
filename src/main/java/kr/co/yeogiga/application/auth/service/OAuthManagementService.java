@@ -6,6 +6,7 @@ import kr.co.yeogiga.application.auth.dto.TokenDto;
 import kr.co.yeogiga.application.auth.dto.UserInfoDto;
 import kr.co.yeogiga.application.auth.dto.UserStatusDto;
 import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
 import kr.co.yeogiga.domain.oauth.entity.OAuth;
 import kr.co.yeogiga.domain.oauth.service.OAuthService;
 import kr.co.yeogiga.domain.oauth.type.OAuthPlatform;
@@ -57,6 +58,10 @@ public class OAuthManagementService {
     public void register(Long userId, SignUpDto.Register request) {
         User user = userService.readById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
+
+        if (userService.readIncludeDeletedUserByNickname(request.nickname())) {
+            throw new CustomException(AuthErrorType.ALREADY_USED_NICKNAME);
+        }
 
         user.updateNickname(request.nickname());
         user.upgradeRoleToUser();
