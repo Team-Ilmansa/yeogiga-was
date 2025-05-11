@@ -63,6 +63,14 @@ public class UserManagementService {
         userService.deleteById(userId);
     }
 
+    /**
+     * 회원 정보 조회 메서드
+     *
+     * @param userId    사용자 ID
+     * @return          UserInfoRes 사용자 정보
+     *                  - 소셜 로그인 사용자 -> nickname, email
+     *                  - 일반 로그인 사용자 -> nickname, email, username
+     */
     @Transactional(readOnly = true)
     public UserInfoRes getUserInfo(Long userId) {
         User user = userService.readById(userId)
