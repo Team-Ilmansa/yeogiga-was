@@ -47,10 +47,6 @@ public class UserService {
         return userRepository.findUserIdIncludeDeletedByNickname(nickname).isPresent();
     }
 
-    public boolean readIncludeDeletedUserByNickname(String nickname) {
-        return userRepository.findUserIdIncludeDeletedByNickname(nickname).isPresent();
-    }
-
     public void deleteById(Long userId) {
         userRepository.deleteById(userId);
     }

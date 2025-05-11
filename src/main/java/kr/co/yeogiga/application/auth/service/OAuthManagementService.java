@@ -59,7 +59,7 @@ public class OAuthManagementService {
         User user = userService.readById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
 
-        if (userService.readIncludeDeletedUserByNickname(request.nickname())) {
+        if (userService.existsIncludeDeletedByNickname(request.nickname())) {
             throw new CustomException(AuthErrorType.ALREADY_USED_NICKNAME);
         }
 
