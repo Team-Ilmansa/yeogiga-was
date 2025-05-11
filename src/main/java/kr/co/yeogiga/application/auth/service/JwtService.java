@@ -1,6 +1,7 @@
 package kr.co.yeogiga.application.auth.service;
 
 import kr.co.yeogiga.application.auth.dto.TokenDto;
+import kr.co.yeogiga.application.auth.type.LoginType;
 import kr.co.yeogiga.common.jwt.JwtHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,9 +12,9 @@ public class JwtService {
     private final JwtHelper jwtHelper;
     private final RefreshTokenService refreshTokenService;
 
-    public TokenDto generateToken(String username, String nickname, Long userId) {
-        String accessToken = jwtHelper.generateAccessToken(username, nickname, userId);
-        String refreshToken = jwtHelper.generateRefreshToken(username, nickname, userId);
+    public TokenDto generateToken(String username, String nickname, Long userId, LoginType loginType) {
+        String accessToken = jwtHelper.generateAccessToken(username, nickname, userId, loginType);
+        String refreshToken = jwtHelper.generateRefreshToken(username, nickname, userId, loginType);
         refreshTokenService.save(userId, refreshToken);
 
         return TokenDto.of(accessToken, refreshToken);
