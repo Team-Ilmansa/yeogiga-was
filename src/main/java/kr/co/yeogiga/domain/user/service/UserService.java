@@ -27,10 +27,6 @@ public class UserService {
         return userRepository.findUserIncludeDeletedById(id);
     }
 
-    public Optional<User> readByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
-
     public Optional<User> readIncludeDeletedUserByUsername(String username) {
         return userRepository.findUserIncludeDeletedByUsername(username);
     }
@@ -43,10 +39,13 @@ public class UserService {
         return userRepository.findDeletedUserIdBefore(date);
     }
 
-    public boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(username);
+    public boolean existsIncludeDeletedByUsername(String username) {
+        return userRepository.findUserIdIncludeDeletedByUsername(username).isPresent();
     }
 
+    public boolean existsIncludeDeletedByNickname(String nickname) {
+        return userRepository.findUserIdIncludeDeletedByNickname(nickname).isPresent();
+    }
 
     public void deleteById(Long userId) {
         userRepository.deleteById(userId);

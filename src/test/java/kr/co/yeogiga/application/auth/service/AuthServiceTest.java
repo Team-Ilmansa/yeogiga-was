@@ -22,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -107,7 +108,7 @@ public class AuthServiceTest {
 
         @Test
         @DisplayName("성공")
-        void successSignUp() {
+        void success() {
             // given
             SignUpDto.Request request = SignUpDto.Request.builder()
                     .username("testid")
@@ -116,7 +117,8 @@ public class AuthServiceTest {
                     .password("testpw")
                     .build();
 
-            when(userService.existsByUsername(request.username())).thenReturn(false);
+            when(userService.existsIncludeDeletedByUsername(request.username())).thenReturn(false);
+            when(userService.existsIncludeDeletedByNickname(request.nickname())).thenReturn(false);
             when(passwordEncoder.encode(request.password())).thenReturn("encodedPassword");
             doNothing().when(userService).save(any());
 
@@ -132,8 +134,8 @@ public class AuthServiceTest {
         }
 
         @Test
-        @DisplayName("실패 - 이미 존재하는 유저")
-        void failSignUp() {
+        @DisplayName("실패 - 이미 사용 중인 아이디")
+        void failAlreadyUsedUsername() {
             // given
             SignUpDto.Request request = SignUpDto.Request.builder()
                     .username("testid")
@@ -142,15 +144,35 @@ public class AuthServiceTest {
                     .password("testpw")
                     .build();
 
-            when(userService.existsByUsername(request.username())).thenReturn(true);
+            when(userService.existsIncludeDeletedByUsername(request.username())).thenReturn(true);
 
             // when
             CustomException exception = assertThrows(CustomException.class, () -> authService.signUp(request));
 
             // then
-            assertEquals(exception.getErrorType(), UserErrorType.ALREADY_EXIST_USERNAME);
+            assertEquals(exception.getErrorType(), AuthErrorType.ALREADY_USED_USERNAME);
         }
 
+        @Test
+        @DisplayName("실패 - 이미 사용 중인 닉네임")
+        void failAlreadyUsedNickname() {
+            // given
+            SignUpDto.Request request = SignUpDto.Request.builder()
+                    .username("testid")
+                    .email("test@test.com")
+                    .nickname("testnick")
+                    .password("testpw")
+                    .build();
+
+            when(userService.existsIncludeDeletedByUsername(request.username())).thenReturn(false);
+            when(userService.existsIncludeDeletedByNickname(request.nickname())).thenReturn(true);
+
+            // when
+            CustomException exception = assertThrows(CustomException.class, () -> authService.signUp(request));
+
+            // then
+            assertEquals(exception.getErrorType(), AuthErrorType.ALREADY_USED_NICKNAME);
+        }
     }
 
     @Nested
@@ -215,6 +237,64 @@ public class AuthServiceTest {
 
             // then
             assertEquals(exception.getErrorType(), AuthErrorType.AUTHENTICATION_FAIL);
+        }
+    }
+
+    @Nested
+    @DisplayName("아이디 중복 확인")
+    class DupCheckUsername {
+        @Test
+        @DisplayName("사용 가능한 아이디")
+        void success() {
+            // given
+            String username = "test";
+            when(userService.existsIncludeDeletedByUsername(username)).thenReturn(false);
+
+            // when & then
+            assertDoesNotThrow(() -> authService.checkDuplicatedUsername(username));
+        }
+
+        @Test
+        @DisplayName("이미 사용 중인 아이디")
+        void failAlreadyUsedUsername() {
+            // given
+            String username = "test";
+            when(userService.existsIncludeDeletedByUsername(username)).thenReturn(true);
+
+            // when
+            CustomException exception = assertThrows(CustomException.class, () -> authService.checkDuplicatedUsername(username));
+
+            // then
+            assertEquals(AuthErrorType.ALREADY_USED_USERNAME, exception.getErrorType());
+        }
+    }
+
+    @Nested
+    @DisplayName("닉네임 중복 확인")
+    class DupCheckNickname {
+        @Test
+        @DisplayName("사용 가능한 닉네임")
+        void success() {
+            // given
+            String nickname = "test";
+            when(userService.existsIncludeDeletedByNickname(nickname)).thenReturn(false);
+
+            // when & then
+            assertDoesNotThrow(() -> authService.checkDuplicatedNickname(nickname));
+        }
+
+        @Test
+        @DisplayName("이미 사용 중인 닉네임")
+        void failAlreadyUsedNickname() {
+            // given
+            String nickname = "test";
+            when(userService.existsIncludeDeletedByNickname(nickname)).thenReturn(true);
+
+            // when
+            CustomException exception = assertThrows(CustomException.class, () -> authService.checkDuplicatedNickname(nickname));
+
+            // then
+            assertEquals(AuthErrorType.ALREADY_USED_NICKNAME, exception.getErrorType());
         }
     }
 }

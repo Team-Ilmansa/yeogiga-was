@@ -20,7 +20,10 @@ public enum AuthErrorType implements BaseErrorType {
     REFRESH_TOKEN_EXPIRED(HttpStatus.NOT_FOUND, "A008", "리프레시 토큰이 만료되었습니다. 재로그인 해주세요."),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "A009", "리프레시 토큰을 찾을 수 없습니다."),
 
-    AUTHENTICATION_FAIL(HttpStatus.BAD_REQUEST, "A010", "로그인에 실패하였습니다. 아이디 또는 비밀번호를 확인해주세요.");
+    AUTHENTICATION_FAIL(HttpStatus.BAD_REQUEST, "A010", "로그인에 실패하였습니다. 아이디 또는 비밀번호를 확인해주세요."),
+
+    ALREADY_USED_USERNAME(HttpStatus.CONFLICT, "A011", "이미 사용 중인 아이디입니다."),
+    ALREADY_USED_NICKNAME(HttpStatus.CONFLICT, "A012", "이미 사용 중인 닉네임입니다.");
 
 
     private final HttpStatus httpStatus;

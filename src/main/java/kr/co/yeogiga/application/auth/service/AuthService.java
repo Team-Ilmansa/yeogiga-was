@@ -31,10 +31,12 @@ public class AuthService {
      */
     @Transactional
     public void signUp(SignUpDto.Request request) {
-        String username = request.username();
+        if (userService.existsIncludeDeletedByUsername(request.username())) {
+            throw new CustomException(AuthErrorType.ALREADY_USED_USERNAME);
+        }
 
-        if (userService.existsByUsername(username)) {
-            throw new CustomException(UserErrorType.ALREADY_EXIST_USERNAME);
+        if (userService.existsIncludeDeletedByNickname(request.nickname())) {
+            throw new CustomException(AuthErrorType.ALREADY_USED_NICKNAME);
         }
 
         User newUser = request.toEntity(passwordEncoder.encode(request.password()));
@@ -93,5 +95,29 @@ public class AuthService {
     public void signOut(String refreshToken) {
         Long userId = jwtService.extractUserId(refreshToken);
         refreshTokenService.delete(userId);
+    }
+
+    /**
+     * 아이디 중복 확인 메서드
+     *
+     * @param username      확인할 아이디
+     */
+    @Transactional(readOnly = true)
+    public void checkDuplicatedUsername(String username) {
+        if (userService.existsIncludeDeletedByUsername(username)) {
+            throw new CustomException(AuthErrorType.ALREADY_USED_USERNAME);
+        }
+    }
+
+    /**
+     * 닉네임 중복 확인 메서드
+     *
+     * @param nickname      확인할 닉네임
+     */
+    @Transactional(readOnly = true)
+    public void checkDuplicatedNickname(String nickname) {
+        if (userService.existsIncludeDeletedByNickname(nickname)) {
+            throw new CustomException(AuthErrorType.ALREADY_USED_NICKNAME);
+        }
     }
 }

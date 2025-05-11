@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @ApiGroup(value = "[인증 API]")
 @Tag(name = "[인증 API]", description = "인증 관련 API")
@@ -51,8 +52,14 @@ public interface AuthApi {
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(name = "회원가입 실패 - 이미 존재하는 아이디", value = """
                                         {
-                                            "code": "U001",
-                                            "message": "이미 존재하는 아이디입니다."
+                                            "code": "A011",
+                                            "message": "이미 사용 중인 아이디입니다."
+                                        }
+                                    """),
+                            @ExampleObject(name = "회원가입 실패 - 이미 존재하는 아이디", value = """
+                                        {
+                                            "code": "A012",
+                                            "message": "이미 사용 중인 닉네임입니다."
                                         }
                                     """)
                     }))
@@ -177,4 +184,51 @@ public interface AuthApi {
             @CookieValue(name = "refreshToken", required = false) String refreshTokenInCookie
     );
 
+    @TrackApi(description = "아이디 중복 확인")
+    @Operation(summary = "아이디 중복 확인", description = "아이디 중복 확인 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "사용가능한 아이디",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "사용가능한 아이디", value = """
+                                        {
+                                            "code": 200,
+                                            "message": "사용 가능한 아이디입니다."
+                                        }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "409", description = "이미 사용 중인 아이디",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "이미 사용 중인 아이디", value = """
+                                        {
+                                            "code": "A011",
+                                            "message": "이미 사용 중인 아이디입니다."
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> checkDuplicatedUsername(@RequestParam(name = "value") String username);
+
+    @TrackApi(description = "닉네임 중복 확인")
+    @Operation(summary = "닉네임 중복 확인", description = "닉네임 중복 확인 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "사용가능한 닉네임",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "사용가능한 닉네임", value = """
+                                        {
+                                            "code": 200,
+                                            "message": "사용 가능한 닉네임입니다."
+                                        }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "409", description = "이미 사용 중인 닉네임",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "이미 사용 중인 닉네임", value = """
+                                        {
+                                            "code": "A012",
+                                            "message": "이미 사용 중인 닉네임입니다."
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> checkDuplicatedNickname(@RequestParam(name = "value") String nickname);
 }

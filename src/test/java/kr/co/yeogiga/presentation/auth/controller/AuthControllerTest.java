@@ -24,6 +24,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -33,6 +34,7 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -435,6 +437,96 @@ public class AuthControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code").value(AuthErrorType.AUTHENTICATION_FAIL.getCode()))
                     .andExpect(jsonPath("$.message").value(AuthErrorType.AUTHENTICATION_FAIL.getMessage()));;
+        }
+    }
+
+    @Nested
+    @DisplayName("아이디 중복 체크")
+    class DupCheckUsername {
+
+        @Test
+        @DisplayName("사용 가능한 아이디")
+        void isAvailable() throws Exception {
+            // given
+            String username = "test";
+            doNothing().when(authService).checkDuplicatedUsername(username);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/auth/dup-check/username")
+                            .param("value", username)
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").value(HttpStatus.OK.value()))
+                    .andExpect(jsonPath("$.message").value("사용 가능한 아이디입니다."));
+        }
+
+        @Test
+        @DisplayName("이미 사용 중인 아이디")
+        void isNotAvailable() throws Exception {
+            // given
+            String username = "test";
+            doThrow(new CustomException(AuthErrorType.ALREADY_USED_USERNAME)).when(authService).checkDuplicatedUsername(username);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/auth/dup-check/username")
+                            .param("value", username)
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.code").value(AuthErrorType.ALREADY_USED_USERNAME.getCode()))
+                    .andExpect(jsonPath("$.message").value(AuthErrorType.ALREADY_USED_USERNAME.getMessage()));
+        }
+    }
+
+    @Nested
+    @DisplayName("닉네임 중복 체크")
+    class DupCheckNickname {
+
+        @Test
+        @DisplayName("사용 가능한 닉네임")
+        void isAvailable() throws Exception {
+            // given
+            String nickname = "test";
+            doNothing().when(authService).checkDuplicatedNickname(nickname);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/auth/dup-check/nickname")
+                            .param("value", nickname)
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").value(HttpStatus.OK.value()))
+                    .andExpect(jsonPath("$.message").value("사용 가능한 닉네임입니다."));
+        }
+
+        @Test
+        @DisplayName("이미 사용 중인 닉네임")
+        void isNotAvailable() throws Exception {
+            // given
+            String nickname = "test";
+            doThrow(new CustomException(AuthErrorType.ALREADY_USED_NICKNAME)).when(authService).checkDuplicatedNickname(nickname);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/auth/dup-check/nickname")
+                            .param("value", nickname)
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.code").value(AuthErrorType.ALREADY_USED_NICKNAME.getCode()))
+                    .andExpect(jsonPath("$.message").value(AuthErrorType.ALREADY_USED_NICKNAME.getMessage()));
         }
     }
 }

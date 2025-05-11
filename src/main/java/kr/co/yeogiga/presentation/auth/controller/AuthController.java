@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
@@ -87,6 +88,24 @@ public class AuthController implements AuthApi {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, CookieUtil.removeCookie(REFRESH_TOKEN_PREFIX).toString())
                 .body(SuccessResponse.ok());
+    }
+
+    @GetMapping("/dup-check/username")
+    public ResponseEntity<?> checkDuplicatedUsername(@RequestParam(name = "value") String username) {
+        authService.checkDuplicatedUsername(username);
+        return ResponseEntity.ok().body(SuccessResponse.builder()
+                .code(HttpStatus.OK.value())
+                .message("사용 가능한 아이디입니다.")
+                .build());
+    }
+
+    @GetMapping("/dup-check/nickname")
+    public ResponseEntity<?> checkDuplicatedNickname(@RequestParam(name = "value") String nickname) {
+        authService.checkDuplicatedNickname(nickname);
+        return ResponseEntity.ok().body(SuccessResponse.builder()
+                .code(HttpStatus.OK.value())
+                .message("사용 가능한 닉네임입니다.")
+                .build());
     }
 
     /**
