@@ -35,7 +35,7 @@ public interface UserApi {
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(name = "기존 비밀번호 불일치", value = """
                                         {
-                                            "code": "U003",
+                                            "code": "U002",
                                             "message": "비밀번호가 불일치합니다."
                                         }
                                     """),
@@ -61,7 +61,7 @@ public interface UserApi {
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(name = "기존과 동일한 비밀번호", value = """
                                         {
-                                            "code": "U002",
+                                            "code": "U001",
                                             "message": "기존과 동일한 비밀번호입니다."
                                         }
                                     """)
@@ -88,7 +88,7 @@ public interface UserApi {
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(name = "이미 회원 탈퇴한 사용자", value = """
                                         {
-                                            "code": "U004",
+                                            "code": "U003",
                                             "message": "이미 회원탈퇴한 사용자입니다."
                                         }
                                     """)

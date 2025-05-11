@@ -307,7 +307,7 @@ public class AuthControllerTest {
         @DisplayName("실패 - 이미 존재하는 아이디")
         void failSignUpAlreadyExists() throws Exception {
             // given
-            doThrow(new CustomException(UserErrorType.ALREADY_EXIST_USERNAME)).when(authService).signUp(any());
+            doThrow(new CustomException(AuthErrorType.ALREADY_USED_USERNAME)).when(authService).signUp(any());
             SignUpDto.Request signUpDto = SignUpDto.Request.builder()
                     .username("testid")
                     .email("test@test.com")
@@ -325,8 +325,8 @@ public class AuthControllerTest {
             // then
             resultActions
                     .andExpect(status().isConflict())
-                    .andExpect(jsonPath("$.code").value(UserErrorType.ALREADY_EXIST_USERNAME.getCode()))
-                    .andExpect(jsonPath("$.message").value(UserErrorType.ALREADY_EXIST_USERNAME.getMessage()));
+                    .andExpect(jsonPath("$.code").value(AuthErrorType.ALREADY_USED_USERNAME.getCode()))
+                    .andExpect(jsonPath("$.message").value(AuthErrorType.ALREADY_USED_USERNAME.getMessage()));
         }
     }
 
