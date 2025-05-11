@@ -83,7 +83,7 @@ public class AuthService {
         User user = userService.readById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
 
-        return jwtService.generateToken(user.getUsername(), user.getNickname(), user.getId());
+        return jwtService.generateToken(user.getUsername(), user.getNickname(), user.getId(), LoginType.from(user.getPassword()));
     }
 
     /**
