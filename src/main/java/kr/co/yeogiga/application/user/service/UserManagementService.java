@@ -2,6 +2,7 @@ package kr.co.yeogiga.application.user.service;
 
 import kr.co.yeogiga.application.auth.service.RefreshTokenService;
 import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
+import kr.co.yeogiga.application.user.dto.UserInfoRes;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.exception.UserErrorType;
@@ -60,5 +61,15 @@ public class UserManagementService {
 
         refreshTokenService.delete(userId);
         userService.deleteById(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public UserInfoRes getUserInfo(Long userId) {
+        User user = userService.readById(userId)
+                .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
+
+        return Objects.isNull(user.getPassword())
+                ? UserInfoRes.fromSocialUser(user)
+                : UserInfoRes.fromNormalUser(user);
     }
 }
