@@ -107,7 +107,7 @@ public class AuthServiceTest {
 
         @Test
         @DisplayName("성공")
-        void successSignUp() {
+        void success() {
             // given
             SignUpDto.Request request = SignUpDto.Request.builder()
                     .username("testid")
@@ -116,7 +116,8 @@ public class AuthServiceTest {
                     .password("testpw")
                     .build();
 
-            when(userService.existsByUsername(request.username())).thenReturn(false);
+            when(userService.existsIncludeDeletedByUsername(request.username())).thenReturn(false);
+            when(userService.existsIncludeDeletedByNickname(request.nickname())).thenReturn(false);
             when(passwordEncoder.encode(request.password())).thenReturn("encodedPassword");
             doNothing().when(userService).save(any());
 
@@ -132,8 +133,8 @@ public class AuthServiceTest {
         }
 
         @Test
-        @DisplayName("실패 - 이미 존재하는 유저")
-        void failSignUp() {
+        @DisplayName("실패 - 이미 사용 중인 아이디")
+        void failAlreadyUsedUsername() {
             // given
             SignUpDto.Request request = SignUpDto.Request.builder()
                     .username("testid")
@@ -142,15 +143,35 @@ public class AuthServiceTest {
                     .password("testpw")
                     .build();
 
-            when(userService.existsByUsername(request.username())).thenReturn(true);
+            when(userService.existsIncludeDeletedByUsername(request.username())).thenReturn(true);
 
             // when
             CustomException exception = assertThrows(CustomException.class, () -> authService.signUp(request));
 
             // then
-            assertEquals(exception.getErrorType(), UserErrorType.ALREADY_EXIST_USERNAME);
+            assertEquals(exception.getErrorType(), AuthErrorType.ALREADY_USED_USERNAME);
         }
 
+        @Test
+        @DisplayName("실패 - 이미 사용 중인 닉네임")
+        void failAlreadyUsedNickname() {
+            // given
+            SignUpDto.Request request = SignUpDto.Request.builder()
+                    .username("testid")
+                    .email("test@test.com")
+                    .nickname("testnick")
+                    .password("testpw")
+                    .build();
+
+            when(userService.existsIncludeDeletedByUsername(request.username())).thenReturn(false);
+            when(userService.existsIncludeDeletedByNickname(request.nickname())).thenReturn(true);
+
+            // when
+            CustomException exception = assertThrows(CustomException.class, () -> authService.signUp(request));
+
+            // then
+            assertEquals(exception.getErrorType(), AuthErrorType.ALREADY_USED_NICKNAME);
+        }
     }
 
     @Nested
