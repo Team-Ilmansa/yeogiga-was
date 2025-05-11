@@ -32,7 +32,7 @@ public class AuthService {
     @Transactional
     public void signUp(SignUpDto.Request request) {
         if (userService.existsIncludeDeletedByUsername(request.username())) {
-            throw new CustomException(AuthErrorType.ALREADY_USED_USERNAME); // swagger 문서 수정 필요 / 테스트 코드 수정 필요
+            throw new CustomException(AuthErrorType.ALREADY_USED_USERNAME);
         }
 
         if (userService.existsIncludeDeletedByNickname(request.nickname())) {
@@ -97,6 +97,11 @@ public class AuthService {
         refreshTokenService.delete(userId);
     }
 
+    /**
+     * 아이디 중복 확인 메서드
+     *
+     * @param username      확인할 아이디
+     */
     @Transactional(readOnly = true)
     public void checkDuplicatedUsername(String username) {
         if (userService.existsIncludeDeletedByUsername(username)) {
@@ -104,6 +109,11 @@ public class AuthService {
         }
     }
 
+    /**
+     * 닉네임 중복 확인 메서드
+     *
+     * @param nickname      확인할 닉네임
+     */
     @Transactional(readOnly = true)
     public void checkDuplicatedNickname(String nickname) {
         if (userService.existsIncludeDeletedByNickname(nickname)) {
