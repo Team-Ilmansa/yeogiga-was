@@ -146,7 +146,7 @@ public interface UserApi {
                     }))
     })
     @GetMapping("/my")
-    public ResponseEntity<?> getUserInfo(
+    ResponseEntity<?> getUserInfo(
             @AuthenticationPrincipal CustomUserDetails userDetails
     );
 }
