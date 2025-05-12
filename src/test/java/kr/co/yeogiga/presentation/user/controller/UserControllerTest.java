@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.auth.constant.AuthConstants;
 import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
 import kr.co.yeogiga.application.user.dto.UserInfoRes;
+import kr.co.yeogiga.application.user.dto.UserInfoUpdateReq;
 import kr.co.yeogiga.application.user.service.UserManagementService;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.response.error.type.CommonErrorType;
@@ -45,6 +46,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -326,6 +328,146 @@ public class UserControllerTest {
                     .andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.code").value(UserErrorType.NOT_FOUND.getCode()))
                     .andExpect(jsonPath("$.message").value(UserErrorType.NOT_FOUND.getMessage()));
+        }
+    }
+
+    @Nested
+    @DisplayName("회원 정보 수정")
+    class UpdateUserInfo {
+
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            UserInfoUpdateReq userInfoUpdateReq = UserInfoUpdateReq.builder()
+                    .nickname("newNickname")
+                    .email("newTest@test.com")
+                    .build();
+            setUpUserDetails(Role.USER);
+
+            doNothing().when(userManagementService).updateUserInfo(userDetails.getUserId(), userInfoUpdateReq);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    put("/api/v1/users")
+                            .with(user(userDetails))
+                            .content(objectMapper.writeValueAsBytes(userInfoUpdateReq))
+                            .contentType(MediaType.APPLICATION_JSON)
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").value(SuccessResponse.ok().code()))
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+
+        }
+
+        @Test
+        @DisplayName("실패 - 이미 사용 중인 닉네임")
+        void failAlreadyUsedNickname() throws Exception {
+            // given
+            UserInfoUpdateReq userInfoUpdateReq = UserInfoUpdateReq.builder()
+                    .nickname("newNickname")
+                    .email("newTest@test.com")
+                    .build();
+            setUpUserDetails(Role.USER);
+
+            doThrow(new CustomException(UserErrorType.ALREADY_USED_NICKNAME)).when(userManagementService).updateUserInfo(any(), any());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    put("/api/v1/users")
+                            .with(user(userDetails))
+                            .content(objectMapper.writeValueAsBytes(userInfoUpdateReq))
+                            .contentType(MediaType.APPLICATION_JSON)
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.code").value(UserErrorType.ALREADY_USED_NICKNAME.getCode()))
+                    .andExpect(jsonPath("$.message").value(UserErrorType.ALREADY_USED_NICKNAME.getMessage()));
+        }
+
+        @Test
+        @DisplayName("실패 - 기존과 동일한 닉네임")
+        void failSameNickname() throws Exception {
+            // given
+            UserInfoUpdateReq userInfoUpdateReq = UserInfoUpdateReq.builder()
+                    .nickname("newNickname")
+                    .email("newTest@test.com")
+                    .build();
+            setUpUserDetails(Role.USER);
+
+            doThrow(new CustomException(UserErrorType.SAME_NICKNAME)).when(userManagementService).updateUserInfo(any(), any());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    put("/api/v1/users")
+                            .with(user(userDetails))
+                            .content(objectMapper.writeValueAsBytes(userInfoUpdateReq))
+                            .contentType(MediaType.APPLICATION_JSON)
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.code").value(UserErrorType.SAME_NICKNAME.getCode()))
+                    .andExpect(jsonPath("$.message").value(UserErrorType.SAME_NICKNAME.getMessage()));
+        }
+
+        @Test
+        @DisplayName("실패 - 기존과 동일한 이메일")
+        void failSameEmail() throws Exception {
+            // given
+            UserInfoUpdateReq userInfoUpdateReq = UserInfoUpdateReq.builder()
+                    .nickname("newNickname")
+                    .email("newTest@test.com")
+                    .build();
+            setUpUserDetails(Role.USER);
+
+            doThrow(new CustomException(UserErrorType.SAME_EMAIL)).when(userManagementService).updateUserInfo(any(), any());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    put("/api/v1/users")
+                            .with(user(userDetails))
+                            .content(objectMapper.writeValueAsBytes(userInfoUpdateReq))
+                            .contentType(MediaType.APPLICATION_JSON)
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.code").value(UserErrorType.SAME_EMAIL.getCode()))
+                    .andExpect(jsonPath("$.message").value(UserErrorType.SAME_EMAIL.getMessage()));
+        }
+
+        @Test
+        @DisplayName("실패 - 유효성 검증 실패")
+        void failValidation() throws Exception {
+            // given
+            UserInfoUpdateReq userInfoUpdateReq = UserInfoUpdateReq.builder()
+//                    .nickname("newNickname")
+//                    .email("newTest@test.com")
+                    .build();
+            setUpUserDetails(Role.USER);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    put("/api/v1/users")
+                            .with(user(userDetails))
+                            .content(objectMapper.writeValueAsBytes(userInfoUpdateReq))
+                            .contentType(MediaType.APPLICATION_JSON)
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(CommonErrorType.VALIDATION_ERROR.getCode()))
+                    .andExpect(jsonPath("$.errors.nickname").exists())
+                    .andExpect(jsonPath("$.errors.email").exists());
         }
     }
 }
