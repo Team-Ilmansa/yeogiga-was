@@ -1,6 +1,7 @@
 package kr.co.yeogiga.common.jwt;
 
 import io.jsonwebtoken.Claims;
+import kr.co.yeogiga.application.auth.type.LoginType;
 import kr.co.yeogiga.common.jwt.dto.JwtClaims;
 import kr.co.yeogiga.infrastructure.properties.JwtProperties;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +16,12 @@ public class JwtHelper {
     private final TokenParser tokenParser;
     private final JwtProperties jwtProperties;
 
-    public String generateAccessToken(String username, String nickname, Long userId) {
-        return tokenBuilder.build(username, generateClaims(nickname, userId), jwtProperties.getAccessTokenExpiration());
+    public String generateAccessToken(String username, String nickname, Long userId, LoginType loginType) {
+        return tokenBuilder.build(username, generateClaims(nickname, userId, loginType), jwtProperties.getAccessTokenExpiration());
     }
 
-    public String generateRefreshToken(String username, String nickname, Long userId) {
-        return tokenBuilder.build(username, generateClaims(nickname, userId), jwtProperties.getRefreshTokenExpiration());
+    public String generateRefreshToken(String username, String nickname, Long userId, LoginType loginType) {
+        return tokenBuilder.build(username, generateClaims(nickname, userId, loginType), jwtProperties.getRefreshTokenExpiration());
     }
 
     public JwtClaims parseClaims(String token) {
@@ -33,9 +34,10 @@ public class JwtHelper {
                 .build();
     }
 
-    private Map<String, Object> generateClaims(String nickname, Long userId) {
+    private Map<String, Object> generateClaims(String nickname, Long userId, LoginType loginType) {
         return Map.of("nickname", nickname,
-                      "userId", userId);
+                      "userId", userId,
+                      "loginType", loginType);
 
     }
 }

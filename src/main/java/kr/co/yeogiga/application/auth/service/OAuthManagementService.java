@@ -5,6 +5,7 @@ import kr.co.yeogiga.application.auth.dto.SignUpDto;
 import kr.co.yeogiga.application.auth.dto.TokenDto;
 import kr.co.yeogiga.application.auth.dto.UserInfoDto;
 import kr.co.yeogiga.application.auth.dto.UserStatusDto;
+import kr.co.yeogiga.application.auth.type.LoginType;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
 import kr.co.yeogiga.domain.oauth.entity.OAuth;
@@ -127,7 +128,7 @@ public class OAuthManagementService {
         String nickname = user.getNickname();
         Long userId = user.getId();
 
-        TokenDto token = jwtService.generateToken(username, nickname, userId);
+        TokenDto token = jwtService.generateToken(username, nickname, userId, LoginType.SOCIAL);
 
         return SignInDto.Response.builder()
                 .token(token)

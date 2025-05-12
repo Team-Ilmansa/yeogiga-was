@@ -3,6 +3,7 @@ package kr.co.yeogiga.presentation.user.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.auth.constant.AuthConstants;
 import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
+import kr.co.yeogiga.application.user.dto.UserInfoRes;
 import kr.co.yeogiga.application.user.service.UserManagementService;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.response.error.type.CommonErrorType;
@@ -34,13 +35,15 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
@@ -239,6 +242,82 @@ public class UserControllerTest {
             // when
             ResultActions resultActions = mockMvc.perform(
                     delete("/api/v1/users")
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value(UserErrorType.NOT_FOUND.getCode()))
+                    .andExpect(jsonPath("$.message").value(UserErrorType.NOT_FOUND.getMessage()));
+        }
+    }
+
+    @Nested
+    @DisplayName("회원 정보 조회")
+    class GetUserInfo {
+        @Test
+        @DisplayName("성공 - 소셜 로그인 사용자")
+        void successForSocialUser() throws Exception {
+            // given
+            setUpUserDetails(Role.USER);
+            UserInfoRes userInfoRes = UserInfoRes.builder()
+                    .nickname("nickname")
+                    .email("test@test.com")
+                    .build();
+            when(userManagementService.getUserInfo(any())).thenReturn(userInfoRes);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/users/my")
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.nickname").value("nickname"))
+                    .andExpect(jsonPath("$.data.email").value("test@test.com"))
+                    .andExpect(jsonPath("$.data.username").doesNotExist());
+        }
+
+        @Test
+        @DisplayName("성공 - 일반 로그인 사용자")
+        void successForNormalUser() throws Exception {
+            // given
+            setUpUserDetails(Role.USER);
+            UserInfoRes userInfoRes = UserInfoRes.builder()
+                    .username("username")
+                    .nickname("nickname")
+                    .email("test@test.com")
+                    .build();
+            when(userManagementService.getUserInfo(any())).thenReturn(userInfoRes);
+
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/users/my")
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.nickname").value("nickname"))
+                    .andExpect(jsonPath("$.data.email").value("test@test.com"))
+                    .andExpect(jsonPath("$.data.username").value("username"));
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 사용자")
+        void failUserNotFound() throws Exception {
+            // given
+            doThrow(new CustomException(UserErrorType.NOT_FOUND)).when(userManagementService).getUserInfo(any());
+            setUpUserDetails(Role.USER);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/users/my")
                             .with(user(userDetails))
             );
 

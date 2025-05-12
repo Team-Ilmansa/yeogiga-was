@@ -2,6 +2,7 @@ package kr.co.yeogiga.application.user.service;
 
 import kr.co.yeogiga.application.auth.service.RefreshTokenService;
 import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
+import kr.co.yeogiga.application.user.dto.UserInfoRes;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.exception.UserErrorType;
@@ -60,5 +61,23 @@ public class UserManagementService {
 
         refreshTokenService.delete(userId);
         userService.deleteById(userId);
+    }
+
+    /**
+     * 회원 정보 조회 메서드
+     *
+     * @param userId    사용자 ID
+     * @return          UserInfoRes 사용자 정보
+     *                  - 소셜 로그인 사용자 -> nickname, email
+     *                  - 일반 로그인 사용자 -> nickname, email, username
+     */
+    @Transactional(readOnly = true)
+    public UserInfoRes getUserInfo(Long userId) {
+        User user = userService.readById(userId)
+                .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
+
+        return Objects.isNull(user.getPassword())
+                ? UserInfoRes.fromSocialUser(user)
+                : UserInfoRes.fromNormalUser(user);
     }
 }

@@ -71,7 +71,7 @@ public class AuthServiceTest {
         when(jwtService.extractUserId(any())).thenReturn(userId);
         when(refreshTokenService.exists(userId)).thenReturn(true);
         when(userService.readById(userId)).thenReturn(Optional.ofNullable(user));
-        when(jwtService.generateToken(any(), any(), any())).thenReturn(tokenDto);
+        when(jwtService.generateToken(any(), any(), any(), any())).thenReturn(tokenDto);
 
         // when
         TokenDto reissuedToken = authService.reissueToken("old-refresh-token");
@@ -196,7 +196,7 @@ public class AuthServiceTest {
 
             when(userService.readIncludeDeletedUserByUsername(request.username())).thenReturn(Optional.of(newUser));
             when(passwordEncoder.matches(request.password(), newUser.getPassword())).thenReturn(true);
-            when(jwtService.generateToken(any(), any(), any())).thenReturn(tokenDto);
+            when(jwtService.generateToken(any(), any(), any(), any())).thenReturn(tokenDto);
 
             // when
             TokenDto token = authService.signIn(request);

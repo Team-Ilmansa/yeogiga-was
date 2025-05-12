@@ -3,6 +3,7 @@ package kr.co.yeogiga.application.auth.service;
 import kr.co.yeogiga.application.auth.dto.SignInDto;
 import kr.co.yeogiga.application.auth.dto.SignUpDto;
 import kr.co.yeogiga.application.auth.dto.TokenDto;
+import kr.co.yeogiga.application.auth.type.LoginType;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
 import kr.co.yeogiga.domain.user.entity.User;
@@ -65,7 +66,7 @@ public class AuthService {
             throw new CustomException(AuthErrorType.AUTHENTICATION_FAIL);
         }
 
-        return jwtService.generateToken(user.getUsername(), user.getNickname(), user.getId());
+        return jwtService.generateToken(user.getUsername(), user.getNickname(), user.getId(), LoginType.NORMAL);
     }
 
     /**
@@ -84,7 +85,7 @@ public class AuthService {
         User user = userService.readById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
 
-        return jwtService.generateToken(user.getUsername(), user.getNickname(), user.getId());
+        return jwtService.generateToken(user.getUsername(), user.getNickname(), user.getId(), LoginType.from(user.getPassword()));
     }
 
     /**

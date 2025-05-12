@@ -2,6 +2,7 @@ package kr.co.yeogiga.application.user.service;
 
 import kr.co.yeogiga.application.auth.service.RefreshTokenService;
 import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
+import kr.co.yeogiga.application.user.dto.UserInfoRes;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.exception.UserErrorType;
@@ -20,6 +21,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -158,7 +160,66 @@ public class UserManagementServiceTest {
             // then
             assertEquals(exception.getErrorType(), UserErrorType.ALREADY_WITHDRAW);
         }
+    }
 
+    @Nested
+    @DisplayName("회원 정보 조회")
+    class GetUserInfo {
+        private final Long userId = 1L;
+        @Test
+        @DisplayName("성공 - 소셜 로그인 사용자")
+        void successForSocialUser() {
+            // given
+            User socialUser = User.builder()
+                    .username("KAKAO 123")
+                    .nickname("nickname")
+                    .role(Role.USER)
+                    .email("test@test.com")
+                    .build();
+            when(userService.readById(eq(userId))).thenReturn(Optional.of(socialUser));
 
+            // when
+            UserInfoRes userInfoRes = userManagementService.getUserInfo(userId);
+
+            // then
+            assertEquals("nickname", userInfoRes.nickname());
+            assertEquals("test@test.com", userInfoRes.email());
+            assertThat(userInfoRes.username()).isNull();
+        }
+
+        @Test
+        @DisplayName("성공 - 일반 로그인 사용자")
+        void successForNormalUser() {
+            // given
+            User socialUser = User.builder()
+                    .username("username")
+                    .password("password")
+                    .nickname("nickname")
+                    .role(Role.USER)
+                    .email("test@test.com")
+                    .build();
+            when(userService.readById(eq(userId))).thenReturn(Optional.of(socialUser));
+
+            // when
+            UserInfoRes userInfoRes = userManagementService.getUserInfo(userId);
+
+            // then
+            assertEquals("nickname", userInfoRes.nickname());
+            assertEquals("username", userInfoRes.username());
+            assertEquals("test@test.com", userInfoRes.email());
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 사용자")
+        void failUserNotFound() {
+            // given
+            when(userService.readById(eq(userId))).thenReturn(Optional.empty());
+
+            // when
+            CustomException exception = assertThrows(CustomException.class, () -> userManagementService.getUserInfo(userId));
+
+            // then
+            assertEquals(UserErrorType.NOT_FOUND, exception.getErrorType());
+        }
     }
 }
