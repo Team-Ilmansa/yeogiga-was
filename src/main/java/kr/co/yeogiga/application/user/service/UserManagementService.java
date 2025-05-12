@@ -3,6 +3,7 @@ package kr.co.yeogiga.application.user.service;
 import kr.co.yeogiga.application.auth.service.RefreshTokenService;
 import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
 import kr.co.yeogiga.application.user.dto.UserInfoRes;
+import kr.co.yeogiga.application.user.dto.UserInfoUpdateReq;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.exception.UserErrorType;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -79,5 +81,30 @@ public class UserManagementService {
         return Objects.isNull(user.getPassword())
                 ? UserInfoRes.fromSocialUser(user)
                 : UserInfoRes.fromNormalUser(user);
+    }
+
+    @Transactional
+    public void updateUserInfo(Long userId, UserInfoUpdateReq userInfoUpdateReq) {
+        String nickname = userInfoUpdateReq.nickname();
+        String email = userInfoUpdateReq.email();
+
+        Optional<User> foundUser = userService.readIncludeDeletedUserByNickname(nickname);
+
+        if (foundUser.isPresent() && !foundUser.get().getId().equals(userId)) {
+            throw new CustomException(UserErrorType.ALREADY_USED_NICKNAME);
+        }
+
+        User user = userService.readById(userId)
+                .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
+
+        if (user.getNickname().equals(nickname)) {
+            throw new CustomException(UserErrorType.SAME_NICKNAME);
+        }
+
+        if (user.getEmail().equals(email)) {
+            throw new CustomException(UserErrorType.SAME_EMAIL);
+        }
+
+        user.updateUserInfo(nickname, email);
     }
 }

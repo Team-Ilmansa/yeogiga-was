@@ -2,6 +2,7 @@ package kr.co.yeogiga.presentation.user.controller;
 
 import jakarta.validation.Valid;
 import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
+import kr.co.yeogiga.application.user.dto.UserInfoUpdateReq;
 import kr.co.yeogiga.application.user.service.UserManagementService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
@@ -14,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,5 +56,14 @@ public class UserController implements UserApi {
     ) {
         return ResponseEntity.ok()
                 .body(SuccessResponse.from(userManagementService.getUserInfo(userDetails.getUserId())));
+    }
+
+    @PutMapping
+    public ResponseEntity<?> update(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody UserInfoUpdateReq userInfoUpdateReq
+    ) {
+        userManagementService.updateUserInfo(userDetails.getUserId(), userInfoUpdateReq);
+        return ResponseEntity.ok().build();
     }
 }
