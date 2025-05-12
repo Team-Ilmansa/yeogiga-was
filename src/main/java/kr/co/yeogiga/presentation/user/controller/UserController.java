@@ -58,6 +58,7 @@ public class UserController implements UserApi {
                 .body(SuccessResponse.from(userManagementService.getUserInfo(userDetails.getUserId())));
     }
 
+    @Override
     @PutMapping
     public ResponseEntity<?> update(
             @AuthenticationPrincipal CustomUserDetails userDetails,
