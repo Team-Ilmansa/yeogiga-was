@@ -36,8 +36,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
                    "WHERE deleted_at IS NOT NULL AND deleted_at <= :date", nativeQuery = true)
     List<Long> findDeletedUserIdBefore(@Param(value = "date") LocalDate date);
 
-    boolean existsByUsername(String username);
-
     @Query(value = "SELECT id " +
                    "FROM users " +
                    "WHERE username = :username LIMIT 1", nativeQuery = true)
