@@ -2,7 +2,7 @@ package kr.co.yeogiga.presentation.tripplace.image.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
-import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDto;
+import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageDeleteService;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageMovementService;
 import kr.co.yeogiga.common.exception.CustomException;
@@ -72,8 +72,8 @@ public class TripPlaceImageControllerTest {
     @DisplayName("같은 날짜 내 이미지 이동 테스트")
     class MoveImageToAnotherPlaceControllerTest {
 
-        private final TripPlaceImageDto.ImageMoveReq req =
-                new TripPlaceImageDto.ImageMoveReq(fromPlaceId, toPlaceId, imageId);
+        private final TripPlaceImageReq.ImageMove req =
+                new TripPlaceImageReq.ImageMove(fromPlaceId, toPlaceId, imageId);
 
         @Test
         @DisplayName("성공")
@@ -166,8 +166,8 @@ public class TripPlaceImageControllerTest {
     @DisplayName("다른 날짜 간 이미지 이동 성공")
     void moveImageBetweenDayPlacesSuccess() throws Exception {
         // given
-        TripPlaceImageDto.ImageCrossDayMoveReq req =
-                new TripPlaceImageDto.ImageCrossDayMoveReq("day1", fromPlaceId, "day2", toPlaceId, imageId);
+        TripPlaceImageReq.ImageCrossDayMove req =
+                new TripPlaceImageReq.ImageCrossDayMove("day1", fromPlaceId, "day2", toPlaceId, imageId);
         doNothing().when(tripPlaceImageMovementService).moveImageBetweenDayPlaces(req);
 
         // when
@@ -188,7 +188,7 @@ public class TripPlaceImageControllerTest {
     @DisplayName("이미지를 Unmatched로 이동 성공")
     void moveImageToUnmatchedSuccess() throws Exception {
         // given
-        TripPlaceImageDto.ImageUnmatchedMoveReq req = new TripPlaceImageDto.ImageUnmatchedMoveReq(fromPlaceId, imageId);
+        TripPlaceImageReq.ImageUnmatchedMove req = new TripPlaceImageReq.ImageUnmatchedMove(fromPlaceId, imageId);
         doNothing().when(tripPlaceImageMovementService).moveImageToUnmatched(tripDayPlaceId, req);
 
         // when
@@ -209,7 +209,7 @@ public class TripPlaceImageControllerTest {
     @DisplayName("Unmatched에서 이미지 복원 성공")
     void moveImageFromUnmatchedToPlaceSuccess() throws Exception {
         // given
-        TripPlaceImageDto.ImageUnmatchedMoveReq req = new TripPlaceImageDto.ImageUnmatchedMoveReq(toPlaceId, imageId);
+        TripPlaceImageReq.ImageUnmatchedMove req = new TripPlaceImageReq.ImageUnmatchedMove(toPlaceId, imageId);
         doNothing().when(tripPlaceImageMovementService).moveImageFromUnmatchedToPlace(tripDayPlaceId, req);
 
         // when

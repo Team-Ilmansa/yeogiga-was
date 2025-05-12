@@ -1,7 +1,7 @@
 package kr.co.yeogiga.presentation.tripplace.image.controller;
 
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
-import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDto;
+import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageDeleteService;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageMovementService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
@@ -27,7 +27,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
     public ResponseEntity<?> moveImageToAnotherPlace(
             @PathVariable Long tripId,
             @PathVariable String tripDayPlaceId,
-            @RequestBody TripPlaceImageDto.ImageMoveReq imageReq
+            @RequestBody TripPlaceImageReq.ImageMove imageReq
     ) {
         tripPlaceImageMovementService.moveImageToAnotherPlace(tripDayPlaceId, imageReq);
         return ResponseEntity.ok(SuccessResponse.ok());
@@ -37,7 +37,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
     @PatchMapping("/{tripId}/images/move")
     public ResponseEntity<?> moveImageBetweenDayPlaces(
             @PathVariable Long tripId,
-            @RequestBody TripPlaceImageDto.ImageCrossDayMoveReq imageReq
+            @RequestBody TripPlaceImageReq.ImageCrossDayMove imageReq
     ) {
         tripPlaceImageMovementService.moveImageBetweenDayPlaces(imageReq);
         return ResponseEntity.ok(SuccessResponse.ok());
@@ -48,7 +48,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
     public ResponseEntity<?> moveImageToUnmatched(
             @PathVariable Long tripId,
             @PathVariable String tripDayPlaceId,
-            @RequestBody TripPlaceImageDto.ImageUnmatchedMoveReq imageReq
+            @RequestBody TripPlaceImageReq.ImageUnmatchedMove imageReq
     ) {
         tripPlaceImageMovementService.moveImageToUnmatched(tripDayPlaceId, imageReq);
         return ResponseEntity.ok(SuccessResponse.ok());
@@ -59,7 +59,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
     public ResponseEntity<?> moveImageFromUnmatched(
             @PathVariable Long tripId,
             @PathVariable String tripDayPlaceId,
-            @RequestBody TripPlaceImageDto.ImageUnmatchedMoveReq imageReq
+            @RequestBody TripPlaceImageReq.ImageUnmatchedMove imageReq
     ) {
         tripPlaceImageMovementService.moveImageFromUnmatchedToPlace(tripDayPlaceId, imageReq);
         return ResponseEntity.ok(SuccessResponse.ok());

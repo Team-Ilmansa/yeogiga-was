@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
-import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDto;
+import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,7 +55,7 @@ public interface TripPlaceImageApi {
     ResponseEntity<?> moveImageToAnotherPlace(
             @PathVariable Long tripId,
             @PathVariable String tripDayPlaceId,
-            @RequestBody TripPlaceImageDto.ImageMoveReq imageReq
+            @RequestBody TripPlaceImageReq.ImageMove imageReq
     );
 
     @TrackApi(description = "다른 날짜 목적지 to 목적지")
@@ -94,7 +94,7 @@ public interface TripPlaceImageApi {
     })
     ResponseEntity<?> moveImageBetweenDayPlaces(
             @PathVariable Long tripId,
-            @RequestBody TripPlaceImageDto.ImageCrossDayMoveReq imageReq
+            @RequestBody TripPlaceImageReq.ImageCrossDayMove imageReq
     );
 
     @TrackApi(description = "같은 날짜 목적지 to unmatched(기타)")
@@ -134,7 +134,7 @@ public interface TripPlaceImageApi {
     ResponseEntity<?> moveImageToUnmatched(
             @PathVariable Long tripId,
             @PathVariable String tripDayPlaceId,
-            @RequestBody TripPlaceImageDto.ImageUnmatchedMoveReq imageReq
+            @RequestBody TripPlaceImageReq.ImageUnmatchedMove imageReq
     );
 
     @TrackApi(description = "같은 날짜 unmatched(기타) to 목적지")
@@ -174,7 +174,7 @@ public interface TripPlaceImageApi {
     ResponseEntity<?> moveImageFromUnmatched(
             @PathVariable Long tripId,
             @PathVariable String tripDayPlaceId,
-            @RequestBody TripPlaceImageDto.ImageUnmatchedMoveReq imageReq
+            @RequestBody TripPlaceImageReq.ImageUnmatchedMove imageReq
     );
 
     @TrackApi(description = "이미지 단일 삭제")
