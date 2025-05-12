@@ -31,6 +31,10 @@ public class UserService {
         return userRepository.findUserIncludeDeletedByUsername(username);
     }
 
+    public Optional<User> readIncludeDeletedUserByNickname(String nickname) {
+        return userRepository.findUserIncludeDeletedByNickname(nickname);
+    }
+
     public Optional<User> readIncludeDeletedUserByPlatformAndPlatformId(OAuthPlatform platform, String platformId) {
         return userRepository.findUserIncludeDeletedByPlatformAndPlatformId(platform, platformId);
     }
