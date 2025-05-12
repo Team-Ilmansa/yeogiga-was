@@ -61,9 +61,9 @@ public class UserController implements UserApi {
     @PutMapping
     public ResponseEntity<?> update(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody UserInfoUpdateReq userInfoUpdateReq
+            @Valid @RequestBody UserInfoUpdateReq userInfoUpdateReq
     ) {
         userManagementService.updateUserInfo(userDetails.getUserId(), userInfoUpdateReq);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(SuccessResponse.ok());
     }
 }
