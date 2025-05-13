@@ -96,13 +96,6 @@ public class UserManagementService {
     @Transactional
     public void updateUserInfo(Long userId, UserInfoUpdateReq userInfoUpdateReq) {
         String nickname = userInfoUpdateReq.nickname();
-        String email = userInfoUpdateReq.email();
-
-        Optional<User> foundUser = userService.readIncludeDeletedUserByNickname(nickname);
-
-        if (foundUser.isPresent() && !foundUser.get().getId().equals(userId)) {
-            throw new CustomException(UserErrorType.ALREADY_USED_NICKNAME);
-        }
 
         User user = userService.readById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
@@ -111,10 +104,10 @@ public class UserManagementService {
             throw new CustomException(UserErrorType.SAME_NICKNAME);
         }
 
-        if (user.getEmail().equals(email)) {
-            throw new CustomException(UserErrorType.SAME_EMAIL);
+        if (userService.existsIncludeDeletedByNickname(nickname)) {
+            throw new CustomException(UserErrorType.ALREADY_USED_NICKNAME);
         }
 
-        user.updateUserInfo(nickname, email);
+        user.updateNickname(nickname);
     }
 }
