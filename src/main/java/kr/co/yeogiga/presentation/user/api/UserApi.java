@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
+import kr.co.yeogiga.application.user.dto.UserInfoUpdateReq;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -147,5 +148,38 @@ public interface UserApi {
     })
     ResponseEntity<?> getUserInfo(
             @AuthenticationPrincipal CustomUserDetails userDetails
+    );
+
+    @TrackApi(description = "회원 정보 수정")
+    @Operation(summary = "회원 정보 수정", description = "회원 정보 수정 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 정보 수정 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "성공", value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다."
+                                        }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "409", description = "회원 정보 수정 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "이미 사용 중인 닉네임", value = """
+                                        {
+                                            "code": "U004",
+                                            "message": "이미 사용 중인 닉네임입니다."
+                                        }
+                                    """),
+                            @ExampleObject(name = "기존과 동일한 닉네임", value = """
+                                        {
+                                            "code": "U005",
+                                            "message": "기존과 동일한 닉네임 입니다."
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> update(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody UserInfoUpdateReq userInfoUpdateReq
     );
 }

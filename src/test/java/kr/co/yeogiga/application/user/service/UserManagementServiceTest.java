@@ -3,6 +3,7 @@ package kr.co.yeogiga.application.user.service;
 import kr.co.yeogiga.application.auth.service.RefreshTokenService;
 import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
 import kr.co.yeogiga.application.user.dto.UserInfoRes;
+import kr.co.yeogiga.application.user.dto.UserInfoUpdateReq;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.exception.UserErrorType;
@@ -220,6 +221,66 @@ public class UserManagementServiceTest {
 
             // then
             assertEquals(UserErrorType.NOT_FOUND, exception.getErrorType());
+        }
+    }
+
+    @Nested
+    @DisplayName("회원 정보 수정")
+    class UpdateUserInfo {
+        private final Long userId = 1L;
+
+        @Mock
+        private User user;
+
+        private UserInfoUpdateReq userInfoUpdateReq = UserInfoUpdateReq.builder()
+                .nickname("newNickname")
+                .build();
+
+        @Test
+        @DisplayName("성공")
+        void success() {
+            // given
+            when(user.getNickname()).thenReturn("nickname");
+            when(userService.existsIncludeDeletedByNickname(eq("newNickname"))).thenReturn(false);
+            when(userService.readById(eq(userId))).thenReturn(Optional.of(user));
+
+            // when
+            userManagementService.updateUserInfo(userId, userInfoUpdateReq);
+
+            // then
+            verify(user).updateNickname("newNickname");
+
+        }
+
+        @Test
+        @DisplayName("실패 - 이미 사용 중인 닉네임")
+        void failAlreadyUsedNickname() {
+            // given
+            when(user.getNickname()).thenReturn("nickname");
+            when(userService.readById(userId)).thenReturn(Optional.of(user));
+            when(userService.existsIncludeDeletedByNickname("newNickname")).thenReturn(true);
+
+            // when
+            CustomException exception = assertThrows(CustomException.class,
+                    () -> userManagementService.updateUserInfo(userId, userInfoUpdateReq));
+
+            // then
+            assertEquals(UserErrorType.ALREADY_USED_NICKNAME, exception.getErrorType());
+        }
+
+        @Test
+        @DisplayName("실패 - 기존과 동일한 닉네임")
+        void failSameNickname() {
+            // given
+            when(user.getNickname()).thenReturn("newNickname");
+            when(userService.readById(eq(userId))).thenReturn(Optional.of(user));
+
+            // when
+            CustomException exception = assertThrows(CustomException.class,
+                    () -> userManagementService.updateUserInfo(userId, userInfoUpdateReq));
+
+            // then
+            assertEquals(UserErrorType.SAME_NICKNAME, exception.getErrorType());
         }
     }
 }

@@ -3,6 +3,7 @@ package kr.co.yeogiga.application.user.service;
 import kr.co.yeogiga.application.auth.service.RefreshTokenService;
 import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
 import kr.co.yeogiga.application.user.dto.UserInfoRes;
+import kr.co.yeogiga.application.user.dto.UserInfoUpdateReq;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.exception.UserErrorType;
@@ -79,5 +80,32 @@ public class UserManagementService {
         return Objects.isNull(user.getPassword())
                 ? UserInfoRes.fromSocialUser(user)
                 : UserInfoRes.fromNormalUser(user);
+    }
+
+    /**
+     * 회원 정보 수정 메서드
+     *
+     * @param userId                사용자 ID
+     * @param userInfoUpdateReq     사용자 정보 갱신 요청 dto(nickname)
+     *
+     * @throws CustomException      UserErrorType.ALREADY_USED_NICKNAME 동일한 닉네임 사용자가 존재하는 경우
+     * @throws CustomException      UserErrorType.SAME_NICKNAME         기존과 동일한 닉네임의 경우
+     */
+    @Transactional
+    public void updateUserInfo(Long userId, UserInfoUpdateReq userInfoUpdateReq) {
+        String nickname = userInfoUpdateReq.nickname();
+
+        User user = userService.readById(userId)
+                .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
+
+        if (user.getNickname().equals(nickname)) {
+            throw new CustomException(UserErrorType.SAME_NICKNAME);
+        }
+
+        if (userService.existsIncludeDeletedByNickname(nickname)) {
+            throw new CustomException(UserErrorType.ALREADY_USED_NICKNAME);
+        }
+
+        user.updateNickname(nickname);
     }
 }

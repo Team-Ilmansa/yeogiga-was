@@ -24,7 +24,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
                    "WHERE id = :id", nativeQuery = true)
     Optional<User> findUserIncludeDeletedById(@Param(value = "id") Long id);
 
-    Optional<User> findByUsername(String username);
+    @Query(value = "SELECT * " +
+            "FROM users " +
+            "WHERE nickname = :nickname", nativeQuery = true)
+    Optional<User> findUserIncludeDeletedByNickname(String nickname);
 
     @Query(value = "SELECT * " +
             "FROM users " +
@@ -35,8 +38,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
                    "FROM users " +
                    "WHERE deleted_at IS NOT NULL AND deleted_at <= :date", nativeQuery = true)
     List<Long> findDeletedUserIdBefore(@Param(value = "date") LocalDate date);
-
-    boolean existsByUsername(String username);
 
     @Query(value = "SELECT id " +
                    "FROM users " +
