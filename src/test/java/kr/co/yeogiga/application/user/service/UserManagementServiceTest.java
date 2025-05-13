@@ -232,12 +232,8 @@ public class UserManagementServiceTest {
         @Mock
         private User user;
 
-        @Mock
-        private User foundUser;
-
         private UserInfoUpdateReq userInfoUpdateReq = UserInfoUpdateReq.builder()
                 .nickname("newNickname")
-                .email("newTest@test.com")
                 .build();
 
         @Test
@@ -245,15 +241,14 @@ public class UserManagementServiceTest {
         void success() {
             // given
             when(user.getNickname()).thenReturn("nickname");
-            when(user.getEmail()).thenReturn("test@test.com");
-            when(userService.readIncludeDeletedUserByNickname(eq("newNickname"))).thenReturn(Optional.empty());
+            when(userService.existsIncludeDeletedByNickname(eq("newNickname"))).thenReturn(false);
             when(userService.readById(eq(userId))).thenReturn(Optional.of(user));
 
             // when
             userManagementService.updateUserInfo(userId, userInfoUpdateReq);
 
             // then
-            verify(user).updateUserInfo("newNickname", "newTest@test.com");
+            verify(user).updateNickname("newNickname");
 
         }
 
@@ -261,8 +256,9 @@ public class UserManagementServiceTest {
         @DisplayName("실패 - 이미 사용 중인 닉네임")
         void failAlreadyUsedNickname() {
             // given
-            when(foundUser.getId()).thenReturn(2L);
-            when(userService.readIncludeDeletedUserByNickname(eq("newNickname"))).thenReturn(Optional.of(foundUser));
+            when(user.getNickname()).thenReturn("nickname");
+            when(userService.readById(userId)).thenReturn(Optional.of(user));
+            when(userService.existsIncludeDeletedByNickname("newNickname")).thenReturn(true);
 
             // when
             CustomException exception = assertThrows(CustomException.class,
@@ -276,9 +272,7 @@ public class UserManagementServiceTest {
         @DisplayName("실패 - 기존과 동일한 닉네임")
         void failSameNickname() {
             // given
-            when(foundUser.getId()).thenReturn(1L);
             when(user.getNickname()).thenReturn("newNickname");
-            when(userService.readIncludeDeletedUserByNickname(eq("newNickname"))).thenReturn(Optional.of(foundUser));
             when(userService.readById(eq(userId))).thenReturn(Optional.of(user));
 
             // when
@@ -287,24 +281,6 @@ public class UserManagementServiceTest {
 
             // then
             assertEquals(UserErrorType.SAME_NICKNAME, exception.getErrorType());
-        }
-
-        @Test
-        @DisplayName("실패 - 기존과 동일한 이메일")
-        void failSameEmail() {
-            // given
-            when(foundUser.getId()).thenReturn(1L);
-            when(user.getNickname()).thenReturn("nickname");
-            when(user.getEmail()).thenReturn("newTest@test.com");
-            when(userService.readIncludeDeletedUserByNickname(eq("newNickname"))).thenReturn(Optional.of(foundUser));
-            when(userService.readById(eq(userId))).thenReturn(Optional.of(user));
-
-            // when
-            CustomException exception = assertThrows(CustomException.class,
-                    () -> userManagementService.updateUserInfo(userId, userInfoUpdateReq));
-
-            // then
-            assertEquals(UserErrorType.SAME_EMAIL, exception.getErrorType());
         }
     }
 }
