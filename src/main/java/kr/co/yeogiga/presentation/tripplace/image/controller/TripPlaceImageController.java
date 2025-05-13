@@ -4,11 +4,13 @@ import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageDeleteService;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageMovementService;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageQueryService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.presentation.tripplace.image.api.TripPlaceImageApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +23,32 @@ import org.springframework.web.bind.annotation.RestController;
 public class TripPlaceImageController implements TripPlaceImageApi {
     private final TripPlaceImageMovementService tripPlaceImageMovementService;
     private final TripPlaceImageDeleteService tripPlaceImageDeleteService;
+    private final TripPlaceImageQueryService tripPlaceImageQueryService;
+
+    @GetMapping("/{tripId}/day-place/{tripDayPlaceId}/places/{placeId}/images")
+    public ResponseEntity<?> getPlaceInfo(
+            @PathVariable Long tripId,
+            @PathVariable String tripDayPlaceId,
+            @PathVariable String placeId
+    ) {
+        return ResponseEntity.ok(
+                SuccessResponse.from(
+                        tripPlaceImageQueryService.getPlaceImageInfo(tripDayPlaceId, placeId)
+                )
+        );
+    }
+
+    @GetMapping("/{tripId}/day-place/{tripDayPlaceId}/unmatched-images")
+    public ResponseEntity<?> getUnmatchedImageInfo(
+            @PathVariable Long tripId,
+            @PathVariable String tripDayPlaceId
+    ) {
+        return ResponseEntity.ok(
+                SuccessResponse.from(
+                        tripPlaceImageQueryService.getUnmatchedImageInfo(tripDayPlaceId)
+                )
+        );
+    }
 
     @Override
     @PatchMapping("/{tripId}/day-place/{tripDayPlaceId}/images/move")
