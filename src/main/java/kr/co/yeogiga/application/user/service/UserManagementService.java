@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -87,11 +86,10 @@ public class UserManagementService {
      * 회원 정보 수정 메서드
      *
      * @param userId                사용자 ID
-     * @param userInfoUpdateReq     사용자 정보 갱신 요청 dto(nickname, email)
+     * @param userInfoUpdateReq     사용자 정보 갱신 요청 dto(nickname)
      *
      * @throws CustomException      UserErrorType.ALREADY_USED_NICKNAME 동일한 닉네임 사용자가 존재하는 경우
      * @throws CustomException      UserErrorType.SAME_NICKNAME         기존과 동일한 닉네임의 경우
-     * @throws CustomException      UserErrorType.SAME_EMAIL            기존과 동일한 이메일의 경우
      */
     @Transactional
     public void updateUserInfo(Long userId, UserInfoUpdateReq userInfoUpdateReq) {
