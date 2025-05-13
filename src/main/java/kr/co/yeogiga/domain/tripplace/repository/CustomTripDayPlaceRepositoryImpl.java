@@ -99,6 +99,39 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
     }
 
     @Override
+    public Optional<Place> findPlaceByIdAndPlaceId(String id, String placeId) {
+        Criteria criteria = Criteria.where("_id").is(id)
+                .and("places.id").is(placeId);
+
+        Query query = new Query(criteria);
+        query.fields().include("places.$");
+
+        TripDayPlace result = mongoTemplate.findOne(query, TripDayPlace.class);
+
+        if (result == null || result.getPlaces() == null || result.getPlaces().isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(result.getPlaces().get(0));
+    }
+
+    @Override
+    public List<Image> findUnmatchedImagesById(String id) {
+        Criteria criteria = Criteria.where("_id").is(id);
+
+        Query query = new Query(criteria);
+        query.fields().include("unmatchedImages");
+
+        TripDayPlace result = mongoTemplate.findOne(query, TripDayPlace.class);
+
+        if (result == null || result.getUnmatchedImages() == null) {
+            return List.of();
+        }
+
+        return result.getUnmatchedImages();
+    }
+
+    @Override
     public void deletePlace(String id, String placeId) {
         Query query = new Query(Criteria.where("_id").is(id));
         Update update = new Update().pull("places", Query.query(Criteria.where("id").is(placeId)));
