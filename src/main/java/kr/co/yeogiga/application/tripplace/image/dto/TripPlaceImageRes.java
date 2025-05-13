@@ -2,6 +2,7 @@ package kr.co.yeogiga.application.tripplace.image.dto;
 
 import kr.co.yeogiga.domain.tripplace.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 
 public class TripPlaceImageRes {
 
+    @Builder
     public record PlaceImageInfo(
             String id,
             String name,
@@ -31,6 +33,7 @@ public class TripPlaceImageRes {
         }
     }
 
+    @Builder
     public record UnmatchedImageInfo(
             List<ImageDto> images
     ) {
@@ -43,6 +46,7 @@ public class TripPlaceImageRes {
         }
     }
 
+    @Builder
     public record ImageDto(
             String id,
             String url,
