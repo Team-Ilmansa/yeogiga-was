@@ -175,12 +175,6 @@ public interface UserApi {
                                             "code": "U005",
                                             "message": "기존과 동일한 닉네임 입니다."
                                         }
-                                    """),
-                            @ExampleObject(name = "기존과 동일한 이메일", value = """
-                                        {
-                                            "code": "U006",
-                                            "message": "기존과 동일한 이메일 입니다."
-                                        }
                                     """)
                     }))
     })
