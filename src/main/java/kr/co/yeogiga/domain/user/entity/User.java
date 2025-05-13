@@ -71,9 +71,4 @@ public class User extends BaseTimeEntity {
     public void revertWithdrawal() {
         this.deletedAt = null;
     }
-
-    public void updateUserInfo(String nickname, String email) {
-        this.nickname = nickname;
-        this.email = email;
-    }
 }
