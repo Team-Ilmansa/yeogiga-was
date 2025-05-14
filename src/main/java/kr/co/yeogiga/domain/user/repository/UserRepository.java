@@ -49,6 +49,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
                    "WHERE nickname = :nickname LIMIT 1", nativeQuery = true)
     Optional<Long> findUserIdIncludeDeletedByNickname(@Param(value = "nickname") String nickname);
 
+    @Query(value = "SELECT id " +
+            "FROM users " +
+            "WHERE email = :email LIMIT 1", nativeQuery = true)
+    Optional<Long> findUserIdIncludeDeletedByEmail(@Param(value = "email") String email);
+
     @Modifying
     @Query(value = "DELETE " +
             "FROM users " +

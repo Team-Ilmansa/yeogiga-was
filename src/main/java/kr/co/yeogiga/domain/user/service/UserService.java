@@ -51,6 +51,10 @@ public class UserService {
         return userRepository.findUserIdIncludeDeletedByNickname(nickname).isPresent();
     }
 
+    public boolean existsIncludeDeletedByEmail(String email) {
+        return userRepository.findUserIdIncludeDeletedByEmail(email).isPresent();
+    }
+
     public void deleteById(Long userId) {
         userRepository.deleteById(userId);
     }

@@ -40,6 +40,10 @@ public class AuthService {
             throw new CustomException(AuthErrorType.ALREADY_USED_NICKNAME);
         }
 
+        if (userService.existsIncludeDeletedByEmail(request.email())) {
+            throw new CustomException(AuthErrorType.ALREADY_USED_EMAIL);
+        }
+
         User newUser = request.toEntity(passwordEncoder.encode(request.password()));
 
         newUser.upgradeRoleToUser();
