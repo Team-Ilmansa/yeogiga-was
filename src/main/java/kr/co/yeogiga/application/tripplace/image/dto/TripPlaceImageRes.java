@@ -1,5 +1,6 @@
 package kr.co.yeogiga.application.tripplace.image.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import kr.co.yeogiga.domain.tripplace.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import lombok.Builder;
@@ -47,6 +48,7 @@ public class TripPlaceImageRes {
     }
 
     @Builder
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record ImageDto(
             String id,
             String url,

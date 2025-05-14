@@ -144,7 +144,7 @@ public class TripPlaceControllerTest {
     void getPlaceDetailsInfoSuccess() throws Exception {
         // given
         TripPlaceRes.PlaceDetails details =
-                new TripPlaceRes.PlaceDetails("place1", "목적지1", 0.0, 0.0, "카페", 10.0);
+                new TripPlaceRes.PlaceDetails("place1", "목적지1", 0.0, 0.0, "카페");
         given(tripPlaceQueryService.getPlaceDetailsInfo(tripDayPlaceId)).willReturn(List.of(details));
 
         // when
