@@ -2,9 +2,11 @@ package kr.co.yeogiga.presentation.image.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.image.dto.ImageDeleteDto;
+import kr.co.yeogiga.application.image.dto.TempImageDto;
 import kr.co.yeogiga.application.image.service.ImageUploadProcessor;
 import kr.co.yeogiga.application.image.service.TempImageAssignProcessor;
 import kr.co.yeogiga.application.image.service.TempPlaceImagesCommandService;
+import kr.co.yeogiga.application.image.service.TempPlaceImagesQueryService;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +26,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -52,6 +56,9 @@ public class ImageControllerTest {
 
     @MockBean
     private TempPlaceImagesCommandService tempPlaceImagesCommandService;
+
+    @MockBean
+    private TempPlaceImagesQueryService tempPlaceImagesQueryService;
 
     private final Long tripId = 1L;
     private final String tripDayPlaceId = "trip-day-place-id";
@@ -106,6 +113,32 @@ public class ImageControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
+    }
+
+    @Test
+    @DisplayName("임시 이미지 리스트 조회 테스트")
+    void getTempImagesInfoTest() throws Exception {
+        // given
+        List<TempImageDto> imageDtos = List.of(
+                new TempImageDto("image1-id", "https://image1.com"),
+                new TempImageDto("image2-id", "https://image2.com")
+        );
+
+        given(tempPlaceImagesQueryService.getTempImagesInfo(tripDayPlaceId))
+                .willReturn(imageDtos);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/temp-images", tripId, tripDayPlaceId)
+        );
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."))
+                .andExpect(jsonPath("$.data[0].id").value("image1-id"))
+                .andExpect(jsonPath("$.data[1].id").value("image2-id"));
     }
 
     @Test
