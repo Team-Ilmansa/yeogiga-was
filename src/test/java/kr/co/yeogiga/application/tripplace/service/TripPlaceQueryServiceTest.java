@@ -137,7 +137,6 @@ public class TripPlaceQueryServiceTest {
         // then
         assertThat(result).hasSize(1);
         assertThat(result.get(0).places()).hasSize(1);
-        assertThat(result.get(0).unmatchedImages()).hasSize(1);
         assertEquals(tripDayPlace.getId(), result.get(0).id());
         assertEquals(1, result.get(0).day());
     }

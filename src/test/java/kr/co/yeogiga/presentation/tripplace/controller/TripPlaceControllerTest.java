@@ -169,8 +169,8 @@ public class TripPlaceControllerTest {
         TripDaySummaryRes.DayDto responseDto = new TripDaySummaryRes.DayDto(
                 "day-id",
                 1,
-                List.of(new TripDaySummaryRes.PlaceDto("place-id", "목적지", 0.0, 1.0, "음식", List.of())),
-                List.of(new TripDaySummaryRes.ImageDto("image-id", "url", 1.0, 2.0, LocalDateTime.now()))
+                List.of(new TripDaySummaryRes.PlaceDto("place-id", "목적지", 0.0, 1.0, "음식", null)),
+                new TripDaySummaryRes.ImageDto("image-id", "url", 1.0, 2.0, LocalDateTime.now())
         );
 
         given(tripPlaceQueryService.getTripDaySummaries(tripId)).willReturn(List.of(responseDto));
@@ -189,7 +189,7 @@ public class TripPlaceControllerTest {
                 .andExpect(jsonPath("$.data[0].id").value("day-id"))
                 .andExpect(jsonPath("$.data[0].day").value(1))
                 .andExpect(jsonPath("$.data[0].places[0].id").value("place-id"))
-                .andExpect(jsonPath("$.data[0].unmatchedImages[0].id").value("image-id"));
+                .andExpect(jsonPath("$.data[0].unmatchedImage.id").value("image-id"));
     }
 
 
