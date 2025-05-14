@@ -3,6 +3,7 @@ package kr.co.yeogiga.presentation.tripplace.api;
 import api.link.checker.annotation.ApiGroup;
 import api.link.checker.annotation.TrackApi;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,8 +20,8 @@ import java.util.List;
 @Tag(name = "[여행 생성 단계에서의 목적지 API]", description = "여행 목적지 관련 API")
 public interface TripPlaceEditingApi {
 
-    @TrackApi(description = "임시 목적지 추가")
-    @Operation(summary = "임시 목적지 추가", description = "임시 추가하는 API입니다.")
+    @TrackApi(description = "임시 목적지 추가 (일차 지정 전)")
+    @Operation(summary = "임시 목적지 추가 (일차 지정 전)", description = "일차 지정 전 임시 추가하는 API입니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "임시 추가 성공",
                     content = @Content(mediaType = "application/json", examples = {
@@ -32,11 +33,16 @@ public interface TripPlaceEditingApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> addTempPlace(@PathVariable Long tripId,
-                                   @RequestBody TripPlaceReq.Request request);
+    ResponseEntity<?> addTempPlace(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
 
-    @TrackApi(description = "임시 목적지 조회")
-    @Operation(summary = "임시 목적지 조회", description = "임시 목적지 조회하는 API입니다.")
+            @Parameter(description = "추가할 목적지 정보")
+            @RequestBody TripPlaceReq.Request request
+    );
+
+    @TrackApi(description = "임시 목적지 조회 (일차 지정 전의 목적지)")
+    @Operation(summary = "임시 목적지 조회 (일차 지정 전의 목적지)", description = "일차 지정 전의 임시 목적지 조회하는 API입니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "임시 목적지 조회 성공",
                     content = @Content(mediaType = "application/json", examples = {
@@ -64,10 +70,13 @@ public interface TripPlaceEditingApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> getTempPlaces(@PathVariable Long tripId);
+    ResponseEntity<?> getTempPlaces(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId
+    );
 
-    @TrackApi(description = "임시 목적지 삭제")
-    @Operation(summary = "임시 목적지 삭제", description = "임시 삭제하는 API입니다.")
+    @TrackApi(description = "임시 목적지 삭제 (일차 지정 전의 목적지)")
+    @Operation(summary = "임시 목적지 삭제 (일차 지정 전의 목적지)", description = "일차 지정 전의 임시 목적지 삭제하는 API입니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "임시 목적지 삭제 성공",
                     content = @Content(mediaType = "application/json", examples = {
@@ -79,11 +88,16 @@ public interface TripPlaceEditingApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> deleteTempPlace(@PathVariable Long tripId,
-                                      @PathVariable String placeId);
+    ResponseEntity<?> deleteTempPlace(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
 
-    @TrackApi(description = "목적지 일차에 이동")
-    @Operation(summary = "목적지 일차에 이동", description = "목적지 일차에 이동하는 API입니다.")
+            @Parameter(description = "목적지 ID")
+            @PathVariable String placeId
+    );
+
+    @TrackApi(description = "담은 목적지 일차별로 이동")
+    @Operation(summary = "담은 목적지 일차별로 이동", description = "담은 목적지를 일차 별로 이동하는 API입니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "목적지 이동 성공",
                     content = @Content(mediaType = "application/json", examples = {
@@ -113,12 +127,19 @@ public interface TripPlaceEditingApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> assignPlaceToDay(@PathVariable Long tripId,
-                                       @PathVariable int day,
-                                       @PathVariable String placeId);
+    ResponseEntity<?> assignPlaceToDay(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
 
-    @TrackApi(description = "일자별 목적지 조회")
-    @Operation(summary = "일자별 목적지 조회", description = "일자별 목적지 조회하는 API입니다.")
+            @Parameter(description = "배정하고자 하는 여행 일차")
+            @PathVariable int day,
+
+            @Parameter(description = "목적지 ID")
+            @PathVariable String placeId
+    );
+
+    @TrackApi(description = "일차에 지정한 목적지 조회")
+    @Operation(summary = "일차에 지정한 목적지 조회", description = "일차에 지정한 목적지 조회하는 API입니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "일자별 목적지 조회 성공",
                     content = @Content(mediaType = "application/json", examples = {
@@ -146,10 +167,18 @@ public interface TripPlaceEditingApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> getAssignedPlaces(@PathVariable Long tripId, @PathVariable int day);
+    ResponseEntity<?> getAssignedPlaces(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
 
-    @TrackApi(description = "목적지 수정")
-    @Operation(summary = "목적지 수정", description = "목적지 수정하는 API입니다.")
+            @Parameter(description = "조회하고자 하는 일차")
+            @PathVariable int day
+    );
+
+    @TrackApi(description = "일차별 목적지의 순서를 수정 (이 과정에서 목적지 삭제도 가능)")
+    @Operation(summary = "일차별 목적지의 순서를 수정 (이 과정에서 목적지 삭제도 가능)", description = "일차별 목적지의 순서를 수정하는 API입니다." +
+            "<br/> 예를 들어, 기존 순서가 (a, b, c, d, e)이고, 순서를 (b, c, a, d, e)로 바꾼다면 바뀐 순서에 대한 목적지 정보들을 List형식으로 담아 보내면 됩니다." +
+            "<br/> 삭제도 가능하다는 말은, (a, b, c, d, e)에서 (b, c, e, d)로 바꿔서 보낸다면 a는 자동으로 삭제됩니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "목적지 수정 성공",
                     content = @Content(mediaType = "application/json", examples = {
@@ -161,12 +190,19 @@ public interface TripPlaceEditingApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> updatePlaces(@PathVariable Long tripId,
-                                   @PathVariable int day,
-                                   @RequestBody List<TripPlaceReq.Request> requests);
+    ResponseEntity<?> updatePlaces(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
 
-    @TrackApi(description = "목적지 삭제")
-    @Operation(summary = "목적지 삭제", description = "목적지 삭제하는 API입니다.")
+            @Parameter(description = "수정하고자 하는 일차")
+            @PathVariable int day,
+
+            @Parameter(description = "변경된 순서로의 목적지 정보 리스트")
+            @RequestBody List<TripPlaceReq.Request> requests
+    );
+
+    @TrackApi(description = "일차에 지정된 목적지 삭제")
+    @Operation(summary = "일차에 지정된 목적지 삭제", description = "일차에 지정된 목적지 삭제하는 API입니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "목적지 삭제 성공",
                     content = @Content(mediaType = "application/json", examples = {
@@ -178,7 +214,14 @@ public interface TripPlaceEditingApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> deleteAssignedPlace(@PathVariable Long tripId,
-                                          @PathVariable int day,
-                                          @PathVariable String placeId);
+    ResponseEntity<?> deleteAssignedPlace(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
+
+            @Parameter(description = "수행할 일차")
+            @PathVariable int day,
+
+            @Parameter(description = "목적지 ID")
+            @PathVariable String placeId
+    );
 }

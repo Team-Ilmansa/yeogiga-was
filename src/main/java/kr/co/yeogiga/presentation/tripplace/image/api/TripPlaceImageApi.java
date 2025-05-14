@@ -3,6 +3,7 @@ package kr.co.yeogiga.presentation.tripplace.image.api;
 import api.link.checker.annotation.ApiGroup;
 import api.link.checker.annotation.TrackApi;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -18,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Tag(name = "[이미지 매칭 후 이미지 API]", description = "이미지 매칭 후 이미지 관련 API")
 public interface TripPlaceImageApi {
 
-    @TrackApi(description = "목적지에 맞는 이미지 조회")
-    @Operation(summary = "목적지에 맞는 이미지 조회", description = "목적지에 맞는 이미지 조회하는 API입니다.")
+    @TrackApi(description = "일차별 목적지에 매칭되어 있는 이미지 조회")
+    @Operation(summary = "일차별 목적지에 매칭되어 있는 이미지 조회", description = "일차별 목적지에 매칭되어 있는 이미지 조회하는 API입니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "목적지에 맞는 이미지 조회 성공",
                     content = @Content(mediaType = "application/json", examples = {
@@ -40,6 +41,13 @@ public interface TripPlaceImageApi {
                                                          "latitude": 1.1,
                                                          "longitude": 2.2,
                                                          "date": "2025-04-13T21:53:57.445"
+                                                     },
+                                                     {
+                                                         "id": "image2-id",
+                                                         "url": "https://image2.com",
+                                                         "latitude": 3.3,
+                                                         "longitude": 4.4,
+                                                         "date": "2025-04-13T21:53:57.445"
                                                      }
                                                 ]
                                             }
@@ -57,13 +65,18 @@ public interface TripPlaceImageApi {
                     }))
     })
     ResponseEntity<?> getPlaceInfo(
+            @Parameter(description = "여행 ID")
             @PathVariable Long tripId,
+
+            @Parameter(description = "여행 일차 ID")
             @PathVariable String tripDayPlaceId,
+
+            @Parameter(description = "목적지 ID")
             @PathVariable String placeId
     );
 
-    @TrackApi(description = "기타 이미지 조회")
-    @Operation(summary = "기타 이미지 조회", description = "기타 이미지 조회하는 API입니다.")
+    @TrackApi(description = "일차별 기타(매칭되지 않은) 이미지 조회")
+    @Operation(summary = "일차별 기타(매칭되지 않은) 이미지 조회", description = "일차별 기타 이미지 조회하는 API입니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "기타 이미지 조회 성공",
                     content = @Content(mediaType = "application/json", examples = {
@@ -76,6 +89,10 @@ public interface TripPlaceImageApi {
                                                      {
                                                          "id": "image1-id",
                                                          "url": "https://image1.com"
+                                                     },
+                                                     {
+                                                         "id": "image2-id",
+                                                         "url": "https://image2.com"
                                                      }
                                                 ]
                                             }
@@ -84,13 +101,16 @@ public interface TripPlaceImageApi {
                     }))
     })
     ResponseEntity<?> getUnmatchedImageInfo(
+            @Parameter(description = "여행 ID")
             @PathVariable Long tripId,
+
+            @Parameter(description = "여행 일차 ID")
             @PathVariable String tripDayPlaceId
     );
 
 
-    @TrackApi(description = "같은 날짜 목적지 to 목적지")
-    @Operation(summary = "같은 날짜 목적지 to 목적지", description = "같은 날짜 목적지 to 목적지 이동하는 API입니다.")
+    @TrackApi(description = "매칭된 이미지 이동 (같은 날짜에 대한 목적지 to 목적지)")
+    @Operation(summary = "매칭된 이미지 이동 (같은 날짜에 대한 목적지 to 목적지)", description = "매칭된 이미지를 같은 날짜 목적지 to 목적지 이동하는 API입니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "이미지 이동 성공",
                     content = @Content(mediaType = "application/json", examples = {
@@ -124,13 +144,18 @@ public interface TripPlaceImageApi {
                     }))
     })
     ResponseEntity<?> moveImageToAnotherPlace(
+            @Parameter(description = "여행 ID")
             @PathVariable Long tripId,
+
+            @Parameter(description = "여행 일차 ID")
             @PathVariable String tripDayPlaceId,
+
+            @Parameter(description = "이동할 이미지 정보")
             @RequestBody TripPlaceImageReq.ImageMove imageReq
     );
 
-    @TrackApi(description = "다른 날짜 목적지 to 목적지")
-    @Operation(summary = "다른 날짜 목적지 to 목적지", description = "다른 날짜 목적지 to 목적지 이동하는 API입니다.")
+    @TrackApi(description = "매칭된 이미지 이동 (다른 날짜로의 목적지 to 목적지)")
+    @Operation(summary = "매칭된 이미지 이동 (다른 날짜로의 목적지 to 목적지)", description = "매칭된 이미지를 다른 날짜 목적지 to 목적지 이동하는 API입니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "이미지 이동 성공",
                     content = @Content(mediaType = "application/json", examples = {
@@ -164,12 +189,15 @@ public interface TripPlaceImageApi {
                     }))
     })
     ResponseEntity<?> moveImageBetweenDayPlaces(
+            @Parameter(description = "여행 ID")
             @PathVariable Long tripId,
+
+            @Parameter(description = "이동할 이미지 정보")
             @RequestBody TripPlaceImageReq.ImageCrossDayMove imageReq
     );
 
-    @TrackApi(description = "같은 날짜 목적지 to unmatched(기타)")
-    @Operation(summary = "같은 날짜 목적지 to unmatched(기타)", description = "같은 날짜 목적지 to unmatched(기타) 이동하는 API입니다.")
+    @TrackApi(description = "매칭된 이미지 이동 (같은 날짜 목적지 to unmatched(기타))")
+    @Operation(summary = "매칭된 이미지 이동 (같은 날짜 목적지 to unmatched(기타))", description = "매칭된 이미지를 같은 날짜 목적지 to unmatched(기타 - 매칭되지 않은) 이동하는 API입니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "이미지 이동 성공",
                     content = @Content(mediaType = "application/json", examples = {
@@ -203,13 +231,18 @@ public interface TripPlaceImageApi {
                     }))
     })
     ResponseEntity<?> moveImageToUnmatched(
+            @Parameter(description = "여행 ID")
             @PathVariable Long tripId,
+
+            @Parameter(description = "여행 일차 ID")
             @PathVariable String tripDayPlaceId,
+
+            @Parameter(description = "이동할 이미지 정보")
             @RequestBody TripPlaceImageReq.ImageUnmatchedMove imageReq
     );
 
-    @TrackApi(description = "같은 날짜 unmatched(기타) to 목적지")
-    @Operation(summary = "같은 날짜 unmatched(기타) to 목적지", description = "같은 날짜 unmatched(기타) to 목적지 이동하는 API입니다.")
+    @TrackApi(description = "매칭된 이미지 이동 (같은 날짜 unmatched(기타) to 목적지)")
+    @Operation(summary = "매칭된 이미지 이동 (같은 날짜 unmatched(기타) to 목적지)", description = "매칭된 이미지를 같은 날짜 unmatched(기타 - 매칭되지 않은) to 목적지 이동하는 API입니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "이미지 이동 성공",
                     content = @Content(mediaType = "application/json", examples = {
@@ -243,13 +276,18 @@ public interface TripPlaceImageApi {
                     }))
     })
     ResponseEntity<?> moveImageFromUnmatched(
+            @Parameter(description = "여행 ID")
             @PathVariable Long tripId,
+
+            @Parameter(description = "여행 일차 ID")
             @PathVariable String tripDayPlaceId,
+
+            @Parameter(description = "이동할 이미지 정보")
             @RequestBody TripPlaceImageReq.ImageUnmatchedMove imageReq
     );
 
-    @TrackApi(description = "이미지 단일 삭제")
-    @Operation(summary = "이미지 단일 삭제", description = "이미지 단일 삭제 API입니다." +
+    @TrackApi(description = "매칭된 이미지에 대해 단일 삭제")
+    @Operation(summary = "매칭된 이미지에 대해 단일 삭제", description = "이미지 단일 삭제 API입니다." +
             " 목적지 내 삭제인지, 기타 항목 삭제인지 요청값 DeleteType를 적절히 적어주세요.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "이미지 단일 삭제 성공",
@@ -263,14 +301,21 @@ public interface TripPlaceImageApi {
                     })),
     })
     ResponseEntity<?> deleteSingleImage(
+            @Parameter(description = "여행 ID")
             @PathVariable Long tripId,
+
+            @Parameter(description = "여행 일차 ID")
             @PathVariable String tripDayPlaceId,
+
+            @Parameter(description = "이미지 ID")
             @PathVariable String imageId,
+
+            @Parameter(description = "단일 삭제할 이미지 정보")
             @RequestBody TripPlaceImageDeleteDto.SingleDeleteReq deleteReq
     );
 
-    @TrackApi(description = "이미지 벌크 삭제")
-    @Operation(summary = "이미지 벌크 삭제", description = "이미지 벌크 삭제 API입니다.")
+    @TrackApi(description = "매칭된 이미지에 대해 벌크 삭제")
+    @Operation(summary = "매칭된 이미지에 대해 벌크 삭제", description = "매칭된 이미지 벌크 삭제 API입니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "이미지 단일 삭제 성공",
                     content = @Content(mediaType = "application/json", examples = {
@@ -283,7 +328,10 @@ public interface TripPlaceImageApi {
                     })),
     })
     ResponseEntity<?> deleteMultipleImages(
+            @Parameter(description = "여행 ID")
             @PathVariable Long tripId,
+
+            @Parameter(description = "벌크 삭제할 이미지 정보")
             @RequestBody TripPlaceImageDeleteDto.MultiDeleteReq deleteReq
     );
 }

@@ -20,7 +20,7 @@ public class TripPlaceImageDeleteDto {
     public record MultiDeleteReq(
             @Schema(description = "삭제할 이미지 ID 리스트", example = "[\"image1-id\", \"image2-id\"]")
             List<String> imageIds,
-            @Schema(description = "삭제할 이미지 url 리스트", example = "[\"https://image1.com\", \"https://image2.com\", \"https://image3.com\"]")
+            @Schema(description = "삭제할 이미지 url 리스트", example = "[\"https://image1.com\", \"https://image2.com\"]")
             List<String> urls
     ) { }
 
