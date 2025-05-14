@@ -1,5 +1,6 @@
 package kr.co.yeogiga.application.tripplace.service;
 
+import kr.co.yeogiga.application.tripplace.dto.TripDaySummaryRes;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
@@ -43,6 +44,21 @@ public class TripPlaceQueryService {
 
         return tripDayPlace.getPlaces().stream()
                 .map(TripPlaceRes.PlaceDetails::from)
+                .toList();
+    }
+
+    /**
+     * 여행 ID로 해당 여행의 일차별 요약 정보 조회 메서드
+     * - 각 여행 일차(Day)마다 포함된 장소(Place)와 이미지(Image) 정보를 포함. (이미지는 1장. 썸네일용)
+     *
+     * @param tripId 조회할 여행 ID
+     * @return 일차 요약 정보 리스트
+     */
+    public List<TripDaySummaryRes.DayDto> getTripDaySummaries(Long tripId) {
+        List<TripDayPlace> tripDayPlaces = tripDayPlaceService.readTripDayPlaceSummariesByTripId(tripId);
+
+        return tripDayPlaces.stream()
+                .map(TripDaySummaryRes.DayDto::from)
                 .toList();
     }
 }
