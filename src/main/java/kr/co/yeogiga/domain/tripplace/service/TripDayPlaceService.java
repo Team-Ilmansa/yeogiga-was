@@ -59,6 +59,10 @@ public class TripDayPlaceService {
         return tripDayPlaceRepository.findUnmatchedImagesById(id);
     }
 
+    public List<TripDayPlace> readTripDayPlaceSummariesByTripId(Long tripId) {
+        return tripDayPlaceRepository.findTripDayPlaceSummariesByTripId(tripId);
+    }
+
     public void deletePlace(String id, String placeId) {
         tripDayPlaceRepository.deletePlace(id, placeId);
     }
