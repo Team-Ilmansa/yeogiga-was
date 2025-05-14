@@ -5,6 +5,7 @@ import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageDeleteService;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageMovementService;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageQueryService;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageReassignmentService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.presentation.tripplace.image.api.TripPlaceImageApi;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
     private final TripPlaceImageMovementService tripPlaceImageMovementService;
     private final TripPlaceImageDeleteService tripPlaceImageDeleteService;
     private final TripPlaceImageQueryService tripPlaceImageQueryService;
+    private final TripPlaceImageReassignmentService tripPlaceImageReassignmentService;
 
     @Override
     @GetMapping("/{tripId}/day-place/{tripDayPlaceId}/places/{placeId}/images")
@@ -92,6 +94,15 @@ public class TripPlaceImageController implements TripPlaceImageApi {
             @RequestBody TripPlaceImageReq.ImageUnmatchedMove imageReq
     ) {
         tripPlaceImageMovementService.moveImageFromUnmatchedToPlace(tripDayPlaceId, imageReq);
+        return ResponseEntity.ok(SuccessResponse.ok());
+    }
+
+    @PatchMapping("/{tripId}/day-place/{tripDayPlaceId}/images/re-assign")
+    public ResponseEntity<?> reassignImages(
+            @PathVariable Long tripId,
+            @PathVariable String tripDayPlaceId
+    ) {
+        tripPlaceImageReassignmentService.reassignImagesToTripDayPlace(tripDayPlaceId);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
