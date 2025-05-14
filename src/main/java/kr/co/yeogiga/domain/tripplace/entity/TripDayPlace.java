@@ -36,4 +36,8 @@ public class TripDayPlace {
     public void addUnmatchedImages(List<Image> images) {
         this.unmatchedImages.addAll(images);
     }
+
+    public void clearUnmatchedImages() {
+        this.unmatchedImages.clear();
+    }
 }

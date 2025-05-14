@@ -37,4 +37,8 @@ public class Place {
     public void addImages(List<Image> images) {
         this.images.addAll(images);
     }
+
+    public void clearImages() {
+        this.images.clear();
+    }
 }
