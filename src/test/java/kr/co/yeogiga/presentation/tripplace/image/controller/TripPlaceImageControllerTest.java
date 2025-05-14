@@ -2,9 +2,11 @@ package kr.co.yeogiga.presentation.tripplace.image.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
-import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDto;
+import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
+import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageRes;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageDeleteService;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageMovementService;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageQueryService;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
@@ -25,11 +27,14 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -55,6 +60,9 @@ public class TripPlaceImageControllerTest {
     @MockBean
     private TripPlaceImageDeleteService tripPlaceImageDeleteService;
 
+    @MockBean
+    private TripPlaceImageQueryService tripPlaceImageQueryService;
+
     private final Long tripId = 1L;
     private final String tripDayPlaceId = "dayId";
     private final String fromPlaceId = "place1-id";
@@ -69,11 +77,80 @@ public class TripPlaceImageControllerTest {
     }
 
     @Nested
+    @DisplayName("이미지 조회 테스트")
+    class GetImageInfoTest {
+
+        @Test
+        @DisplayName("특정 장소의 이미지 조회")
+        void getPlaceInfoSuccess() throws Exception {
+            // given
+            TripPlaceImageRes.PlaceImageInfo placeImageInfo = TripPlaceImageRes.PlaceImageInfo.builder()
+                    .id("place-id")
+                    .name("카페")
+                    .latitude(1.1)
+                    .longitude(2.2)
+                    .placeType("식당")
+                    .images(List.of())
+                    .build();
+
+            when(tripPlaceImageQueryService.getPlaceImageInfo(tripDayPlaceId, fromPlaceId))
+                    .thenReturn(placeImageInfo);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/places/{placeId}/images", tripId, tripDayPlaceId, fromPlaceId)
+                            .accept(MediaType.APPLICATION_JSON)
+            );
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."))
+                    .andExpect(jsonPath("$.data.id").value("place-id"))
+                    .andExpect(jsonPath("$.data.name").value("카페"));
+        }
+
+        @Test
+        @DisplayName("Unmatched 이미지 조회")
+        void getUnmatchedImageInfoSuccess() throws Exception {
+            // given
+            TripPlaceImageRes.UnmatchedImageInfo unmatchedImageInfo = TripPlaceImageRes.UnmatchedImageInfo.builder()
+                    .images(List.of(
+                            TripPlaceImageRes.ImageDto.builder()
+                                    .id("image-id")
+                                    .url("https://image.com")
+                                    .latitude(0.0)
+                                    .longitude(1.1)
+                                    .date(LocalDateTime.now())
+                                    .build()
+                    ))
+                    .build();
+
+            when(tripPlaceImageQueryService.getUnmatchedImageInfo(tripDayPlaceId))
+                    .thenReturn(unmatchedImageInfo);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/unmatched-images", tripId, tripDayPlaceId)
+                            .accept(MediaType.APPLICATION_JSON)
+            );
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."))
+                    .andExpect(jsonPath("$.data.images").isArray());
+        }
+    }
+
+    @Nested
     @DisplayName("같은 날짜 내 이미지 이동 테스트")
     class MoveImageToAnotherPlaceControllerTest {
 
-        private final TripPlaceImageDto.ImageMoveReq req =
-                new TripPlaceImageDto.ImageMoveReq(fromPlaceId, toPlaceId, imageId);
+        private final TripPlaceImageReq.ImageMove req =
+                new TripPlaceImageReq.ImageMove(fromPlaceId, toPlaceId, imageId);
 
         @Test
         @DisplayName("성공")
@@ -166,8 +243,8 @@ public class TripPlaceImageControllerTest {
     @DisplayName("다른 날짜 간 이미지 이동 성공")
     void moveImageBetweenDayPlacesSuccess() throws Exception {
         // given
-        TripPlaceImageDto.ImageCrossDayMoveReq req =
-                new TripPlaceImageDto.ImageCrossDayMoveReq("day1", fromPlaceId, "day2", toPlaceId, imageId);
+        TripPlaceImageReq.ImageCrossDayMove req =
+                new TripPlaceImageReq.ImageCrossDayMove("day1", fromPlaceId, "day2", toPlaceId, imageId);
         doNothing().when(tripPlaceImageMovementService).moveImageBetweenDayPlaces(req);
 
         // when
@@ -188,7 +265,7 @@ public class TripPlaceImageControllerTest {
     @DisplayName("이미지를 Unmatched로 이동 성공")
     void moveImageToUnmatchedSuccess() throws Exception {
         // given
-        TripPlaceImageDto.ImageUnmatchedMoveReq req = new TripPlaceImageDto.ImageUnmatchedMoveReq(fromPlaceId, imageId);
+        TripPlaceImageReq.ImageUnmatchedMove req = new TripPlaceImageReq.ImageUnmatchedMove(fromPlaceId, imageId);
         doNothing().when(tripPlaceImageMovementService).moveImageToUnmatched(tripDayPlaceId, req);
 
         // when
@@ -209,7 +286,7 @@ public class TripPlaceImageControllerTest {
     @DisplayName("Unmatched에서 이미지 복원 성공")
     void moveImageFromUnmatchedToPlaceSuccess() throws Exception {
         // given
-        TripPlaceImageDto.ImageUnmatchedMoveReq req = new TripPlaceImageDto.ImageUnmatchedMoveReq(toPlaceId, imageId);
+        TripPlaceImageReq.ImageUnmatchedMove req = new TripPlaceImageReq.ImageUnmatchedMove(toPlaceId, imageId);
         doNothing().when(tripPlaceImageMovementService).moveImageFromUnmatchedToPlace(tripDayPlaceId, req);
 
         // when

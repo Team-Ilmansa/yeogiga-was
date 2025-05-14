@@ -24,11 +24,10 @@ public class TripPlaceRes {
     public record PlaceSummary(
             String id,
             String name,
-            String placeType,
-            double order
+            String placeType
     ) {
         public static PlaceSummary from(Place place) {
-            return new PlaceSummary(place.getId(), place.getName(), place.getPlaceType(), place.getOrder());
+            return new PlaceSummary(place.getId(), place.getName(), place.getPlaceType());
         }
     }
 
@@ -37,12 +36,11 @@ public class TripPlaceRes {
             String name,
             double latitude,
             double longitude,
-            String placeType,
-            double order
+            String placeType
     ) {
         public static PlaceDetails from(Place place) {
             return new PlaceDetails(place.getId(), place.getName(), place.getLatitude(),
-                    place.getLongitude(), place.getPlaceType(), place.getOrder());
+                    place.getLongitude(), place.getPlaceType());
         }
     }
 }

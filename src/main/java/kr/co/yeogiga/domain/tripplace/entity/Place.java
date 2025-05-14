@@ -2,23 +2,25 @@ package kr.co.yeogiga.domain.tripplace.entity;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 public class Place {
+    @Field("id")
     private String id;
     private String name;
-    private double latitude;
-    private double longitude;
+    private Double latitude;
+    private Double longitude;
     private String placeType;
-    private double order;
+    private Double order;
     private List<Image> images;
 
     @Builder
-    public Place(String id, String name, double latitude,
-                 double longitude, String placeType, double order) {
+    public Place(String id, String name, Double latitude,
+                 Double longitude, String placeType, Double order) {
         this.id = id;
         this.name = name;
         this.latitude = latitude;

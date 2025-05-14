@@ -1,6 +1,6 @@
 package kr.co.yeogiga.application.tripplace.image.service;
 
-import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDto;
+import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.entity.Image;
@@ -25,7 +25,7 @@ public class TripPlaceImageMovementService {
      * @param tripDayPlaceId TripDayPlace 문서 ID
      * @param imageReq       이미지 이동에 필요한 정보를 담은 요청 DTO
      */
-    public void moveImageToAnotherPlace(String tripDayPlaceId, TripPlaceImageDto.ImageMoveReq imageReq) {
+    public void moveImageToAnotherPlace(String tripDayPlaceId, TripPlaceImageReq.ImageMove imageReq) {
         Image image = getImageFromTripPlace(tripDayPlaceId, imageReq.fromPlaceId(), imageReq.imageId());
 
         tripDayPlaceService.deleteImage(tripDayPlaceId, imageReq.fromPlaceId(), imageReq.imageId());
@@ -37,7 +37,7 @@ public class TripPlaceImageMovementService {
      *
      * @param imageReq 이미지 이동에 필요한 정보를 담은 요청 DTO
      */
-    public void moveImageBetweenDayPlaces(TripPlaceImageDto.ImageCrossDayMoveReq imageReq) {
+    public void moveImageBetweenDayPlaces(TripPlaceImageReq.ImageCrossDayMove imageReq) {
         Image image = getImageFromTripPlace(imageReq.fromTripDayPlaceId(), imageReq.fromPlaceId(), imageReq.imageId());
 
         tripDayPlaceService.deleteImage(imageReq.fromTripDayPlaceId(), imageReq.fromPlaceId(), imageReq.imageId());
@@ -50,7 +50,7 @@ public class TripPlaceImageMovementService {
      * @param tripDayPlaceId TripDayPlace 문서 ID
      * @param imageReq       이미지 이동에 필요한 정보를 담은 요청 DTO
      */
-    public void moveImageToUnmatched(String tripDayPlaceId, TripPlaceImageDto.ImageUnmatchedMoveReq imageReq) {
+    public void moveImageToUnmatched(String tripDayPlaceId, TripPlaceImageReq.ImageUnmatchedMove imageReq) {
         Image image = getImageFromTripPlace(tripDayPlaceId, imageReq.placeId(), imageReq.imageId());
 
         tripDayPlaceService.deleteImage(tripDayPlaceId, imageReq.placeId(), imageReq.imageId());
@@ -63,7 +63,7 @@ public class TripPlaceImageMovementService {
      * @param tripDayPlaceId TripDayPlace 문서 ID
      * @param imageReq       이미지 이동에 필요한 정보를 담은 요청 DTO
      */
-    public void moveImageFromUnmatchedToPlace(String tripDayPlaceId, TripPlaceImageDto.ImageUnmatchedMoveReq imageReq) {
+    public void moveImageFromUnmatchedToPlace(String tripDayPlaceId, TripPlaceImageReq.ImageUnmatchedMove imageReq) {
         TripDayPlace tripDayPlace = getTripDayPlaceById(tripDayPlaceId);
 
         Image image = tripDayPlace.getUnmatchedImages().stream()

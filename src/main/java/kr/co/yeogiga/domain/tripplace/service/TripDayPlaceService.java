@@ -51,6 +51,18 @@ public class TripDayPlaceService {
         return tripDayPlaceRepository.findOrderByIdAndPlaceId(id, placeId);
     }
 
+    public Optional<Place> readPlaceByIdAndPlaceId(String id, String placeId) {
+        return tripDayPlaceRepository.findPlaceByIdAndPlaceId(id, placeId);
+    }
+
+    public List<Image> readUnmatchedImagesById(String id) {
+        return tripDayPlaceRepository.findUnmatchedImagesById(id);
+    }
+
+    public List<TripDayPlace> readTripDayPlaceSummariesByTripId(Long tripId) {
+        return tripDayPlaceRepository.findTripDayPlaceSummariesByTripId(tripId);
+    }
+
     public void deletePlace(String id, String placeId) {
         tripDayPlaceRepository.deletePlace(id, placeId);
     }

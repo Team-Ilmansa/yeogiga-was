@@ -1,6 +1,7 @@
 package kr.co.yeogiga.presentation.tripplace.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.yeogiga.application.tripplace.dto.TripDaySummaryRes;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceCommandService;
@@ -24,6 +25,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
@@ -144,7 +146,7 @@ public class TripPlaceControllerTest {
     void getPlaceDetailsInfoSuccess() throws Exception {
         // given
         TripPlaceRes.PlaceDetails details =
-                new TripPlaceRes.PlaceDetails("place1", "목적지1", 0.0, 0.0, "카페", 10.0);
+                new TripPlaceRes.PlaceDetails("place1", "목적지1", 0.0, 0.0, "카페");
         given(tripPlaceQueryService.getPlaceDetailsInfo(tripDayPlaceId)).willReturn(List.of(details));
 
         // when
@@ -157,6 +159,37 @@ public class TripPlaceControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
+    }
+
+    @Test
+    @DisplayName("여행 ID로 여행 일차 요약 목록 조회에 성공한다")
+    void getTripDaySummaries_success() throws Exception {
+        // given
+        Long tripId = 1L;
+        TripDaySummaryRes.DayDto responseDto = new TripDaySummaryRes.DayDto(
+                "day-id",
+                1,
+                List.of(new TripDaySummaryRes.PlaceDto("place-id", "목적지", 0.0, 1.0, "음식", null)),
+                new TripDaySummaryRes.ImageDto("image-id", "url", 1.0, 2.0, LocalDateTime.now())
+        );
+
+        given(tripPlaceQueryService.getTripDaySummaries(tripId)).willReturn(List.of(responseDto));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/trip/{tripId}/day-place", tripId)
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."))
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data[0].id").value("day-id"))
+                .andExpect(jsonPath("$.data[0].day").value(1))
+                .andExpect(jsonPath("$.data[0].places[0].id").value("place-id"))
+                .andExpect(jsonPath("$.data[0].unmatchedImage.id").value("image-id"));
     }
 
 

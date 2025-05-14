@@ -1,6 +1,6 @@
 package kr.co.yeogiga.application.tripplace.image.service;
 
-import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDto;
+import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.entity.Image;
@@ -50,7 +50,7 @@ public class TripPlaceImageMovementServiceTest {
     private Place buildPlace(String id, String name, List<Image> images) {
         Place place = Place.builder()
                 .id(id).name(name).latitude(1.0).longitude(1.0)
-                .placeType("카페").order(1)
+                .placeType("카페")
                 .build();
         place.addImages(images);
         return place;
@@ -67,8 +67,8 @@ public class TripPlaceImageMovementServiceTest {
     @DisplayName("같은 날짜 다른 목적지 이미지 이동 테스트")
     class MoveImageToAnotherPlaceTest {
 
-        private final TripPlaceImageDto.ImageMoveReq imageReq
-                = new TripPlaceImageDto.ImageMoveReq(fromPlaceId, toPlaceId, imageId);
+        private final TripPlaceImageReq.ImageMove imageReq
+                = new TripPlaceImageReq.ImageMove(fromPlaceId, toPlaceId, imageId);
 
         @Test
         @DisplayName("성공")
@@ -142,8 +142,8 @@ public class TripPlaceImageMovementServiceTest {
     @DisplayName("다른 날짜 간 이미지 이동 테스트")
     void moveImageBetweenDayPlacesTest() {
         // given
-        TripPlaceImageDto.ImageCrossDayMoveReq imageReq =
-                new TripPlaceImageDto.ImageCrossDayMoveReq(tripDayPlaceId1, fromPlaceId, tripDayPlaceId2, toPlaceId, imageId);
+        TripPlaceImageReq.ImageCrossDayMove imageReq =
+                new TripPlaceImageReq.ImageCrossDayMove(tripDayPlaceId1, fromPlaceId, tripDayPlaceId2, toPlaceId, imageId);
 
         Image image = buildImage();
         Place from = buildPlace(fromPlaceId, "목적지1", List.of(image));
@@ -164,8 +164,8 @@ public class TripPlaceImageMovementServiceTest {
     @DisplayName("이미지 Unmatched 영역으로 이동 테스트")
     void moveImageToUnmatchedTest() {
         // given
-        TripPlaceImageDto.ImageUnmatchedMoveReq imageReq =
-                new TripPlaceImageDto.ImageUnmatchedMoveReq(fromPlaceId, imageId);
+        TripPlaceImageReq.ImageUnmatchedMove imageReq =
+                new TripPlaceImageReq.ImageUnmatchedMove(fromPlaceId, imageId);
 
         Image image = buildImage();
         Place from = buildPlace(fromPlaceId, "목적지", List.of(image));
@@ -185,8 +185,8 @@ public class TripPlaceImageMovementServiceTest {
     @DisplayName("Unmatched 영역에서 Place로 이미지 이동 테스트")
     void MoveImageFromUnmatchedToPlaceTest() {
         // given
-        TripPlaceImageDto.ImageUnmatchedMoveReq imageReq =
-                new TripPlaceImageDto.ImageUnmatchedMoveReq(toPlaceId, imageId);
+        TripPlaceImageReq.ImageUnmatchedMove imageReq =
+                new TripPlaceImageReq.ImageUnmatchedMove(toPlaceId, imageId);
 
         Image image = buildImage();
         TripDayPlace tripDayPlace = buildTripDayPlace(List.of());
