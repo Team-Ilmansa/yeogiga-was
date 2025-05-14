@@ -3,6 +3,7 @@ package kr.co.yeogiga.presentation.image.api;
 import api.link.checker.annotation.ApiGroup;
 import api.link.checker.annotation.TrackApi;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,8 +22,8 @@ import java.util.List;
 @Tag(name = "[이미지 매칭 전 API]", description = "이미지 매칭 전 관련 API")
 public interface ImageApi {
 
-    @TrackApi(description = "이미지 업로드")
-    @Operation(summary = "이미지 업로드", description = "이미지 업로드하는 API입니다.")
+    @TrackApi(description = "이미지 업로드 (정렬하기 전 단계이므로, 일차별 임시 저장소로 이동)")
+    @Operation(summary = "이미지 업로드 (정렬하기 전 단계이므로, 일차별 임시 저장소로 이동)", description = "이미지 업로드하는 API입니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "이미지 업로드 성공",
                     content = @Content(mediaType = "application/json", examples = {
@@ -34,12 +35,19 @@ public interface ImageApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> uploadImages(@RequestPart(value = "images", required = false) List<MultipartFile> images,
-                                   @PathVariable Long tripId,
-                                   @PathVariable String tripDayPlaceId);
+    ResponseEntity<?> uploadImages(
+            @Parameter(description = "업로드할 이미지 파일 목록")
+            @RequestPart(value = "images", required = false) List<MultipartFile> images,
 
-    @TrackApi(description = "이미지 목적지 매핑")
-    @Operation(summary = "이미지 목적지 매핑", description = "이미지 목적지 매핑하는 API입니다.")
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
+
+            @Parameter(description = "여행 일차 ID")
+            @PathVariable String tripDayPlaceId
+    );
+
+    @TrackApi(description = "일차별 임시 저장된 이미지 목적지에 매칭 (정렬 버튼 클릭)")
+    @Operation(summary = "일차별 임시 저장된 이미지 목적지에 매칭 (정렬 버튼 클릭)", description = "일차별 임시 저장된 이미지 목적지에 매칭하는 API입니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "이미지 목적지 매핑 성공",
                     content = @Content(mediaType = "application/json", examples = {
@@ -66,13 +74,18 @@ public interface ImageApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> assignImages(@PathVariable Long tripId,
-                                   @PathVariable String tripDayPlaceId);
+    ResponseEntity<?> assignImages(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
+
+            @Parameter(description = "여행 일차 ID")
+            @PathVariable String tripDayPlaceId
+    );
 
     @TrackApi(description = "여행 일차별 임시 저장 이미지 조회")
     @Operation(summary = "여행 일차별 임시 저장 이미지 조회", description = "여행 일차별 임시 저장 이미지 조회하는 API입니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "이미지 목적지 매핑 성공",
+            @ApiResponse(responseCode = "200", description = "임시 저장된 이미지 조회 성공",
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(name = "임시 저장 이미지 내역 있음", value = """
                                         {
@@ -99,11 +112,16 @@ public interface ImageApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> getTempImagesInfo(@PathVariable Long tripId,
-                                        @PathVariable String tripDayPlaceId);
+    ResponseEntity<?> getTempImagesInfo(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
 
-    @TrackApi(description = "임시 이미지 삭제")
-    @Operation(summary = "임시 이미지 삭제", description = "임시 이미지 삭제하는 API입니다.")
+            @Parameter(description = "여행 일차 ID")
+            @PathVariable String tripDayPlaceId
+    );
+
+    @TrackApi(description = "일차별 이미지 매칭 전 임시 저장된 이미지 삭제")
+    @Operation(summary = "일차별 이미지 매칭 전 임시 저장된 이미지 삭제", description = "일차별 이미지 매칭 전 임시 저장된 이미지 삭제하는 API입니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "임시 이미지 삭제 성공",
                     content = @Content(mediaType = "application/json", examples = {
@@ -115,7 +133,14 @@ public interface ImageApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> removeTempImages(@PathVariable Long tripId,
-                                       @PathVariable String tripDayPlaceId,
-                                       @RequestBody ImageDeleteDto deleteDto);
+    ResponseEntity<?> removeTempImages(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
+
+            @Parameter(description = "여행 일차 ID")
+            @PathVariable String tripDayPlaceId,
+
+            @Parameter(description = "임시 이미지 삭제 정보")
+            @RequestBody ImageDeleteDto deleteDto
+    );
 }
