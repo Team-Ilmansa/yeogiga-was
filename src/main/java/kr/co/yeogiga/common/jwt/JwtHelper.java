@@ -16,12 +16,12 @@ public class JwtHelper {
     private final TokenParser tokenParser;
     private final JwtProperties jwtProperties;
 
-    public String generateAccessToken(String username, String nickname, Long userId, LoginType loginType) {
-        return tokenBuilder.build(username, generateClaims(nickname, userId, loginType), jwtProperties.getAccessTokenExpiration());
+    public String generateAccessToken(String nickname, Long userId, LoginType loginType) {
+        return tokenBuilder.build(String.valueOf(userId), generateClaims(nickname, userId, loginType), jwtProperties.getAccessTokenExpiration());
     }
 
-    public String generateRefreshToken(String username, String nickname, Long userId, LoginType loginType) {
-        return tokenBuilder.build(username, generateClaims(nickname, userId, loginType), jwtProperties.getRefreshTokenExpiration());
+    public String generateRefreshToken(String nickname, Long userId, LoginType loginType) {
+        return tokenBuilder.build(String.valueOf(userId), generateClaims(nickname, userId, loginType), jwtProperties.getRefreshTokenExpiration());
     }
 
     public JwtClaims parseClaims(String token) {
@@ -29,7 +29,6 @@ public class JwtHelper {
 
         return JwtClaims.builder()
                 .nickname(claims.get("nickname", String.class))
-                .username(claims.get("username", String.class))
                 .userId(claims.get("userId", Long.class))
                 .build();
     }
