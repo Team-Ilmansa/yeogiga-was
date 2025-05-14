@@ -132,6 +132,7 @@ public class ImageControllerTest {
                 get("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/temp-images", tripId, tripDayPlaceId)
         );
 
+        // then
         resultActions
                 .andDo(print())
                 .andExpect(status().isOk())
