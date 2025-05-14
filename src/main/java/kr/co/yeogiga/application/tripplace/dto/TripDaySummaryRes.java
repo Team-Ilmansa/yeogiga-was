@@ -14,7 +14,7 @@ public class TripDaySummaryRes {
             String id,
             Integer day,
             List<PlaceDto> places,
-            List<ImageDto> unmatchedImages
+            ImageDto unmatchedImage
     ) {
         public static DayDto from(TripDayPlace tripDayPlace) {
             return new DayDto(
@@ -25,8 +25,9 @@ public class TripDaySummaryRes {
                             .map(PlaceDto::from)
                             .toList(),
                     tripDayPlace.getUnmatchedImages().stream()
+                            .findFirst()
                             .map(ImageDto::from)
-                            .toList()
+                            .orElse(null)
             );
         }
     }
@@ -37,7 +38,7 @@ public class TripDaySummaryRes {
             Double latitude,
             Double longitude,
             String type,
-            List<ImageDto> images
+            ImageDto image
     ) {
         public static PlaceDto from(Place place) {
             return new PlaceDto(
@@ -47,8 +48,9 @@ public class TripDaySummaryRes {
                     place.getLongitude(),
                     place.getPlaceType(),
                     place.getImages().stream()
+                            .findFirst()
                             .map(ImageDto::from)
-                            .toList()
+                            .orElse(null)
             );
         }
     }
