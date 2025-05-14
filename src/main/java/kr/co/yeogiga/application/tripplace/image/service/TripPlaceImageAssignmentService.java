@@ -28,12 +28,10 @@ public class TripPlaceImageAssignmentService {
      * - 위도/경도가 있을 경우 가장 가까운 목적지(Place)에 연결
      * - 위도/경도가 없거나 목적지가 없을 경우 기타(unmatchedImages)로 분류
      *
-     * @param tripDayPlaceId TripDayPlace의 ID
+     * @param tripDayPlace TripDayPlace 객체
+     * @param images       처리하고자 하는 이미지 리스트
      */
-    public void assignImageToTripDayPlace(String tripDayPlaceId, List<Image> images) {
-        TripDayPlace tripDayPlace = tripDayPlaceService.readById(tripDayPlaceId)
-                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_PLACE_NOT_FOUND));
-
+    public void assignImageToTripDayPlace(TripDayPlace tripDayPlace, List<Image> images) {
         // GPS 정보를 기준으로 가장 가까운 장소별로 이미지 그룹핑
         List<Image> unmatchedImages = new ArrayList<>();
         Map<String, List<Image>> placeImageMap = groupImagesByNearestPlace(
