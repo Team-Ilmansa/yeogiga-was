@@ -63,6 +63,13 @@ public class TripPlaceController implements TripPlaceApi {
         );
     }
 
+    @GetMapping("/{tripId}/day-place")
+    public ResponseEntity<?> getTripDaySummaries(@PathVariable Long tripId) {
+        return ResponseEntity.ok(
+                SuccessResponse.from(tripPlaceQueryService.getTripDaySummaries(tripId))
+        );
+    }
+
     @Override
     @PutMapping("/{tripId}/day-place/{tripDayPlaceId}/places/order")
     public ResponseEntity<?> reorderPlaces(@PathVariable Long tripId,
