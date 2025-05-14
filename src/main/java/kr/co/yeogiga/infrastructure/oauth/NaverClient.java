@@ -70,9 +70,8 @@ public class NaverClient extends OAuthClient {
 
             JsonNode root = objectMapper.readTree(response.getBody());
             String platformId = root.path("response").get("id").asText();
-            String email = root.path("response").get("email").asText();
 
-            return UserInfoDto.of(platformId, email);
+            return UserInfoDto.of(platformId);
         } catch (Exception e) {
             log.error("[OAUTH ERROR:naver] {}", e.getMessage());
             throw new CustomException(OAuthErrorType.OAUTH_ERROR);
