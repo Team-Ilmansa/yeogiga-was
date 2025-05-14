@@ -97,6 +97,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
+    @Override
     @PatchMapping("/{tripId}/day-place/{tripDayPlaceId}/images/re-assign")
     public ResponseEntity<?> reassignImages(
             @PathVariable Long tripId,
