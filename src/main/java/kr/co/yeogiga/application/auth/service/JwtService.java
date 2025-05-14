@@ -12,9 +12,9 @@ public class JwtService {
     private final JwtHelper jwtHelper;
     private final RefreshTokenService refreshTokenService;
 
-    public TokenDto generateToken(String username, String nickname, Long userId, LoginType loginType) {
-        String accessToken = jwtHelper.generateAccessToken(username, nickname, userId, loginType);
-        String refreshToken = jwtHelper.generateRefreshToken(username, nickname, userId, loginType);
+    public TokenDto generateToken(String nickname, Long userId, LoginType loginType) {
+        String accessToken = jwtHelper.generateAccessToken(nickname, userId, loginType);
+        String refreshToken = jwtHelper.generateRefreshToken(nickname, userId, loginType);
         refreshTokenService.save(userId, refreshToken);
 
         return TokenDto.of(accessToken, refreshToken);

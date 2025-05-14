@@ -4,7 +4,6 @@ import lombok.Builder;
 
 @Builder
 public record JwtClaims(
-        String username,
         String nickname,
         Long userId
 ) {

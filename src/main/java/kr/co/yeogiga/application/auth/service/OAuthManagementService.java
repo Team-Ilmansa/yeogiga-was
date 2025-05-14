@@ -123,11 +123,10 @@ public class OAuthManagementService {
      */
     private SignInDto.Response getSignInResponse(UserStatusDto userStatus) {
         User user = userStatus.user();
-        String username = user.getUsername();
         String nickname = user.getNickname();
         Long userId = user.getId();
 
-        TokenDto token = jwtService.generateToken(username, nickname, userId, LoginType.SOCIAL);
+        TokenDto token = jwtService.generateToken(nickname, userId, LoginType.SOCIAL);
 
         return SignInDto.Response.builder()
                 .token(token)

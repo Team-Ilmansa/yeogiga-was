@@ -70,7 +70,7 @@ public class AuthService {
             throw new CustomException(AuthErrorType.AUTHENTICATION_FAIL);
         }
 
-        return jwtService.generateToken(user.getUsername(), user.getNickname(), user.getId(), LoginType.NORMAL);
+        return jwtService.generateToken(user.getNickname(), user.getId(), LoginType.NORMAL);
     }
 
     /**
@@ -89,7 +89,7 @@ public class AuthService {
         User user = userService.readById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
 
-        return jwtService.generateToken(user.getUsername(), user.getNickname(), user.getId(), LoginType.from(user.getPassword()));
+        return jwtService.generateToken(user.getNickname(), user.getId(), LoginType.from(user.getPassword()));
     }
 
     /**
