@@ -7,6 +7,7 @@ import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageRes;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageDeleteService;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageMovementService;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageQueryService;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageReassignmentService;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
@@ -62,6 +63,9 @@ public class TripPlaceImageControllerTest {
 
     @MockBean
     private TripPlaceImageQueryService tripPlaceImageQueryService;
+
+    @MockBean
+    private TripPlaceImageReassignmentService tripPlaceImageReassignmentService;
 
     private final Long tripId = 1L;
     private final String tripDayPlaceId = "dayId";
@@ -299,6 +303,20 @@ public class TripPlaceImageControllerTest {
         // then
         resultActions
                 .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
+    }
+
+    @Test
+    @DisplayName("이미지 목적지에 맞게 재정렬 테스트")
+    void reassignImagesTest() throws Exception {
+        // given
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/re-assign", tripId, tripDayPlaceId)
+        );
+        resultActions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
     }
