@@ -154,15 +154,13 @@ public interface TripPlaceApi {
                                                              "latitude": 0.0,
                                                              "longitude": 1.1,
                                                              "type": "식당",
-                                                             "images": [
-                                                                 {
+                                                             "image": {
                                                                      "id": "image1-id",
                                                                      "url": "https://image1.com",
                                                                      "latitude": 1.1,
                                                                      "longitude": 2.2,
                                                                      "date": "2025-04-13T21:53:57.445"
                                                                  }
-                                                             ]
                                                          },
                                                          {
                                                              "id": "place2-id",
@@ -170,15 +168,13 @@ public interface TripPlaceApi {
                                                              "latitude": 3.3,
                                                              "longitude": 4.4,
                                                              "type": "식당",
-                                                             "images": []
+                                                             "image": null
                                                          }
                                                      ],
-                                                     "unmatchedImages": [
-                                                         {
-                                                             "id": "image2-id",
-                                                             "url": "https://image2.com"
-                                                         }
-                                                     ]
+                                                     "unmatchedImage": {
+                                                         "id": "image2-id",
+                                                         "url": "https://image2.com"
+                                                     }
                                                 }
                                             ]
                                         }
