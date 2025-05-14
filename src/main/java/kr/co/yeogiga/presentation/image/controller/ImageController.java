@@ -4,12 +4,14 @@ import kr.co.yeogiga.application.image.dto.ImageDeleteDto;
 import kr.co.yeogiga.application.image.service.ImageUploadProcessor;
 import kr.co.yeogiga.application.image.service.TempImageAssignProcessor;
 import kr.co.yeogiga.application.image.service.TempPlaceImagesCommandService;
+import kr.co.yeogiga.application.image.service.TempPlaceImagesQueryService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.presentation.image.api.ImageApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +29,7 @@ public class ImageController implements ImageApi {
     private final ImageUploadProcessor imageUploadProcessor;
     private final TempImageAssignProcessor tempImageAssignProcessor;
     private final TempPlaceImagesCommandService tempPlaceImagesCommandService;
+    private final TempPlaceImagesQueryService tempPlaceImagesQueryService;
 
     @Override
     @PostMapping("/{tripId}/day-place/{tripDayPlaceId}/images")
@@ -43,6 +46,14 @@ public class ImageController implements ImageApi {
                                           @PathVariable String tripDayPlaceId) {
         tempImageAssignProcessor.assignFromTempStorage(tripDayPlaceId);
         return ResponseEntity.ok(SuccessResponse.ok());
+    }
+
+    @GetMapping("/{tripId}/day-place/{tripDayPlaceId}/temp-images")
+    public ResponseEntity<?> getTempImagesInfo(@PathVariable Long tripId,
+                                               @PathVariable String tripDayPlaceId) {
+        return ResponseEntity.ok(
+                SuccessResponse.from(tempPlaceImagesQueryService.getTempImagesInfo(tripDayPlaceId))
+        );
     }
 
     @Override
