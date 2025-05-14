@@ -13,7 +13,6 @@ import kr.co.yeogiga.common.response.error.type.CommonErrorType;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
-import kr.co.yeogiga.domain.user.exception.UserErrorType;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,7 +33,6 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -327,6 +325,32 @@ public class AuthControllerTest {
                     .andExpect(status().isConflict())
                     .andExpect(jsonPath("$.code").value(AuthErrorType.ALREADY_USED_USERNAME.getCode()))
                     .andExpect(jsonPath("$.message").value(AuthErrorType.ALREADY_USED_USERNAME.getMessage()));
+        }
+
+        @Test
+        @DisplayName("실패 - 이미 존재하는 이메일")
+        void failSignUpAlreadyExistsEmail() throws Exception {
+            // given
+            doThrow(new CustomException(AuthErrorType.ALREADY_USED_EMAIL)).when(authService).signUp(any());
+            SignUpDto.Request signUpDto = SignUpDto.Request.builder()
+                    .username("testid")
+                    .email("test@test.com")
+                    .password("testpw")
+                    .nickname("testnick")
+                    .build();
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    post("/api/v1/auth/sign-up")
+                            .content(objectMapper.writeValueAsBytes(signUpDto))
+                            .contentType(MediaType.APPLICATION_JSON)
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.code").value(AuthErrorType.ALREADY_USED_EMAIL.getCode()))
+                    .andExpect(jsonPath("$.message").value(AuthErrorType.ALREADY_USED_EMAIL.getMessage()));
         }
     }
 

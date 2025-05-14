@@ -71,9 +71,8 @@ public class KakaoClient extends OAuthClient {
 
             JsonNode root = objectMapper.readTree(response.getBody());
             String platformId = root.get("id").asText();
-            String email = root.path("kakao_account").get("email") .asText();
 
-            return UserInfoDto.of(platformId, email);
+            return UserInfoDto.of(platformId);
         } catch (Exception e) {
             log.error("[OAUTH ERROR:kakao] {}", e.getMessage());
             throw new CustomException(OAuthErrorType.OAUTH_ERROR);

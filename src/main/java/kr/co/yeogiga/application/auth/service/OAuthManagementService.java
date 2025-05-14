@@ -98,7 +98,6 @@ public class OAuthManagementService {
      */
     private User registerUser(OAuthPlatform platform, UserInfoDto userInfo) {
         User user = User.builder()
-                .email(userInfo.email())
                 .role(Role.GUEST)
                 .username(platform + " " + userInfo.platformId())
                 .nickname(platform + " " + userInfo.platformId())

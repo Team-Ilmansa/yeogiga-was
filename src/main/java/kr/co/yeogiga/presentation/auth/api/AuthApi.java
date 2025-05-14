@@ -61,6 +61,12 @@ public interface AuthApi {
                                             "code": "A012",
                                             "message": "이미 사용 중인 닉네임입니다."
                                         }
+                                    """),
+                            @ExampleObject(name = "회원가입 실패 - 이미 존재하는 닉네임", value = """
+                                        {
+                                            "code": "A013",
+                                            "message": "이미 사용 중인 이메일입니다."
+                                        }
                                     """)
                     }))
     })

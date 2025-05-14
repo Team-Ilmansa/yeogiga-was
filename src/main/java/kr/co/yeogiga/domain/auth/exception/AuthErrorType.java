@@ -23,7 +23,8 @@ public enum AuthErrorType implements BaseErrorType {
     AUTHENTICATION_FAIL(HttpStatus.BAD_REQUEST, "A010", "로그인에 실패하였습니다. 아이디 또는 비밀번호를 확인해주세요."),
 
     ALREADY_USED_USERNAME(HttpStatus.CONFLICT, "A011", "이미 사용 중인 아이디입니다."),
-    ALREADY_USED_NICKNAME(HttpStatus.CONFLICT, "A012", "이미 사용 중인 닉네임입니다.");
+    ALREADY_USED_NICKNAME(HttpStatus.CONFLICT, "A012", "이미 사용 중인 닉네임입니다."),
+    ALREADY_USED_EMAIL(HttpStatus.CONFLICT, "A013", "이미 사용 중인 이메일입니다.");
 
 
     private final HttpStatus httpStatus;

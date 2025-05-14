@@ -119,6 +119,7 @@ public class AuthServiceTest {
 
             when(userService.existsIncludeDeletedByUsername(request.username())).thenReturn(false);
             when(userService.existsIncludeDeletedByNickname(request.nickname())).thenReturn(false);
+            when(userService.existsIncludeDeletedByEmail(request.email())).thenReturn(false);
             when(passwordEncoder.encode(request.password())).thenReturn("encodedPassword");
             doNothing().when(userService).save(any());
 
@@ -167,11 +168,34 @@ public class AuthServiceTest {
             when(userService.existsIncludeDeletedByUsername(request.username())).thenReturn(false);
             when(userService.existsIncludeDeletedByNickname(request.nickname())).thenReturn(true);
 
+
             // when
             CustomException exception = assertThrows(CustomException.class, () -> authService.signUp(request));
 
             // then
             assertEquals(exception.getErrorType(), AuthErrorType.ALREADY_USED_NICKNAME);
+        }
+
+        @Test
+        @DisplayName("실패 - 이미 사용 중인 이메일")
+        void failAlreadyUsedEmail() {
+            // given
+            SignUpDto.Request request = SignUpDto.Request.builder()
+                    .username("testid")
+                    .email("test@test.com")
+                    .nickname("testnick")
+                    .password("testpw")
+                    .build();
+
+            when(userService.existsIncludeDeletedByUsername(request.username())).thenReturn(false);
+            when(userService.existsIncludeDeletedByNickname(request.nickname())).thenReturn(false);
+            when(userService.existsIncludeDeletedByEmail(request.email())).thenReturn(true);
+
+            // when
+            CustomException exception = assertThrows(CustomException.class, () -> authService.signUp(request));
+
+            // then
+            assertEquals(exception.getErrorType(), AuthErrorType.ALREADY_USED_EMAIL);
         }
     }
 

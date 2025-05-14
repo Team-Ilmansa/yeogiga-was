@@ -1,10 +1,9 @@
 package kr.co.yeogiga.application.auth.dto;
 
 public record UserInfoDto(
-        String platformId,
-        String email
+        String platformId
 ) {
-    public static UserInfoDto of(String platformId, String email) {
-        return new UserInfoDto(platformId, email);
+    public static UserInfoDto of(String platformId) {
+        return new UserInfoDto(platformId);
     }
 }
