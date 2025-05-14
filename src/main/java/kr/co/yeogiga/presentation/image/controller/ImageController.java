@@ -48,6 +48,7 @@ public class ImageController implements ImageApi {
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
+    @Override
     @GetMapping("/{tripId}/day-place/{tripDayPlaceId}/temp-images")
     public ResponseEntity<?> getTempImagesInfo(@PathVariable Long tripId,
                                                @PathVariable String tripDayPlaceId) {

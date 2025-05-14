@@ -69,6 +69,39 @@ public interface ImageApi {
     ResponseEntity<?> assignImages(@PathVariable Long tripId,
                                    @PathVariable String tripDayPlaceId);
 
+    @TrackApi(description = "여행 일차별 임시 저장 이미지 조회")
+    @Operation(summary = "여행 일차별 임시 저장 이미지 조회", description = "여행 일차별 임시 저장 이미지 조회하는 API입니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "이미지 목적지 매핑 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "임시 저장 이미지 내역 있음", value = """
+                                        {
+                                             "code": 200,
+                                             "message": "요청이 성공하였습니다.",
+                                             "data": [
+                                                 {
+                                                     "id": "image1-id",
+                                                     "url": "https://image1.com"
+                                                 },
+                                                 {
+                                                     "id": "image2-id",
+                                                     "url": "https://image2.com"
+                                                 }
+                                             ]
+                                        }
+                                    """),
+                            @ExampleObject(name = "임시 저장 이미지 내역 없음 (빈 리스트 반환)", value = """
+                                        {
+                                             "code": 200,
+                                             "message": "요청이 성공하였습니다.",
+                                             "data": []
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> getTempImagesInfo(@PathVariable Long tripId,
+                                        @PathVariable String tripDayPlaceId);
+
     @TrackApi(description = "임시 이미지 삭제")
     @Operation(summary = "임시 이미지 삭제", description = "임시 이미지 삭제하는 API입니다.")
     @ApiResponses({
