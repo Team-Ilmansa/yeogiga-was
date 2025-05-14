@@ -18,6 +18,77 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Tag(name = "[이미지 매칭 후 이미지 API]", description = "이미지 매칭 후 이미지 관련 API")
 public interface TripPlaceImageApi {
 
+    @TrackApi(description = "목적지에 맞는 이미지 조회")
+    @Operation(summary = "목적지에 맞는 이미지 조회", description = "목적지에 맞는 이미지 조회하는 API입니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "목적지에 맞는 이미지 조회 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다.",
+                                            "data": {
+                                                "id": "place1-id",
+                                                "name": "목적지1",
+                                                "latitude": 0.0,
+                                                "longitude": 1.1,
+                                                "type": "식당",
+                                                "images": [
+                                                     {
+                                                         "id": "image1-id",
+                                                         "url": "https://image1.com",
+                                                         "latitude": 1.1,
+                                                         "longitude": 2.2,
+                                                         "date": "2025-04-13T21:53:57.445"
+                                                     }
+                                                ]
+                                            }
+                                        }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "여행 일차 존재하지 않음",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                            "code": "T005",
+                                            "message": "해당 목적지가 존재하지 않습니다"
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> getPlaceInfo(
+            @PathVariable Long tripId,
+            @PathVariable String tripDayPlaceId,
+            @PathVariable String placeId
+    );
+
+    @TrackApi(description = "기타 이미지 조회")
+    @Operation(summary = "기타 이미지 조회", description = "기타 이미지 조회하는 API입니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "기타 이미지 조회 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다.",
+                                            "data": {
+                                                "images": [
+                                                     {
+                                                         "id": "image1-id",
+                                                         "url": "https://image1.com"
+                                                     }
+                                                ]
+                                            }
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> getUnmatchedImageInfo(
+            @PathVariable Long tripId,
+            @PathVariable String tripDayPlaceId
+    );
+
+
     @TrackApi(description = "같은 날짜 목적지 to 목적지")
     @Operation(summary = "같은 날짜 목적지 to 목적지", description = "같은 날짜 목적지 to 목적지 이동하는 API입니다.")
     @ApiResponses({

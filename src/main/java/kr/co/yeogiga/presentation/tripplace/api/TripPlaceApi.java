@@ -134,6 +134,59 @@ public interface TripPlaceApi {
     ResponseEntity<?> getPlaceDetailsInfo(@PathVariable Long tripId,
                                           @PathVariable String tripDayPlaceId);
 
+    @TrackApi(description = "목적지 요약 정보 불러오기 (여행 회고 과정 중)")
+    @Operation(summary = "목적지 요약 정보 불러오기 (여행 회고 과정 중)", description = "여행 목적지 요약 정보를 불러오는 API입니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "여행 목적지 요약 정보 불러오기",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다.",
+                                            "data": [
+                                                {
+                                                     "id": "tripDayPlace-id",
+                                                     "day": 1,
+                                                     "places": [
+                                                         {
+                                                             "id": "place1-id",
+                                                             "name": "목적지1",
+                                                             "latitude": 0.0,
+                                                             "longitude": 1.1,
+                                                             "type": "식당",
+                                                             "images": [
+                                                                 {
+                                                                     "id": "image1-id",
+                                                                     "url": "https://image1.com",
+                                                                     "latitude": 1.1,
+                                                                     "longitude": 2.2,
+                                                                     "date": "2025-04-13T21:53:57.445"
+                                                                 }
+                                                             ]
+                                                         },
+                                                         {
+                                                             "id": "place2-id",
+                                                             "name": "목적지2",
+                                                             "latitude": 3.3,
+                                                             "longitude": 4.4,
+                                                             "type": "식당",
+                                                             "images": []
+                                                         }
+                                                     ],
+                                                     "unmatchedImages": [
+                                                         {
+                                                             "id": "image2-id",
+                                                             "url": "https://image2.com"
+                                                         }
+                                                     ]
+                                                }
+                                            ]
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> getTripDaySummaries(@PathVariable Long tripId);
+
     @TrackApi(description = "여행 목적지 순서 변경")
     @Operation(summary = "여행 목적지 순서 변경", description = "여행 목적지 순서를 변경하는 API입니다.")
     @ApiResponses({

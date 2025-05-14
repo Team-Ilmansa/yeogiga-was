@@ -25,6 +25,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
     private final TripPlaceImageDeleteService tripPlaceImageDeleteService;
     private final TripPlaceImageQueryService tripPlaceImageQueryService;
 
+    @Override
     @GetMapping("/{tripId}/day-place/{tripDayPlaceId}/places/{placeId}/images")
     public ResponseEntity<?> getPlaceInfo(
             @PathVariable Long tripId,
@@ -38,6 +39,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
         );
     }
 
+    @Override
     @GetMapping("/{tripId}/day-place/{tripDayPlaceId}/unmatched-images")
     public ResponseEntity<?> getUnmatchedImageInfo(
             @PathVariable Long tripId,

@@ -63,6 +63,7 @@ public class TripPlaceController implements TripPlaceApi {
         );
     }
 
+    @Override
     @GetMapping("/{tripId}/day-place")
     public ResponseEntity<?> getTripDaySummaries(@PathVariable Long tripId) {
         return ResponseEntity.ok(
