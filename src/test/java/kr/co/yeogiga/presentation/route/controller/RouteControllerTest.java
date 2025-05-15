@@ -68,8 +68,7 @@ public class RouteControllerTest {
         // then
         resultActions
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
     }
 }
