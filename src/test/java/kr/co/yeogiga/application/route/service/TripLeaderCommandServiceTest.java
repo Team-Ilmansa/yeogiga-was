@@ -1,7 +1,6 @@
-package kr.co.yeogiga.application.route;
+package kr.co.yeogiga.application.route.service;
 
 import kr.co.yeogiga.application.route.dto.RouteReq;
-import kr.co.yeogiga.application.route.service.TripLeaderCommandService;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
