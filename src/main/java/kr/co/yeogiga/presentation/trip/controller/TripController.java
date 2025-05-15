@@ -4,7 +4,9 @@ import kr.co.yeogiga.application.trip.dto.TripReq;
 import kr.co.yeogiga.application.trip.service.TripCommandService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
+import kr.co.yeogiga.presentation.trip.api.TripApi;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,15 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/trip")
 @RequiredArgsConstructor
-public class TripController {
+public class TripController implements TripApi {
     private final TripCommandService tripCommandService;
 
+    @Override
     @PostMapping
     public ResponseEntity<?> createTrip(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody TripReq.Creation request
     ) {
         tripCommandService.create(userDetails.getUserId(), request);
-        return ResponseEntity.ok(SuccessResponse.ok());
+        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 }

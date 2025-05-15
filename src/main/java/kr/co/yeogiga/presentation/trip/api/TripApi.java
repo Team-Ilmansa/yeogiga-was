@@ -1,0 +1,38 @@
+package kr.co.yeogiga.presentation.trip.api;
+
+import api.link.checker.annotation.ApiGroup;
+import api.link.checker.annotation.TrackApi;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.yeogiga.application.trip.dto.TripReq;
+import kr.co.yeogiga.common.security.auth.CustomUserDetails;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.RequestBody;
+
+@ApiGroup(value = "[여행 API]")
+@Tag(name = "[여행 API]", description = "여행 관련 API")
+public interface TripApi {
+
+    @TrackApi(description = "여행 생성")
+    @Operation(summary = "여행 생성", description = "여행 생성 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "여행 생성 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                             {
+                                                 "code": 201,
+                                                 "message": "요청이 성공하였습니다."
+                                             }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> createTrip(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody TripReq.Creation request
+    );
+}
