@@ -17,7 +17,6 @@ public class TripReq {
             String title,
 
             @Schema(description = "목적지 도시", example = "대구광역시")
-            @NotBlank(message = "여행 도시는 필수 입력값입니다.")
             @Size(max = 20, message = "여행 도시는 최대 20글자까지 가능합니다.")
             String city
     ) {

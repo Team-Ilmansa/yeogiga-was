@@ -29,7 +29,7 @@ public class Trip {
     @Column(name = "leader_id", nullable = false)
     private Long leaderId;
 
-    @Column(length = 20, nullable = false)
+    @Column(length = 20)
     private String city;
 
     @Column(name = "started_at")
