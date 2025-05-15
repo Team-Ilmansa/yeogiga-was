@@ -26,10 +26,13 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.LocalDateTime;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -146,6 +149,65 @@ public class TripControllerTest {
             resultActions
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errors.city").value("여행 도시는 최대 20글자까지 가능합니다."));
+        }
+    }
+
+    @Nested
+    @DisplayName("여행 시간 수정")
+    class TimeModification {
+
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 00);
+            LocalDateTime endTime = LocalDateTime.of(2025, 5, 2, 12, 00);
+            TripReq.Time request = TripReq.Time.builder()
+                    .start(startTime)
+                    .end(endTime)
+                    .build();
+
+            doNothing().when(tripCommandService).updateTime(any(), any(), any());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    put("/api/v1/trip/{tripId}/time", 1L)
+                            .with(user(userDetails))
+                            .content(objectMapper.writeValueAsBytes(request))
+                            .contentType(MediaType.APPLICATION_JSON)
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+        }
+
+        @Test
+        @DisplayName("실패 - 유효성 검증 실패")
+        void failValidation() throws Exception {
+            // given
+            LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 00);
+            LocalDateTime endTime = LocalDateTime.of(2025, 5, 2, 12, 00);
+            TripReq.Time request = TripReq.Time.builder()
+                    .start(startTime)
+//                    .end(endTime)
+                    .build();
+
+            doNothing().when(tripCommandService).updateTime(any(), any(), any());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    put("/api/v1/trip/{tripId}/time", 1L)
+                            .with(user(userDetails))
+                            .content(objectMapper.writeValueAsBytes(request))
+                            .contentType(MediaType.APPLICATION_JSON)
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors.end").exists());
         }
     }
 }

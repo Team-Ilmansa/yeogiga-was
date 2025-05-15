@@ -1,8 +1,9 @@
 package kr.co.yeogiga.application.trip.service;
 
 import kr.co.yeogiga.application.trip.dto.TripReq;
+import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.entity.Trip;
-import kr.co.yeogiga.domain.trip.entity.TripMember;
+import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.service.TripMemberService;
 import kr.co.yeogiga.domain.trip.service.TripService;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
@@ -17,13 +18,19 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -85,4 +92,158 @@ public class TripCommandServiceTest {
             assertEquals(TravelStatus.PLANNED, capturedTrip.getTravelStatus());
         }
     }
+
+    @Nested
+    @DisplayName("시간 수정")
+    class TimeModification {
+        private final Long tripId = 1L;
+        private final Long userId = 1L;
+
+        private Trip trip = Trip.builder()
+                .title("test")
+                .city("대구광역시")
+                .leaderId(userId)
+                .build();
+
+        @Test
+        @DisplayName("성공 - 여행 전")
+        void successBeforeTrip() {
+            // given
+            LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 00);
+            LocalDateTime endTime = LocalDateTime.of(2025, 5, 2, 12, 00);
+            TripReq.Time time = TripReq.Time.builder()
+                    .start(startTime)
+                    .end(endTime)
+                    .build();
+
+            when(tripService.findById(tripId)).thenReturn(Optional.of(trip));
+
+            // LocalDateTime::now static 메서드에 대한 반환값 Stub
+            try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+                String date = "2025-03-01T12:00:00Z";
+                Clock clock = Clock.fixed(Instant.parse(date), ZoneId.of("UTC"));
+                LocalDateTime mockNow = LocalDateTime.now(clock);
+                mockedLocalDateTime.when(LocalDateTime::now).thenReturn(mockNow);
+
+                // when
+                tripCommandService.updateTime(tripId, userId, time);
+
+                // then
+                assertEquals(TravelStatus.PLANNED, trip.getTravelStatus());
+            }
+        }
+
+        @Test
+        @DisplayName("성공 - 여행 중")
+        void successOnTrip() {
+            // given
+            LocalDateTime startTime = LocalDateTime.of(2025, 2, 1, 12, 00);
+            LocalDateTime endTime = LocalDateTime.of(2025, 4, 2, 12, 00);
+            TripReq.Time time = TripReq.Time.builder()
+                    .start(startTime)
+                    .end(endTime)
+                    .build();
+
+            when(tripService.findById(tripId)).thenReturn(Optional.of(trip));
+
+            // LocalDateTime::now static 메서드에 대한 반환값 Stub
+            try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+                String date = "2025-03-01T12:00:00Z";
+                Clock clock = Clock.fixed(Instant.parse(date), ZoneId.of("UTC"));
+                LocalDateTime mockNow = LocalDateTime.now(clock);
+                mockedLocalDateTime.when(LocalDateTime::now).thenReturn(mockNow);
+
+                // when
+                tripCommandService.updateTime(tripId, userId, time);
+
+                // then
+                assertEquals(TravelStatus.IN_PROGRESS, trip.getTravelStatus());
+            }
+        }
+
+        @Test
+        @DisplayName("성공 - 여행 후")
+        void successAfterTrip() {
+            // given
+            LocalDateTime startTime = LocalDateTime.of(2025, 1, 1, 12, 00);
+            LocalDateTime endTime = LocalDateTime.of(2025, 2, 2, 12, 00);
+            TripReq.Time time = TripReq.Time.builder()
+                    .start(startTime)
+                    .end(endTime)
+                    .build();
+
+            when(tripService.findById(tripId)).thenReturn(Optional.of(trip));
+
+            // LocalDateTime::now static 메서드에 대한 반환값 Stub
+            try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+                String date = "2025-03-01T12:00:00Z";
+                Clock clock = Clock.fixed(Instant.parse(date), ZoneId.of("UTC"));
+                LocalDateTime mockNow = LocalDateTime.now(clock);
+                mockedLocalDateTime.when(LocalDateTime::now).thenReturn(mockNow);
+
+                // when
+                tripCommandService.updateTime(tripId, userId, time);
+
+                // then
+                assertEquals(TravelStatus.COMPLETED, trip.getTravelStatus());
+            }
+        }
+
+        @Test
+        @DisplayName("실패 - 여행 시각 오류 (종료 시각 <= 출발 시각")
+        void failInvalidDateRange() {
+            // given
+            LocalDateTime startTime = LocalDateTime.of(2025, 3, 1, 12, 00);
+            LocalDateTime endTime = LocalDateTime.of(2025, 2, 2, 12, 00);
+            TripReq.Time time = TripReq.Time.builder()
+                    .start(startTime)
+                    .end(endTime)
+                    .build();
+
+            when(tripService.findById(tripId)).thenReturn(Optional.of(trip));
+
+            // LocalDateTime::now static 메서드에 대한 반환값 Stub
+            try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+                String date = "2025-03-01T12:00:00Z";
+                Clock clock = Clock.fixed(Instant.parse(date), ZoneId.of("UTC"));
+                LocalDateTime mockNow = LocalDateTime.now(clock);
+                mockedLocalDateTime.when(LocalDateTime::now).thenReturn(mockNow);
+
+                // when
+                CustomException exception = assertThrows(CustomException.class, () -> tripCommandService.updateTime(tripId, userId, time));
+
+                // then
+                assertEquals(TripErrorType.INVALID_DATE_RANGE, exception.getErrorType());
+            }
+        }
+
+        @Test
+        @DisplayName("실패 - 방장 아닌 사용자 요청")
+        void failForbidden() {
+            // given
+            LocalDateTime startTime = LocalDateTime.of(2025, 1, 1, 12, 00);
+            LocalDateTime endTime = LocalDateTime.of(2025, 2, 2, 12, 00);
+            TripReq.Time time = TripReq.Time.builder()
+                    .start(startTime)
+                    .end(endTime)
+                    .build();
+
+            when(tripService.findById(tripId)).thenReturn(Optional.of(trip));
+
+            // LocalDateTime::now static 메서드에 대한 반환값 Stub
+            try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+                String date = "2025-03-01T12:00:00Z";
+                Clock clock = Clock.fixed(Instant.parse(date), ZoneId.of("UTC"));
+                LocalDateTime mockNow = LocalDateTime.now(clock);
+                mockedLocalDateTime.when(LocalDateTime::now).thenReturn(mockNow);
+
+                // when
+                CustomException exception = assertThrows(CustomException.class, () -> tripCommandService.updateTime(tripId, 2L, time));
+
+                // then
+                assertEquals(TripErrorType.PERMISSION_DENIED_NOT_LEADER, exception.getErrorType());
+            }
+        }
+    }
 }
+
