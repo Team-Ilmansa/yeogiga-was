@@ -49,4 +49,13 @@ public class Trip {
         this.city = city;
         this.travelStatus = travelStatus;
     }
+
+    public void updateTime(LocalDateTime startedAt, LocalDateTime endedAt) {
+        this.startedAt = startedAt;
+        this.endedAt = endedAt;
+    }
+
+    public void updateStatus(TravelStatus status) {
+        this.travelStatus = status;
+    }
 }
