@@ -1,5 +1,6 @@
 package kr.co.yeogiga.presentation.trip.controller;
 
+import jakarta.validation.Valid;
 import kr.co.yeogiga.application.trip.dto.TripReq;
 import kr.co.yeogiga.application.trip.service.TripCommandService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
@@ -24,7 +25,7 @@ public class TripController implements TripApi {
     @PostMapping
     public ResponseEntity<?> createTrip(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody TripReq.Creation request
+            @Valid @RequestBody TripReq.Creation request
     ) {
         tripCommandService.create(userDetails.getUserId(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
