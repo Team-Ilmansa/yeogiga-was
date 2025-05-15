@@ -33,11 +33,12 @@ public class TripController implements TripApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
+    @Override
     @PutMapping("/{tripId}/time")
     public ResponseEntity<?> updateTripTime(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long tripId,
-            @RequestBody TripReq.Time request
+            @Valid @RequestBody TripReq.Time request
     ) {
         tripCommandService.updateTime(tripId, userDetails.getUserId(), request);
         return ResponseEntity.ok(SuccessResponse.ok());
