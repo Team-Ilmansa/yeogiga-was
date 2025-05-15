@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import kr.co.yeogiga.application.trip.dto.TripReq;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
@@ -103,6 +104,7 @@ public interface TripApi {
             @Parameter(description = "여행 ID")
             @PathVariable Long tripId,
 
+            @Valid
             @RequestBody TripReq.Time request
     );
 }
