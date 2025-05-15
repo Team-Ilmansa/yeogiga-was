@@ -29,6 +29,9 @@ public class Trip {
     @Column(name = "leader_id", nullable = false)
     private Long leaderId;
 
+    @Column(length = 20, nullable = false)
+    private String city;
+
     @Column(name = "started_at")
     private LocalDateTime startedAt;
 
@@ -40,11 +43,10 @@ public class Trip {
     private TravelStatus travelStatus;
 
     @Builder
-    public Trip(String title, Long leaderId, LocalDateTime startedAt, LocalDateTime endedAt, TravelStatus travelStatus) {
+    public Trip(String title, Long leaderId, String city, TravelStatus travelStatus) {
         this.title = title;
         this.leaderId = leaderId;
-        this.startedAt = startedAt;
-        this.endedAt = endedAt;
+        this.city = city;
         this.travelStatus = travelStatus;
     }
 }
