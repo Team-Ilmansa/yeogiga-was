@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RouteController implements RouteApi {
     private final TripLeaderCommandService tripLeaderCommandService;
 
+    @Override
     @PostMapping("/{tripId}/days/{day}/routes")
     public ResponseEntity<?> storeLeaderRoute(
             @PathVariable Long tripId,
