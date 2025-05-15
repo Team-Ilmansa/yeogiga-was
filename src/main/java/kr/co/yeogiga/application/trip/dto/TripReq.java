@@ -49,6 +49,7 @@ public class TripReq {
     ) {
         @Schema(hidden = true)
         public boolean isValid() {
+            if (start == null || end == null) return false;
             return start.isBefore(end);
         }
     }
