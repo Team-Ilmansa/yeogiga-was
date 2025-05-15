@@ -286,6 +286,36 @@ public interface TripPlaceImageApi {
             @RequestBody TripPlaceImageReq.ImageUnmatchedMove imageReq
     );
 
+    @TrackApi(description = "매칭된 이미지 목적지에 맞게 재정렬")
+    @Operation(summary = "매칭된 이미지 목적지에 맞게 재정렬", description = "매칭된 이미지 목적지에 맞게 재정렬하는 API입니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "이미지 재정렬 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다."
+                                        }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "여행 일차 존재하지 않음",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                            "code": "T003",
+                                            "message": "해당 여행 일차 정보가 존재하지 않습니다."
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> reassignImages(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
+
+            @Parameter(description = "여행 일차 ID")
+            @PathVariable String tripDayPlaceId
+    );
+
     @TrackApi(description = "매칭된 이미지에 대해 단일 삭제")
     @Operation(summary = "매칭된 이미지에 대해 단일 삭제", description = "이미지 단일 삭제 API입니다." +
             " 목적지 내 삭제인지, 기타 항목 삭제인지 요청값 DeleteType를 적절히 적어주세요.")

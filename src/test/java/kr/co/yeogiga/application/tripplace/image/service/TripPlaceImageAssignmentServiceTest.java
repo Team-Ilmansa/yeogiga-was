@@ -1,7 +1,5 @@
 package kr.co.yeogiga.application.tripplace.image.service;
 
-import kr.co.yeogiga.common.exception.CustomException;
-import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
@@ -17,12 +15,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -85,29 +79,13 @@ class TripPlaceImageAssignmentServiceTest {
         tempImages.add(imgWithGps);
         tempImages.add(imgWithoutGps);
 
-        given(tripDayPlaceService.readById(tripDayPlaceId)).willReturn(Optional.of(tripDayPlace));
-
         // when
-        tripPlaceImageAssignmentService.assignImageToTripDayPlace(tripDayPlaceId, tempImages);
+        tripPlaceImageAssignmentService.assignImageToTripDayPlace(tripDayPlace, tempImages);
 
         // then
         assertEquals(1, tripDayPlace.getPlaces().get(0).getImages().size());
         assertEquals(1, tripDayPlace.getUnmatchedImages().size());
         verify(tripDayPlaceService, times(1)).save(tripDayPlace);
-    }
-
-    @Test
-    @DisplayName("실패 - TripDayPlace 존재 x")
-    void assignImageFailDayPlaceNotFound() {
-        // given
-        given(tripDayPlaceService.readById(anyString())).willReturn(Optional.empty());
-
-        // when
-        CustomException exception = assertThrows(CustomException.class,
-                () -> tripPlaceImageAssignmentService.assignImageToTripDayPlace(tripDayPlaceId, tempImages));
-
-        // then
-        assertEquals(TripErrorType.TRIP_PLACE_NOT_FOUND, exception.getErrorType());
     }
 }
 

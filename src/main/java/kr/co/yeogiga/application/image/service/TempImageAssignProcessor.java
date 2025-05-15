@@ -2,9 +2,12 @@ package kr.co.yeogiga.application.image.service;
 
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageAssignmentService;
 import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.entity.TempPlaceImages;
+import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 import kr.co.yeogiga.domain.tripplace.exception.ImageErrorType;
 import kr.co.yeogiga.domain.tripplace.service.TempPlaceImagesService;
+import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TempImageAssignProcessor {
     private final TempPlaceImagesService tempPlaceImagesService;
+    private final TripDayPlaceService tripDayPlaceService;
     private final TripPlaceImageAssignmentService tripPlaceImageAssignmentService;
 
     /**
@@ -24,7 +28,10 @@ public class TempImageAssignProcessor {
         TempPlaceImages tempPlaceImages = tempPlaceImagesService.readByTripDayPlaceId(tripDayPlaceId)
                 .orElseThrow(() -> new CustomException(ImageErrorType.TEMP_IMAGE_NOT_FOUND));
 
-        tripPlaceImageAssignmentService.assignImageToTripDayPlace(tripDayPlaceId, tempPlaceImages.getImages());
+        TripDayPlace tripDayPlace = tripDayPlaceService.readById(tripDayPlaceId)
+                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_PLACE_NOT_FOUND));
+
+        tripPlaceImageAssignmentService.assignImageToTripDayPlace(tripDayPlace, tempPlaceImages.getImages());
 
         tempPlaceImagesService.deleteById(tempPlaceImages.getId());
     }
