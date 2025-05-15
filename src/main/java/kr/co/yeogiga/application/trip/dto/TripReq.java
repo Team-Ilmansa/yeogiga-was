@@ -3,9 +3,11 @@ package kr.co.yeogiga.application.trip.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
 public class TripReq {
 
+    @Builder
     @Schema(name = "TripReq.Creation", description = "여행 생성 DTO")
     public record Creation(
 
