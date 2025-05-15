@@ -1,15 +1,23 @@
 package kr.co.yeogiga.application.route.service;
 
 import kr.co.yeogiga.application.route.dto.RouteReq;
+import kr.co.yeogiga.domain.triproute.entity.Route;
+import kr.co.yeogiga.domain.triproute.entity.TripRoute;
+import kr.co.yeogiga.domain.triproute.service.TripRouteService;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;
 import kr.co.yeogiga.infrastructure.redis.constant.RouteConstant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class TripLeaderCommandService {
     private final RedisRepository redisRepository;
+    private final TripRouteService tripRouteService;
 
     // (위도/경도) 비교 시 같은 위치로 간주할 오차 범위 (약 10~14m 정도)
     private static final double LOCATION_THRESHOLD = 0.0001;
@@ -52,5 +60,60 @@ public class TripLeaderCommandService {
         double lonDiff = Math.abs(prevRoute.longitude() - nowRoute.longitude());
 
         return latDiff < LOCATION_THRESHOLD && lonDiff < LOCATION_THRESHOLD;
+    }
+
+    /**
+     * Redis에 버퍼링된 TripRoute 데이터를 RDB에 로드하는 메서드.
+     * - TRIP_ROUTE_KEY_PATTERN을 통한 Redis 내 키 패턴 조회
+     * - 각 키의 루트 데이터를 TripRoute 엔티티로 변환
+     * - RDB에 일괄 저장 후, 관련 Redis 키들을 삭제
+     */
+    public void persistAllTripRoutes() {
+        Set<String> keys = redisRepository.getKeysByPattern(RouteConstant.TRIP_ROUTE_KEY_PATTERN);
+
+        List<TripRoute> tripRoutes = new ArrayList<>();
+
+        for (String key : keys) {
+            TripRoute tripRoute = convertKeyToTripRoute(key);
+            if (tripRoute == null) continue;
+
+            tripRoutes.add(tripRoute);
+        }
+
+        tripRouteService.saveAll(tripRoutes);
+        redisRepository.deleteKeys(keys.stream().toList());
+    }
+
+    /**
+     * Redis 키 문자열을 파싱하여 TripRoute 도메인 엔티티로 변환하는 메서드
+     * - Redis에 저장된 StoredFormat 리스트를 Route 리스트로 매핑
+     *
+     * @param key Redis에 저장된 경로 데이터 키
+     * @return TripRoute 엔티티
+     */
+    private TripRoute convertKeyToTripRoute(String key) {
+        String[] parts = key.split(":");
+        Long tripId = Long.parseLong(parts[2]);
+        int day = Integer.parseInt(parts[3]);
+
+        List<RouteReq.StoredFormat> storedRoutes = redisRepository.getList(key, RouteReq.StoredFormat.class);
+
+        if (storedRoutes == null || storedRoutes.isEmpty()) {
+            return null;
+        }
+
+        List<Route> routes = storedRoutes.stream()
+                .map(r -> Route.builder()
+                        .latitude(r.latitude())
+                        .longitude(r.longitude())
+                        .time(r.time())
+                        .build())
+                .toList();
+
+        return TripRoute.builder()
+                .tripId(tripId)
+                .day(day)
+                .routes(routes)
+                .build();
     }
 }

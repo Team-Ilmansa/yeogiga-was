@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -76,5 +77,15 @@ public class RedisRepository {
 
     public boolean existsInSet(String key, Object value) {
         return Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(key, value));
+    }
+
+    public Set<String> getKeysByPattern(String pattern) {
+        return redisTemplate.keys(pattern);
+    }
+
+    public void deleteKeys(Collection<String> keys) {
+        if (keys != null && !keys.isEmpty()) {
+            redisTemplate.delete(keys);
+        }
     }
 }
