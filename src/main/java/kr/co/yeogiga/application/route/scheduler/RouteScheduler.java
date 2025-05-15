@@ -1,4 +1,4 @@
-package kr.co.yeogiga.application.route.schedule;
+package kr.co.yeogiga.application.route.scheduler;
 
 import kr.co.yeogiga.application.route.service.TripLeaderCommandService;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class RouteSchedule {
+public class RouteScheduler {
     private final TripLeaderCommandService tripLeaderCommandService;
 
     /**
