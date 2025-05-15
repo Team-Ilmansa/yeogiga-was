@@ -29,6 +29,25 @@ public interface TripApi {
                                                  "message": "요청이 성공하였습니다."
                                              }
                                     """)
+                    })),
+            @ApiResponse(responseCode = "400", description = "여행 생성 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "최대 글자수 초과", value = """
+                                             {
+                                                 "code": "G002",
+                                                 "errors": {
+                                                     "title": "제목은 최대 20글자까지 가능합니다."
+                                                 }
+                                             }
+                                    """),
+                            @ExampleObject(name = "필수 입력값 미입력", value = """
+                                             {
+                                                 "code": "G002",
+                                                 "errors": {
+                                                     "title": "제목은 필수 입력값입니다."
+                                                 }
+                                             }
+                                    """)
                     }))
     })
     ResponseEntity<?> createTrip(
