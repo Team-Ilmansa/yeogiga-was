@@ -35,6 +35,10 @@ public class RedisRepository {
         redisTemplate.opsForList().rightPush(key, value);
     }
 
+    public void setValueInList(String key, long index, Object value) {
+        redisTemplate.opsForList().set(key, index, value);
+    }
+
     public <T> List<T> getList(String key, Class<T> clazz) {
         List<Object> objects = redisTemplate.opsForList().range(key, 0, -1);
         if (objects == null || objects.isEmpty()) {
@@ -44,6 +48,14 @@ public class RedisRepository {
         return objects.stream()
                 .map(clazz::cast)
                 .collect(Collectors.toList());
+    }
+
+    public <T> T getLastFromList(String key, Class<T> clazz) {
+        List<Object> objects = redisTemplate.opsForList().range(key, -1, -1);
+        if (objects == null || objects.isEmpty()) {
+            return null;
+        }
+        return clazz.cast(objects.get(0));
     }
 
     public void removeFromList(String key, Object value) {
