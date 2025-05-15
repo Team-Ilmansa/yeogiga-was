@@ -2,9 +2,11 @@ package kr.co.yeogiga.domain.user.repository;
 
 import kr.co.yeogiga.domain.oauth.entity.OAuth;
 import kr.co.yeogiga.domain.oauth.repository.OAuthRepository;
-import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.oauth.type.OAuthPlatform;
+import kr.co.yeogiga.domain.triproute.converter.RouteListConverter;
+import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.type.Role;
+import kr.co.yeogiga.infrastructure.TestObjectMapperConfig;
 import kr.co.yeogiga.infrastructure.config.JpaConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestPropertySource(locations = "classpath:application-test.yml")
-@Import(JpaConfig.class)
+@Import({JpaConfig.class, TestObjectMapperConfig.class})
 public class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
