@@ -49,7 +49,7 @@ public class TripCommandService {
                 .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
 
         if (!time.isValid()) {
-            throw new CustomException(TripErrorType.INVALID_DATA_RANGE);
+            throw new CustomException(TripErrorType.INVALID_DATE_RANGE);
         }
 
         if (!trip.getLeaderId().equals(userId)) {

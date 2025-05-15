@@ -18,7 +18,7 @@ public enum TripErrorType implements BaseErrorType {
 
     TRIP_NOT_FOUND(HttpStatus.NOT_FOUND, "T006", "해당 여행이 존재하지 않습니다."),
     PERMISSION_DENIED_NOT_LEADER(HttpStatus.FORBIDDEN, "T007", "여행 방장이 아닙니다."),
-    INVALID_DATA_RANGE(HttpStatus.BAD_REQUEST, "T008", "여행 시작 시간과 종료 시간을 확인하세요.");
+    INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "T008", "여행 시작 시간과 종료 시간을 확인하세요.");
 
     private final HttpStatus httpStatus;
     private final String code;
