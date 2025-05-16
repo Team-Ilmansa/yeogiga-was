@@ -13,4 +13,8 @@ public class TripMemberService {
     public void save(TripMember tripMember) {
         tripMemberRepository.save(tripMember);
     }
+
+    public boolean existsByTripIdAndUserId(Long tripId, Long userId) {
+        return tripMemberRepository.findByTripIdAndUserId(tripId, userId).isPresent();
+    }
 }
