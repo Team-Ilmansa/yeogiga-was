@@ -45,7 +45,7 @@ public class TripCommandService {
 
     @Transactional
     public void updateTime(Long tripId, Long userId, TripReq.Time time) {
-        Trip trip = tripService.findById(tripId)
+        Trip trip = tripService.readById(tripId)
                 .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
 
         if (!time.isValid()) {
