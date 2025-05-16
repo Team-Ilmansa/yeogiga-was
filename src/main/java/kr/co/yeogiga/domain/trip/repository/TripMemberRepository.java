@@ -4,4 +4,5 @@ import kr.co.yeogiga.domain.trip.entity.TripMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TripMemberRepository extends JpaRepository<TripMember, Long> {
+    boolean existsByTripIdAndUserId(Long tripId, Long userId);
 }
