@@ -24,6 +24,12 @@ public class TripCommandService {
     private final TripMemberService tripMemberService;
     private final UserService userService;
 
+    /**
+     * 여행 생성 메서드
+     *
+     * @param leaderId          방장(여행 생성자) ID
+     * @param creationRequest   여행 생성 요청 DTO
+     */
     @Transactional
     public void create(Long leaderId, TripReq.Creation creationRequest) {
         Trip trip = Trip.builder()
@@ -45,6 +51,17 @@ public class TripCommandService {
         tripMemberService.save(tripMember);
     }
 
+    /**
+     * 여행 시간 수정 메서드
+     *
+     * @param tripId        여행 ID
+     * @param userId        요청자 ID
+     * @param time          여행 시간 수정 요청 DTO
+     *
+     * @throws CustomException  TripErrorType.TRIP_NOT_FOUND - 여행 조회 불가
+     * @throws CustomException  TripErrorType.INVALID_DATE_RANGE - 여행 시간 범위 오류 (종료 시각 <= 출발시각)
+     * @throws CustomException  TripErrorType.PERMISSION_DENIED_NOT_LEADER - 방장이 아닌 사용자
+     */
     @Transactional
     public void updateTime(Long tripId, Long userId, TripReq.Time time) {
         Trip trip = tripService.readById(tripId)
@@ -64,6 +81,11 @@ public class TripCommandService {
         trip.updateStatus(status);
     }
 
+    /**
+     * 여행 상태 갱신 메서드
+     *
+     * @param time      현재 시간
+     */
     @Transactional
     public void updateTravelStatus(LocalDateTime time) {
         tripService.updateAllTravelStatusToInProgress(time);
