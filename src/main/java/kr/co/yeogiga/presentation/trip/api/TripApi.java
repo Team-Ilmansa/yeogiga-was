@@ -3,15 +3,18 @@ package kr.co.yeogiga.presentation.trip.api;
 import api.link.checker.annotation.ApiGroup;
 import api.link.checker.annotation.TrackApi;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import kr.co.yeogiga.application.trip.dto.TripReq;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @ApiGroup(value = "[여행 API]")
@@ -53,5 +56,55 @@ public interface TripApi {
     ResponseEntity<?> createTrip(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody TripReq.Creation request
+    );
+
+    @TrackApi(description = "여행 시간 수정")
+    @Operation(summary = "여행 시간 수정", description = "여행 시간 수정 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "여행 시간 수정 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                             {
+                                                 "code": 200,
+                                                 "message": "요청이 성공하였습니다."
+                                             }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "400", description = "여행 시간 수정 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "여행 시작, 종료 시간 범위 에러 (종료 시각 <= 시작 시간)", value = """
+                                             {
+                                                 "code": "T008",
+                                                 "message": "여행 시작 시간과 종료 시간을 확인하세요."
+                                             }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "403", description = "여행 시간 수정 실패 - 권한",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "방장이 아닌 사용자 수정 불가", value = """
+                                             {
+                                                 "code": "T007",
+                                                 "message": "여행 방장이 아닙니다."
+                                             }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "여행 시간 수정 실패 - 여행 존재 여부",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "존재하지 않는 여행", value = """
+                                             {
+                                                 "code": "T006",
+                                                 "message": "여행 시작 시간과 종료 시간을 확인하세요."
+                                             }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> updateTripTime(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
+
+            @Valid
+            @RequestBody TripReq.Time request
     );
 }

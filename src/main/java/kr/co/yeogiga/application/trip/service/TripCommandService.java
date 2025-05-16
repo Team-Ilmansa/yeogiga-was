@@ -4,6 +4,7 @@ import kr.co.yeogiga.application.trip.dto.TripReq;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.entity.TripMember;
+import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.service.TripMemberService;
 import kr.co.yeogiga.domain.trip.service.TripService;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
@@ -40,5 +41,24 @@ public class TripCommandService {
 
         tripService.save(trip);
         tripMemberService.save(tripMember);
+    }
+
+    @Transactional
+    public void updateTime(Long tripId, Long userId, TripReq.Time time) {
+        Trip trip = tripService.readById(tripId)
+                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
+
+        if (!time.isValid()) {
+            throw new CustomException(TripErrorType.INVALID_DATE_RANGE);
+        }
+
+        if (!trip.getLeaderId().equals(userId)) {
+            throw new CustomException(TripErrorType.PERMISSION_DENIED_NOT_LEADER);
+        }
+
+        TravelStatus status = TravelStatus.resolveStatus(time.start(), time.end());
+
+        trip.updateTime(time.start(), time.end());
+        trip.updateStatus(status);
     }
 }
