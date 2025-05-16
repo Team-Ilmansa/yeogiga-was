@@ -15,6 +15,6 @@ public class TripMemberService {
     }
 
     public boolean existsByTripIdAndUserId(Long tripId, Long userId) {
-        return tripMemberRepository.findByTripIdAndUserId(tripId, userId).isPresent();
+        return tripMemberRepository.existsByTripIdAndUserId(tripId, userId);
     }
 }
