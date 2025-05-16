@@ -16,7 +16,7 @@ public class TripService {
         tripRepository.save(trip);
     }
 
-    public Optional<Trip> findById(Long tripId) {
+    public Optional<Trip> readById(Long tripId) {
         return tripRepository.findById(tripId);
     }
 }
