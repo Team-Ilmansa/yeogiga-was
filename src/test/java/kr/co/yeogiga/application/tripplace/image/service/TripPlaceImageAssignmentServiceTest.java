@@ -4,6 +4,7 @@ import kr.co.yeogiga.domain.tripplace.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
+import kr.co.yeogiga.domain.triproute.service.TripRouteService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,9 @@ class TripPlaceImageAssignmentServiceTest {
 
     @Mock
     private TripDayPlaceService tripDayPlaceService;
+
+    @Mock
+    private TripRouteService tripRouteService;
 
     @InjectMocks
     private TripPlaceImageAssignmentService tripPlaceImageAssignmentService;

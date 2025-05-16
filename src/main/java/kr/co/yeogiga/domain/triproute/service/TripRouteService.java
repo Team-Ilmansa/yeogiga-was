@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -14,5 +15,9 @@ public class TripRouteService {
 
     public void saveAll(List<TripRoute> tripRoutes) {
         tripRouteRepository.saveAllInBatch(tripRoutes);
+    }
+
+    public Optional<TripRoute> readByTripIdAndDay(Long tripId, int day) {
+        return tripRouteRepository.findByTripIdAndDay(tripId, day);
     }
 }
