@@ -116,7 +116,7 @@ public class TripCommandServiceTest {
                     .end(endTime)
                     .build();
 
-            when(tripService.findById(tripId)).thenReturn(Optional.of(trip));
+            when(tripService.readById(tripId)).thenReturn(Optional.of(trip));
 
             // LocalDateTime::now static 메서드에 대한 반환값 Stub
             try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
@@ -144,7 +144,7 @@ public class TripCommandServiceTest {
                     .end(endTime)
                     .build();
 
-            when(tripService.findById(tripId)).thenReturn(Optional.of(trip));
+            when(tripService.readById(tripId)).thenReturn(Optional.of(trip));
 
             // LocalDateTime::now static 메서드에 대한 반환값 Stub
             try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
@@ -172,7 +172,7 @@ public class TripCommandServiceTest {
                     .end(endTime)
                     .build();
 
-            when(tripService.findById(tripId)).thenReturn(Optional.of(trip));
+            when(tripService.readById(tripId)).thenReturn(Optional.of(trip));
 
             // LocalDateTime::now static 메서드에 대한 반환값 Stub
             try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
@@ -200,7 +200,7 @@ public class TripCommandServiceTest {
                     .end(endTime)
                     .build();
 
-            when(tripService.findById(tripId)).thenReturn(Optional.of(trip));
+            when(tripService.readById(tripId)).thenReturn(Optional.of(trip));
 
             // LocalDateTime::now static 메서드에 대한 반환값 Stub
             try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
@@ -228,7 +228,7 @@ public class TripCommandServiceTest {
                     .end(endTime)
                     .build();
 
-            when(tripService.findById(tripId)).thenReturn(Optional.of(trip));
+            when(tripService.readById(tripId)).thenReturn(Optional.of(trip));
 
             // LocalDateTime::now static 메서드에 대한 반환값 Stub
             try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
