@@ -35,16 +35,10 @@ public class TripReq {
     public record Time(
             @Schema(description = "여행 시작 시각", example = "2025-01-01T12:00:00", type = "string")
             @NotNull(message = "여행 시작 시각은 필수 입력값입니다.")
-            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-            @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-            @JsonSerialize(using = LocalDateTimeSerializer.class)
             LocalDateTime start,
 
             @Schema(description = "여행 종료 시각", example = "2025-01-05T12:00:00", type = "string")
             @NotNull(message = "여행 종료 시각은 필수 입력값입니다.")
-            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-            @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-            @JsonSerialize(using = LocalDateTimeSerializer.class)
             LocalDateTime end
     ) {
         @Schema(hidden = true)
