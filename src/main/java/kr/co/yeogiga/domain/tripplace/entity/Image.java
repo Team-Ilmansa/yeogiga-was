@@ -22,4 +22,9 @@ public class Image {
         this.longitude = longitude;
         this.date = date;
     }
+
+    public void updateGps(Double latitude, Double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 }
