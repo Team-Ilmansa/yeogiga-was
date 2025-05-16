@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class TripCommandService {
@@ -60,5 +62,11 @@ public class TripCommandService {
 
         trip.updateTime(time.start(), time.end());
         trip.updateStatus(status);
+    }
+
+    @Transactional
+    public void updateTravelStatus(LocalDateTime time) {
+        tripService.updateAllTravelStatusToInProgress(time);
+        tripService.updateAllTravelStatusToCompleted(time);
     }
 }
