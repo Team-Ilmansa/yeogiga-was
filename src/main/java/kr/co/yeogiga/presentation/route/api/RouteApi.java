@@ -3,6 +3,7 @@ package kr.co.yeogiga.presentation.route.api;
 import api.link.checker.annotation.ApiGroup;
 import api.link.checker.annotation.TrackApi;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,8 +32,13 @@ public interface RouteApi {
                     }))
     })
     ResponseEntity<?> storeLeaderRoute(
+            @Parameter(description = "여행 ID")
             @PathVariable Long tripId,
+
+            @Parameter(description = "진행하고 있는 여행 일차")
             @PathVariable int day,
+
+            @Parameter(description = "GPS 정보")
             @RequestBody RouteReq.Request routeReq
     );
 
@@ -82,6 +88,7 @@ public interface RouteApi {
                     }))
     })
     ResponseEntity<?> getTripRoutes(
+            @Parameter(description = "여행 ID")
             @PathVariable Long tripId
     );
 }
