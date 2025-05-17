@@ -33,6 +33,7 @@ public class RouteController implements RouteApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
+    @Override
     @GetMapping("/{tripId}/routes")
     public ResponseEntity<?> getTripRoutes(
             @PathVariable Long tripId
