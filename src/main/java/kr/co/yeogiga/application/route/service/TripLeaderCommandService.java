@@ -8,6 +8,7 @@ import kr.co.yeogiga.infrastructure.redis.RedisRepository;
 import kr.co.yeogiga.infrastructure.redis.constant.RouteConstant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +69,7 @@ public class TripLeaderCommandService {
      * - 각 키의 루트 데이터를 TripRoute 엔티티로 변환
      * - RDB에 일괄 저장 후, 관련 Redis 키들을 삭제
      */
+    @Transactional
     public void persistAllTripRoutes() {
         Set<String> keys = redisRepository.getKeysByPattern(RouteConstant.TRIP_ROUTE_KEY_PATTERN);
 
