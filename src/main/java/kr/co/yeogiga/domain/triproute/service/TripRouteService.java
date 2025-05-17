@@ -20,4 +20,8 @@ public class TripRouteService {
     public Optional<TripRoute> readByTripIdAndDay(Long tripId, int day) {
         return tripRouteRepository.findByTripIdAndDay(tripId, day);
     }
+
+    public List<TripRoute> readByTripId(Long tripId) {
+        return tripRouteRepository.findByTripIdOrderByDay(tripId);
+    }
 }
