@@ -2,11 +2,13 @@ package kr.co.yeogiga.presentation.route.controller;
 
 import kr.co.yeogiga.application.route.dto.RouteReq;
 import kr.co.yeogiga.application.route.service.TripLeaderCommandService;
+import kr.co.yeogiga.application.route.service.TripRouteQueryService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.presentation.route.api.RouteApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class RouteController implements RouteApi {
     private final TripLeaderCommandService tripLeaderCommandService;
+    private final TripRouteQueryService tripRouteQueryService;
 
     @Override
     @PostMapping("/{tripId}/days/{day}/routes")
@@ -28,5 +31,14 @@ public class RouteController implements RouteApi {
     ) {
         tripLeaderCommandService.storeLeaderRouteInRedis(tripId, day, routeReq);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
+    }
+
+    @GetMapping("/{tripId}/routes")
+    public ResponseEntity<?> getTripRoutes(
+            @PathVariable Long tripId
+    ) {
+        return ResponseEntity.ok(
+                SuccessResponse.from(tripRouteQueryService.getTripRoutes(tripId))
+        );
     }
 }
