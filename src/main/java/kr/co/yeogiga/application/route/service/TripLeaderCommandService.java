@@ -1,6 +1,8 @@
 package kr.co.yeogiga.application.route.service;
 
 import kr.co.yeogiga.application.route.dto.RouteReq;
+import kr.co.yeogiga.domain.trip.entity.Trip;
+import kr.co.yeogiga.domain.trip.service.TripService;
 import kr.co.yeogiga.domain.triproute.entity.Route;
 import kr.co.yeogiga.domain.triproute.entity.TripRoute;
 import kr.co.yeogiga.domain.triproute.service.TripRouteService;
@@ -12,13 +14,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class TripLeaderCommandService {
     private final RedisRepository redisRepository;
     private final TripRouteService tripRouteService;
+    private final TripService tripService;
 
     // (위도/경도) 비교 시 같은 위치로 간주할 오차 범위 (약 10~14m 정도)
     private static final double LOCATION_THRESHOLD = 0.0001;
@@ -73,10 +80,18 @@ public class TripLeaderCommandService {
     public void persistAllTripRoutes() {
         Set<String> keys = redisRepository.getKeysByPattern(RouteConstant.TRIP_ROUTE_KEY_PATTERN);
 
+        Set<Long> tripIds = keys.stream()
+                .map(this::extractTripIdFromKey)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        Map<Long, Trip> tripMap = tripService.readAllByIds(tripIds).stream()
+                .collect(Collectors.toMap(Trip::getId, Function.identity()));
+
         List<TripRoute> tripRoutes = new ArrayList<>();
 
         for (String key : keys) {
-            TripRoute tripRoute = convertKeyToTripRoute(key);
+            TripRoute tripRoute = convertKeyToTripRoute(key, tripMap);
             if (tripRoute == null) continue;
 
             tripRoutes.add(tripRoute);
@@ -86,6 +101,11 @@ public class TripLeaderCommandService {
         redisRepository.deleteKeys(keys.stream().toList());
     }
 
+    private Long extractTripIdFromKey(String key) {
+        String[] parts = key.split(":");
+        return Long.parseLong(parts[2]);
+    }
+
     /**
      * Redis 키 문자열을 파싱하여 TripRoute 도메인 엔티티로 변환하는 메서드
      * - Redis에 저장된 StoredFormat 리스트를 Route 리스트로 매핑
@@ -93,7 +113,7 @@ public class TripLeaderCommandService {
      * @param key Redis에 저장된 경로 데이터 키
      * @return TripRoute 엔티티
      */
-    private TripRoute convertKeyToTripRoute(String key) {
+    private TripRoute convertKeyToTripRoute(String key, Map<Long, Trip> tripMap) {
         String[] parts = key.split(":");
         Long tripId = Long.parseLong(parts[2]);
         int day = Integer.parseInt(parts[3]);
@@ -112,10 +132,13 @@ public class TripLeaderCommandService {
                         .build())
                 .toList();
 
+        Trip trip = tripMap.get(tripId);
+        if (trip == null) return null;
+
         return TripRoute.builder()
-                .tripId(tripId)
                 .day(day)
                 .routes(routes)
+                .trip(trip)
                 .build();
     }
 }
