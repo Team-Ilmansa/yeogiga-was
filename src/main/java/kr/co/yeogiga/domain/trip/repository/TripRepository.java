@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 public interface TripRepository extends JpaRepository<Trip, Long> {
 
@@ -22,4 +24,5 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
             "WHERE travelStatus != 'COMPLETED' AND endedAt <= :time")
     void updateTravelStatusCompleted(@Param(value = "time") LocalDateTime time);
 
+    List<Trip> findAllByIdIn(Set<Long> ids);
 }
