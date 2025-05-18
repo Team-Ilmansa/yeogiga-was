@@ -5,6 +5,7 @@ import kr.co.yeogiga.domain.calendar.repository.CalendarRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,6 +19,10 @@ public class CalendarService {
 
     public Optional<Calendar> readByUserIdAndTripId(Long userId, Long tripId) {
         return calendarRepository.findByUserIdAndTrip_Id(userId, tripId);
+    }
+
+    public List<Calendar> readAllByTripId(Long tripId) {
+        return calendarRepository.findAllByTrip_Id(tripId);
     }
 
     public boolean existsByUserIdAndTripId(Long userId, Long tripId) {
