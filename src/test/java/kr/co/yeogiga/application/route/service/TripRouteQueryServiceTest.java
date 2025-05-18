@@ -35,13 +35,11 @@ public class TripRouteQueryServiceTest {
         Route route2 = Route.builder().latitude(2.2).longitude(3.3).build();
 
         TripRoute tripRoute1 = TripRoute.builder()
-                .tripId(tripId)
                 .day(1)
                 .routes(List.of(route1))
                 .build();
 
         TripRoute tripRoute2 = TripRoute.builder()
-                .tripId(tripId)
                 .day(2)
                 .routes(List.of(route2))
                 .build();
