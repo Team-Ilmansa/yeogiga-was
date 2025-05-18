@@ -37,6 +37,7 @@ public class CalendarController implements CalendarApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
+    @Override
     @GetMapping("/{tripId}/calendars/me")
     public ResponseEntity<?> getUserAvailability(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -49,6 +50,7 @@ public class CalendarController implements CalendarApi {
         );
     }
 
+    @Override
     @GetMapping("/{tripId}/calendars")
     public ResponseEntity<?> getTripAvailabilities(
             @PathVariable Long tripId
