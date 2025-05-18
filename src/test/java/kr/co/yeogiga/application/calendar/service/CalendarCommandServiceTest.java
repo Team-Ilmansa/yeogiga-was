@@ -48,7 +48,7 @@ public class CalendarCommandServiceTest {
 
         @Test
         @DisplayName("성공")
-        void Success() {
+        void success() {
             // given
             CalendarReq request = new CalendarReq(List.of(LocalDate.of(2025, 7, 1)));
             Trip trip = mock(Trip.class);
@@ -65,7 +65,7 @@ public class CalendarCommandServiceTest {
 
         @Test
         @DisplayName("실패 - 이미 등록된 Calendar 존재")
-        void AlreadyExists() {
+        void alreadyExists() {
             // given
             CalendarReq request = new CalendarReq(List.of(LocalDate.of(2025, 7, 1)));
 
@@ -81,7 +81,7 @@ public class CalendarCommandServiceTest {
 
         @Test
         @DisplayName("실패 - Trip이 존재하지 않음")
-        void TripNotFound() {
+        void tripNotFound() {
             // given
             CalendarReq request = new CalendarReq(List.of(LocalDate.of(2025, 7, 1)));
 
@@ -103,7 +103,7 @@ public class CalendarCommandServiceTest {
 
         @Test
         @DisplayName("성공")
-        void Success() {
+        void success() {
             // given
             CalendarReq request = new CalendarReq(List.of(LocalDate.of(2025, 7, 2)));
             Calendar calendar = mock(Calendar.class);
@@ -119,7 +119,7 @@ public class CalendarCommandServiceTest {
 
         @Test
         @DisplayName("실패 - 수정 대상 Calendar 없음")
-        void NotFoundCalendar() {
+        void notFoundCalendar() {
             // given
             CalendarReq request = new CalendarReq(List.of(LocalDate.of(2025, 7, 2)));
 
