@@ -105,8 +105,8 @@ public class CalendarControllerTest {
             // then
             resultActions
                     .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.created().message()));
         }
 
         @Test
