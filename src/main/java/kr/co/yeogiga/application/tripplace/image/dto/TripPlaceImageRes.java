@@ -54,7 +54,8 @@ public class TripPlaceImageRes {
             String url,
             Double latitude,
             Double longitude,
-            LocalDateTime date
+            LocalDateTime date,
+            boolean favorite
     ) {
         public static ImageDto from(Image image) {
             return new ImageDto(
@@ -62,7 +63,8 @@ public class TripPlaceImageRes {
                     image.getUrl(),
                     image.getLatitude(),
                     image.getLongitude(),
-                    image.getDate()
+                    image.getDate(),
+                    image.isFavorite()
             );
         }
     }
