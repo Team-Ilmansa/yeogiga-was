@@ -1,5 +1,6 @@
 package kr.co.yeogiga.application.tripplace.image.service;
 
+import kr.co.yeogiga.application.tripplace.image.dto.FavoriteImageRes;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageRes;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
@@ -43,5 +44,18 @@ public class TripPlaceImageQueryService {
         List<Image> images = tripDayPlaceService.readUnmatchedImagesById(tripDayPlaceId);
 
         return TripPlaceImageRes.UnmatchedImageInfo.from(images);
+    }
+
+    /**
+     * TripDayPlace에서 즐겨찾기(favorite)로 표시된 이미지 목록 조회 메서드
+     * - 목적지에 매핑된 이미지 & 기타 이미지(unmatchedImages) 중 favorite == true 인 이미지만 포함
+     *
+     * @param tripDayPlaceId TripDayPlace(여행 일차) ID
+     * @return 즐겨찾기된 이미지 목록 (FavoriteImageRes DTO 리스트)
+     */
+    public List<FavoriteImageRes> getFavoriteImages(String tripDayPlaceId) {
+        return tripDayPlaceService.readFavoriteImages(tripDayPlaceId).stream()
+                .map(FavoriteImageRes::from)
+                .toList();
     }
 }

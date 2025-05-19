@@ -1,6 +1,7 @@
 package kr.co.yeogiga.application.tripplace.image.service;
 
 import kr.co.yeogiga.application.image.service.ImageDeleteProcessor;
+import kr.co.yeogiga.application.tripplace.image.dto.FavoriteImageReq;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +18,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class TripPlaceImageDeleteServiceTest {
+public class TripPlaceImageCommandServiceTest {
 
     @Mock
     private TripDayPlaceService tripDayPlaceService;
@@ -26,11 +27,25 @@ public class TripPlaceImageDeleteServiceTest {
     private ImageDeleteProcessor imageDeleteProcessor;
 
     @InjectMocks
-    private TripPlaceImageDeleteService tripPlaceImageDeleteService;
+    private TripPlaceImageCommandService tripPlaceImageCommandService;
 
     private final String tripDayPlaceId = "day-1";
     private final String placeId = "place-1";
     private final String imageId = "image-123";
+
+    @Test
+    @DisplayName("이미지 즐겨찾기 테스트")
+    void updateImageFavoriteStatusTest() {
+        // given
+        FavoriteImageReq favoriteImageReq = new FavoriteImageReq(placeId, true);
+
+        // when
+        tripPlaceImageCommandService.updateImageFavoriteStatus(tripDayPlaceId, imageId, favoriteImageReq);
+
+        // then
+        verify(tripDayPlaceService, times(1))
+                .updateImageFavorite(tripDayPlaceId, placeId, imageId, true);
+    }
 
     @Nested
     @DisplayName("단일 이미지 삭제 테스트")
@@ -46,7 +61,7 @@ public class TripPlaceImageDeleteServiceTest {
                     );
 
             // when
-            tripPlaceImageDeleteService.deleteSingleImage(tripDayPlaceId, imageId, req);
+            tripPlaceImageCommandService.deleteSingleImage(tripDayPlaceId, imageId, req);
 
             // then
             verify(tripDayPlaceService, times(1)).deleteImage(tripDayPlaceId, placeId, imageId);
@@ -63,7 +78,7 @@ public class TripPlaceImageDeleteServiceTest {
                     );
 
             // when
-            tripPlaceImageDeleteService.deleteSingleImage(tripDayPlaceId, imageId, req);
+            tripPlaceImageCommandService.deleteSingleImage(tripDayPlaceId, imageId, req);
 
             // then
             verify(tripDayPlaceService, times(1)).deleteImageFromUnMatched(tripDayPlaceId, imageId);
@@ -82,7 +97,7 @@ public class TripPlaceImageDeleteServiceTest {
                 new TripPlaceImageDeleteDto.MultiDeleteReq(imageIds, urls);
 
         // when
-        tripPlaceImageDeleteService.deleteMultipleImages(tripId, req);
+        tripPlaceImageCommandService.deleteMultipleImages(tripId, req);
 
         // then
         verify(tripDayPlaceService, times(1)).deleteImagesByTripId(tripId, imageIds);

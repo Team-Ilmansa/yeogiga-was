@@ -1,5 +1,6 @@
 package kr.co.yeogiga.application.tripplace.image.service;
 
+import kr.co.yeogiga.application.tripplace.image.dto.FavoriteImageRes;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageRes;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
@@ -21,6 +22,7 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -101,5 +103,19 @@ public class TripPlaceImageQueryServiceTest {
         // then
         assertEquals(image.getUrl(), result.images().get(0).url());
         assertThat(result.images()).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("특정 여행에서 즐겨찾기한 이미지 조회 테스트")
+    void getFavoriteImagesTest() {
+        // given
+        given(tripDayPlaceService.readFavoriteImages(tripDayPlaceId))
+                .willReturn(List.of(image));
+
+        // when
+        List<FavoriteImageRes> result = tripPlaceImageQueryService.getFavoriteImages(tripDayPlaceId);
+
+        // then
+        assertEquals(1, result.size());
     }
 }

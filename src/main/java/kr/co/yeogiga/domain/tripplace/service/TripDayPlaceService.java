@@ -63,6 +63,14 @@ public class TripDayPlaceService {
         return tripDayPlaceRepository.findTripDayPlaceSummariesByTripId(tripId);
     }
 
+    public List<Image> readFavoriteImages(String id) {
+        return tripDayPlaceRepository.findFavoriteImages(id);
+    }
+
+    public void updateImageFavorite(String id, String placeId, String imageId, boolean favorite) {
+        tripDayPlaceRepository.updateImageFavorite(id, placeId, imageId, favorite);
+    }
+      
     public void updatePlaceVisited(String id, String placeId, boolean isVisited) {
         tripDayPlaceRepository.updatePlaceVisited(id, placeId, isVisited);
     }

@@ -1,8 +1,9 @@
 package kr.co.yeogiga.presentation.tripplace.image.controller;
 
+import kr.co.yeogiga.application.tripplace.image.dto.FavoriteImageReq;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
-import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageDeleteService;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageCommandService;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageMovementService;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageQueryService;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageReassignmentService;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class TripPlaceImageController implements TripPlaceImageApi {
     private final TripPlaceImageMovementService tripPlaceImageMovementService;
-    private final TripPlaceImageDeleteService tripPlaceImageDeleteService;
+    private final TripPlaceImageCommandService tripPlaceImageCommandService;
     private final TripPlaceImageQueryService tripPlaceImageQueryService;
     private final TripPlaceImageReassignmentService tripPlaceImageReassignmentService;
 
@@ -50,6 +51,19 @@ public class TripPlaceImageController implements TripPlaceImageApi {
         return ResponseEntity.ok(
                 SuccessResponse.from(
                         tripPlaceImageQueryService.getUnmatchedImageInfo(tripDayPlaceId)
+                )
+        );
+    }
+
+    @Override
+    @GetMapping("/{tripId}/day-place/{tripDayPlaceId}/images/favorite")
+    public ResponseEntity<?> getFavoriteImages(
+            @PathVariable Long tripId,
+            @PathVariable String tripDayPlaceId
+    ) {
+        return ResponseEntity.ok(
+                SuccessResponse.from(
+                        tripPlaceImageQueryService.getFavoriteImages(tripDayPlaceId)
                 )
         );
     }
@@ -108,6 +122,18 @@ public class TripPlaceImageController implements TripPlaceImageApi {
     }
 
     @Override
+    @PatchMapping("/{tripId}/day-place/{tripDayPlaceId}/images/{imageId}/favorite")
+    public ResponseEntity<?> updateImageFavoriteStatus(
+            @PathVariable Long tripId,
+            @PathVariable String tripDayPlaceId,
+            @PathVariable String imageId,
+            @RequestBody FavoriteImageReq favoriteImageReq
+    ) {
+        tripPlaceImageCommandService.updateImageFavoriteStatus(tripDayPlaceId, imageId, favoriteImageReq);
+        return ResponseEntity.ok(SuccessResponse.ok());
+    }
+
+    @Override
     @DeleteMapping("/{tripId}/day-place/{tripDayPlaceId}/images/{imageId}")
     public ResponseEntity<?> deleteSingleImage(
             @PathVariable Long tripId,
@@ -115,7 +141,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
             @PathVariable String imageId,
             @RequestBody TripPlaceImageDeleteDto.SingleDeleteReq deleteReq
     ) {
-        tripPlaceImageDeleteService.deleteSingleImage(tripDayPlaceId, imageId, deleteReq);
+        tripPlaceImageCommandService.deleteSingleImage(tripDayPlaceId, imageId, deleteReq);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
@@ -125,7 +151,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
             @PathVariable Long tripId,
             @RequestBody TripPlaceImageDeleteDto.MultiDeleteReq deleteReq
     ) {
-        tripPlaceImageDeleteService.deleteMultipleImages(tripId, deleteReq);
+        tripPlaceImageCommandService.deleteMultipleImages(tripId, deleteReq);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 }

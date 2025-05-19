@@ -1,6 +1,7 @@
 package kr.co.yeogiga.application.tripplace.image.service;
 
 import kr.co.yeogiga.application.image.service.ImageDeleteProcessor;
+import kr.co.yeogiga.application.tripplace.image.dto.FavoriteImageReq;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import lombok.RequiredArgsConstructor;
@@ -9,13 +10,24 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * TripDayPlace 내 이미지 삭제 기능을 담당하는 서비스 클래스
+ * TripDayPlace 내 이미지 쓰기 연산을 담당하는 서비스 클래스
  */
 @Service
 @RequiredArgsConstructor
-public class TripPlaceImageDeleteService {
+public class TripPlaceImageCommandService {
     private final TripDayPlaceService tripDayPlaceService;
     private final ImageDeleteProcessor imageDeleteProcessor;
+
+    /**
+     * 특정 TripDayPlace 문서 내의 Place에 포함된 Image의 즐겨찾기(favorite) 상태 업데이트 메서드
+     *
+     * @param tripDayPlaceId 여행 ID
+     * @param imageId        이미지 ID
+     * @param favoriteReq    목적지 ID 및 즐겨찾기 상태
+     */
+    public void updateImageFavoriteStatus(String tripDayPlaceId, String imageId, FavoriteImageReq favoriteReq) {
+        tripDayPlaceService.updateImageFavorite(tripDayPlaceId, favoriteReq.placeId(), imageId, favoriteReq.favorite());
+    }
 
     /**
      * 단일 이미지를 삭제 메서드
