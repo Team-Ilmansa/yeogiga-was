@@ -187,6 +187,50 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
     }
 
     @Override
+    public List<Image> findFavoriteImages(String id) {
+        // 목적지에 매핑된 이미지 중 favorite == true
+        Aggregation placesImages = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("_id").is(id)),
+                Aggregation.unwind("places"),
+                Aggregation.unwind("places.images"),
+                Aggregation.match(Criteria.where("places.images.favorite").is(true)),
+                Aggregation.project()
+                        .and("places.images._id").as("_id")
+                        .and("places.images.url").as("url")
+                        .and("places.images.latitude").as("latitude")
+                        .and("places.images.longitude").as("longitude")
+                        .and("places.images.date").as("date")
+                        .and("places.images.favorite").as("favorite")
+        );
+
+        List<Image> favoriteFromPlaces = mongoTemplate
+                .aggregate(placesImages, "trip_day_place", Image.class)
+                .getMappedResults();
+
+        // 2. unmatchedImages 중 favorite == true
+        Aggregation unmatchedImages = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("_id").is(id)),
+                Aggregation.unwind("unmatchedImages"),
+                Aggregation.match(Criteria.where("unmatchedImages.favorite").is(true)),
+                Aggregation.project()
+                        .and("unmatchedImages._id").as("_id")
+                        .and("unmatchedImages.url").as("url")
+                        .and("unmatchedImages.latitude").as("latitude")
+                        .and("unmatchedImages.longitude").as("longitude")
+                        .and("unmatchedImages.date").as("date")
+                        .and("unmatchedImages.favorite").as("favorite")
+        );
+
+        List<Image> favoriteFromUnmatched = mongoTemplate
+                .aggregate(unmatchedImages, "trip_day_place", Image.class)
+                .getMappedResults();
+
+        return List.of(favoriteFromPlaces, favoriteFromUnmatched).stream()
+                .flatMap(List::stream)
+                .toList();
+    }
+
+    @Override
     public void updateImageFavorite(String id, String placeId, String imageId, boolean favorite) {
         Query query = Query.query(Criteria.where("_id").is(id));
         Update update;
