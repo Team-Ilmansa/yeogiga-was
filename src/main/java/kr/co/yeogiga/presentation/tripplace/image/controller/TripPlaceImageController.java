@@ -55,6 +55,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
         );
     }
 
+    @Override
     @GetMapping("/{tripId}/day-place/{tripDayPlaceId}/images/favorite")
     public ResponseEntity<?> getFavoriteImages(
             @PathVariable Long tripId,

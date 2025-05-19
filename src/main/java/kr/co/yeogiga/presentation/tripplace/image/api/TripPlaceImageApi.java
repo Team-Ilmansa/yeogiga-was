@@ -113,6 +113,46 @@ public interface TripPlaceImageApi {
             @PathVariable String tripDayPlaceId
     );
 
+    @TrackApi(description = "즐겨찾기한 이미지 조회")
+    @Operation(summary = "즐겨찾기한 이미지 조회", description = "즐겨찾기한 이미지 조회하는 API입니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "즐겨찾기 이미지 조회 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다.",
+                                            "data": {
+                                                "images": [
+                                                     {
+                                                         "id": "image1-id",
+                                                         "url": "https://image1.com",
+                                                         "latitude": 1.1,
+                                                         "longitude": 2.2,
+                                                         "date": "2025-04-13T21:53:57.445",
+                                                         "favorite": true
+                                                     },
+                                                     {
+                                                         "id": "image2-id",
+                                                         "url": "https://image2.com",
+                                                         "latitude": 3.3,
+                                                         "longitude": 4.4,
+                                                         "date": "2025-04-13T21:53:57.445",
+                                                         "favorite": false
+                                                     }
+                                                ]
+                                            }
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> getFavoriteImages(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
+
+            @Parameter(description = "여행 일차 ID")
+            @PathVariable String tripDayPlaceId
+    );
 
     @TrackApi(description = "매칭된 이미지 이동 (같은 날짜에 대한 목적지 to 목적지)")
     @Operation(summary = "매칭된 이미지 이동 (같은 날짜에 대한 목적지 to 목적지)", description = "매칭된 이미지를 같은 날짜 목적지 to 목적지 이동하는 API입니다.")
