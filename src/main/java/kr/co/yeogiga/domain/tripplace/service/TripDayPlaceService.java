@@ -63,6 +63,10 @@ public class TripDayPlaceService {
         return tripDayPlaceRepository.findTripDayPlaceSummariesByTripId(tripId);
     }
 
+    public void updatePlaceVisited(String id, String placeId, boolean isVisited) {
+        tripDayPlaceRepository.updatePlaceVisited(id, placeId, isVisited);
+    }
+
     public void deletePlace(String id, String placeId) {
         tripDayPlaceRepository.deletePlace(id, placeId);
     }

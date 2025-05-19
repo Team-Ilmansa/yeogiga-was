@@ -187,6 +187,16 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
     }
 
     @Override
+    public void updatePlaceVisited(String id, String placeId, boolean isVisited) {
+        Query query = Query.query(
+                Criteria.where("_id").is(id)
+                        .and("places.id").is(placeId)
+        );
+        Update update = new Update().set("places.$.isVisited", isVisited);
+        mongoTemplate.updateFirst(query, update, TripDayPlace.class);
+    }
+
+    @Override
     public void deletePlace(String id, String placeId) {
         Query query = new Query(Criteria.where("_id").is(id));
         Update update = new Update().pull("places", Query.query(Criteria.where("id").is(placeId)));
