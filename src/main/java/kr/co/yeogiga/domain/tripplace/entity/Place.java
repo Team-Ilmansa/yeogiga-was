@@ -17,6 +17,7 @@ public class Place {
     private String placeType;
     private Double order;
     private List<Image> images;
+    private boolean isVisited;
 
     @Builder
     public Place(String id, String name, Double latitude,
@@ -28,6 +29,7 @@ public class Place {
         this.placeType = placeType;
         this.order = order;
         this.images = new ArrayList<>();
+        this.isVisited = false;
     }
 
     public void updateOrder(double order) {

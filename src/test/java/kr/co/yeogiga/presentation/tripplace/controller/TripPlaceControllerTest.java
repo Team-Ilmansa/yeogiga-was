@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.tripplace.dto.TripDaySummaryRes;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
+import kr.co.yeogiga.application.tripplace.dto.VisitedMarkReq;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceCommandService;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceQueryService;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceSavingService;
@@ -33,6 +34,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -146,7 +148,7 @@ public class TripPlaceControllerTest {
     void getPlaceDetailsInfoSuccess() throws Exception {
         // given
         TripPlaceRes.PlaceDetails details =
-                new TripPlaceRes.PlaceDetails("place1", "목적지1", 0.0, 0.0, "카페");
+                new TripPlaceRes.PlaceDetails("place1", "목적지1", 0.0, 0.0, "카페", true);
         given(tripPlaceQueryService.getPlaceDetailsInfo(tripDayPlaceId)).willReturn(List.of(details));
 
         // when
@@ -235,6 +237,26 @@ public class TripPlaceControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value(TripErrorType.TRIP_PLACE_NOT_FOUND.getCode()))
                 .andExpect(jsonPath("$.message").value(TripErrorType.TRIP_PLACE_NOT_FOUND.getMessage()));
+    }
+
+    @Test
+    @DisplayName("목적지 방문 여부 수정 성공")
+    void markPlaceAsVisitedSuccess() throws Exception {
+        // given
+        VisitedMarkReq request = new VisitedMarkReq(true);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/places/{placeId}/mark", tripId, tripDayPlaceId, placeId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+        );
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
     }
 
     @Test

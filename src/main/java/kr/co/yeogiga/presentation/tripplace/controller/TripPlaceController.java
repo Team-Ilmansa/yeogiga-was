@@ -1,6 +1,7 @@
 package kr.co.yeogiga.presentation.tripplace.controller;
 
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.VisitedMarkReq;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceCommandService;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceQueryService;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceSavingService;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -77,6 +79,16 @@ public class TripPlaceController implements TripPlaceApi {
                                            @PathVariable String tripDayPlaceId,
                                            @RequestBody TripPlaceReq.ReorderRequest reorderRequest) {
         tripPlaceCommandService.reorderPlaces(tripDayPlaceId, reorderRequest);
+        return ResponseEntity.ok(SuccessResponse.ok());
+    }
+
+    @Override
+    @PatchMapping("/{tripId}/day-place/{tripDayPlaceId}/places/{placeId}/mark")
+    public ResponseEntity<?> markPlaceAsVisited(@PathVariable Long tripId,
+                                                @PathVariable String tripDayPlaceId,
+                                                @PathVariable String placeId,
+                                                @RequestBody VisitedMarkReq visitedMarkReq) {
+        tripPlaceCommandService.markPlaceAsVisited(tripDayPlaceId, placeId, visitedMarkReq.isVisited());
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
