@@ -127,21 +127,21 @@ public class TripPlaceCommandService {
     /**
      * 특정 목적지의 방문 여부를 업데이트하는 메서드
      *
-     * @param tripPlaceId 여행 일차 ID
-     * @param placeId     목적지 ID
-     * @param isVisited   변경할 상태
+     * @param tripDayPlaceId 여행 일차 ID
+     * @param placeId        목적지 ID
+     * @param isVisited      변경할 상태
      */
-    public void markPlaceAsVisited(String tripPlaceId, String placeId, boolean isVisited) {
-        tripDayPlaceService.updatePlaceVisited(tripPlaceId, placeId, isVisited);
+    public void markPlaceAsVisited(String tripDayPlaceId, String placeId, boolean isVisited) {
+        tripDayPlaceService.updatePlaceVisited(tripDayPlaceId, placeId, isVisited);
     }
 
     /**
      * 여행 일차(TripDayPlace)에서 특정 목적지를 삭제하는 메서드
      *
-     * @param tripPlaceId 여행 일차 ID
-     * @param placeId     삭제할 목적지 ID
+     * @param tripDayPlaceId 여행 일차 ID
+     * @param placeId        삭제할 목적지 ID
      */
-    public void deletePlace(String tripPlaceId, String placeId) {
-        tripDayPlaceService.deletePlace(tripPlaceId, placeId);
+    public void deletePlace(String tripDayPlaceId, String placeId) {
+        tripDayPlaceService.deletePlace(tripDayPlaceId, placeId);
     }
 }
