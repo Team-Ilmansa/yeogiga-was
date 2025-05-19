@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * TripDayPlace 내 이미지 삭제 기능을 담당하는 서비스 클래스
+ * TripDayPlace 내 이미지 쓰기 연산을 담당하는 서비스 클래스
  */
 @Service
 @RequiredArgsConstructor
-public class TripPlaceImageDeleteService {
+public class TripPlaceImageCommandService {
     private final TripDayPlaceService tripDayPlaceService;
     private final ImageDeleteProcessor imageDeleteProcessor;
 

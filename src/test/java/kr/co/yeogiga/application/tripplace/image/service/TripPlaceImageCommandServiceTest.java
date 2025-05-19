@@ -17,7 +17,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class TripPlaceImageDeleteServiceTest {
+public class TripPlaceImageCommandServiceTest {
 
     @Mock
     private TripDayPlaceService tripDayPlaceService;
@@ -26,7 +26,7 @@ public class TripPlaceImageDeleteServiceTest {
     private ImageDeleteProcessor imageDeleteProcessor;
 
     @InjectMocks
-    private TripPlaceImageDeleteService tripPlaceImageDeleteService;
+    private TripPlaceImageCommandService tripPlaceImageCommandService;
 
     private final String tripDayPlaceId = "day-1";
     private final String placeId = "place-1";
@@ -46,7 +46,7 @@ public class TripPlaceImageDeleteServiceTest {
                     );
 
             // when
-            tripPlaceImageDeleteService.deleteSingleImage(tripDayPlaceId, imageId, req);
+            tripPlaceImageCommandService.deleteSingleImage(tripDayPlaceId, imageId, req);
 
             // then
             verify(tripDayPlaceService, times(1)).deleteImage(tripDayPlaceId, placeId, imageId);
@@ -63,7 +63,7 @@ public class TripPlaceImageDeleteServiceTest {
                     );
 
             // when
-            tripPlaceImageDeleteService.deleteSingleImage(tripDayPlaceId, imageId, req);
+            tripPlaceImageCommandService.deleteSingleImage(tripDayPlaceId, imageId, req);
 
             // then
             verify(tripDayPlaceService, times(1)).deleteImageFromUnMatched(tripDayPlaceId, imageId);
@@ -82,7 +82,7 @@ public class TripPlaceImageDeleteServiceTest {
                 new TripPlaceImageDeleteDto.MultiDeleteReq(imageIds, urls);
 
         // when
-        tripPlaceImageDeleteService.deleteMultipleImages(tripId, req);
+        tripPlaceImageCommandService.deleteMultipleImages(tripId, req);
 
         // then
         verify(tripDayPlaceService, times(1)).deleteImagesByTripId(tripId, imageIds);

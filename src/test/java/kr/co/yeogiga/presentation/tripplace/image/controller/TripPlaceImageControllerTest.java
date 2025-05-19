@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageRes;
-import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageDeleteService;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageCommandService;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageMovementService;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageQueryService;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageReassignmentService;
@@ -59,7 +59,7 @@ public class TripPlaceImageControllerTest {
     private TripPlaceImageMovementService tripPlaceImageMovementService;
 
     @MockBean
-    private TripPlaceImageDeleteService tripPlaceImageDeleteService;
+    private TripPlaceImageCommandService tripPlaceImageCommandService;
 
     @MockBean
     private TripPlaceImageQueryService tripPlaceImageQueryService;

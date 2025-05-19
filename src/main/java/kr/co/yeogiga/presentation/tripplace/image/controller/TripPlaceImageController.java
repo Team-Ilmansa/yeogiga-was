@@ -2,7 +2,7 @@ package kr.co.yeogiga.presentation.tripplace.image.controller;
 
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
-import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageDeleteService;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageCommandService;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageMovementService;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageQueryService;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageReassignmentService;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class TripPlaceImageController implements TripPlaceImageApi {
     private final TripPlaceImageMovementService tripPlaceImageMovementService;
-    private final TripPlaceImageDeleteService tripPlaceImageDeleteService;
+    private final TripPlaceImageCommandService tripPlaceImageCommandService;
     private final TripPlaceImageQueryService tripPlaceImageQueryService;
     private final TripPlaceImageReassignmentService tripPlaceImageReassignmentService;
 
@@ -115,7 +115,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
             @PathVariable String imageId,
             @RequestBody TripPlaceImageDeleteDto.SingleDeleteReq deleteReq
     ) {
-        tripPlaceImageDeleteService.deleteSingleImage(tripDayPlaceId, imageId, deleteReq);
+        tripPlaceImageCommandService.deleteSingleImage(tripDayPlaceId, imageId, deleteReq);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
@@ -125,7 +125,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
             @PathVariable Long tripId,
             @RequestBody TripPlaceImageDeleteDto.MultiDeleteReq deleteReq
     ) {
-        tripPlaceImageDeleteService.deleteMultipleImages(tripId, deleteReq);
+        tripPlaceImageCommandService.deleteMultipleImages(tripId, deleteReq);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 }
