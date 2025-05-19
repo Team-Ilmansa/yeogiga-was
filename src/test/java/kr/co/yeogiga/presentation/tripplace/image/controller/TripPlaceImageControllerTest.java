@@ -2,6 +2,7 @@ package kr.co.yeogiga.presentation.tripplace.image.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.tripplace.image.dto.FavoriteImageReq;
+import kr.co.yeogiga.application.tripplace.image.dto.FavoriteImageRes;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageRes;
@@ -32,6 +33,8 @@ import org.springframework.web.context.WebApplicationContext;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -147,6 +150,38 @@ public class TripPlaceImageControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."))
                     .andExpect(jsonPath("$.data.images").isArray());
+        }
+
+        @Test
+        @DisplayName("즐겨찾기한 이미지 조회")
+        void getFavoriteImagesSuccess() throws Exception {
+            // given
+            FavoriteImageRes image1 = new FavoriteImageRes(
+                    "image1-id", "https://image1.com", 0.0, 1.1,
+                    LocalDateTime.now(), true
+            );
+
+            FavoriteImageRes image2 = new FavoriteImageRes(
+                    "image2-id", "https://image2.com", 2.2, 3.3,
+                    LocalDateTime.now(), true
+            );
+
+            given(tripPlaceImageQueryService.getFavoriteImages(tripDayPlaceId))
+                    .willReturn(List.of(image1, image2));
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/favorite", tripId, tripDayPlaceId)
+            );
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."))
+                    .andExpect(jsonPath("$.data", hasSize(2)))
+                    .andExpect(jsonPath("$.data[0].id").value("image1-id"))
+                    .andExpect(jsonPath("$.data[1].id").value("image2-id"));
         }
     }
 
