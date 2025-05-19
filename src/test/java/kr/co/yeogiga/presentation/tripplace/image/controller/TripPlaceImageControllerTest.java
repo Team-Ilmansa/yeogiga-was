@@ -373,6 +373,7 @@ public class TripPlaceImageControllerTest {
                         .content(objectMapper.writeValueAsString(request))
         );
 
+        // then
         resultActions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
