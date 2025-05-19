@@ -1,7 +1,7 @@
 package kr.co.yeogiga.presentation.tripplace.image.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.yeogiga.application.tripplace.image.dto.ImageFavoriteReq;
+import kr.co.yeogiga.application.tripplace.image.dto.FavoriteImageReq;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageRes;
@@ -329,7 +329,7 @@ public class TripPlaceImageControllerTest {
     void updateImageFavoriteStatusTest() throws Exception {
         // given
         String placeId = "place-id";
-        ImageFavoriteReq request = new ImageFavoriteReq(placeId, true);
+        FavoriteImageReq request = new FavoriteImageReq(placeId, true);
 
         // when
         ResultActions resultActions = mockMvc.perform(

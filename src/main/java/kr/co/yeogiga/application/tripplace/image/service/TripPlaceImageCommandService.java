@@ -1,7 +1,7 @@
 package kr.co.yeogiga.application.tripplace.image.service;
 
 import kr.co.yeogiga.application.image.service.ImageDeleteProcessor;
-import kr.co.yeogiga.application.tripplace.image.dto.ImageFavoriteReq;
+import kr.co.yeogiga.application.tripplace.image.dto.FavoriteImageReq;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class TripPlaceImageCommandService {
      * @param imageId        이미지 ID
      * @param favoriteReq    목적지 ID 및 즐겨찾기 상태
      */
-    public void updateImageFavoriteStatus(String tripDayPlaceId, String imageId, ImageFavoriteReq favoriteReq) {
+    public void updateImageFavoriteStatus(String tripDayPlaceId, String imageId, FavoriteImageReq favoriteReq) {
         tripDayPlaceService.updateImageFavorite(tripDayPlaceId, favoriteReq.placeId(), imageId, favoriteReq.favorite());
     }
 

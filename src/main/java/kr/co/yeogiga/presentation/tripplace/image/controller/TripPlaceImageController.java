@@ -1,6 +1,6 @@
 package kr.co.yeogiga.presentation.tripplace.image.controller;
 
-import kr.co.yeogiga.application.tripplace.image.dto.ImageFavoriteReq;
+import kr.co.yeogiga.application.tripplace.image.dto.FavoriteImageReq;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
 import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageCommandService;
@@ -114,9 +114,9 @@ public class TripPlaceImageController implements TripPlaceImageApi {
             @PathVariable Long tripId,
             @PathVariable String tripDayPlaceId,
             @PathVariable String imageId,
-            @RequestBody ImageFavoriteReq imageFavoriteReq
+            @RequestBody FavoriteImageReq favoriteImageReq
     ) {
-        tripPlaceImageCommandService.updateImageFavoriteStatus(tripDayPlaceId, imageId, imageFavoriteReq);
+        tripPlaceImageCommandService.updateImageFavoriteStatus(tripDayPlaceId, imageId, favoriteImageReq);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 

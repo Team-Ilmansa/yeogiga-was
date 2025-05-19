@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.yeogiga.application.tripplace.image.dto.ImageFavoriteReq;
+import kr.co.yeogiga.application.tripplace.image.dto.FavoriteImageReq;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
 import org.springframework.http.ResponseEntity;
@@ -345,7 +345,7 @@ public interface TripPlaceImageApi {
             @Parameter(description = "이미지 ID")
             @PathVariable String imageId,
 
-            @RequestBody ImageFavoriteReq imageFavoriteReq
+            @RequestBody FavoriteImageReq favoriteImageReq
     );
 
     @TrackApi(description = "매칭된 이미지에 대해 단일 삭제")
