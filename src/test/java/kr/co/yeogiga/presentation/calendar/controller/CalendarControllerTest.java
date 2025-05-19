@@ -2,10 +2,11 @@ package kr.co.yeogiga.presentation.calendar.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.calendar.dto.CalendarReq;
+import kr.co.yeogiga.application.calendar.dto.CalendarRes;
 import kr.co.yeogiga.application.calendar.service.CalendarCommandService;
+import kr.co.yeogiga.application.calendar.service.CalendarQueryService;
 import kr.co.yeogiga.common.response.error.type.CommonErrorType;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
-import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.domain.user.entity.User;
@@ -30,9 +31,13 @@ import org.springframework.web.context.WebApplicationContext;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -56,15 +61,20 @@ public class CalendarControllerTest {
     @MockBean
     private CalendarCommandService calendarCommandService;
 
-    private CustomUserDetails userDetails;
+    @MockBean
+    private CalendarQueryService calendarQueryService;
+
+    private CustomUserDetailsImpl userDetails;
 
     private final Long tripId = 1L;
+    private final Long userId = 1L;
 
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext) {
         this.mockMvc = MockMvcBuilders
                 .webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
+                .defaultRequest(get("/**").with(csrf()))
                 .defaultRequest(post("/**").with(csrf()))
                 .defaultRequest(put("/**").with(csrf()))
                 .build();
@@ -80,7 +90,7 @@ public class CalendarControllerTest {
                 .nickname("nickname")
                 .role(Role.USER)
                 .build();
-        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(user, "id", userId);
         userDetails = new CustomUserDetailsImpl(user);
     }
 
@@ -128,6 +138,61 @@ public class CalendarControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code").value(CommonErrorType.VALIDATION_ERROR.getCode()))
                     .andExpect(jsonPath("$.errors").exists());
+        }
+    }
+
+    @Nested
+    @DisplayName("W2M 조회 테스트")
+    class ReadCalendarTest {
+
+        @Test
+        @DisplayName("내 가능 날짜 조회 테스트")
+        void getUserAvailabilityTest() throws Exception {
+            // given
+            CalendarRes.UserAvailability response =
+                    new CalendarRes.UserAvailability(userId, List.of(LocalDate.of(2025, 7, 1)));
+
+            given(calendarQueryService.getUserAvailability(any(), any())).willReturn(response);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/{tripId}/calendars/me", tripId)
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.userId").value(response.userId()))
+                    .andExpect(jsonPath("$.data.availableDates[0]").value("2025-07-01"));
+        }
+
+        @Test
+        @DisplayName("Trip 전체 유저 가능 날짜 조회 테스트")
+        void getTripAvailabilitiesTest() throws Exception {
+            // given
+            List<CalendarRes.UserAvailability> list = List.of(
+                    new CalendarRes.UserAvailability(1L, List.of(LocalDate.of(2025, 7, 1))),
+                    new CalendarRes.UserAvailability(2L, List.of(LocalDate.of(2025, 7, 2)))
+            );
+            CalendarRes.TripAvailabilityList response = new CalendarRes.TripAvailabilityList(list);
+
+            given(calendarQueryService.getTripAvailabilities(tripId)).willReturn(response);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/{tripId}/calendars", tripId)
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.availabilities", hasSize(2)))
+                    .andExpect(jsonPath("$.data.availabilities[0].userId").value(1))
+                    .andExpect(jsonPath("$.data.availabilities[1].availableDates[0]").value("2025-07-02"));
         }
     }
 
