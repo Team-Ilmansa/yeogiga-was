@@ -29,6 +29,7 @@ public class TripController implements TripApi {
     private final TripQueryService tripQueryService;
     private final TripCommandService tripCommandService;
 
+    @Override
     @GetMapping
     public ResponseEntity<?> getAllTrip(@AuthenticationPrincipal CustomUserDetails userDetails) {
         List<TripRes.TripSummary> tripList = tripQueryService.getAllTrip(userDetails.getUserId());

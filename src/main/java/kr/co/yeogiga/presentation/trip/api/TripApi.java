@@ -21,6 +21,51 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Tag(name = "[여행 API]", description = "여행 관련 API")
 public interface TripApi {
 
+    @TrackApi(description = "사용자가 속한 여행 조회")
+    @Operation(summary = "사용자가 속한 여행 조회", description = "사용자가 속한 여행 조회 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "사용자가 속한 여행 조회 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "조회 성공", value = """
+                                             {
+                                                 "code": 200,
+                                                 "message": "요청이 성공하였습니다.",
+                                                 "data": [
+                                                     {
+                                                         "tripId": 2,
+                                                         "title": "여행2",
+                                                         "startedAt": "2025-05-10T12:00:00",
+                                                         "endedAt": "2025-05-20T12:01:00",
+                                                         "status": "IN_PROGRESS"
+                                                     },
+                                                     {
+                                                         "tripId": 1,
+                                                         "title": "여행1",
+                                                         "startedAt": "2025-05-23T12:00:00",
+                                                         "endedAt": "2025-05-26T12:01:00",
+                                                         "status": "PLANNED"
+                                                     },
+                                                     {
+                                                         "tripId": 3,
+                                                         "title": "여행3",
+                                                         "startedAt": null,
+                                                         "endedAt": null,
+                                                         "status": "PLANNED"
+                                                     }
+                                                 ]
+                                             }
+                                    """),
+                            @ExampleObject(name = "조회 성공 - 속한 여행 없는 경우 빈 배열 반환", value = """
+                                             {
+                                                 "code": 200,
+                                                 "message": "요청이 성공하였습니다.",
+                                                 "data": []
+                                             }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> getAllTrip(@AuthenticationPrincipal CustomUserDetails userDetails);
+
     @TrackApi(description = "여행 생성")
     @Operation(summary = "여행 생성", description = "여행 생성 API")
     @ApiResponses({
