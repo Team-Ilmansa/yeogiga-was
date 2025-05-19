@@ -55,6 +55,18 @@ public class TripPlaceImageController implements TripPlaceImageApi {
         );
     }
 
+    @GetMapping("/{tripId}/day-place/{tripDayPlaceId}/images/favorite")
+    public ResponseEntity<?> getFavoriteImages(
+            @PathVariable Long tripId,
+            @PathVariable String tripDayPlaceId
+    ) {
+        return ResponseEntity.ok(
+                SuccessResponse.from(
+                        tripPlaceImageQueryService.getFavoriteImages(tripDayPlaceId)
+                )
+        );
+    }
+
     @Override
     @PatchMapping("/{tripId}/day-place/{tripDayPlaceId}/images/move")
     public ResponseEntity<?> moveImageToAnotherPlace(
