@@ -269,6 +269,10 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
                     .filterArray(Criteria.where("i._id").is(imageId));
         }
 
+        mongoTemplate.updateFirst(query, update, TripDayPlace.class);
+    }
+
+    @Override
     public void updatePlaceVisited(String id, String placeId, boolean isVisited) {
         Query query = Query.query(
                 Criteria.where("_id").is(id)
