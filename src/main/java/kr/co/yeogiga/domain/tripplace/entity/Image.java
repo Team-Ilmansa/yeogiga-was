@@ -13,6 +13,7 @@ public class Image {
     private Double latitude;
     private Double longitude;
     private LocalDateTime date;
+    private boolean favorite;
 
     @Builder
     public Image(String url, Double latitude, Double longitude, LocalDateTime date) {
@@ -21,6 +22,7 @@ public class Image {
         this.latitude = latitude;
         this.longitude = longitude;
         this.date = date;
+        this.favorite = false;
     }
 
     public void updateGps(Double latitude, Double longitude) {
