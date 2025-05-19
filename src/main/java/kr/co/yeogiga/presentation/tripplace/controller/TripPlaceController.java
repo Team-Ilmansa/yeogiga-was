@@ -82,6 +82,7 @@ public class TripPlaceController implements TripPlaceApi {
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
+    @Override
     @PatchMapping("/{tripId}/day-place/{tripDayPlaceId}/places/{placeId}/mark")
     public ResponseEntity<?> markPlaceAsVisited(@PathVariable Long tripId,
                                                 @PathVariable String tripDayPlaceId,
