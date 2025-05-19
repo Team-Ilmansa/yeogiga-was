@@ -1,6 +1,7 @@
 package kr.co.yeogiga.presentation.tripplace.image.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.yeogiga.application.tripplace.image.dto.ImageFavoriteReq;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageRes;
@@ -316,6 +317,27 @@ public class TripPlaceImageControllerTest {
         ResultActions resultActions = mockMvc.perform(
                 patch("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/re-assign", tripId, tripDayPlaceId)
         );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
+    }
+
+    @Test
+    @DisplayName("이미지 즐겨찾기 테스트")
+    void updateImageFavoriteStatusTest() throws Exception {
+        // given
+        String placeId = "place-id";
+        ImageFavoriteReq request = new ImageFavoriteReq(placeId, true);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/images/{imageId}/favorite", tripId, tripDayPlaceId, imageId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+        );
+
         resultActions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
