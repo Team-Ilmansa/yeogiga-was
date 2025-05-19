@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.VisitedMarkReq;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -80,12 +81,14 @@ public interface TripPlaceApi {
                                                             {
                                                                 "id": "place1-id",
                                                                 "name": "목적지1",
-                                                                "placeType": "식당"
+                                                                "placeType": "식당",
+                                                                "isVisited": true
                                                             },
                                                             {
                                                                 "id": "place2-id",
                                                                 "name": "목적지2",
-                                                                "placeType": "식당"
+                                                                "placeType": "식당",
+                                                                "isVisited": false
                                                             }
                                                         ]
                                                     },
@@ -96,12 +99,14 @@ public interface TripPlaceApi {
                                                             {
                                                                 "id": "place3-id",
                                                                 "name": "목적지3",
-                                                                "placeType": "식당"
+                                                                "placeType": "식당",
+                                                                "isVisited": false
                                                             },
                                                             {
                                                                 "id": "place4-id",
                                                                 "name": "목적지4",
-                                                                "placeType": "식당"
+                                                                "placeType": "식당",
+                                                                "isVisited": false
                                                             }
                                                         ]
                                                     }
@@ -130,14 +135,16 @@ public interface TripPlaceApi {
                                                         "name": "목적지1",
                                                         "latitude": 11.22,
                                                         "longitude": 33.44,
-                                                        "placeType": "식당"
+                                                        "placeType": "식당",
+                                                        "isVisited": true
                                                     },
                                                     {
                                                         "id": "place2-id",
                                                         "name": "목적지 2",
                                                         "latitude": 55.66,
                                                         "longitude": 77.88,
-                                                        "placeType": "식당"
+                                                        "placeType": "식당",
+                                                        "isVisited": false
                                                     }
                                                 ]
                                         }
@@ -245,6 +252,32 @@ public interface TripPlaceApi {
 
             @Parameter(description = "목적지 순서 변경을 위한 정보")
             @RequestBody TripPlaceReq.ReorderRequest reorderRequest
+    );
+
+    @TrackApi(description = "여행 목적지 방문 여부 체크 (여행 목적지 지정 확정 후)")
+    @Operation(summary = "여행 목적지 방문 여부 체크 (여행 목적지 지정 확정 후)", description = "여행 목적지 방문 여부 체크하는 API입니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "여행 목적지 방문 여부 체크 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다."
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> markPlaceAsVisited(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
+
+            @Parameter(description = "여행 일차 ID")
+            @PathVariable String tripDayPlaceId,
+
+            @Parameter(description = "목적지  ID")
+            @PathVariable String placeId,
+
+            @RequestBody VisitedMarkReq visitedMarkReq
     );
 
     @TrackApi(description = "특정 일차 여행 목적지 삭제 (여행 목적지 지정 확정 후)")

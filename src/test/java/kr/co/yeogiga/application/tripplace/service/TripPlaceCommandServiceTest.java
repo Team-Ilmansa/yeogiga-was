@@ -186,6 +186,20 @@ public class TripPlaceCommandServiceTest {
     }
 
     @Test
+    @DisplayName("목적지 방문 여부 변경 성공")
+    void markPlaceAsVisitedSuccess() {
+        // given
+        String placeId = "place-id";
+        boolean isVisited = true;
+
+        // when
+        tripPlaceCommandService.markPlaceAsVisited(tripDayPlaceId, placeId, isVisited);
+
+        // then
+        verify(tripDayPlaceService, times(1)).updatePlaceVisited(tripDayPlaceId, placeId, isVisited);
+    }
+
+    @Test
     @DisplayName("삭제 성공")
     void deletePlaceSuccess() {
         // given

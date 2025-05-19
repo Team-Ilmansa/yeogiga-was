@@ -66,8 +66,20 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
     public Optional<TripDayPlace> findByIdSorted(String id) {
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("_id").is(id)),
+
                 Aggregation.unwind("places", true),
+
+                Aggregation.project("tripId", "day")
+                        .and("places.id").as("places.id")
+                        .and("places.name").as("places.name")
+                        .and("places.latitude").as("places.latitude")
+                        .and("places.longitude").as("places.longitude")
+                        .and("places.placeType").as("places.placeType")
+                        .and("places.order").as("places.order")
+                        .and("places.isVisited").as("places.isVisited"),
+
                 Aggregation.sort(Sort.by(Sort.Direction.ASC, "places.order")),
+
                 Aggregation.group("_id")
                         .first("tripId").as("tripId")
                         .first("day").as("day")
@@ -80,19 +92,30 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
         return results.getMappedResults().stream().findFirst();
     }
 
-
     @Override
     public List<TripDayPlace> findByTripIdSorted(Long tripId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("tripId").is(tripId)),
+
                 Aggregation.unwind("places", true),
+
+                Aggregation.project("tripId", "day")
+                        .and("places.id").as("places.id")
+                        .and("places.name").as("places.name")
+                        .and("places.placeType").as("places.placeType")
+                        .and("places.order").as("places.order")
+                        .and("places.isVisited").as("places.isVisited"),
+
                 Aggregation.sort(Sort.by(Sort.Direction.ASC, "places.order")),
+
                 Aggregation.group("_id")
                         .first("tripId").as("tripId")
                         .first("day").as("day")
                         .push("places").as("places"),
+
                 Aggregation.sort(Sort.by(Sort.Direction.ASC, "day"))
         );
+
 
         AggregationResults<TripDayPlace> results =
                 mongoTemplate.aggregate(aggregation, "trip_day_place", TripDayPlace.class);
@@ -246,6 +269,12 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
                     .filterArray(Criteria.where("i._id").is(imageId));
         }
 
+    public void updatePlaceVisited(String id, String placeId, boolean isVisited) {
+        Query query = Query.query(
+                Criteria.where("_id").is(id)
+                        .and("places.id").is(placeId)
+        );
+        Update update = new Update().set("places.$.isVisited", isVisited);
         mongoTemplate.updateFirst(query, update, TripDayPlace.class);
     }
 

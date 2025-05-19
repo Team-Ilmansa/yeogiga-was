@@ -69,6 +69,9 @@ public class TripDayPlaceService {
 
     public void updateImageFavorite(String id, String placeId, String imageId, boolean favorite) {
         tripDayPlaceRepository.updateImageFavorite(id, placeId, imageId, favorite);
+      
+    public void updatePlaceVisited(String id, String placeId, boolean isVisited) {
+        tripDayPlaceRepository.updatePlaceVisited(id, placeId, isVisited);
     }
 
     public void deletePlace(String id, String placeId) {
