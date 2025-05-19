@@ -1,6 +1,7 @@
 package kr.co.yeogiga.application.tripplace.image.service;
 
 import kr.co.yeogiga.application.image.service.ImageDeleteProcessor;
+import kr.co.yeogiga.application.tripplace.image.dto.ImageFavoriteReq;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import org.junit.jupiter.api.DisplayName;
@@ -31,6 +32,20 @@ public class TripPlaceImageCommandServiceTest {
     private final String tripDayPlaceId = "day-1";
     private final String placeId = "place-1";
     private final String imageId = "image-123";
+
+    @Test
+    @DisplayName("이미지 즐겨찾기 테스트")
+    void updateImageFavoriteStatusTest() {
+        // given
+        ImageFavoriteReq imageFavoriteReq = new ImageFavoriteReq(placeId, true);
+
+        // when
+        tripPlaceImageCommandService.updateImageFavoriteStatus(tripDayPlaceId, imageId, imageFavoriteReq);
+
+        // then
+        verify(tripDayPlaceService, times(1))
+                .updateImageFavorite(tripDayPlaceId, placeId, imageId, true);
+    }
 
     @Nested
     @DisplayName("단일 이미지 삭제 테스트")
