@@ -25,7 +25,7 @@ public class CustomTripRouteRepositoryImpl implements CustomTripRouteRepository 
                 tripRoutes,
                 BATCH_SIZE,
                 (PreparedStatement ps, TripRoute tripRoute) -> {
-                    ps.setLong(1, tripRoute.getTripId());
+                    ps.setLong(1, tripRoute.getTrip().getId());
                     ps.setInt(2, tripRoute.getDay());
                     ps.setString(3, routeListConverter.convertToDatabaseColumn(tripRoute.getRoutes()));
                 });

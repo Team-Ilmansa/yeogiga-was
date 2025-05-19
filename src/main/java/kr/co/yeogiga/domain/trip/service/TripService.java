@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +21,10 @@ public class TripService {
 
     public Optional<Trip> readById(Long tripId) {
         return tripRepository.findById(tripId);
+    }
+
+    public List<Trip> readAllByIds(Set<Long> ids) {
+        return tripRepository.findAllByIdIn(ids);
     }
 
     public void updateAllTravelStatusToInProgress(LocalDateTime time) {

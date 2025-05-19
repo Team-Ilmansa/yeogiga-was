@@ -3,9 +3,13 @@ package kr.co.yeogiga.domain.triproute.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.triproute.converter.RouteListConverter;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -22,19 +26,20 @@ public class TripRoute {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "trip_id")
-    private Long tripId;
-
     private int day;
 
     @Column(columnDefinition = "TEXT")
     @Convert(converter = RouteListConverter.class)
     private List<Route> routes;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "trip_id")
+    private Trip trip;
+
     @Builder
-    public TripRoute(Long tripId, int day, List<Route> routes) {
-        this.tripId = tripId;
+    public TripRoute(int day, List<Route> routes, Trip trip) {
         this.day = day;
         this.routes = routes;
+        this.trip = trip;
     }
 }
