@@ -5,6 +5,8 @@ import kr.co.yeogiga.domain.trip.repository.TripMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class TripMemberService {
@@ -12,6 +14,10 @@ public class TripMemberService {
 
     public void save(TripMember tripMember) {
         tripMemberRepository.save(tripMember);
+    }
+
+    public List<TripMember> readAllByUserId(Long userId) {
+        return tripMemberRepository.findTripByUserId(userId);
     }
 
     public boolean existsByTripIdAndUserId(Long tripId, Long userId) {
