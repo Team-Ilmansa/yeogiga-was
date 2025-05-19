@@ -187,6 +187,25 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
     }
 
     @Override
+    public void updateImageFavorite(String id, String placeId, String imageId, boolean favorite) {
+        Query query = Query.query(Criteria.where("_id").is(id));
+        Update update;
+
+        if (placeId != null) {
+            update = new Update()
+                    .set("places.$[p].images.$[i].favorite", favorite)
+                    .filterArray(Criteria.where("p.id").is(placeId))
+                    .filterArray(Criteria.where("i._id").is(imageId));
+        } else {
+            update = new Update()
+                    .set("unmatchedImages.$[i].favorite", favorite)
+                    .filterArray(Criteria.where("i._id").is(imageId));
+        }
+
+        mongoTemplate.updateFirst(query, update, TripDayPlace.class);
+    }
+
+    @Override
     public void deletePlace(String id, String placeId) {
         Query query = new Query(Criteria.where("_id").is(id));
         Update update = new Update().pull("places", Query.query(Criteria.where("id").is(placeId)));
