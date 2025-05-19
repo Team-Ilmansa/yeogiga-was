@@ -125,6 +125,17 @@ public class TripPlaceCommandService {
     }
 
     /**
+     * 특정 목적지의 방문 여부를 업데이트하는 메서드
+     *
+     * @param tripPlaceId 여행 일차 ID
+     * @param placeId     목적지 ID
+     * @param isVisited   변경할 상태
+     */
+    public void markPlaceAsVisited(String tripPlaceId, String placeId, boolean isVisited) {
+        tripDayPlaceService.updatePlaceVisited(tripPlaceId, placeId, isVisited);
+    }
+
+    /**
      * 여행 일차(TripDayPlace)에서 특정 목적지를 삭제하는 메서드
      *
      * @param tripPlaceId 여행 일차 ID
