@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.yeogiga.application.tripplace.image.dto.ImageFavoriteReq;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
 import org.springframework.http.ResponseEntity;
@@ -40,14 +41,16 @@ public interface TripPlaceImageApi {
                                                          "url": "https://image1.com",
                                                          "latitude": 1.1,
                                                          "longitude": 2.2,
-                                                         "date": "2025-04-13T21:53:57.445"
+                                                         "date": "2025-04-13T21:53:57.445",
+                                                         "favorite": true
                                                      },
                                                      {
                                                          "id": "image2-id",
                                                          "url": "https://image2.com",
                                                          "latitude": 3.3,
                                                          "longitude": 4.4,
-                                                         "date": "2025-04-13T21:53:57.445"
+                                                         "date": "2025-04-13T21:53:57.445",
+                                                         "favorite": false
                                                      }
                                                 ]
                                             }
@@ -88,11 +91,13 @@ public interface TripPlaceImageApi {
                                                 "images": [
                                                      {
                                                          "id": "image1-id",
-                                                         "url": "https://image1.com"
+                                                         "url": "https://image1.com",
+                                                         "favorite": true
                                                      },
                                                      {
                                                          "id": "image2-id",
-                                                         "url": "https://image2.com"
+                                                         "url": "https://image2.com",
+                                                         "favorite": false
                                                      }
                                                 ]
                                             }
@@ -314,6 +319,33 @@ public interface TripPlaceImageApi {
 
             @Parameter(description = "여행 일차 ID")
             @PathVariable String tripDayPlaceId
+    );
+
+    @TrackApi(description = "이미지 즐겨찾기 선택")
+    @Operation(summary = "이미지 즐겨찾기 선택", description = "이미지 즐겨찾기 선택하는 API입니다." +
+            "<br/> 목적지에 매핑된 이미지의 경우 body에 placeId를 넣어주시고, 기타(unmatched)의 경우에는 placeId를 넣지 말아 주세요.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "이미지 즐겨찾기 선택 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다."
+                                        }
+                                    """)
+                    })),
+    })
+    ResponseEntity<?> updateImageFavoriteStatus(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
+
+            @Parameter(description = "여행 일차 ID")
+            @PathVariable String tripDayPlaceId,
+
+            @Parameter(description = "이미지 ID")
+            @PathVariable String imageId,
+
+            @RequestBody ImageFavoriteReq imageFavoriteReq
     );
 
     @TrackApi(description = "매칭된 이미지에 대해 단일 삭제")
