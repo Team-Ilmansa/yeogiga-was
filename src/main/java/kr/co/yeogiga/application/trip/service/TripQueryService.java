@@ -24,9 +24,7 @@ public class TripQueryService {
      * @return              사용자가 속한 여행 목록
      */
     public List<TripRes.TripSummary> getAllTrip(Long userId) {
-        return tripMemberService.readAllByUserId(userId).stream()
-                .map(TripMember::getTrip)
-                .sorted(Comparator.comparing(Trip::getStartedAt, Comparator.nullsLast(Comparator.naturalOrder())))
+        return tripMemberService.readAllTripByUserId(userId).stream()
                 .map(TripRes.TripSummary::from)
                 .collect(Collectors.toList());
     }
