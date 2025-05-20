@@ -50,16 +50,12 @@ public class TripQueryServiceTest {
                 .role(Role.USER)
                 .build();
 
-        private TripMember tripMember = TripMember.builder()
-                .trip(trip)
-                .user(user)
-                .build();
 
         @Test
         @DisplayName("성공")
         void success() {
             // given
-            when(tripMemberService.readAllByUserId(userId)).thenReturn(List.of(tripMember));
+            when(tripMemberService.readAllTripByUserId(userId)).thenReturn(List.of(trip));
 
             // when
             List<TripRes.TripSummary> result = tripQueryService.getAllTrip(userId);
@@ -72,7 +68,7 @@ public class TripQueryServiceTest {
         @DisplayName("성공 - 빈 배열 반환")
         void successEmptyList() {
             // given
-            when(tripMemberService.readAllByUserId(userId)).thenReturn(List.of());
+            when(tripMemberService.readAllTripByUserId(userId)).thenReturn(List.of());
 
             // when
             List<TripRes.TripSummary> result = tripQueryService.getAllTrip(userId);
