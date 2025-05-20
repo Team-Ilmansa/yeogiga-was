@@ -28,6 +28,7 @@ public class TripController implements TripApi {
     private final TripCommandService tripCommandService;
     private final TripQueryService tripQueryService;
 
+    @Override
     @GetMapping("/main")
     public ResponseEntity<?> getMainTrip(
             @AuthenticationPrincipal CustomUserDetails userDetails
