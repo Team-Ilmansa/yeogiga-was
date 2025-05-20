@@ -17,6 +17,7 @@ public interface CustomTripDayPlaceRepository {
     Optional<Place> findPlaceByIdAndPlaceId(String id, String placeId);
     List<Image> findUnmatchedImagesById(String id);
     List<TripDayPlace> findTripDayPlaceSummariesByTripId(Long tripId);
+    Optional<TripDayPlace> findTripDayPlaceByTripIdAndDay(Long tripId, int day);
     List<Image> findFavoriteImages(String id);
     void updateImageFavorite(String id, String placeId, String imageId, boolean favorite);
     void updatePlaceVisited(String id, String placeId, boolean isVisited);

@@ -210,6 +210,16 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
     }
 
     @Override
+    public Optional<TripDayPlace> findTripDayPlaceByTripIdAndDay(Long tripId, int day) {
+        Query query = Query.query(
+                Criteria.where("tripId").is(tripId)
+                        .and("day").is(day)
+        );
+
+        return Optional.ofNullable(mongoTemplate.findOne(query, TripDayPlace.class));
+    }
+
+    @Override
     public List<Image> findFavoriteImages(String id) {
         // 목적지에 매핑된 이미지 중 favorite == true
         Aggregation placesImages = Aggregation.newAggregation(
