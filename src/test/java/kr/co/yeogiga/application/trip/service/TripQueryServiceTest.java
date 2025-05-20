@@ -1,0 +1,203 @@
+package kr.co.yeogiga.application.trip.service;
+
+import kr.co.yeogiga.application.trip.dto.TripRes;
+import kr.co.yeogiga.domain.trip.entity.Trip;
+import kr.co.yeogiga.domain.trip.service.TripMemberService;
+import kr.co.yeogiga.domain.trip.type.TravelStatus;
+import kr.co.yeogiga.domain.tripplace.entity.Place;
+import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
+import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+public class TripQueryServiceTest {
+
+    @Mock
+    private TripMemberService tripMemberService;
+
+    @Mock
+    private TripDayPlaceService tripDayPlaceService;
+
+    @InjectMocks
+    private TripQueryService tripQueryService;
+
+    @Nested
+    @DisplayName("메인 화면 내 여행 조회")
+    class TripInfoInMain {
+        private final Long userId = 1L;
+
+        private Trip trip1 = Trip.builder()
+                .title("title")
+                .leaderId(userId)
+                .travelStatus(TravelStatus.PLANNED)
+                .build();
+
+        private Trip trip2 = Trip.builder()
+                .title("title")
+                .leaderId(userId)
+                .travelStatus(TravelStatus.PLANNED)
+                .build();
+
+        @Test
+        @DisplayName("진행 전인 여행만 존재하는 경우")
+        void successIfTripOnlyPlanned() {
+            // given
+            ReflectionTestUtils.setField(trip1, "id", 1L);
+            ReflectionTestUtils.setField(trip1, "startedAt", LocalDateTime.of(2025, 5, 20, 12, 0));
+            ReflectionTestUtils.setField(trip1, "endedAt", LocalDateTime.of(2025, 5, 21, 12, 0));
+
+            ReflectionTestUtils.setField(trip2, "id", 2L);
+            ReflectionTestUtils.setField(trip2, "startedAt", LocalDateTime.of(2025, 5, 22, 12, 0));
+            ReflectionTestUtils.setField(trip2, "endedAt", LocalDateTime.of(2025, 5, 23, 12, 0));
+
+            Place place = Place.builder()
+                    .id("place-id")
+                    .name("두류 공원")
+                    .latitude(11.11)
+                    .longitude(12.12)
+                    .order(10.0)
+                    .placeType("관광 명소")
+                    .build();
+
+            TripDayPlace tripDayPlace = TripDayPlace.builder()
+                    .tripId(trip1.getId())
+                    .day(1)
+                    .places(List.of(place))
+                    .build();
+
+            when(tripMemberService.readAllTripByUserId(userId)).thenReturn(List.of(trip1, trip2));
+            when(tripDayPlaceService.readTripDayPlaceByTripIdAndDay(eq(trip1.getId()), eq(1))).thenReturn(Optional.of(tripDayPlace));
+
+            try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+                String date = "2025-05-15T12:00:00Z";
+                Clock clock = Clock.fixed(Instant.parse(date), ZoneId.of("UTC"));
+                LocalDateTime mockNow = LocalDateTime.now(clock);
+                mockedLocalDateTime.when(LocalDateTime::now).thenReturn(mockNow);
+
+                // when
+                TripRes.TripMainInfo result = tripQueryService.getTripMainInfo(userId);
+
+                // then
+                assertEquals(trip1.getId(), result.tripId());
+                assertEquals(trip1.getTitle(), result.title());
+                assertEquals(1, result.day());
+                assertThat(result.places()).hasSize(1);
+            }
+        }
+
+        @Test
+        @DisplayName("진행 전인 여행에 목적지가 아직 없는 경우")
+        void successIfTripPlannedDoseNotHavePlace() {
+            // given
+            ReflectionTestUtils.setField(trip1, "id", 1L);
+            ReflectionTestUtils.setField(trip1, "startedAt", LocalDateTime.of(2025, 5, 20, 12, 0));
+            ReflectionTestUtils.setField(trip1, "endedAt", LocalDateTime.of(2025, 5, 21, 12, 0));
+
+            when(tripMemberService.readAllTripByUserId(userId)).thenReturn(List.of(trip1, trip2));
+            when(tripDayPlaceService.readTripDayPlaceByTripIdAndDay(eq(trip1.getId()), eq(1))).thenReturn(Optional.empty());
+
+            try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+                String date = "2025-05-15T12:00:00Z";
+                Clock clock = Clock.fixed(Instant.parse(date), ZoneId.of("UTC"));
+                LocalDateTime mockNow = LocalDateTime.now(clock);
+                mockedLocalDateTime.when(LocalDateTime::now).thenReturn(mockNow);
+
+                // when
+                TripRes.TripMainInfo result = tripQueryService.getTripMainInfo(userId);
+
+                // then
+                assertEquals(trip1.getId(), result.tripId());
+                assertEquals(trip1.getTitle(), result.title());
+                assertEquals(1, result.day());
+                assertThat(result.places()).hasSize(0);
+            }
+        }
+
+        @Test
+        @DisplayName("진행 중인 여행이 존재하는 경우")
+        void successIfTripPlannedAndInProgress() {
+            // given
+            ReflectionTestUtils.setField(trip1, "id", 1L);
+            ReflectionTestUtils.setField(trip1, "travelStatus", TravelStatus.IN_PROGRESS);
+            ReflectionTestUtils.setField(trip1, "startedAt", LocalDateTime.of(2025, 5, 10, 12, 0));
+            ReflectionTestUtils.setField(trip1, "endedAt", LocalDateTime.of(2025, 5, 20, 12, 0));
+
+            ReflectionTestUtils.setField(trip2, "id", 2L);
+            ReflectionTestUtils.setField(trip2, "startedAt", LocalDateTime.of(2025, 5, 20, 12, 0));
+            ReflectionTestUtils.setField(trip2, "endedAt", LocalDateTime.of(2025, 5, 21, 12, 0));
+
+            Place place = Place.builder()
+                    .id("place-id")
+                    .name("두류 공원")
+                    .latitude(11.11)
+                    .longitude(12.12)
+                    .order(10.0)
+                    .placeType("관광 명소")
+                    .build();
+
+            TripDayPlace tripDayPlace = TripDayPlace.builder()
+                    .tripId(trip1.getId())
+                    .day(1)
+                    .places(List.of(place))
+                    .build();
+
+            when(tripMemberService.readAllTripByUserId(userId)).thenReturn(List.of(trip1, trip2));
+            when(tripDayPlaceService.readTripDayPlaceByTripIdAndDay(eq(trip1.getId()), eq(6))).thenReturn(Optional.of(tripDayPlace));
+
+            try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+                String date = "2025-05-15T12:00:00Z";
+                Clock clock = Clock.fixed(Instant.parse(date), ZoneId.of("UTC"));
+                LocalDateTime mockNow = LocalDateTime.now(clock);
+                mockedLocalDateTime.when(LocalDateTime::now).thenReturn(mockNow);
+
+                // when
+                TripRes.TripMainInfo result = tripQueryService.getTripMainInfo(userId);
+
+                // then
+                assertEquals(trip1.getId(), result.tripId());
+                assertEquals(trip1.getTitle(), result.title());
+                assertEquals(6, result.day());
+                assertThat(result.places()).hasSize(1);
+            }
+        }
+
+        @Test
+        @DisplayName("진행 중 또는 진행 전인 여행이 없는 경우")
+        void successIfNoTripInProgress() {
+            // given
+            ReflectionTestUtils.setField(trip1, "id", 1L);
+            ReflectionTestUtils.setField(trip1, "travelStatus", TravelStatus.COMPLETED);
+            ReflectionTestUtils.setField(trip1, "startedAt", LocalDateTime.of(2025, 5, 10, 12, 0));
+            ReflectionTestUtils.setField(trip1, "endedAt", LocalDateTime.of(2025, 5, 11, 12, 0));
+
+            when(tripMemberService.readAllTripByUserId(userId)).thenReturn(List.of(trip1));
+
+            // when
+            TripRes.TripMainInfo result = tripQueryService.getTripMainInfo(userId);
+
+            // then
+            assertThat(result).isNull();
+        }
+    }
+}
