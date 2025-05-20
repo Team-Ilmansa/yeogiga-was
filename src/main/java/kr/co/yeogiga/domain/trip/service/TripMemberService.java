@@ -1,5 +1,6 @@
 package kr.co.yeogiga.domain.trip.service;
 
+import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.entity.TripMember;
 import kr.co.yeogiga.domain.trip.repository.TripMemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +17,8 @@ public class TripMemberService {
         tripMemberRepository.save(tripMember);
     }
 
-    public List<TripMember> readAllByUserId(Long userId) {
-        return tripMemberRepository.findTripByUserId(userId);
+    public List<Trip> readAllTripByUserId(Long userId) {
+        return tripMemberRepository.findAllTripByUserId(userId);
     }
 
     public boolean existsByTripIdAndUserId(Long tripId, Long userId) {
