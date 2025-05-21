@@ -27,6 +27,10 @@ public class TripService {
         return tripRepository.findAllByIdIn(ids);
     }
 
+    public boolean existsById(Long tripId) {
+        return tripRepository.findById(tripId).isPresent();
+    }
+
     public void updateAllTravelStatusToInProgress(LocalDateTime time) {
         tripRepository.updateTravelStatusInProgress(time);
     }
