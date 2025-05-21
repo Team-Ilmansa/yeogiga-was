@@ -2,11 +2,14 @@ package kr.co.yeogiga.presentation.trip.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.trip.dto.TripReq;
+import kr.co.yeogiga.application.trip.dto.TripRes;
 import kr.co.yeogiga.application.trip.service.TripCommandService;
+import kr.co.yeogiga.application.trip.service.TripQueryService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
+import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.type.Role;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
@@ -27,10 +30,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -53,6 +60,9 @@ public class TripControllerTest {
 
     @MockBean
     private TripCommandService tripCommandService;
+
+    @MockBean
+    private TripQueryService tripQueryService;
 
     private CustomUserDetails userDetails;
 
@@ -208,6 +218,38 @@ public class TripControllerTest {
             resultActions
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errors.end").exists());
+        }
+    }
+
+    @Nested
+    @DisplayName("사용자가 속한 여행 조회")
+    class GetAllTrip {
+
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            TripRes.TripSummary tripSummary = TripRes.TripSummary.builder()
+                    .tripId(1L)
+                    .title("title")
+                    .startedAt(LocalDateTime.of(2025, 5, 19, 12, 0))
+                    .endedAt(LocalDateTime.of(2025, 5, 20, 12, 0))
+                    .status(TravelStatus.IN_PROGRESS)
+                    .build();
+
+            when(tripQueryService.getAllTrip(any())).thenReturn(List.of(tripSummary));
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip")
+                    .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()))
+                    .andExpect(jsonPath("$.data").isArray());
         }
     }
 }
