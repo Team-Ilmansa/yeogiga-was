@@ -1,5 +1,6 @@
 package kr.co.yeogiga.domain.tripplace.repository;
 
+import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.tripplace.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
@@ -210,13 +211,27 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
     }
 
     @Override
-    public Optional<TripDayPlace> findTripDayPlaceByTripIdAndDay(Long tripId, int day) {
-        Query query = Query.query(
-                Criteria.where("tripId").is(tripId)
-                        .and("day").is(day)
+    public List<Place> findAllPlacesByTripIdAndDay(Long tripId, int day) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("tripId").is(tripId).and("day").is(day)),
+
+                Aggregation.unwind("places"),
+
+                Aggregation.sort(Sort.by(Sort.Direction.ASC, "places.order")),
+
+                Aggregation.project()
+                        .and("places.id").as("id")
+                        .and("places.name").as("name")
+                        .and("places.latitude").as("latitude")
+                        .and("places.longitude").as("longitude")
+                        .and("places.placeType").as("placeType")
+                        .and("places.order").as("order")
+                        .and("places.isVisited").as("isVisited")
         );
 
-        return Optional.ofNullable(mongoTemplate.findOne(query, TripDayPlace.class));
+        AggregationResults<Place> result = mongoTemplate.aggregate(aggregation, "trip_day_place", Place.class);
+
+        return result.getMappedResults();
     }
 
     @Override
