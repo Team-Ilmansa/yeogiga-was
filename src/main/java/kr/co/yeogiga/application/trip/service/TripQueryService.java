@@ -5,7 +5,7 @@ import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.service.TripMemberService;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
-import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
+import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -116,12 +115,9 @@ public class TripQueryService {
      *                      - 아직 여행 목적지 정보가 없는 경우 Empty List 반환
      */
     private List<TripPlaceRes.PlaceSummary> getPlaceSummaries(Long tripId, int day) {
-        TripDayPlace tripDayPlace = tripDayPlaceService.readTripDayPlaceByTripIdAndDay(tripId, day)
-                .orElse(null);
+        List<Place> places = tripDayPlaceService.readTripDayPlaceByTripIdAndDay(tripId, day);
 
-        return Objects.nonNull(tripDayPlace)
-                ? tripDayPlace.getPlaces().stream()
-                    .map(TripPlaceRes.PlaceSummary::from).toList()
-                : new ArrayList<>();
+        return places.stream()
+                .map(TripPlaceRes.PlaceSummary::from).toList();
     }
 }
