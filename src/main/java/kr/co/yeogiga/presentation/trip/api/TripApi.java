@@ -21,6 +21,88 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Tag(name = "[여행 API]", description = "여행 관련 API")
 public interface TripApi {
 
+    @TrackApi(description = "메인 화면 내 여행 조회")
+    @Operation(summary = "메인 화면 내 여행 조회", description = "메인 화면 내 여행 조회 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "메인 화면 내 여행 조회 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "예정인 여행", description = "예정인 여행은 1일차의 정보를 반환", value = """
+                                             {
+                                                  "code": 200,
+                                                  "message": "요청이 성공하였습니다.",
+                                                  "data": {
+                                                      "tripId": 1,
+                                                      "title": "여행1",
+                                                      "staredAt": "2025-05-25T12:00:00",
+                                                      "travelStatus": "PLANNED",
+                                                      "day": 1,
+                                                      "places": [
+                                                          {
+                                                              "id": "place-id",
+                                                              "name": "달성공원",
+                                                              "placeType": "관광지",
+                                                              "isVisited": false
+                                                          },
+                                                          {
+                                                              "id": "place-id",
+                                                              "name": "두류공원",
+                                                              "placeType": "관광지",
+                                                              "isVisited": false
+                                                          }
+                                                      ]
+                                                  }
+                                              }
+                                    """),
+                            @ExampleObject(name = "진행 중인 여행", description = "여행 진행 중인 일자의 정보를 반환", value = """
+                                             {
+                                                   "code": 200,
+                                                   "message": "요청이 성공하였습니다.",
+                                                   "data": {
+                                                       "tripId": 4,
+                                                       "title": "여행4",
+                                                       "staredAt": "2025-05-17T12:00:00",
+                                                       "travelStatus": "IN_PROGRESS",
+                                                       "day": 5,
+                                                       "places": [
+                                                           {
+                                                               "id": "place-id",
+                                                               "name": "계명대",
+                                                               "placeType": "관광지",
+                                                               "isVisited": false
+                                                           },
+                                                           {
+                                                               "id": "place-id",
+                                                               "name": "영남대",
+                                                               "placeType": "관광지",
+                                                               "isVisited": false
+                                                           },
+                                                           {
+                                                               "id": "place-id",
+                                                               "name": "두류공원",
+                                                               "placeType": "관광지",
+                                                               "isVisited": false
+                                                           },
+                                                           {
+                                                               "id": "place-id",
+                                                               "name": "달성공원",
+                                                               "placeType": "관광지",
+                                                               "isVisited": false
+                                                           }
+                                                       ]
+                                                   }
+                                               }
+                                    """),
+                            @ExampleObject(name = "예정이거나 진행 중인 여행이 없는 경우", description = "data 부분 제외", value = """
+                                             {
+                                                 "code": 200,
+                                                 "message": "요청이 성공하였습니다."
+                                             }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> getMainTrip(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    );
     @TrackApi(description = "사용자가 속한 여행 조회")
     @Operation(summary = "사용자가 속한 여행 조회", description = "사용자가 속한 여행 조회 API")
     @ApiResponses({

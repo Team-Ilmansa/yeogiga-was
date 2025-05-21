@@ -5,11 +5,13 @@ import kr.co.yeogiga.application.trip.dto.TripReq;
 import kr.co.yeogiga.application.trip.dto.TripRes;
 import kr.co.yeogiga.application.trip.service.TripCommandService;
 import kr.co.yeogiga.application.trip.service.TripQueryService;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
+import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.type.Role;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
@@ -222,6 +224,97 @@ public class TripControllerTest {
     }
 
     @Nested
+    @DisplayName("메인 화면 내 여행 조회")
+    class TripInMainView {
+
+        private Place place = Place.builder()
+                .id("place-id")
+                .name("두류 공원")
+                .latitude(11.11)
+                .longitude(12.12)
+                .order(10.0)
+                .placeType("관광 명소")
+                .build();
+
+        private TripPlaceRes.PlaceSummary placeSummary = TripPlaceRes.PlaceSummary.from(place);
+
+        @Test
+        @DisplayName("계획 중인 여행")
+        void successIfTripPlanned() throws Exception {
+            // given
+            TripRes.TripMainInfo tripMainInfo = TripRes.TripMainInfo.builder()
+                    .tripId(1L)
+                    .title("test")
+                    .staredAt(LocalDateTime.of(2025, 5, 21, 12, 00))
+                    .travelStatus(TravelStatus.PLANNED)
+                    .places(List.of(placeSummary))
+                    .build();
+
+            when(tripQueryService.getTripMainInfo(any())).thenReturn(tripMainInfo);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/main")
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.tripId").value(tripMainInfo.tripId()))
+                    .andExpect(jsonPath("$.data.title").value(tripMainInfo.title()))
+                    .andExpect(jsonPath("$.data.travelStatus").value(tripMainInfo.travelStatus().name()))
+                    .andExpect(jsonPath("$.data.places").isArray());
+        }
+
+        @Test
+        @DisplayName("진행 중인 여행")
+        void successIfTripInProgress() throws Exception {
+            // given
+            TripRes.TripMainInfo tripMainInfo = TripRes.TripMainInfo.builder()
+                    .tripId(1L)
+                    .title("test")
+                    .staredAt(LocalDateTime.of(2025, 5, 21, 12, 00))
+                    .travelStatus(TravelStatus.IN_PROGRESS)
+                    .places(List.of(placeSummary))
+                    .build();
+
+            when(tripQueryService.getTripMainInfo(any())).thenReturn(tripMainInfo);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/main")
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.tripId").value(tripMainInfo.tripId()))
+                    .andExpect(jsonPath("$.data.title").value(tripMainInfo.title()))
+                    .andExpect(jsonPath("$.data.travelStatus").value(tripMainInfo.travelStatus().name()))
+                    .andExpect(jsonPath("$.data.places").isArray());
+        }
+
+        @Test
+        @DisplayName("예정이거나 진행 중인 여행이 없는 경우")
+        void successIfNotTripPlannedAndInProgress() throws Exception {
+            // given
+            when(tripQueryService.getTripMainInfo(any())).thenReturn(null);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/main")
+                            .with(user(userDetails))
+              );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data").doesNotExist());
+        }
+    }
+
     @DisplayName("사용자가 속한 여행 조회")
     class GetAllTrip {
 
@@ -242,7 +335,6 @@ public class TripControllerTest {
             // when
             ResultActions resultActions = mockMvc.perform(
                     get("/api/v1/trip")
-                    .with(user(userDetails))
             );
 
             // then

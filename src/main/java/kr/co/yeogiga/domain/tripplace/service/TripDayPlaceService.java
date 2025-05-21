@@ -63,6 +63,10 @@ public class TripDayPlaceService {
         return tripDayPlaceRepository.findTripDayPlaceSummariesByTripId(tripId);
     }
 
+    public List<Place> readTripDayPlaceByTripIdAndDay(Long tripId, int day) {
+        return tripDayPlaceRepository.findAllPlacesByTripIdAndDay(tripId, day);
+    }
+
     public List<Image> readFavoriteImages(String id) {
         return tripDayPlaceRepository.findFavoriteImages(id);
     }
