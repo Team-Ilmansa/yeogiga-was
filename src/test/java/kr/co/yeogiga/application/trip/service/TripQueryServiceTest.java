@@ -53,6 +53,9 @@ public class TripQueryServiceTest {
 
         private Trip trip1 = Trip.builder()
                 .title("title")
+                .leaderId(userId)
+                .travelStatus(TravelStatus.PLANNED)
+                .build();
   
         private Trip trip2 = Trip.builder()
                 .title("title")

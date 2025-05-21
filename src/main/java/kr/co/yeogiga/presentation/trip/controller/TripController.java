@@ -7,7 +7,6 @@ import kr.co.yeogiga.application.trip.service.TripCommandService;
 import kr.co.yeogiga.application.trip.service.TripQueryService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
-import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.presentation.trip.api.TripApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,7 +28,6 @@ import java.util.List;
 public class TripController implements TripApi {
     private final TripQueryService tripQueryService;
     private final TripCommandService tripCommandService;
-    private final TripQueryService tripQueryService;
 
     @Override
     @GetMapping("/main")

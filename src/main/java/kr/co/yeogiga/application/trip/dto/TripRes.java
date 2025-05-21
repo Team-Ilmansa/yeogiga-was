@@ -31,7 +31,7 @@ public class TripRes {
         }
     }
 
-}
+    @Builder
     public record TripSummary(
             Long tripId,
             String title,

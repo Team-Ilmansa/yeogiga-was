@@ -3,7 +3,6 @@ package kr.co.yeogiga.application.trip.service;
 import kr.co.yeogiga.application.trip.dto.TripRes;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.domain.trip.entity.Trip;
-import kr.co.yeogiga.domain.trip.entity.TripMember;
 import kr.co.yeogiga.domain.trip.service.TripMemberService;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
@@ -121,6 +120,7 @@ public class TripQueryService {
 
         return places.stream()
                 .map(TripPlaceRes.PlaceSummary::from).toList();
+    }
 
     /**
      * 사용자가 속한 여행 목록을 반환하는 메서드
