@@ -1,12 +1,13 @@
 package kr.co.yeogiga.presentation.trip.controller;
 
+import kr.co.yeogiga.application.trip.dto.TripMemberRes;
 import kr.co.yeogiga.application.trip.service.TripMemberCommandService;
+import kr.co.yeogiga.application.trip.service.TripMemberQueryService;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
-import kr.co.yeogiga.domain.trip.entity.TripMember;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.exception.TripMemberErrorType;
 import kr.co.yeogiga.domain.user.entity.User;
@@ -28,10 +29,14 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -50,6 +55,9 @@ public class TripMemberControllerTest {
 
     @MockBean
     private TripMemberCommandService tripMemberCommandService;
+
+    @MockBean
+    private TripMemberQueryService tripMemberQueryService;
 
     private CustomUserDetails userDetails;
 
@@ -151,6 +159,43 @@ public class TripMemberControllerTest {
                     .andExpect(status().isConflict())
                     .andExpect(jsonPath("$.code").value(TripMemberErrorType.ALREADY_EXISTS.getCode()))
                     .andExpect(jsonPath("$.message").value(TripMemberErrorType.ALREADY_EXISTS.getMessage()));
+        }
+    }
+
+    @Nested
+    @DisplayName("여행 멤버 조회")
+    class TripMemberInfo {
+        private final Long tripId = 1L;
+
+        private TripMemberRes.MemberInfo memberInfo1 = TripMemberRes.MemberInfo.builder()
+                .userId(1L)
+                .nickname("nick1")
+                .imageUrl("http://image1.com")
+                .build();
+
+        private TripMemberRes.MemberInfo memberInfo2 = TripMemberRes.MemberInfo.builder()
+                .userId(2L)
+                .nickname("nick2")
+                .build();
+
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            when(tripMemberQueryService.getTripMembers(tripId)).thenReturn(List.of(memberInfo1, memberInfo2));
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/{tripId}/members", tripId)
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data").isArray())
+                    .andExpect(jsonPath("$.data[0].userId").value(1L))
+                    .andExpect(jsonPath("$.data[1].userId").value(2L));;
         }
     }
 }

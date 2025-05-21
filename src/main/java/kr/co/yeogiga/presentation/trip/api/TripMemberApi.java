@@ -18,6 +18,45 @@ import org.springframework.web.bind.annotation.PathVariable;
 @Tag(name = "[여행 멤버 API]", description = "여행 멤버 관련 API")
 public interface TripMemberApi {
 
+    @TrackApi(description = "여행 멤버 조회")
+    @Operation(summary = "여행 멤버 조회", description = "여행 멤버 조회 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "여행 멤버 조회 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(description = "이미지 미존재 멤버의 경우에는 모노그램 이미지로 표시 필요", value = """
+                                             {
+                                                 "code": 200,
+                                                 "message": "요청이 성공하였습니다.",
+                                                 "data": [
+                                                     {
+                                                         "userId": 1,
+                                                         "nickname": "nick1",
+                                                         "imageUrl": "http://image1.com"
+                                                     },
+                                                     {
+                                                         "userId": 2,
+                                                         "nickname": "nick2",
+                                                         "imageUrl": "http://image2.com"
+                                                     },
+                                                     {
+                                                         "userId": 3,
+                                                         "nickname": "nick3",
+                                                         "imageUrl": null
+                                                     },
+                                                     {
+                                                         "userId": 4,
+                                                         "nickname": "nick4",
+                                                         "imageUrl": null
+                                                     }
+                                                 ]
+                                             }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> getTripMembers(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId
+    );
 
     @TrackApi(description = "여행 멤버 참가")
     @Operation(summary = "여행 멤버 참가", description = "여행 멤버 참가 API")

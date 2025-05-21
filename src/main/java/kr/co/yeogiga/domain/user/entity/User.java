@@ -35,6 +35,9 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private String nickname;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @ColumnDefault("false")
     @Column(name = "signed_up", nullable = false)
     private boolean signedUp;
