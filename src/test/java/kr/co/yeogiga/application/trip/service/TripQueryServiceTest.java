@@ -80,14 +80,8 @@ public class TripQueryServiceTest {
                     .placeType("관광 명소")
                     .build();
 
-            TripDayPlace tripDayPlace = TripDayPlace.builder()
-                    .tripId(trip1.getId())
-                    .day(1)
-                    .places(List.of(place))
-                    .build();
-
             when(tripMemberService.readAllTripByUserId(userId)).thenReturn(List.of(trip1, trip2));
-            when(tripDayPlaceService.readTripDayPlaceByTripIdAndDay(eq(trip1.getId()), eq(1))).thenReturn(Optional.of(tripDayPlace));
+            when(tripDayPlaceService.readTripDayPlaceByTripIdAndDay(eq(trip1.getId()), eq(1))).thenReturn(List.of(place));
 
             try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
                 String date = "2025-05-15T12:00:00Z";
@@ -115,7 +109,7 @@ public class TripQueryServiceTest {
             ReflectionTestUtils.setField(trip1, "endedAt", LocalDateTime.of(2025, 5, 21, 12, 0));
 
             when(tripMemberService.readAllTripByUserId(userId)).thenReturn(List.of(trip1, trip2));
-            when(tripDayPlaceService.readTripDayPlaceByTripIdAndDay(eq(trip1.getId()), eq(1))).thenReturn(Optional.empty());
+            when(tripDayPlaceService.readTripDayPlaceByTripIdAndDay(eq(trip1.getId()), eq(1))).thenReturn(List.of());
 
             try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
                 String date = "2025-05-15T12:00:00Z";
@@ -163,7 +157,7 @@ public class TripQueryServiceTest {
                     .build();
 
             when(tripMemberService.readAllTripByUserId(userId)).thenReturn(List.of(trip1, trip2));
-            when(tripDayPlaceService.readTripDayPlaceByTripIdAndDay(eq(trip1.getId()), eq(6))).thenReturn(Optional.of(tripDayPlace));
+            when(tripDayPlaceService.readTripDayPlaceByTripIdAndDay(eq(trip1.getId()), eq(6))).thenReturn(List.of(place));
 
             try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
                 String date = "2025-05-15T12:00:00Z";
