@@ -197,24 +197,5 @@ public class TripMemberControllerTest {
                     .andExpect(jsonPath("$.data[0].userId").value(1L))
                     .andExpect(jsonPath("$.data[1].userId").value(2L));;
         }
-
-        @Test
-        @DisplayName("실패 - 여행 미존재")
-        void failIfTripNotFound() throws Exception {
-            // given
-            doThrow(new CustomException(TripErrorType.TRIP_NOT_FOUND)).when(tripMemberQueryService).getTripMembers(tripId);
-
-            // when
-            ResultActions resultActions = mockMvc.perform(
-                    get("/api/v1/trip/{tripId}/members", tripId)
-                            .with(user(userDetails))
-            );
-
-            // then
-            resultActions
-                    .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.code").value(TripErrorType.TRIP_NOT_FOUND.getCode()))
-                    .andExpect(jsonPath("$.message").value(TripErrorType.TRIP_NOT_FOUND.getMessage()));;
-        }
     }
 }

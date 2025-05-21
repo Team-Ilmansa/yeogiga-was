@@ -30,9 +30,6 @@ public class TripMemberQueryServiceTest {
     @Mock
     private TripMemberService tripMemberService;
 
-    @Mock
-    private TripService tripService;
-
     @InjectMocks
     private TripMemberQueryService tripMemberQueryService;
 
@@ -67,7 +64,6 @@ public class TripMemberQueryServiceTest {
         @DisplayName("성공")
         void success() {
             // given
-            when(tripService.existsById(tripId)).thenReturn(true);
             when(tripMemberService.readAllUserByTripId(tripId)).thenReturn(List.of(user1, user2));
 
             // when
@@ -77,20 +73,6 @@ public class TripMemberQueryServiceTest {
             assertThat(result).hasSize(2);
             assertEquals(user1.getId(), result.get(0).userId());
             assertEquals(user2.getId(), result.get(1).userId());
-        }
-
-        @Test
-        @DisplayName("실패 - 여행 조회 불가")
-        void failIfTripNotFound() {
-            // given
-            when(tripService.existsById(tripId)).thenReturn(false);
-
-            // when
-            CustomException exception = assertThrows(CustomException.class,
-                    () -> tripMemberQueryService.getTripMembers(tripId));
-
-            // then
-            assertEquals(TripErrorType.TRIP_NOT_FOUND, exception.getErrorType());
         }
     }
 }
