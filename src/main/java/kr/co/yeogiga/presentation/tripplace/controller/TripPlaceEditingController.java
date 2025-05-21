@@ -25,7 +25,7 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
     private final TripPlaceEditingService tripPlaceEditingService;
 
     @Override
-    @PostMapping("/{tripId}/days/{day}/places/{placeId}")
+    @PostMapping("/{tripId}/days/{day}/places")
     public ResponseEntity<?> assignPlaceToDay(@PathVariable Long tripId,
                                               @PathVariable int day,
                                               @RequestBody TripPlaceReq.Request place) {

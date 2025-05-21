@@ -78,8 +78,6 @@ public class TripPlaceEditingControllerTest {
                 .placeType("카페")
                 .build();
 
-        private final String placeId = "place-id";
-
         @Test
         @DisplayName("성공")
         void addPlaceSuccess() throws Exception {
@@ -88,7 +86,7 @@ public class TripPlaceEditingControllerTest {
 
             // when
             ResultActions resultActions = mockMvc.perform(
-                    post("/api/v1/trip/{tripId}/days/{day}/places/{placeId}", tripId, day, placeId)
+                    post("/api/v1/trip/{tripId}/days/{day}/places", tripId, day)
                             .contentType(APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
             );
@@ -109,7 +107,7 @@ public class TripPlaceEditingControllerTest {
 
             // when
             ResultActions resultActions = mockMvc.perform(
-                    post("/api/v1/trip/{tripId}/days/{day}/places/{placeId}", tripId, day, placeId)
+                    post("/api/v1/trip/{tripId}/days/{day}/places", tripId, day)
                             .contentType(APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
             );
