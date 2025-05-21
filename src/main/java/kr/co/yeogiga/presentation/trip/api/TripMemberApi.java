@@ -51,15 +51,6 @@ public interface TripMemberApi {
                                                  ]
                                              }
                                     """)
-                    })),
-            @ApiResponse(responseCode = "404", description = "여행 멤버 조회 실패",
-                    content = @Content(mediaType = "application/json", examples = {
-                            @ExampleObject(name = "존재하지 않는 여행", value = """
-                                             {
-                                                 "code": "T006",
-                                                 "message": "해당 여행이 존재하지 않습니다."
-                                             }
-                                    """)
                     }))
     })
     ResponseEntity<?> getTripMembers(
