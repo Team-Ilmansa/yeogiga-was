@@ -21,10 +21,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/trip")
 @RequiredArgsConstructor
 public class TripController implements TripApi {
+    private final TripQueryService tripQueryService;
     private final TripCommandService tripCommandService;
     private final TripQueryService tripQueryService;
 
@@ -35,6 +38,13 @@ public class TripController implements TripApi {
     ) {
         TripRes.TripMainInfo tripMainInfo = tripQueryService.getTripMainInfo(userDetails.getUserId());
         return ResponseEntity.ok().body(SuccessResponse.from(tripMainInfo));
+    }
+
+    @Override
+    @GetMapping
+    public ResponseEntity<?> getAllTrip(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        List<TripRes.TripSummary> tripList = tripQueryService.getAllTrip(userDetails.getUserId());
+        return ResponseEntity.ok().body(SuccessResponse.from(tripList));
     }
 
     @Override

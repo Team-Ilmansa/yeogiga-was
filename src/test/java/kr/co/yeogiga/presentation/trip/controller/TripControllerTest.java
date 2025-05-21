@@ -35,6 +35,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -305,12 +306,42 @@ public class TripControllerTest {
             ResultActions resultActions = mockMvc.perform(
                     get("/api/v1/trip/main")
                             .with(user(userDetails))
-            );
+              );
 
             // then
             resultActions
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data").doesNotExist());
+        }
+    }
+
+    @DisplayName("사용자가 속한 여행 조회")
+    class GetAllTrip {
+
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            TripRes.TripSummary tripSummary = TripRes.TripSummary.builder()
+                    .tripId(1L)
+                    .title("title")
+                    .startedAt(LocalDateTime.of(2025, 5, 19, 12, 0))
+                    .endedAt(LocalDateTime.of(2025, 5, 20, 12, 0))
+                    .status(TravelStatus.IN_PROGRESS)
+                    .build();
+
+            when(tripQueryService.getAllTrip(any())).thenReturn(List.of(tripSummary));
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip")
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()))
+                    .andExpect(jsonPath("$.data").isArray());
         }
     }
 }
