@@ -22,6 +22,7 @@ public class TripMemberController implements TripMemberApi {
     private final TripMemberCommandService tripMemberCommandService;
     private final TripMemberQueryService tripMemberQueryService;
 
+    @Override
     @GetMapping("/{tripId}/members")
     public ResponseEntity<?> getTripMembers(@PathVariable Long tripId) {
         return ResponseEntity.ok().body(SuccessResponse.from(tripMemberQueryService.getTripMembers(tripId)));
