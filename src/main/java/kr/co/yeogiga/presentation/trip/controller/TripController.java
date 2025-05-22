@@ -68,6 +68,7 @@ public class TripController implements TripApi {
 
     }
 
+    @Override
     @DeleteMapping("/{tripId}")
     public ResponseEntity<?> removeTrip(@PathVariable Long tripId) {
         tripCommandService.removeTrip(tripId);
