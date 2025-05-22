@@ -12,6 +12,7 @@ import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
+import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
@@ -480,6 +481,66 @@ public class TripControllerTest {
                             .with(user(userDetails))
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsBytes(updateRequest))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value(TripErrorType.TRIP_NOT_FOUND.getCode()))
+                    .andExpect(jsonPath("$.message").value(TripErrorType.TRIP_NOT_FOUND.getMessage()));
+        }
+    }
+
+    @Nested
+    @DisplayName("특정 여행 조회")
+    class GetTrip {
+        private final Long tripId = 1L;
+
+        private Trip trip = Trip.builder()
+                .title("title")
+                .city("city")
+                .leaderId(1L)
+                .travelStatus(TravelStatus.IN_PROGRESS)
+                .build();
+
+        private User user = User.builder()
+                .username("username")
+                .password("password")
+                .nickname("nickname")
+                .email("test@test.com")
+                .role(Role.USER)
+                .build();
+
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            TripRes.TripSummary tripSummary = TripRes.TripSummary.from(trip, List.of(user));
+            when(tripQueryService.getTrip(tripId)).thenReturn(tripSummary);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/{tripId}", tripId)
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.title").value(trip.getTitle()))
+                    .andExpect(jsonPath("$.data.members[0].nickname").value(user.getNickname()));
+        }
+
+        @Test
+        @DisplayName("실패 - 여행 미존재")
+        void failIfTripNotFound() throws Exception {
+            // given
+            doThrow(new CustomException(TripErrorType.TRIP_NOT_FOUND)).when(tripQueryService).getTrip(tripId);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/{tripId}", tripId)
+                            .with(user(userDetails))
             );
 
             // then

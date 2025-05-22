@@ -103,6 +103,53 @@ public interface TripApi {
     ResponseEntity<?> getMainTrip(
             @AuthenticationPrincipal CustomUserDetails userDetails
     );
+
+    @TrackApi(description = "특정 여행 조회")
+    @Operation(summary = "특정 여행 조회", description = "특정 여행 조회 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "특정 여행 조회 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                             {
+                                                    "code": 200,
+                                                    "message": "요청이 성공하였습니다.",
+                                                    "data": {
+                                                        "tripId": 1,
+                                                        "title": "여행2",
+                                                        "city": null,
+                                                        "startedAt": "2025-05-15T12:00:00",
+                                                        "endedAt": "2025-05-21T12:01:00",
+                                                        "status": "COMPLETED",
+                                                        "members": [
+                                                            {
+                                                                "userId": 1,
+                                                                "nickname": "nick",
+                                                                "imageUrl": null
+                                                            },
+                                                            {
+                                                                "userId": 4,
+                                                                "nickname": "nick2",
+                                                                "imageUrl": null
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "특정 여행 조회 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "여행 미존재",value = """
+                                             {
+                                                     "code": "T006",
+                                                     "message": "해당 여행이 존재하지 않습니다."
+                                                 }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> getTrip(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId);
+
     @TrackApi(description = "사용자가 속한 여행 조회")
     @Operation(summary = "사용자가 속한 여행 조회", description = "사용자가 속한 여행 조회 API")
     @ApiResponses({
@@ -116,6 +163,7 @@ public interface TripApi {
                                                       {
                                                           "tripId": 1,
                                                           "title": "여행2",
+                                                          "city": null,
                                                           "startedAt": null,
                                                           "endedAt": null,
                                                           "status": "PLANNED",
@@ -135,6 +183,7 @@ public interface TripApi {
                                                       {
                                                           "tripId": 2,
                                                           "title": "여행1",
+                                                          "city": null,
                                                           "startedAt": null,
                                                           "endedAt": null,
                                                           "status": "PLANNED",
