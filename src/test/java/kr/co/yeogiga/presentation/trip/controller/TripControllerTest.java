@@ -6,10 +6,12 @@ import kr.co.yeogiga.application.trip.dto.TripRes;
 import kr.co.yeogiga.application.trip.service.TripCommandService;
 import kr.co.yeogiga.application.trip.service.TripQueryService;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
+import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
+import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.user.entity.User;
@@ -35,8 +37,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -372,6 +374,109 @@ public class TripControllerTest {
             resultActions
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+        }
+    }
+
+    @Nested
+    @DisplayName("여행 정보 업데이트")
+    class TripInfoModification {
+        private final Long tripId = 1L;
+
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            TripReq.Update updateRequest = TripReq.Update.builder()
+                    .title("new title")
+                    .build();
+
+            doNothing().when(tripCommandService).updateTripInfo(tripId, updateRequest);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    put("/api/v1/trip/{tripId}", tripId)
+                            .with(user(userDetails))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsBytes(updateRequest))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+        }
+
+        @Test
+        @DisplayName("실패 - 유효성 검증 실패: 제목 글자 수 초과")
+        void failTitleLengthValidation() throws Exception {
+            // given
+            TripReq.Update updateRequest = TripReq.Update.builder()
+                    .title("titletitletitletitletitle")
+                    .build();
+
+            doNothing().when(tripCommandService).updateTripInfo(tripId, updateRequest);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    put("/api/v1/trip/{tripId}", tripId)
+                            .with(user(userDetails))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsBytes(updateRequest))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors.title").exists());
+        }
+
+        @Test
+        @DisplayName("실패 - 유효성 검증 실패: 빈 제목")
+        void failTitleIsNull() throws Exception {
+            // given
+            TripReq.Update updateRequest = TripReq.Update.builder()
+//                    .title("titletitletitletitletitle")
+                    .build();
+
+            doNothing().when(tripCommandService).updateTripInfo(tripId, updateRequest);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    put("/api/v1/trip/{tripId}", tripId)
+                            .with(user(userDetails))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsBytes(updateRequest))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors.title").exists());
+        }
+
+        @Test
+        @DisplayName("실패 - 여행 미존재")
+        void failIfTripNotFound() throws Exception {
+            // given
+            TripReq.Update updateRequest = TripReq.Update.builder()
+                    .title("new title")
+                    .build();
+
+            doThrow(new CustomException(TripErrorType.TRIP_NOT_FOUND)).when(tripCommandService).updateTripInfo(tripId, updateRequest);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    put("/api/v1/trip/{tripId}", tripId)
+                            .with(user(userDetails))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsBytes(updateRequest))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value(TripErrorType.TRIP_NOT_FOUND.getCode()))
+                    .andExpect(jsonPath("$.message").value(TripErrorType.TRIP_NOT_FOUND.getMessage()));
         }
     }
 }

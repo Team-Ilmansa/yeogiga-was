@@ -57,6 +57,16 @@ public class TripController implements TripApi {
     }
 
     @Override
+    @PutMapping("/{tripId}")
+    public ResponseEntity<?> updateTripInfo(
+        @PathVariable Long tripId,
+        @Valid @RequestBody TripReq.Update updateRequest
+    ) {
+        tripCommandService.updateTripInfo(tripId, updateRequest);
+        return ResponseEntity.ok(SuccessResponse.ok());
+    }
+
+    @Override
     @PutMapping("/{tripId}/time")
     public ResponseEntity<?> updateTripTime(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -65,7 +75,6 @@ public class TripController implements TripApi {
     ) {
         tripCommandService.updateTime(tripId, userDetails.getUserId(), request);
         return ResponseEntity.ok(SuccessResponse.ok());
-
     }
 
     @Override

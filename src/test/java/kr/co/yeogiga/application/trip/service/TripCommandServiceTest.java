@@ -10,6 +10,7 @@ import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.service.UserService;
 import kr.co.yeogiga.domain.user.type.Role;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -263,6 +265,77 @@ public class TripCommandServiceTest {
 
             // then
             verify(tripService, times(1)).deleteById(tripId);
+        }
+    }
+
+    @Nested
+    @DisplayName("여행 정보 수정")
+    class TripInfoModification {
+        private final Long tripId = 1L;
+        private final Long userId = 1L;
+
+        private Trip trip = Trip.builder()
+                .title("title")
+                .leaderId(userId)
+                .travelStatus(TravelStatus.COMPLETED)
+                .build();
+
+        @BeforeEach
+        void setUp() {
+            ReflectionTestUtils.setField(trip, "id", tripId);
+        }
+
+        @Test
+        @DisplayName("성공")
+        void success() {
+            // given
+            TripReq.Update updateRequest = TripReq.Update.builder()
+                    .title("new title")
+                    .build();
+
+            when(tripService.readById(tripId)).thenReturn(Optional.of(trip));
+
+            // when
+            tripCommandService.updateTripInfo(tripId, updateRequest);
+
+            // then
+            assertEquals(updateRequest.title(), trip.getTitle());
+        }
+
+        @Test
+        @DisplayName("실패 - 여행 미존재")
+        void failIfTripNotFound() {
+            // given
+            TripReq.Update updateRequest = TripReq.Update.builder()
+                    .title("new title")
+                    .build();
+
+            when(tripService.readById(tripId)).thenReturn(Optional.empty());
+
+            // when
+            CustomException exception = assertThrows(CustomException.class,
+                    () -> tripCommandService.updateTripInfo(tripId, updateRequest));
+
+            // then
+            assertEquals(TripErrorType.TRIP_NOT_FOUND, exception.getErrorType());
+        }
+
+        @Test
+        @DisplayName("실패 - 기존과 동일한 여행 제목")
+        void failIfSameTitle() {
+            // given
+            TripReq.Update updateRequest = TripReq.Update.builder()
+                    .title("title")
+                    .build();
+
+            when(tripService.readById(tripId)).thenReturn(Optional.of(trip));
+
+            // when
+            CustomException exception = assertThrows(CustomException.class,
+                    () -> tripCommandService.updateTripInfo(tripId, updateRequest));
+
+            // then
+            assertEquals(TripErrorType.SAME_TRIP_TITLE, exception.getErrorType());
         }
     }
 }

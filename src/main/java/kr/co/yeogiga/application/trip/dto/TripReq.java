@@ -42,4 +42,14 @@ public class TripReq {
             return start.isBefore(end);
         }
     }
+
+    @Builder
+    @Schema(name = "TripReq.Update", description = "여행 정보 수정 요청 DTO")
+    public record Update(
+            @Schema(description = "여행 제목", example = "new title")
+            @NotBlank(message = "제목은 필수 입력값입니다.")
+            @Size(max = 20, message = "제목은 최대 20글자까지 가능합니다.")
+            String title
+    ) {
+    }
 }

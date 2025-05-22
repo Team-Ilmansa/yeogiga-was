@@ -20,7 +20,11 @@ public enum TripErrorType implements BaseErrorType {
     INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "T008", "여행 시작 시간과 종료 시간을 확인하세요."),
 
     CALENDAR_NOT_FOUND(HttpStatus.NOT_FOUND, "T009", "사용자의 가능한 날짜 정보가 존재하지 않습니다."),
-    CALENDAR_ALREADY_EXISTS(HttpStatus.CONFLICT, "T010", "이미 가능한 날짜 정보가 등록되어 있습니다.");
+    CALENDAR_ALREADY_EXISTS(HttpStatus.CONFLICT, "T010", "이미 가능한 날짜 정보가 등록되어 있습니다."),
+
+    SAME_TRIP_TITLE(HttpStatus.CONFLICT, "T011", "기존과 동일한 여행 제목입니다.");
+
+
 
     private final HttpStatus httpStatus;
     private final String code;

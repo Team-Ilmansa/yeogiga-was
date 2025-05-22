@@ -185,6 +185,63 @@ public interface TripApi {
             @RequestBody TripReq.Creation request
     );
 
+    @TrackApi(description = "여행 정보 수정")
+    @Operation(summary = "여행 정보 수정", description = "여행 정보 수정 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "여행 정보 수정 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                             {
+                                                 "code": 200,
+                                                 "message": "요청이 성공하였습니다."
+                                             }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "400", description = "여행 정보 수정 실패 - 유효성 검증",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "제목 미입력", value = """
+                                             {
+                                                  "code": "G002",
+                                                  "errors": {
+                                                      "title": "제목은 필수 입력값입니다."
+                                                  }
+                                              }
+                                    """),
+                            @ExampleObject(name = "제목 글자수 초과", value = """
+                                             {
+                                                  "code": "G002",
+                                                  "errors": {
+                                                      "title": "제목은 최대 20글자까지 가능합니다."
+                                                  }
+                                              }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "여행 정보 수정 실패 - 여행 미존재",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "여행 미존재", value = """
+                                             {
+                                                 "code": "T006",
+                                                 "message": "해당 여행이 존재하지 않습니다."
+                                             }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "409", description = "여행 정보 수정 실패 - 기존과 동일한 제목",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "기존과 동일한 제목", value = """
+                                             {
+                                                  "code": "T011",
+                                                  "message": "기존과 동일한 여행 제목입니다."
+                                              }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> updateTripInfo(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
+
+            @Valid @RequestBody TripReq.Update updateRequest
+    );
+
     @TrackApi(description = "여행 시간 수정")
     @Operation(summary = "여행 시간 수정", description = "여행 시간 수정 API")
     @ApiResponses({

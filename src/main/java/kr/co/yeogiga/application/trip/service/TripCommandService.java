@@ -93,6 +93,25 @@ public class TripCommandService {
     }
 
     /**
+     * 여행 정보를 갱신하는 메서드
+     * - 여행 제목 갱신
+     *
+     * @param tripId            여행 ID
+     * @param updateRequest     여행 업데이터 요청 DTO (title)
+     */
+    @Transactional
+    public void updateTripInfo(Long tripId, TripReq.Update updateRequest) {
+        Trip trip = tripService.readById(tripId)
+                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
+
+        if (trip.getTitle().equals(updateRequest.title())) {
+            throw new CustomException(TripErrorType.SAME_TRIP_TITLE);
+        }
+
+        trip.updateInfo(updateRequest.title());
+    }
+
+    /**
      * 여행 삭제 메서드
      *
      * @param tripId    여행 ID
