@@ -2,8 +2,11 @@ package kr.co.yeogiga.application.trip.service;
 
 import kr.co.yeogiga.application.trip.dto.TripRes;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
+import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.entity.Trip;
+import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.service.TripMemberService;
+import kr.co.yeogiga.domain.trip.service.TripService;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
@@ -18,11 +21,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class TripQueryService {
+    private final TripService tripService;
     private final TripMemberService tripMemberService;
     private final TripDayPlaceService tripDayPlaceService;
 
@@ -138,5 +141,21 @@ public class TripQueryService {
                     return TripRes.TripSummary.from(trip, members);
                 })
                 .toList();
+    }
+
+    /**
+     * 특정 여행 정보를 조회하는 메서드
+     *
+     * @param tripId        여행 ID
+     * @return              여행 정보
+     */
+    @Transactional(readOnly = true)
+    public TripRes.TripSummary getTrip(Long tripId) {
+        Trip trip = tripService.readById(tripId)
+                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
+
+        List<User> members = tripMemberService.readAllUserByTripId(tripId);
+
+        return TripRes.TripSummary.from(trip, members);
     }
 }
