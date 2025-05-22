@@ -56,6 +56,7 @@ public class TripController implements TripApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
+    @Override
     @PutMapping("/{tripId}")
     public ResponseEntity<?> updateTripInfo(
         @PathVariable Long tripId,
