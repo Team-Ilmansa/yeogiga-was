@@ -36,6 +36,7 @@ public class TripRes {
     public record TripSummary(
             Long tripId,
             String title,
+            String city,
             LocalDateTime startedAt,
             LocalDateTime endedAt,
             TravelStatus status,
