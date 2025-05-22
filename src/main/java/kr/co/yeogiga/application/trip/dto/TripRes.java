@@ -4,6 +4,7 @@ import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
 
+import kr.co.yeogiga.domain.user.entity.User;
 import lombok.Builder;
 import java.util.List;
 import java.time.LocalDateTime;
@@ -37,15 +38,17 @@ public class TripRes {
             String title,
             LocalDateTime startedAt,
             LocalDateTime endedAt,
-            TravelStatus status
+            TravelStatus status,
+            List<TripMemberRes.MemberInfo> members
     ) {
-        public static TripSummary from(Trip trip) {
+        public static TripSummary from(Trip trip, List<User> members) {
             return TripSummary.builder()
                     .tripId(trip.getId())
                     .title(trip.getTitle())
                     .startedAt(trip.getStartedAt())
                     .endedAt(trip.getEndedAt())
                     .status(trip.getTravelStatus())
+                    .members(members.stream().map(TripMemberRes.MemberInfo::fromEntity).toList())
                     .build();
         }
     }
