@@ -156,7 +156,10 @@ public interface TripApi {
                             @ExampleObject(value = """
                                              {
                                                  "code": 201,
-                                                 "message": "요청이 성공하였습니다."
+                                                 "message": "요청이 성공하였습니다.",
+                                                 "data": {
+                                                     "tripId": 2
+                                                 }
                                              }
                                     """)
                     })),
