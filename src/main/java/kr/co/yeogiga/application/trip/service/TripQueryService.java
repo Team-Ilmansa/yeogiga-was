@@ -130,7 +130,7 @@ public class TripQueryService {
      * 사용자가 속한 여행 목록을 반환하는 메서드
      * - 여행 시작 시간(staredAt) 기준 정렬, 아직 시간이 정해지지 않은 여행 맨 뒤에 위치
      *
-     * @param userId        사용자 ID(pk)
+     * @param userId        사용자 ID
      * @return              사용자가 속한 여행 목록
      */
     @Transactional(readOnly = true)
