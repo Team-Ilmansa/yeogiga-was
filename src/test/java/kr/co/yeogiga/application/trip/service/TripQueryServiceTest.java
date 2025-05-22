@@ -31,6 +31,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -198,7 +199,8 @@ public class TripQueryServiceTest {
             assertThat(result).isNull();
         }
     }
-  
+
+    @Nested
     @DisplayName("전체 여행 목록 조회")
     class GetAllTrip {
         private final Long userId = 1L;
@@ -224,6 +226,7 @@ public class TripQueryServiceTest {
         void success() {
             // given
             when(tripMemberService.readAllTripByUserId(userId)).thenReturn(List.of(trip));
+            when(tripMemberService.readAllUserByTripId(any())).thenReturn(List.of(user));
 
             // when
             List<TripRes.TripSummary> result = tripQueryService.getAllTrip(userId);

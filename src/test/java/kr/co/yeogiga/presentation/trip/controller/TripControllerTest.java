@@ -1,6 +1,7 @@
 package kr.co.yeogiga.presentation.trip.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.yeogiga.application.trip.dto.TripMemberRes;
 import kr.co.yeogiga.application.trip.dto.TripReq;
 import kr.co.yeogiga.application.trip.dto.TripRes;
 import kr.co.yeogiga.application.trip.service.TripCommandService;
@@ -324,7 +325,13 @@ public class TripControllerTest {
     @Nested
     @DisplayName("사용자가 속한 여행 조회")
     class GetAllTrip {
-
+        private User user = User.builder()
+                .username("username")
+                .password("password")
+                .email("test@test.com")
+                .nickname("nickname")
+                .role(Role.USER)
+                .build();
         @Test
         @DisplayName("성공")
         void success() throws Exception {
@@ -335,6 +342,7 @@ public class TripControllerTest {
                     .startedAt(LocalDateTime.of(2025, 5, 19, 12, 0))
                     .endedAt(LocalDateTime.of(2025, 5, 20, 12, 0))
                     .status(TravelStatus.IN_PROGRESS)
+                    .members(List.of(TripMemberRes.MemberInfo.fromEntity(user)))
                     .build();
 
             when(tripQueryService.getAllTrip(any())).thenReturn(List.of(tripSummary));
@@ -348,7 +356,8 @@ public class TripControllerTest {
             resultActions
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()))
-                    .andExpect(jsonPath("$.data").isArray());
+                    .andExpect(jsonPath("$.data").isArray())
+                    .andExpect(jsonPath("$.data[0].members").isArray());
         }
     }
 
