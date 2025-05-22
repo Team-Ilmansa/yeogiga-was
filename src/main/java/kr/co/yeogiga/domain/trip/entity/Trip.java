@@ -12,12 +12,16 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "trip")
+@SQLRestriction("deleted_at IS NULL")
+@SQLDelete(sql = "UPDATE trip SET deleted_at = NOW() WHERE id = ?")
 public class Trip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,6 +41,9 @@ public class Trip {
 
     @Column(name = "ended_at")
     private LocalDateTime endedAt;
+
+    @Column(name = "deleted_At")
+    private LocalDateTime deletedAt;
 
     @Column(name = "travel_status", nullable = false)
     @Enumerated(EnumType.STRING)

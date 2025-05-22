@@ -37,8 +37,11 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -315,6 +318,7 @@ public class TripControllerTest {
         }
     }
 
+    @Nested
     @DisplayName("사용자가 속한 여행 조회")
     class GetAllTrip {
 
@@ -342,6 +346,32 @@ public class TripControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()))
                     .andExpect(jsonPath("$.data").isArray());
+        }
+    }
+
+    @Nested
+    @DisplayName("여행 삭제")
+    class TripDeletion {
+        private final Long tripId = 1L;
+
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            doNothing().when(tripCommandService).removeTrip(tripId);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    delete("/api/v1/trip/{tripId}", tripId)
+                            .with(user(userDetails))
+            );
+
+            // then
+            verify(tripCommandService, times(1)).removeTrip(tripId);
+
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
         }
     }
 }

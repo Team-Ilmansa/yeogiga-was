@@ -234,4 +234,21 @@ public interface TripApi {
             @Valid
             @RequestBody TripReq.Time request
     );
+
+    @TrackApi(description = "여행 삭제")
+    @Operation(summary = "여행 삭제", description = "여행 삭제 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "여행 삭제 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                             {
+                                                 "code": 200,
+                                                 "message": "요청이 성공하였습니다."
+                                             }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> removeTrip(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId);
 }

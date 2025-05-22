@@ -34,4 +34,8 @@ public class TripService {
     public void updateAllTravelStatusToCompleted(LocalDateTime time) {
         tripRepository.updateTravelStatusCompleted(time);
     }
+
+    public void deleteById(Long tripId) {
+        tripRepository.deleteById(tripId);
+    }
 }
