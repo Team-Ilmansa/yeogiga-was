@@ -91,4 +91,13 @@ public class TripCommandService {
         tripService.updateAllTravelStatusToInProgress(time);
         tripService.updateAllTravelStatusToCompleted(time);
     }
+
+    /**
+     * 여행 삭제 메서드
+     *
+     * @param tripId    여행 ID
+     */
+    public void removeTrip(Long tripId) {
+        tripService.deleteById(tripId);
+    }
 }
