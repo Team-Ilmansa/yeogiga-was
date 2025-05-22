@@ -1,16 +1,18 @@
 package kr.co.yeogiga.application.trip.service;
 
 import kr.co.yeogiga.application.trip.dto.TripRes;
+import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.entity.Trip;
+import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.service.TripMemberService;
+import kr.co.yeogiga.domain.trip.service.TripService;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
-import kr.co.yeogiga.domain.trip.entity.TripMember;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.type.Role;
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,12 +33,16 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class TripQueryServiceTest {
+
+    @Mock
+    private TripService tripService;
 
     @Mock
     private TripMemberService tripMemberService;
@@ -246,6 +252,61 @@ public class TripQueryServiceTest {
 
             // then
             assertThat(result).hasSize(0);
+        }
+    }
+
+    @Nested
+    @DisplayName("특정 여행 조회")
+    class GetTrip {
+
+        private User user = User.builder()
+                .username("username")
+                .password("password")
+                .nickname("nickname")
+                .email("test@test.com")
+                .role(Role.USER)
+                .build();
+
+        private Trip trip = Trip.builder()
+                .title("title")
+                .city("대구광역시")
+                .leaderId(1L)
+                .travelStatus(TravelStatus.IN_PROGRESS)
+                .build();
+
+        @BeforeEach
+        void setUp() {
+            ReflectionTestUtils.setField(trip, "id", 1L);
+        }
+
+        @Test
+        @DisplayName("성공")
+        void success() {
+            // given
+            when(tripService.readById(trip.getId())).thenReturn(Optional.of(trip));
+            when(tripMemberService.readAllUserByTripId(trip.getId())).thenReturn((List.of(user)));
+
+            // when
+            TripRes.TripSummary result = tripQueryService.getTrip(1L);
+
+            // then
+            assertEquals(trip.getId(), result.tripId());
+            assertEquals(trip.getTitle(), result.title());
+            assertThat(result.members()).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 여행")
+        void failIfTripNotFound() {
+            // given
+            when(tripService.readById(trip.getId())).thenReturn(Optional.empty());
+
+            // when
+            CustomException exception = assertThrows(CustomException.class,
+                    () -> tripQueryService.getTrip(1L));
+
+            // then
+            assertEquals(TripErrorType.TRIP_NOT_FOUND, exception.getErrorType());
         }
     }
 }
