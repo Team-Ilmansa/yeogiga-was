@@ -163,6 +163,7 @@ public interface TripApi {
                                                       {
                                                           "tripId": 1,
                                                           "title": "여행2",
+                                                          "city": null,
                                                           "startedAt": null,
                                                           "endedAt": null,
                                                           "status": "PLANNED",
@@ -182,6 +183,7 @@ public interface TripApi {
                                                       {
                                                           "tripId": 2,
                                                           "title": "여행1",
+                                                          "city": null,
                                                           "startedAt": null,
                                                           "endedAt": null,
                                                           "status": "PLANNED",
