@@ -42,4 +42,10 @@ public class TripReq {
             return start.isBefore(end);
         }
     }
+
+    @Builder
+    public record Update(
+            String title
+    ) {
+    }
 }
