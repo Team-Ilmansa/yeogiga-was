@@ -65,4 +65,8 @@ public class Trip {
     public void updateStatus(TravelStatus status) {
         this.travelStatus = status;
     }
+
+    public void updateInfo(String title) {
+        this.title = title;
+    }
 }
