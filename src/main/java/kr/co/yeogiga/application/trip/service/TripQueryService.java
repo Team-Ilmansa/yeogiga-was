@@ -7,6 +7,7 @@ import kr.co.yeogiga.domain.trip.service.TripMemberService;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
+import kr.co.yeogiga.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -129,9 +130,13 @@ public class TripQueryService {
      * @param userId        사용자 ID(pk)
      * @return              사용자가 속한 여행 목록
      */
+    @Transactional(readOnly = true)
     public List<TripRes.TripSummary> getAllTrip(Long userId) {
         return tripMemberService.readAllTripByUserId(userId).stream()
-                .map(TripRes.TripSummary::from)
+                .map(trip -> {
+                    List<User> members = tripMemberService.readAllUserByTripId(trip.getId());
+                    return TripRes.TripSummary.from(trip, members);
+                })
                 .collect(Collectors.toList());
     }
 }
