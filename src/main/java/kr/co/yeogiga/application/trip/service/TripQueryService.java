@@ -137,6 +137,6 @@ public class TripQueryService {
                     List<User> members = tripMemberService.readAllUserByTripId(trip.getId());
                     return TripRes.TripSummary.from(trip, members);
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 }
