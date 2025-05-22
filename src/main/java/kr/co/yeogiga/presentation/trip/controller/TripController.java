@@ -40,6 +40,12 @@ public class TripController implements TripApi {
         return ResponseEntity.ok().body(SuccessResponse.from(tripMainInfo));
     }
 
+    @GetMapping("/{tripId}")
+    public ResponseEntity<?> getTrip(@PathVariable Long tripId) {
+        return ResponseEntity.ok()
+                .body(SuccessResponse.from(tripQueryService.getTrip(tripId)));
+    }
+
     @Override
     @GetMapping
     public ResponseEntity<?> getAllTrip(@AuthenticationPrincipal CustomUserDetails userDetails) {
