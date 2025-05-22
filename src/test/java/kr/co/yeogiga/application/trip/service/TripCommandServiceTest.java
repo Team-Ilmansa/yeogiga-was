@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -243,6 +244,25 @@ public class TripCommandServiceTest {
                 // then
                 assertEquals(TripErrorType.PERMISSION_DENIED_NOT_LEADER, exception.getErrorType());
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("여행 삭제")
+    class TripDeletion {
+        private final Long tripId = 1L;
+
+        @Test
+        @DisplayName("성공")
+        void success() {
+            // given
+            doNothing().when(tripService).deleteById(tripId);
+
+            // when
+            tripCommandService.removeTrip(tripId);
+
+            // then
+            verify(tripService, times(1)).deleteById(tripId);
         }
     }
 }
