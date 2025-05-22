@@ -319,6 +319,24 @@ public class TripCommandServiceTest {
             // then
             assertEquals(TripErrorType.TRIP_NOT_FOUND, exception.getErrorType());
         }
+
+        @Test
+        @DisplayName("실패 - 기존과 동일한 여행 제목")
+        void failIfSameTitle() {
+            // given
+            TripReq.Update updateRequest = TripReq.Update.builder()
+                    .title("title")
+                    .build();
+
+            when(tripService.readById(tripId)).thenReturn(Optional.of(trip));
+
+            // when
+            CustomException exception = assertThrows(CustomException.class,
+                    () -> tripCommandService.updateTripInfo(tripId, updateRequest));
+
+            // then
+            assertEquals(TripErrorType.SAME_TRIP_TITLE, exception.getErrorType());
+        }
     }
 }
 
