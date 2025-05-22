@@ -59,7 +59,7 @@ public class TripController implements TripApi {
     @PutMapping("/{tripId}")
     public ResponseEntity<?> updateTripInfo(
         @PathVariable Long tripId,
-        @RequestBody TripReq.Update updateRequest
+        @Valid @RequestBody TripReq.Update updateRequest
     ) {
         tripCommandService.updateTripInfo(tripId, updateRequest);
         return ResponseEntity.ok(SuccessResponse.ok());
