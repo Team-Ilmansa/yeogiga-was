@@ -106,7 +106,7 @@ public class TripControllerTest {
                     .city("대구광역시")
                     .build();
 
-            doNothing().when(tripCommandService).create(any(), any());
+            when(tripCommandService.create(any(), any())).thenReturn(1L);
 
             // when
             ResultActions resultActions = mockMvc.perform(
@@ -119,7 +119,8 @@ public class TripControllerTest {
             // then
             resultActions
                     .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$.message").value(SuccessResponse.created().message()));
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.created().message()))
+                    .andExpect(jsonPath("$.data.tripId").value(1L));
         }
 
         @Test
