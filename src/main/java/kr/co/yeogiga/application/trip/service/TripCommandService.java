@@ -31,7 +31,7 @@ public class TripCommandService {
      * @param creationRequest   여행 생성 요청 DTO
      */
     @Transactional
-    public void create(Long leaderId, TripReq.Creation creationRequest) {
+    public Long create(Long leaderId, TripReq.Creation creationRequest) {
         Trip trip = Trip.builder()
                 .title(creationRequest.title())
                 .city(creationRequest.city())
@@ -47,8 +47,9 @@ public class TripCommandService {
                 .user(leader)
                 .build();
 
-        tripService.save(trip);
+
         tripMemberService.save(tripMember);
+        return tripService.save(trip).getId();
     }
 
     /**

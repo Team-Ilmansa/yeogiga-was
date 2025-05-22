@@ -15,8 +15,8 @@ import java.util.Set;
 public class TripService {
     private final TripRepository tripRepository;
 
-    public void save(Trip trip) {
-        tripRepository.save(trip);
+    public Trip save(Trip trip) {
+        return tripRepository.save(trip);
     }
 
     public Optional<Trip> readById(Long tripId) {

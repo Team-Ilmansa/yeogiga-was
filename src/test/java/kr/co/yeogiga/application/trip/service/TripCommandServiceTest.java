@@ -77,13 +77,22 @@ public class TripCommandServiceTest {
                     .role(Role.USER)
                     .build();
 
+            Trip trip = Trip.builder()
+                    .title(creationRequest.title())
+                    .city(creationRequest.city())
+                    .travelStatus(TravelStatus.PLANNED)
+                    .leaderId(leaderId)
+                    .build();
+
+            ReflectionTestUtils.setField(trip, "id", 1L);
+
             when(userService.readById(any())).thenReturn(Optional.of(user));
-            doNothing().when(tripService).save(any());
+            when(tripService.save(any())).thenReturn(trip);
             doNothing().when(tripMemberService).save(any());
 
 
             // when
-            tripCommandService.create(leaderId, creationRequest);
+            Long newTripId = tripCommandService.create(leaderId, creationRequest);
 
             // then
             verify(tripService).save(tripCaptor.capture());
@@ -93,6 +102,8 @@ public class TripCommandServiceTest {
             assertEquals(creationRequest.city(), capturedTrip.getCity());
             assertEquals(leaderId, capturedTrip.getLeaderId());
             assertEquals(TravelStatus.PLANNED, capturedTrip.getTravelStatus());
+
+            assertEquals(1L, newTripId);
         }
     }
 
