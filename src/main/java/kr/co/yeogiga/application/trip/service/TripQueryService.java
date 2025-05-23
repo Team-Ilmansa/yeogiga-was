@@ -38,7 +38,7 @@ public class TripQueryService {
      *                      - 여행 중: 진행 중인 여행과 그 일차의 목적지 정보
      *                      - 그 외: null
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public TripRes.TripMainInfo getTripMainInfo(Long userId) {
         List<Trip> tripList = tripMemberService.readAllTripByUserId(userId);
 
