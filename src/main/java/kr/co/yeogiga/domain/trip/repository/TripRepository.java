@@ -15,13 +15,13 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     @Modifying
     @Query("UPDATE trip " +
             "SET travelStatus = 'IN_PROGRESS' " +
-            "WHERE travelStatus != 'IN_PROGRESS' AND startedAt <= :time AND :time <= endedAt")
+            "WHERE travelStatus != 'IN_PROGRESS' AND travelStatus != 'SETTING' AND startedAt <= :time AND :time <= endedAt")
     void updateTravelStatusInProgress(@Param(value = "time") LocalDateTime time);
 
     @Modifying
     @Query("UPDATE trip " +
             "SET travelStatus = 'COMPLETED' " +
-            "WHERE travelStatus != 'COMPLETED' AND endedAt <= :time")
+            "WHERE travelStatus != 'COMPLETED' AND travelStatus != 'SETTING' AND endedAt <= :time")
     void updateTravelStatusCompleted(@Param(value = "time") LocalDateTime time);
 
     List<Trip> findAllByIdIn(Set<Long> ids);
