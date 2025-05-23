@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query(value = "SELECT u.id, u.username, u.password, u.email, u.nickname, u.signed_up, u.role, u.deleted_at, u.created_at, u.modified_at " +
+    @Query(value = "SELECT u.id, u.username, u.password, u.email, u.nickname,  u.image_url, u.signed_up, u.role, u.deleted_at, u.created_at, u.modified_at " +
                    "FROM users u " +
                    "INNER JOIN oauth o ON u.id = o.user_id " +
                    "WHERE o.platform = :platform AND o.platform_id = :platformId", nativeQuery = true)
