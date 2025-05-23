@@ -35,7 +35,7 @@ public class TripCommandService {
         Trip trip = Trip.builder()
                 .title(creationRequest.title())
                 .leaderId(leaderId)
-                .travelStatus(TravelStatus.PLANNED)
+                .travelStatus(TravelStatus.SETTING)
                 .build();
 
         User leader = userService.readById(leaderId)
