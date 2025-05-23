@@ -34,7 +34,6 @@ public class TripCommandService {
     public Long create(Long leaderId, TripReq.Creation creationRequest) {
         Trip trip = Trip.builder()
                 .title(creationRequest.title())
-                .city(creationRequest.city())
                 .leaderId(leaderId)
                 .travelStatus(TravelStatus.PLANNED)
                 .build();

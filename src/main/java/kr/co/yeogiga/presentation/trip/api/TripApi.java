@@ -111,29 +111,40 @@ public interface TripApi {
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(value = """
                                              {
-                                                    "code": 200,
-                                                    "message": "요청이 성공하였습니다.",
-                                                    "data": {
-                                                        "tripId": 1,
-                                                        "title": "여행2",
-                                                        "city": null,
-                                                        "startedAt": "2025-05-15T12:00:00",
-                                                        "endedAt": "2025-05-21T12:01:00",
-                                                        "status": "COMPLETED",
-                                                        "members": [
-                                                            {
-                                                                "userId": 1,
-                                                                "nickname": "nick",
-                                                                "imageUrl": null
-                                                            },
-                                                            {
-                                                                "userId": 4,
-                                                                "nickname": "nick2",
-                                                                "imageUrl": null
-                                                            }
-                                                        ]
-                                                    }
-                                                }
+                                                     "code": 200,
+                                                     "message": "요청이 성공하였습니다.",
+                                                     "data": {
+                                                         "tripId": 1,
+                                                         "title": "새로운 여행1",
+                                                         "city": "경주시",
+                                                         "leaderId": 2,
+                                                         "startedAt": "2025-05-01T12:00:00",
+                                                         "endedAt": "2025-05-02T12:01:00",
+                                                         "status": "COMPLETED",
+                                                         "members": [
+                                                             {
+                                                                 "userId": 1,
+                                                                 "nickname": "nick3",
+                                                                 "imageUrl": null
+                                                             },
+                                                             {
+                                                                 "userId": 2,
+                                                                 "nickname": "nick",
+                                                                 "imageUrl": null
+                                                             },
+                                                             {
+                                                                 "userId": 3,
+                                                                 "nickname": "nick2",
+                                                                 "imageUrl": null
+                                                             },
+                                                             {
+                                                                 "userId": 4,
+                                                                 "nickname": "testNick",
+                                                                 "imageUrl": null
+                                                             }
+                                                         ]
+                                                     }
+                                                 }
                                     """)
                     })),
             @ApiResponse(responseCode = "404", description = "특정 여행 조회 실패",
@@ -157,46 +168,90 @@ public interface TripApi {
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(name = "조회 성공", value = """
                                              {
-                                                  "code": 200,
-                                                  "message": "요청이 성공하였습니다.",
-                                                  "data": [
-                                                      {
-                                                          "tripId": 1,
-                                                          "title": "여행2",
-                                                          "city": null,
-                                                          "startedAt": null,
-                                                          "endedAt": null,
-                                                          "status": "PLANNED",
-                                                          "members": [
-                                                              {
-                                                                  "userId": 1,
-                                                                  "nickname": "nick",
-                                                                  "imageUrl": "http://image.com"
-                                                              },
-                                                              {
-                                                                  "userId": 4,
-                                                                  "nickname": "nick2",
-                                                                  "imageUrl": null
-                                                              }
-                                                          ]
-                                                      },
-                                                      {
-                                                          "tripId": 2,
-                                                          "title": "여행1",
-                                                          "city": null,
-                                                          "startedAt": null,
-                                                          "endedAt": null,
-                                                          "status": "PLANNED",
-                                                          "members": [
-                                                              {
-                                                                  "userId": 1,
-                                                                  "nickname": "nick",
-                                                                  "imageUrl": "http://image.com"
-                                                              }
-                                                          ]
-                                                      }
-                                                  ]
-                                              }
+                                                   "code": 200,
+                                                   "message": "요청이 성공하였습니다.",
+                                                   "data": [
+                                                       {
+                                                           "tripId": 1,
+                                                           "title": "새로운 여행1",
+                                                           "city": "경주시",
+                                                           "leaderId": 2,
+                                                           "startedAt": "2025-05-01T12:00:00",
+                                                           "endedAt": "2025-05-02T12:01:00",
+                                                           "status": "COMPLETED",
+                                                           "members": [
+                                                               {
+                                                                   "userId": 1,
+                                                                   "nickname": "nick3",
+                                                                   "imageUrl": null
+                                                               },
+                                                               {
+                                                                   "userId": 2,
+                                                                   "nickname": "nick",
+                                                                   "imageUrl": null
+                                                               },
+                                                               {
+                                                                   "userId": 3,
+                                                                   "nickname": "nick2",
+                                                                   "imageUrl": null
+                                                               },
+                                                               {
+                                                                   "userId": 4,
+                                                                   "nickname": "testNick",
+                                                                   "imageUrl": null
+                                                               }
+                                                           ]
+                                                       },
+                                                       {
+                                                           "tripId": 2,
+                                                           "title": "여행2",
+                                                           "city": "대구광역시",
+                                                           "leaderId": 2,
+                                                           "startedAt": "2025-05-01T12:00:00",
+                                                           "endedAt": "2025-05-02T12:01:00",
+                                                           "status": "COMPLETED",
+                                                           "members": [
+                                                               {
+                                                                   "userId": 2,
+                                                                   "nickname": "nick",
+                                                                   "imageUrl": null
+                                                               }
+                                                           ]
+                                                       },
+                                                       {
+                                                           "tripId": 3,
+                                                           "title": "여행3",
+                                                           "city": "부산광역시",
+                                                           "leaderId": 2,
+                                                           "startedAt": "2025-05-01T12:00:00",
+                                                           "endedAt": "2025-05-02T12:01:00",
+                                                           "status": "COMPLETED",
+                                                           "members": [
+                                                               {
+                                                                   "userId": 2,
+                                                                   "nickname": "nick",
+                                                                   "imageUrl": null
+                                                               }
+                                                           ]
+                                                       },
+                                                       {
+                                                           "tripId": 4,
+                                                           "title": "여행4",
+                                                           "city": "가평",
+                                                           "leaderId": 2,
+                                                           "startedAt": "2025-05-17T12:00:00",
+                                                           "endedAt": "2025-05-25T12:01:00",
+                                                           "status": "IN_PROGRESS",
+                                                           "members": [
+                                                               {
+                                                                   "userId": 2,
+                                                                   "nickname": "nick",
+                                                                   "imageUrl": null
+                                                               }
+                                                           ]
+                                                       }
+                                                   ]
+                                               }
                                     """),
                             @ExampleObject(name = "조회 성공 - 속한 여행 없는 경우 빈 배열 반환", value = """
                                              {

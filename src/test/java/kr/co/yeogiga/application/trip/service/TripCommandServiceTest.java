@@ -59,7 +59,6 @@ public class TripCommandServiceTest {
 
         private TripReq.Creation creationRequest = TripReq.Creation.builder()
                 .title("test")
-                .city("대구광역시")
                 .build();
 
         @Captor
@@ -79,7 +78,6 @@ public class TripCommandServiceTest {
 
             Trip trip = Trip.builder()
                     .title(creationRequest.title())
-                    .city(creationRequest.city())
                     .travelStatus(TravelStatus.PLANNED)
                     .leaderId(leaderId)
                     .build();
@@ -99,7 +97,6 @@ public class TripCommandServiceTest {
 
             Trip capturedTrip = tripCaptor.getValue();
             assertEquals(creationRequest.title(), capturedTrip.getTitle());
-            assertEquals(creationRequest.city(), capturedTrip.getCity());
             assertEquals(leaderId, capturedTrip.getLeaderId());
             assertEquals(TravelStatus.PLANNED, capturedTrip.getTravelStatus());
 

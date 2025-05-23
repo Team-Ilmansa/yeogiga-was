@@ -105,7 +105,6 @@ public class TripControllerTest {
             // given
             TripReq.Creation creationRequest = TripReq.Creation.builder()
                     .title("test")
-                    .city("대구광역시")
                     .build();
 
             when(tripCommandService.create(any(), any())).thenReturn(1L);
@@ -131,7 +130,6 @@ public class TripControllerTest {
             // given
             TripReq.Creation creationRequest = TripReq.Creation.builder()
 //                    .title("test")
-                    .city("대구광역시")
                     .build();
 
             // when
@@ -153,8 +151,7 @@ public class TripControllerTest {
         void failValidationLength() throws Exception {
             // given
             TripReq.Creation creationRequest = TripReq.Creation.builder()
-                    .title("test")
-                    .city("대구광역시대구광역시대구광역시대구광역시대구광역시대구광역시")
+                    .title("titletitletitletitletitle")
                     .build();
 
             // when
@@ -168,7 +165,7 @@ public class TripControllerTest {
             // then
             resultActions
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.errors.city").value("여행 도시는 최대 20글자까지 가능합니다."));
+                    .andExpect(jsonPath("$.errors.title").exists());
         }
     }
 

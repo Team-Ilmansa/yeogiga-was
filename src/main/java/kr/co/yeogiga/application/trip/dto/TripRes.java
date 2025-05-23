@@ -37,6 +37,7 @@ public class TripRes {
             Long tripId,
             String title,
             String city,
+            Long leaderId,
             LocalDateTime startedAt,
             LocalDateTime endedAt,
             TravelStatus status,
@@ -46,6 +47,8 @@ public class TripRes {
             return TripSummary.builder()
                     .tripId(trip.getId())
                     .title(trip.getTitle())
+                    .city(trip.getCity())
+                    .leaderId(trip.getLeaderId())
                     .startedAt(trip.getStartedAt())
                     .endedAt(trip.getEndedAt())
                     .status(trip.getTravelStatus())
