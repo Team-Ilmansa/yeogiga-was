@@ -35,7 +35,7 @@ public class TripCommandService {
         Trip trip = Trip.builder()
                 .title(creationRequest.title())
                 .leaderId(leaderId)
-                .travelStatus(TravelStatus.PLANNED)
+                .travelStatus(TravelStatus.SETTING)
                 .build();
 
         User leader = userService.readById(leaderId)
@@ -53,6 +53,7 @@ public class TripCommandService {
 
     /**
      * 여행 시간 수정 메서드
+     * - 여행 일정과 목적지까지 확정이 나지 않은 상태(SETTING)일 경우, 여행 상태(TravelStatus)값 미변경
      *
      * @param tripId        여행 ID
      * @param userId        요청자 ID
@@ -75,10 +76,12 @@ public class TripCommandService {
             throw new CustomException(TripErrorType.PERMISSION_DENIED_NOT_LEADER);
         }
 
-        TravelStatus status = TravelStatus.resolveStatus(time.start(), time.end());
+        if (trip.getTravelStatus() != TravelStatus.SETTING) {
+            TravelStatus status = TravelStatus.resolveStatus(time.start(), time.end());
+            trip.updateStatus(status);
+        }
 
         trip.updateTime(time.start(), time.end());
-        trip.updateStatus(status);
     }
 
     /**

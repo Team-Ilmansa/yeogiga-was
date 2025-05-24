@@ -3,6 +3,7 @@ package kr.co.yeogiga.domain.trip.type;
 import java.time.LocalDateTime;
 
 public enum TravelStatus {
+    SETTING,
     PLANNED,
     IN_PROGRESS,
     COMPLETED;

@@ -1,6 +1,11 @@
 package kr.co.yeogiga.application.tripplace.service;
 
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.domain.trip.entity.Trip;
+import kr.co.yeogiga.domain.trip.exception.TripErrorType;
+import kr.co.yeogiga.domain.trip.service.TripService;
+import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
@@ -8,6 +13,7 @@ import kr.co.yeogiga.infrastructure.redis.RedisRepository;
 import kr.co.yeogiga.infrastructure.redis.constant.PlaceConstant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,17 +22,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TripPlaceSavingService {
     private final TripDayPlaceService tripDayPlaceService;
+    private final TripService tripService;
     private final RedisRepository redisRepository;
 
     /**
      * 여행 생성 완료 시, Redis에 임시 저장된 일차별 목적지들을 MongoDB에 저장하는 메서드
      * - 1일차부터 lastDay까지 순회하며 TripDayPlace 생성
      * - Redis에 임시 저장한 데이터 삭제 (list, set)
-     * - 생성된 TripDayPlace 리스트를 MongoDB에 일괄 저장
+     * - 생성된 TripDayPlace 리스트를 MongoDB에 일괄
+     * - 여행 생성 완료 시, 여행 상태 변경
      *
      * @param tripId  : 여행 ID
      * @param lastDay : 여행 마지막 일차
      */
+    @Transactional
     public void completeTrip(Long tripId, int lastDay) {
         List<TripDayPlace> tripDayPlaces = new ArrayList<>();
 
@@ -37,6 +46,11 @@ public class TripPlaceSavingService {
             redisRepository.del(PlaceConstant.dayPlacesKey(tripId, day));
             redisRepository.del(PlaceConstant.dayPlaceSetKey(tripId, day));
         }
+
+        Trip trip = tripService.readById(tripId)
+                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
+
+        trip.updateStatus(TravelStatus.resolveStatus(trip.getStartedAt(), trip.getEndedAt()));
 
         tripDayPlaceService.saveAll(tripDayPlaces);
     }

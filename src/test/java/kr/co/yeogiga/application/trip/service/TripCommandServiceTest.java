@@ -98,7 +98,7 @@ public class TripCommandServiceTest {
             Trip capturedTrip = tripCaptor.getValue();
             assertEquals(creationRequest.title(), capturedTrip.getTitle());
             assertEquals(leaderId, capturedTrip.getLeaderId());
-            assertEquals(TravelStatus.PLANNED, capturedTrip.getTravelStatus());
+            assertEquals(TravelStatus.SETTING, capturedTrip.getTravelStatus());
 
             assertEquals(1L, newTripId);
         }
@@ -114,6 +114,7 @@ public class TripCommandServiceTest {
                 .title("test")
                 .city("대구광역시")
                 .leaderId(userId)
+                .travelStatus(TravelStatus.PLANNED)
                 .build();
 
         @Test
