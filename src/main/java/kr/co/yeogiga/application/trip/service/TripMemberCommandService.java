@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class TripMemberCommandService {
@@ -49,5 +51,51 @@ public class TripMemberCommandService {
                 .build();
 
         tripMemberService.save(tripMember);
+    }
+
+    /**
+     * 여행 탈퇴 메서드
+     * - 여행 멤버가 2명 이상인 경우, 방장 탈퇴 불가능
+     * - 탈퇴 후 여행 멤버가 존재하지 않을 경우 여행 삭제
+     *
+     * @param tripId            여행 ID
+     * @param userId            요청 사용자 ID
+     * @throws CustomException  TripErrorType.TRIP_NOT_FOUND - 존재하지 않는 여행
+     * @throws CustomException  TripMemberErrorType.LEADER_CAN_NOT_LEAVE_TRIP
+     *                          - 여행 멤버가 2명 이상이고, 방장이 탈퇴하려는 경우
+     */
+    @Transactional
+    public void leaveTrip(Long tripId, Long userId) {
+        List<Long> memberIds = tripMemberService.readAllUserIdByTripId(tripId);
+        int memberCount = memberIds.size();
+
+        if (!isMember(memberIds, userId)) {
+            throw new CustomException(TripMemberErrorType.IS_NOT_MEMBER);
+        }
+
+        Long leaderId = tripService.findLeaderIdByTripId(tripId)
+                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
+
+        if (memberCount != 1 && userId.equals(leaderId) ) {
+            throw new CustomException(TripMemberErrorType.LEADER_CAN_NOT_LEAVE_TRIP);
+        }
+
+        tripMemberService.deleteByTripIdAndUserId(tripId, userId);
+
+        if (memberCount == 1) {
+            tripService.deleteById(tripId);
+        }
+    }
+
+    /**
+     * 여행 멤버 여부를 확인하는 메서드
+     *
+     * @param memberIds     여행 멤버 ID 목록
+     * @param userId        요청 보낸 사용자 ID
+     * @return              여행 멤버 여부
+     */
+    private boolean isMember(List<Long> memberIds, Long userId) {
+        return memberIds.stream()
+                .anyMatch(memberId -> memberId.equals(userId));
     }
 }
