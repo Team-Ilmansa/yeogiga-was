@@ -142,7 +142,7 @@ public class TripMemberCommandServiceTest {
         void successIfMoreThan2MembersAndNotLeader() {
             // given
             when(tripMemberService.readAllUserIdByTripId(tripId)).thenReturn(List.of(userId1, userId2));
-            when(tripService.findLeaderIdByTripId(tripId)).thenReturn(Optional.of(userId1));
+            when(tripService.readLeaderIdByTripId(tripId)).thenReturn(Optional.of(userId1));
             doNothing().when(tripMemberService).deleteByTripIdAndUserId(tripId, userId2);
 
             // when
@@ -157,7 +157,7 @@ public class TripMemberCommandServiceTest {
         void successIfOnlyOneMember() {
             // given
             when(tripMemberService.readAllUserIdByTripId(tripId)).thenReturn(List.of(userId1));
-            when(tripService.findLeaderIdByTripId(tripId)).thenReturn(Optional.of(userId1));
+            when(tripService.readLeaderIdByTripId(tripId)).thenReturn(Optional.of(userId1));
             doNothing().when(tripMemberService).deleteByTripIdAndUserId(tripId, userId1);
 
             // when
@@ -186,7 +186,7 @@ public class TripMemberCommandServiceTest {
         void failIfLeaderAndMemberIsMoreThan2() {
             // given
             when(tripMemberService.readAllUserIdByTripId(tripId)).thenReturn(List.of(userId1, userId2));
-            when(tripService.findLeaderIdByTripId(tripId)).thenReturn(Optional.of(userId1));
+            when(tripService.readLeaderIdByTripId(tripId)).thenReturn(Optional.of(userId1));
 
             // when
             CustomException exception = assertThrows(CustomException.class,
@@ -194,6 +194,56 @@ public class TripMemberCommandServiceTest {
 
             // then
             assertEquals(TripMemberErrorType.LEADER_CAN_NOT_LEAVE_TRIP, exception.getErrorType());
+        }
+    }
+
+    @Nested
+    @DisplayName("여행 멤버 추방")
+    class KickMember {
+        private final Long tripId = 1L;
+        private final Long leaderId = 1L;
+        private final Long targetUserId = 2L;
+
+        @Test
+        @DisplayName("성공")
+        void success() {
+            // given
+            when(tripService.readLeaderIdByTripId(tripId)).thenReturn(Optional.of(leaderId));
+            doNothing().when(tripMemberService).deleteByTripIdAndUserId(tripId, targetUserId);
+
+            // when
+            tripMemberCommandService.kickMember(tripId, leaderId, targetUserId);
+
+            // then
+            verify(tripMemberService, times(1)).deleteByTripIdAndUserId(tripId, targetUserId);
+        }
+
+        @Test
+        @DisplayName("실패 - 방장이 아닌 사용자가 요청한 경우")
+        void failIfNotLeader() {
+            // given
+            when(tripService.readLeaderIdByTripId(tripId)).thenReturn(Optional.of(3L));
+
+            // when
+            CustomException exception = assertThrows(CustomException.class,
+                    () -> tripMemberCommandService.kickMember(tripId, leaderId, targetUserId));
+
+            // then
+            assertEquals(TripMemberErrorType.ONLY_LEADER, exception.getErrorType());
+        }
+
+        @Test
+        @DisplayName("실패 - 자기 자신을 추방하려는 경우")
+        void failIfSelfKick() {
+            // given
+            when(tripService.readLeaderIdByTripId(tripId)).thenReturn(Optional.of(leaderId));
+
+            // when
+            CustomException exception = assertThrows(CustomException.class,
+                    () -> tripMemberCommandService.kickMember(tripId, leaderId, leaderId));
+
+            // then
+            assertEquals(TripMemberErrorType.CAN_NOT_SELF_KICK, exception.getErrorType());
         }
     }
 }

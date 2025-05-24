@@ -32,6 +32,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -261,6 +262,69 @@ public class TripMemberControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code").value(TripMemberErrorType.IS_NOT_MEMBER.getCode()))
                     .andExpect(jsonPath("$.message").value(TripMemberErrorType.IS_NOT_MEMBER.getMessage()));
+        }
+    }
+
+    @Nested
+    @DisplayName("여행 멤버 추방")
+    class KickMember {
+        private final Long tripId = 1L;
+        private final Long targetUserId = 2L;
+
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            doNothing().when(tripMemberCommandService).kickMember(anyLong(), any(), anyLong());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    delete("/api/v1/trip/{tripId}/members/{memberId}", tripId, targetUserId)
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+        }
+
+        @Test
+        @DisplayName("실패 - 방장이 아닌 사용자가 요청한 경우")
+        void failIfNotLeader() throws Exception {
+            // given
+            doThrow(new CustomException(TripMemberErrorType.ONLY_LEADER)).when(tripMemberCommandService).kickMember(anyLong(), any(), anyLong());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    delete("/api/v1/trip/{tripId}/members/{memberId}", tripId, targetUserId)
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.code").value(TripMemberErrorType.ONLY_LEADER.getCode()))
+                    .andExpect(jsonPath("$.message").value(TripMemberErrorType.ONLY_LEADER.getMessage()));
+        }
+
+        @Test
+        @DisplayName("실패 - 자기 자신을 추방하려는 경우")
+        void failIfSelfKick() throws Exception {
+            // given
+            doThrow(new CustomException(TripMemberErrorType.CAN_NOT_SELF_KICK)).when(tripMemberCommandService).kickMember(anyLong(), any(), anyLong());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    delete("/api/v1/trip/{tripId}/members/{memberId}", tripId, targetUserId)
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(TripMemberErrorType.CAN_NOT_SELF_KICK.getCode()))
+                    .andExpect(jsonPath("$.message").value(TripMemberErrorType.CAN_NOT_SELF_KICK.getMessage()));
         }
     }
 }

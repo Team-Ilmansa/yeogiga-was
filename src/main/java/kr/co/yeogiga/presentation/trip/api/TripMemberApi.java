@@ -136,4 +136,45 @@ public interface TripMemberApi {
             @Parameter(description = "여행 ID")
             @PathVariable Long tripId
     );
+
+    @TrackApi(description = "여행 멤버 추방")
+    @Operation(summary = "여행 멤버 추방", description = "여행 멤버 추방 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "여행 멤버 추방 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                             {
+                                                 "code": 200,
+                                                 "message": "요청이 성공하였습니다."
+                                             }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "400", description = "여행 멤버 추방 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "자기 자신을 추방하려 하는 경우", value = """
+                                             {
+                                                   "code": "T103",
+                                                   "message": "자기 자신은 추방할 수 없습니다."
+                                               }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "403", description = "여행 멤버 추방 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "여행 방장이 아닌 사용자가 요청한 경우", value = """
+                                             {
+                                                 "code": "T104",
+                                                 "message": "여행 방장만 이용 가능한 기능입니다."
+                                             }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> leaveTrip(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
+
+            @Parameter(description = "추방 멤버 ID")
+            @PathVariable Long memberId
+    );
 }
