@@ -98,4 +98,31 @@ public class TripMemberCommandService {
         return memberIds.stream()
                 .anyMatch(memberId -> memberId.equals(userId));
     }
+
+    /**
+     * 여행 멤버 추방 메서드
+     *
+     * @param tripId            여행 ID
+     * @param userId            추방 요청 사용자 ID
+     * @param targetUserId      추방 대상 사용자 ID
+     *
+     * @throws CustomException  TripErrorType.TRIP_NOT_FOUND - 여행 미존재
+     * @throws CustomException  TripMemberErrorType.ONLY_LEADER - 요청자가 여행 방장이 아닌 경우
+     * @throws CustomException  TripMemberErrorType.CAN_NOT_SELF_KICK - 자기 자신을 추방하려 하는 경우
+     */
+    @Transactional
+    public void kickMember(Long tripId, Long userId, Long targetUserId) {
+        Long leaderId = tripService.readLeaderIdByTripId(tripId)
+                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
+
+        if (!userId.equals(leaderId)) {
+            throw new CustomException(TripMemberErrorType.ONLY_LEADER);
+        }
+
+        if (userId.equals(targetUserId)) {
+            throw new CustomException(TripMemberErrorType.CAN_NOT_SELF_KICK);
+        }
+
+        tripMemberService.deleteByTripIdAndUserId(tripId, targetUserId);
+    }
 }
