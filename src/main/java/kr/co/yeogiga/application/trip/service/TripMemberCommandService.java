@@ -12,6 +12,7 @@ import kr.co.yeogiga.domain.user.exception.UserErrorType;
 import kr.co.yeogiga.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ public class TripMemberCommandService {
      * @throws CustomException  UserErrorType.NOT_FOUND - 존재하지 않는 사용자
      * @throws CustomException  TripMemberErrorType.ALREADY_EXISTS - 이미 여행에 참가 중인 사용자
      */
+    @Transactional
     public void joinTrip(Long tripId, Long userId) {
         Trip trip = tripService.readById(tripId)
                 .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
