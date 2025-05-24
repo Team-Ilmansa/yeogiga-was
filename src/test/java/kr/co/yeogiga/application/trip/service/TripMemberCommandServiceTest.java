@@ -142,7 +142,7 @@ public class TripMemberCommandServiceTest {
         void successIfMoreThan2MembersAndNotLeader() {
             // given
             when(tripMemberService.readAllUserIdByTripId(tripId)).thenReturn(List.of(userId1, userId2));
-            when(tripService.findLeaderIdByTripId(tripId)).thenReturn(Optional.of(userId1));
+            when(tripService.readLeaderIdByTripId(tripId)).thenReturn(Optional.of(userId1));
             doNothing().when(tripMemberService).deleteByTripIdAndUserId(tripId, userId2);
 
             // when
@@ -157,7 +157,7 @@ public class TripMemberCommandServiceTest {
         void successIfOnlyOneMember() {
             // given
             when(tripMemberService.readAllUserIdByTripId(tripId)).thenReturn(List.of(userId1));
-            when(tripService.findLeaderIdByTripId(tripId)).thenReturn(Optional.of(userId1));
+            when(tripService.readLeaderIdByTripId(tripId)).thenReturn(Optional.of(userId1));
             doNothing().when(tripMemberService).deleteByTripIdAndUserId(tripId, userId1);
 
             // when
@@ -186,7 +186,7 @@ public class TripMemberCommandServiceTest {
         void failIfLeaderAndMemberIsMoreThan2() {
             // given
             when(tripMemberService.readAllUserIdByTripId(tripId)).thenReturn(List.of(userId1, userId2));
-            when(tripService.findLeaderIdByTripId(tripId)).thenReturn(Optional.of(userId1));
+            when(tripService.readLeaderIdByTripId(tripId)).thenReturn(Optional.of(userId1));
 
             // when
             CustomException exception = assertThrows(CustomException.class,

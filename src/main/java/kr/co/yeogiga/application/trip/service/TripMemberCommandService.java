@@ -73,7 +73,7 @@ public class TripMemberCommandService {
             throw new CustomException(TripMemberErrorType.IS_NOT_MEMBER);
         }
 
-        Long leaderId = tripService.findLeaderIdByTripId(tripId)
+        Long leaderId = tripService.readLeaderIdByTripId(tripId)
                 .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
 
         if (memberCount != 1 && userId.equals(leaderId) ) {

@@ -27,7 +27,7 @@ public class TripService {
         return tripRepository.findAllByIdIn(ids);
     }
 
-    public Optional<Long> findLeaderIdByTripId(Long tripId) {
+    public Optional<Long> readLeaderIdByTripId(Long tripId) {
         return tripRepository.findLeaderIdById(tripId);
     }
 
