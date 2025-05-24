@@ -26,7 +26,15 @@ public class TripMemberService {
         return tripMemberRepository.findAllUserByTripId(tripId);
     }
 
+    public List<Long> readAllUserIdByTripId(Long tripId) {
+        return tripMemberRepository.findAllUserIdByTripId(tripId);
+    }
+
     public boolean existsByTripIdAndUserId(Long tripId, Long userId) {
         return tripMemberRepository.existsByTripIdAndUserId(tripId, userId);
+    }
+
+    public void deleteByTripIdAndUserId(Long tripId, Long userId) {
+        tripMemberRepository.deleteByTripIdAndUserId(tripId, userId);
     }
 }
