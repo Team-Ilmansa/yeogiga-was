@@ -39,6 +39,7 @@ public class TripMemberController implements TripMemberApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
+    @Override
     @DeleteMapping("/{tripId}/members")
     public ResponseEntity<?> leaveTrip(
             @AuthenticationPrincipal CustomUserDetails userDetails,

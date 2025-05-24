@@ -101,4 +101,39 @@ public interface TripMemberApi {
             @Parameter(description = "여행 ID")
             @PathVariable Long tripId
     );
+
+    @TrackApi(description = "여행 탈퇴")
+    @Operation(summary = "여행 탈퇴", description = "여행 탈퇴 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "여행 탈퇴 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                             {
+                                                 "code": 200,
+                                                 "message": "요청이 성공하였습니다."
+                                             }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "400", description = "여행 탈퇴 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "여행 멤버가 2명 이상이고, 요청자가 방장인 경우", value = """
+                                             {
+                                                  "code": "T101",
+                                                  "message": "방장은 여행에서 떠날 수 없습니다. 권한을 위임해주세요."
+                                              }
+                                    """),
+                            @ExampleObject(name = "여행 멤버가 아닌 경우", value = """
+                                             {
+                                                  "code": "T102",
+                                                  "message": "해당 여행의 멤버가 아닙니다."
+                                              }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> leaveTrip(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId
+    );
 }
