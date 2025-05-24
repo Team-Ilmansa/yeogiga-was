@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface TripRepository extends JpaRepository<Trip, Long> {
@@ -25,4 +26,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     void updateTravelStatusCompleted(@Param(value = "time") LocalDateTime time);
 
     List<Trip> findAllByIdIn(Set<Long> ids);
+
+    @Query("SELECT t.leaderId FROM trip t WHERE t.id = :tripId")
+    Optional<Long> findLeaderIdById(@Param(value = "tripId") Long tripId);
 }
