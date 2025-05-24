@@ -20,11 +20,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -124,6 +126,74 @@ public class TripMemberCommandServiceTest {
 
             // then
             assertEquals(TripMemberErrorType.ALREADY_EXISTS, exception.getErrorType());
+        }
+    }
+
+    @Nested
+    @DisplayName("여행 탈퇴")
+    class LeaveTrip {
+        private final Long tripId = 1L;
+
+        private final Long userId1 = 1L;
+        private final Long userId2 = 2L;
+
+        @Test
+        @DisplayName("2명 이상의 멤버가 존재하고, 리더가 아닌 경우")
+        void successIfMoreThan2MembersAndNotLeader() {
+            // given
+            when(tripMemberService.readAllUserIdByTripId(tripId)).thenReturn(List.of(userId1, userId2));
+            when(tripService.findLeaderIdByTripId(tripId)).thenReturn(Optional.of(userId1));
+            doNothing().when(tripMemberService).deleteByTripIdAndUserId(tripId, userId2);
+
+            // when
+            tripMemberCommandService.leaveTrip(tripId, userId2);
+
+            // then
+            verify(tripService, times(0)).deleteById(tripId);
+        }
+
+        @Test
+        @DisplayName("여행 멤버가 1명인 경우(방장 본인만 남은 상태)")
+        void successIfOnlyOneMember() {
+            // given
+            when(tripMemberService.readAllUserIdByTripId(tripId)).thenReturn(List.of(userId1));
+            when(tripService.findLeaderIdByTripId(tripId)).thenReturn(Optional.of(userId1));
+            doNothing().when(tripMemberService).deleteByTripIdAndUserId(tripId, userId1);
+
+            // when
+            tripMemberCommandService.leaveTrip(tripId, userId1);
+
+            // then
+            verify(tripService, times(1)).deleteById(tripId);
+        }
+
+        @Test
+        @DisplayName("실패 - 멤버가 아닌 경우")
+        void failIfNotMember() {
+            // given
+            when(tripMemberService.readAllUserIdByTripId(tripId)).thenReturn(List.of(userId1));
+
+            // when
+            CustomException exception = assertThrows(CustomException.class,
+                    () -> tripMemberCommandService.leaveTrip(tripId, userId2));
+
+            // then
+            assertEquals(TripMemberErrorType.IS_NOT_MEMBER, exception.getErrorType());
+        }
+
+        @Test
+        @DisplayName("실패 - 여행 리더이고, 멤버가 2명 이상인 경우")
+        void failIfLeaderAndMemberIsMoreThan2() {
+            // given
+            when(tripMemberService.readAllUserIdByTripId(tripId)).thenReturn(List.of(userId1, userId2));
+            when(tripService.findLeaderIdByTripId(tripId)).thenReturn(Optional.of(userId1));
+
+            // when
+            CustomException exception = assertThrows(CustomException.class,
+                    () -> tripMemberCommandService.leaveTrip(tripId, userId1));
+
+            // then
+            assertEquals(TripMemberErrorType.LEADER_CAN_NOT_LEAVE_TRIP, exception.getErrorType());
         }
     }
 }

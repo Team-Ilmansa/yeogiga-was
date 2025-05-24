@@ -27,6 +27,10 @@ public class TripService {
         return tripRepository.findAllByIdIn(ids);
     }
 
+    public Optional<Long> findLeaderIdByTripId(Long tripId) {
+        return tripRepository.findLeaderIdById(tripId);
+    }
+
     public void updateAllTravelStatusToInProgress(LocalDateTime time) {
         tripRepository.updateTravelStatusInProgress(time);
     }
