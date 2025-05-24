@@ -48,4 +48,14 @@ public class TripMemberController implements TripMemberApi {
         tripMemberCommandService.leaveTrip(tripId, userDetails.getUserId());
         return ResponseEntity.ok(SuccessResponse.ok());
     }
+
+    @DeleteMapping("/{tripId}/members/{memberId}")
+    public ResponseEntity<?> leaveTrip(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long tripId,
+            @PathVariable Long memberId
+    ) {
+        tripMemberCommandService.kickMember(tripId, userDetails.getUserId(), memberId);
+        return ResponseEntity.ok(SuccessResponse.ok());
+    }
 }
