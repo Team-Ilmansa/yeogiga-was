@@ -36,6 +36,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -196,6 +197,70 @@ public class TripMemberControllerTest {
                     .andExpect(jsonPath("$.data").isArray())
                     .andExpect(jsonPath("$.data[0].userId").value(1L))
                     .andExpect(jsonPath("$.data[1].userId").value(2L));;
+        }
+    }
+
+    @Nested
+    @DisplayName("여행 멤버 탈퇴")
+    class LeaveTrip {
+        private final Long tripId = 1L;
+
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            doNothing().when(tripMemberCommandService).leaveTrip(any(), any());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    delete("/api/v1/trip/{tripId}/members", tripId)
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+        }
+
+        @Test
+        @DisplayName("실패 - 멤버가 2명 이상이고 요청자가 방장인 경우")
+        void failIfMemberIsMoreThan2AndLeader() throws Exception {
+            // given
+            doThrow(new CustomException(TripMemberErrorType.LEADER_CAN_NOT_LEAVE_TRIP))
+                    .when(tripMemberCommandService).leaveTrip(any(), any());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    delete("/api/v1/trip/{tripId}/members", tripId)
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(TripMemberErrorType.LEADER_CAN_NOT_LEAVE_TRIP.getCode()))
+                    .andExpect(jsonPath("$.message").value(TripMemberErrorType.LEADER_CAN_NOT_LEAVE_TRIP.getMessage()));
+        }
+
+        @Test
+        @DisplayName("실패 - 여행 멤버가 아닌 경우")
+        void failItNotMember() throws Exception {
+            // given
+            doThrow(new CustomException(TripMemberErrorType.IS_NOT_MEMBER))
+                    .when(tripMemberCommandService).leaveTrip(any(), any());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    delete("/api/v1/trip/{tripId}/members", tripId)
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(TripMemberErrorType.IS_NOT_MEMBER.getCode()))
+                    .andExpect(jsonPath("$.message").value(TripMemberErrorType.IS_NOT_MEMBER.getMessage()));
         }
     }
 }
