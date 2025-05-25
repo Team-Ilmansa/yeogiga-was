@@ -1,5 +1,6 @@
 package kr.co.yeogiga.presentation.pin.controller;
 
+import jakarta.validation.Valid;
 import kr.co.yeogiga.application.pin.dto.PinReq;
 import kr.co.yeogiga.application.pin.service.PinCommandService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
@@ -21,7 +22,7 @@ public class PinController {
     @PostMapping("/{tripId}/pin")
     public ResponseEntity<?> createPin(
             @PathVariable Long tripId,
-            @RequestBody PinReq.Creation request
+            @Valid @RequestBody PinReq.Creation request
     ) {
         pinCommandService.createPin(tripId, request);
         return ResponseEntity.status(HttpStatus.CREATED)
