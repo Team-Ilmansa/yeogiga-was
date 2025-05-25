@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import kr.co.yeogiga.application.user.dto.FcmTokenReq;
 import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
 import kr.co.yeogiga.application.user.dto.UserInfoUpdateReq;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
@@ -181,5 +182,58 @@ public interface UserApi {
     ResponseEntity<?> update(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody UserInfoUpdateReq userInfoUpdateReq
+    );
+
+    @TrackApi(description = "Fcm Token 저장")
+    @Operation(summary = "Fcm Token 저장", description = "Fcm Token 저장 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Fcm Token 저장 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "Fcm Token 저장 성공", value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다."
+                                        }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "Fcm Token 저장 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "존재하지 않는 사용자", value = """
+                                        {
+                                            "code": "U000",
+                                            "message": "존재하지 않는 사용자입니다."
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> registerFcmToken(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody FcmTokenReq fcmTokenReq
+    );
+
+    @TrackApi(description = "Fcm Token 삭제")
+    @Operation(summary = "Fcm Token 삭제", description = "Fcm Token 삭제 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Fcm Token 삭제 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "Fcm Token 삭제 성공", value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다."
+                                        }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "Fcm Token 삭제 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "존재하지 않는 사용자", value = """
+                                        {
+                                            "code": "U000",
+                                            "message": "존재하지 않는 사용자입니다."
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> deleteFcmToken(
+            @AuthenticationPrincipal CustomUserDetails userDetails
     );
 }

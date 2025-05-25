@@ -72,6 +72,7 @@ public class UserController implements UserApi {
         return ResponseEntity.ok().body(SuccessResponse.ok());
     }
 
+    @Override
     @PostMapping("/fcm-token")
     public ResponseEntity<?> registerFcmToken(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -81,6 +82,7 @@ public class UserController implements UserApi {
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
+    @Override
     @DeleteMapping("/fcm-token")
     public ResponseEntity<?> deleteFcmToken(
             @AuthenticationPrincipal CustomUserDetails userDetails
