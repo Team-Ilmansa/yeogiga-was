@@ -23,6 +23,7 @@ public class PinController implements PinApi {
     private final PinCommandService pinCommandService;
     private final PinQueryService pinQueryService;
 
+    @Override
     @GetMapping("/{tripId}/pin")
     public ResponseEntity<?> getPin(@PathVariable Long tripId) {
         return ResponseEntity.ok()
