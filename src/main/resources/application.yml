@@ -50,3 +50,7 @@ jwt:
   expiration:
     access-token: ${JWT_AT_EXPIRATION:1800000}
     refresh-token: ${JWT_RT_EXPIRATION:86400000}
+
+--- # firebase
+firebase:
+  key: ${FIREBASE_KEY}
