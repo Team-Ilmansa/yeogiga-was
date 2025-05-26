@@ -19,6 +19,30 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Tag(name = "[집결지 핀(PIN) API]", description = "집결지 핀(PIN) API")
 public interface PinApi {
 
+    @TrackApi(description = "집결지 핀 조회")
+    @Operation(summary = "집결지 핀 조회", description = "집결지 핀 조회 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "집결지 핀 조회 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                             "code": 200,
+                                             "message": "요청이 성공하였습니다.",
+                                             "data": {
+                                                 "place": "대구광역시 달서구 공원순환로 36",
+                                                 "latitude": 30.857555601596,
+                                                 "longitude": 120.56408081052,
+                                                 "time": "2025-05-26T12:30:00"
+                                             }
+                                         }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> getPin(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId)
+   ;
+
     @TrackApi(description = "집결지 핀 생성")
     @Operation(summary = "집결지 핀 생성", description = "집결지 핀 생성 API")
     @ApiResponses({
