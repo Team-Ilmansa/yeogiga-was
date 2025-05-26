@@ -54,6 +54,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "WHERE email = :email LIMIT 1", nativeQuery = true)
     Optional<Long> findUserIdIncludeDeletedByEmail(@Param(value = "email") String email);
 
+    Optional<User> findByFcmToken(String fcmToken);
+
     @Modifying
     @Query(value = "DELETE " +
             "FROM users " +
