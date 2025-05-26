@@ -2,9 +2,11 @@ package kr.co.yeogiga.presentation.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.auth.constant.AuthConstants;
+import kr.co.yeogiga.application.user.dto.FcmTokenReq;
 import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
 import kr.co.yeogiga.application.user.dto.UserInfoRes;
 import kr.co.yeogiga.application.user.dto.UserInfoUpdateReq;
+import kr.co.yeogiga.application.user.service.UserFcmTokenService;
 import kr.co.yeogiga.application.user.service.UserManagementService;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.response.error.type.CommonErrorType;
@@ -45,6 +47,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
@@ -68,6 +71,9 @@ public class UserControllerTest {
 
     @MockBean
     private UserManagementService userManagementService;
+
+    @MockBean
+    private UserFcmTokenService userFcmTokenService;
 
     private CustomUserDetails userDetails;
 
@@ -409,6 +415,52 @@ public class UserControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code").value(CommonErrorType.VALIDATION_ERROR.getCode()))
                     .andExpect(jsonPath("$.errors.nickname").exists());
+        }
+    }
+
+    @Nested
+    @DisplayName("FcmToken 테스트")
+    class FcmToken {
+
+        @Test
+        @DisplayName("FcmToken 등록 테스트")
+        void registerFcmTokenSuccess() throws Exception {
+            // given
+            setUpUserDetails(Role.USER);
+            FcmTokenReq request = new FcmTokenReq("fcm-token");
+            doNothing().when(userFcmTokenService).registerFcmToken(userDetails.getUserId(), request);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    post("/api/v1/users/fcm-token")
+                            .with(user(userDetails))
+                            .content(objectMapper.writeValueAsBytes(request))
+                            .contentType(MediaType.APPLICATION_JSON)
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+        }
+
+        @Test
+        @DisplayName("FcmToken 삭제 테스트")
+        void deleteFcmTokenSuccess() throws Exception {
+            // given
+            setUpUserDetails(Role.USER);
+            doNothing().when(userFcmTokenService).deleteFcmToken(userDetails.getUserId());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    delete("/api/v1/users/fcm-token")
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
         }
     }
 }

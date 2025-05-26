@@ -38,6 +38,9 @@ public class User extends BaseTimeEntity {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(name = "fcm_token")
+    private String fcmToken;
+
     @ColumnDefault("false")
     @Column(name = "signed_up", nullable = false)
     private boolean signedUp;
@@ -73,5 +76,9 @@ public class User extends BaseTimeEntity {
 
     public void revertWithdrawal() {
         this.deletedAt = null;
+    }
+
+    public void updateFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 }
