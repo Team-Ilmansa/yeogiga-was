@@ -90,13 +90,27 @@ public class UserFcmTokenServiceTest {
                 .build();
 
         @Test
-        @DisplayName("성공")
-        void success() {
+        @DisplayName("성공 - 사용자 ID를 통한 사용자 토큰 삭제")
+        void deletesUserFcmTokenByUserId() {
             // given
             given(userService.readById(userId)).willReturn(Optional.ofNullable(user));
 
             // when
             userFcmTokenService.deleteFcmToken(userId);
+
+            // then
+            assertNull(user.getFcmToken());
+        }
+
+        @Test
+        @DisplayName("성공 - 토큰을 통한 사용자 토큰 삭제")
+        void deletesUserFcmTokenByFcmToken() {
+            // given
+            String fcmToken = "fcm-token";
+            given(userService.readByFcmToken(fcmToken)).willReturn(Optional.ofNullable(user));
+
+            // when
+            userFcmTokenService.deleteFcmTokenByToken(fcmToken);
 
             // then
             assertNull(user.getFcmToken());
