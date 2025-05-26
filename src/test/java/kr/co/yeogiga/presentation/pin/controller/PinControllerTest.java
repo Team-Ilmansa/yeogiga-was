@@ -3,10 +3,12 @@ package kr.co.yeogiga.presentation.pin.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.pin.dto.PinReq;
 import kr.co.yeogiga.application.pin.service.PinCommandService;
+import kr.co.yeogiga.application.pin.service.PinQueryService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
+import kr.co.yeogiga.domain.pin.entity.Pin;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.type.Role;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
@@ -29,7 +31,9 @@ import org.springframework.web.context.WebApplicationContext;
 import java.time.LocalDateTime;
 
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -51,6 +55,9 @@ public class PinControllerTest {
 
     @MockBean
     private PinCommandService pinCommandService;
+
+    @MockBean
+    private PinQueryService pinQueryService;
 
     private CustomUserDetails userDetails;
 
@@ -156,6 +163,40 @@ public class PinControllerTest {
             resultActions
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errors").exists());
+        }
+    }
+
+    @Nested
+    @DisplayName("핀 조회")
+    class GetPin {
+        private final Long tripId = 1L;
+
+        private Pin pin = Pin.builder()
+                .place("경상북도 경산시 대학로 280")
+                .latitude(1.1)
+                .longitude(2.2)
+                .time(LocalDateTime.of(2025, 5, 26, 13, 0))
+                .build();
+
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            when(pinQueryService.getPin(tripId)).thenReturn(pin);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/{tripId}/pin", tripId)
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.place").value(pin.getPlace()))
+                    .andExpect(jsonPath("$.data.latitude").value(pin.getLatitude()))
+                    .andExpect(jsonPath("$.data.longitude").value(pin.getLongitude()))
+                    .andExpect(jsonPath("$.data.time").value("2025-05-26T13:00:00"));
         }
     }
 }
