@@ -44,14 +44,21 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. Docker 이미지 build 및 push
+      # 3. Firebase를 위한 JSON 파일 생성
+      - name: Create Json
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: "./src/main/resources/yeogiga-808f2-firebase-adminsdk-fbsvc-b180bb10a5.json"
+          json: ${{ secrets.FIREBASE_PRODUCTION_JSON }}
+
+      # 4. Docker 이미지 build 및 push
       - name: docker build and push
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build -t ${{ secrets.DOCKER_USERNAME }}/yeogiga:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/yeogiga:latest
 
-      # 4. ec2 pull
+      # 5. ec2 pull
       - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
