@@ -43,6 +43,10 @@ public class UserService {
         return userRepository.findDeletedUserIdBefore(date);
     }
 
+    public Optional<User> readByFcmToken(String fcmToken) {
+        return userRepository.findByFcmToken(fcmToken);
+    }
+
     public boolean existsIncludeDeletedByUsername(String username) {
         return userRepository.findUserIdIncludeDeletedByUsername(username).isPresent();
     }

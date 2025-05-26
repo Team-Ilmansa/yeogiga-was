@@ -69,6 +69,9 @@ dependencies {
     /* JAXB */
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
     implementation 'com.sun.xml.bind:jaxb-impl:2.3.1'
+
+    /* FCM (Firebase Cloud Messaging) */
+    implementation 'com.google.firebase:firebase-admin:9.3.0'
 }
 
 tasks.named('test') {

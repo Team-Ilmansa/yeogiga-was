@@ -31,7 +31,7 @@ public class UserFcmTokenService {
 
     /**
      * 사용자의 FCM 토큰을 제거 메서드
-     * - 로그아웃, 회원 탈퇴 등에 사용
+     * - 로그아웃에 사용
      *
      * @param userId 토큰을 삭제할 사용자 ID
      * @throws CustomException UserErrorType.NOT_FOUND - 사용자가 존재하지 않는 경우
@@ -41,6 +41,19 @@ public class UserFcmTokenService {
         User user = userService.readById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
 
-        user.updateFcmToken(null);
+        user.clearFcmToken();
+    }
+
+    /**
+     * fcmToken을 통해 사용자의 FCM 토큰을 제거 메서드
+     *
+     * @param fcmToken 제거할 FcmToken
+     */
+    @Transactional
+    public void deleteFcmTokenByToken(String fcmToken) {
+        User user = userService.readByFcmToken(fcmToken)
+                .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
+
+        user.clearFcmToken();
     }
 }
