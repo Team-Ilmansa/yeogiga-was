@@ -2,6 +2,8 @@ package kr.co.yeogiga.application.trip.service;
 
 import kr.co.yeogiga.application.trip.dto.TripRes;
 import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.domain.calendar.entity.Calendar;
+import kr.co.yeogiga.domain.calendar.service.CalendarService;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.service.TripMemberService;
@@ -26,6 +28,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -49,6 +52,9 @@ public class TripQueryServiceTest {
 
     @Mock
     private TripDayPlaceService tripDayPlaceService;
+
+    @Mock
+    private CalendarService calendarService;
 
     @InjectMocks
     private TripQueryService tripQueryService;
@@ -307,6 +313,75 @@ public class TripQueryServiceTest {
 
             // then
             assertEquals(TripErrorType.TRIP_NOT_FOUND, exception.getErrorType());
+        }
+    }
+
+    @Nested
+    @DisplayName("준비 중 여행 조회")
+    class GetSettingTrip {
+        private final Long userId = 1L;
+
+        private Trip trip = Trip.builder()
+                .title("title")
+                .leaderId(userId)
+                .travelStatus(TravelStatus.SETTING)
+                .build();
+
+        private Calendar calendar = Calendar.builder()
+                .trip(trip)
+                .userId(userId)
+                .availableDates(List.of(
+                        LocalDate.of(2025, 7, 1),
+                        LocalDate.of(2025, 7, 2),
+                        LocalDate.of(2025, 7, 10)
+                ))
+                .build();
+
+        @BeforeEach
+        void setUp() {
+            ReflectionTestUtils.setField(trip, "id", 1L);
+        }
+
+        @Test
+        @DisplayName("성공 - 여행 시간은 확정된 경우")
+        void successIfTimeIsSet() {
+            // given
+            when(tripMemberService.readAllTripByUserId(userId)).thenReturn(List.of(trip));
+            when(calendarService.readByUserIdAndTripId(userId, trip.getId())).thenReturn(Optional.of(calendar));
+
+            // when
+            List<TripRes.SettingTripInfo> result = tripQueryService.getSettingTrip(userId);
+
+            // then
+            assertThat(result).hasSize(1);
+
+            TripRes.SettingTripInfo settingTripInfo = result.get(0);
+            assertEquals(trip.getId(), settingTripInfo.tripId());
+            assertEquals(trip.getTitle(), settingTripInfo.title());
+            assertEquals(LocalDate.of(2025, 7, 1), settingTripInfo.startedAt());
+            assertEquals(LocalDate.of(2025, 7, 10), settingTripInfo.endedAt());
+            assertEquals(TravelStatus.SETTING, settingTripInfo.status());
+        }
+
+        @Test
+        @DisplayName("성공 - 여행 시간이 확정되지 않은 경우")
+        void successIfTimeIsNotSet() {
+            // given
+            when(tripMemberService.readAllTripByUserId(userId)).thenReturn(List.of(trip));
+            when(calendarService.readByUserIdAndTripId(userId, trip.getId())).thenReturn(Optional.empty());
+
+            // when
+            List<TripRes.SettingTripInfo> result = tripQueryService.getSettingTrip(userId);
+
+            // then
+            assertThat(result).hasSize(1);
+
+            TripRes.SettingTripInfo settingTripInfo = result.get(0);
+            assertEquals(trip.getId(), settingTripInfo.tripId());
+            assertEquals(trip.getTitle(), settingTripInfo.title());
+            assertThat(settingTripInfo.startedAt()).isNull();
+            assertThat(settingTripInfo.endedAt()).isNull();
+            assertEquals(TravelStatus.SETTING, settingTripInfo.status());
         }
     }
 }
