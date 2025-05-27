@@ -6,6 +6,9 @@ import kr.co.yeogiga.domain.trip.type.TravelStatus;
 
 import kr.co.yeogiga.domain.user.entity.User;
 import lombok.Builder;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.time.LocalDateTime;
 
@@ -53,6 +56,25 @@ public class TripRes {
                     .endedAt(trip.getEndedAt())
                     .status(trip.getTravelStatus())
                     .members(members.stream().map(TripMemberRes.MemberInfo::fromEntity).toList())
+                    .build();
+        }
+    }
+
+    @Builder
+    public record SettingTripInfo(
+            Long tripId,
+            String title,
+            LocalDate startedAt,
+            LocalDate endedAt,
+            TravelStatus status
+    ) {
+        public static SettingTripInfo from(Trip trip, Pair<LocalDate, LocalDate> time) {
+            return SettingTripInfo.builder()
+                    .tripId(trip.getId())
+                    .title(trip.getTitle())
+                    .startedAt(time.getLeft())
+                    .endedAt(time.getRight())
+                    .status(trip.getTravelStatus())
                     .build();
         }
     }
