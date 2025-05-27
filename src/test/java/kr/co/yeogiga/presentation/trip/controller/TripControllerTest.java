@@ -35,6 +35,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -545,6 +546,40 @@ public class TripControllerTest {
                     .andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.code").value(TripErrorType.TRIP_NOT_FOUND.getCode()))
                     .andExpect(jsonPath("$.message").value(TripErrorType.TRIP_NOT_FOUND.getMessage()));
+        }
+    }
+
+    @Nested
+    @DisplayName("준비 중 여행 조회")
+    class GetSettingTrip {
+        private TripRes.SettingTripInfo settingTripInfo = TripRes.SettingTripInfo.builder()
+                .tripId(1L)
+                .title("title")
+                .status(TravelStatus.SETTING)
+                .startedAt(LocalDate.of(2025, 7, 1))
+                .endedAt(LocalDate.of(2025, 7, 10))
+                .build();
+
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            when(tripQueryService.getSettingTrip(any())).thenReturn(List.of(settingTripInfo));
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/setting")
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data[0].tripId").value(settingTripInfo.tripId()))
+                    .andExpect(jsonPath("$.data[0].title").value(settingTripInfo.title()))
+                    .andExpect(jsonPath("$.data[0].status").value(settingTripInfo.status().name()))
+                    .andExpect(jsonPath("$.data[0].startedAt").value(settingTripInfo.startedAt().toString()))
+                    .andExpect(jsonPath("$.data[0].endedAt").value(settingTripInfo.endedAt().toString()));
         }
     }
 }
