@@ -3,6 +3,8 @@ package kr.co.yeogiga.application.trip.service;
 import kr.co.yeogiga.application.trip.dto.TripRes;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.domain.calendar.entity.Calendar;
+import kr.co.yeogiga.domain.calendar.service.CalendarService;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.service.TripMemberService;
@@ -12,15 +14,19 @@ import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import kr.co.yeogiga.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +34,7 @@ public class TripQueryService {
     private final TripService tripService;
     private final TripMemberService tripMemberService;
     private final TripDayPlaceService tripDayPlaceService;
+    private final CalendarService calendarService;
 
     /**
      * 메인 화면 내 여행 정보를 조회하는 메서드
@@ -157,5 +164,36 @@ public class TripQueryService {
         List<User> members = tripMemberService.readAllUserByTripId(tripId);
 
         return TripRes.TripSummary.from(trip, members);
+    }
+
+    /**
+     * 준비 상태의 여행 목록을 조회하는 메서드
+     *
+     * @param userId        사용자 ID
+     * @return              준비 상태 여행 DTO 목록
+     */
+    @Transactional(readOnly = true)
+    public List<TripRes.SettingTripInfo> getSettingTrip(Long userId) {
+        List<Trip> tripList = tripMemberService.readAllTripByUserId(userId);
+
+        return tripList.stream()
+                .filter(trip -> TravelStatus.SETTING.equals(trip.getTravelStatus()))
+                .map(trip -> TripRes.SettingTripInfo.from(trip, getLeaderW2M(trip)))
+                .toList();
+    }
+
+    /**
+     * 여행 방장의 W2M 정보를 반환하는 메서드
+     *
+     * @param trip      여행 객체
+     * @return          여행 방장의 W2M 정보 (가장 빠른 날짜, 가장 늦은 날짜)
+     */
+    private Pair<LocalDate, LocalDate> getLeaderW2M(Trip trip) {
+        Optional<Calendar> calendar = calendarService.readByUserIdAndTripId(trip.getLeaderId(), trip.getId());
+
+        return calendar.isPresent()
+                ? Pair.of(Collections.min(calendar.get().getAvailableDates()), Collections.max(calendar.get().getAvailableDates()))
+                : Pair.of(null, null);
+
     }
 }
