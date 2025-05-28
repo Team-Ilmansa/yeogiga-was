@@ -8,7 +8,11 @@ import kr.co.yeogiga.infrastructure.redis.constant.PlaceConstant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 여행 생성 단계에서 사용자들이 선택한 "목적지"들을 임시 저장하고 관리하는 서비스 클래스.
@@ -96,26 +100,61 @@ public class TripPlaceEditingService {
     }
 
     /**
-     * 편집 중인 여행 일정의 목적지를 수정하는 메서드 (목적지의 새로운 순서로 덮어쓰기 등)
+     * 편집 중인 여행 일정의 목적지 순서를 수정하는 메서드
      * - 기존 List & Set 모두 삭제
      * - 새로운 순서대로 List & Set에 저장
      *
-     * @param tripId : 여행 ID
-     * @param day    : 여행 일차
-     * @param places : 새로운 순서의 TripPlaceDto.Request 리스트
+     * @param tripId         여행 ID
+     * @param day            여행 일차
+     * @param reorderRequest 재정렬할 목적지 ID 리스트
      */
-    public void updatePlaces(Long tripId, int day, List<TripPlaceReq.Request> places) {
+    public void reorderPlaces(Long tripId, int day, TripPlaceReq.ReorderRequest reorderRequest) {
         String dayPlacesKey = PlaceConstant.dayPlacesKey(tripId, day);
         String dayPlaceSetKey = PlaceConstant.dayPlaceSetKey(tripId, day);
+
+        List<TripPlaceReq.StoredFormat> storedPlaces =
+                redisRepository.getList(dayPlacesKey, TripPlaceReq.StoredFormat.class);
+
+        if (storedPlaces == null || storedPlaces.isEmpty()) {
+            return;
+        }
+
+        Map<String, TripPlaceReq.StoredFormat> placeMap = storedPlaces.stream()
+                .collect(Collectors.toMap(TripPlaceReq.StoredFormat::id, Function.identity()));
+
+        // 요청한 정렬 순서에 맞게 목적지 재정렬
+        List<TripPlaceReq.StoredFormat> reordered =
+                buildReorderedPlaces(reorderRequest.orderedPlaceIds(), placeMap);
 
         redisRepository.del(dayPlacesKey);
         redisRepository.del(dayPlaceSetKey);
 
-        for (TripPlaceReq.Request place : places) {
-            redisRepository.setList(dayPlacesKey, place.toStoredFormat());
+        for (TripPlaceReq.StoredFormat place : reordered) {
+            redisRepository.setList(dayPlacesKey, place);
             String placeUniqueKey = makeUniqueKey(place.name(), place.latitude(), place.longitude());
             redisRepository.addToSet(dayPlaceSetKey, placeUniqueKey);
         }
+    }
+
+    /**
+     * 목적지를 정렬하여 반환하는 메서드
+     *
+     * @param orderedIds 정렬된 Place ID 목록
+     * @param placeMap   ID 기준 Place 매핑 정보
+     * @return 재정렬된 Place 리스트
+     */
+    private List<TripPlaceReq.StoredFormat> buildReorderedPlaces(
+            List<String> orderedIds,
+            Map<String, TripPlaceReq.StoredFormat> placeMap
+    ) {
+        List<TripPlaceReq.StoredFormat> reordered = new ArrayList<>();
+
+        for (String placeId : orderedIds) {
+            TripPlaceReq.StoredFormat place = placeMap.get(placeId);
+            reordered.add(place);
+        }
+
+        return reordered;
     }
 
     /**
