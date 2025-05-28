@@ -32,7 +32,9 @@ public class TripPlaceSortService {
         List<TripPlaceReq.StoredFormat> places =
                 redisRepository.getList(listKey, TripPlaceReq.StoredFormat.class);
 
-        if (places.isEmpty()) return;
+        if (places == null || places.isEmpty()) {
+            return;
+        }
 
         // 숙소 카테고리 & 나머지 카테고리 분리
         List<TripPlaceReq.StoredFormat> lodgings = new ArrayList<>();
