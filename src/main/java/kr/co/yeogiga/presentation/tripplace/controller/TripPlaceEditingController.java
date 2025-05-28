@@ -44,11 +44,11 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
 
     @Override
     @PutMapping("/{tripId}/days/{day}/places")
-    public ResponseEntity<?> updatePlaces(@PathVariable Long tripId,
+    public ResponseEntity<?> reorderPlaces(@PathVariable Long tripId,
                                           @PathVariable int day,
-                                          @RequestBody List<TripPlaceReq.Request> requests) {
+                                          @RequestBody TripPlaceReq.ReorderRequest request) {
 
-        tripPlaceEditingService.updatePlaces(tripId, day, requests);
+        tripPlaceEditingService.reorderPlaces(tripId, day, request);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
