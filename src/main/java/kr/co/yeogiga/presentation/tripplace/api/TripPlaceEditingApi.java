@@ -91,7 +91,7 @@ public interface TripPlaceEditingApi {
 
     @TrackApi(description = "일차별 목적지의 순서를 수정 (이 과정에서 목적지 삭제도 가능)")
     @Operation(summary = "일차별 목적지의 순서를 수정 (이 과정에서 목적지 삭제도 가능)", description = "일차별 목적지의 순서를 수정하는 API입니다." +
-            "<br/> 예를 들어, 기존 순서가 (a, b, c, d, e)이고, 순서를 (b, c, a, d, e)로 바꾼다면 바뀐 순서에 대한 목적지 정보들을 List형식으로 담아 보내면 됩니다." +
+            "<br/> 예를 들어, 기존 순서가 (a, b, c, d, e)이고, 순서를 (b, c, a, d, e)로 바꾼다면 바뀐 순서에 대한 목적지 id를 List형식으로 바꿔 보내면 됩니다." +
             "<br/> 삭제도 가능하다는 말은, (a, b, c, d, e)에서 (b, c, e, d)로 바꿔서 보낸다면 a는 자동으로 삭제됩니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "목적지 수정 성공",
@@ -104,15 +104,15 @@ public interface TripPlaceEditingApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> updatePlaces(
+    ResponseEntity<?> reorderPlaces(
             @Parameter(description = "여행 ID")
             @PathVariable Long tripId,
 
             @Parameter(description = "수정하고자 하는 일차")
             @PathVariable int day,
 
-            @Parameter(description = "변경된 순서로의 목적지 정보 리스트")
-            @RequestBody List<TripPlaceReq.Request> requests
+            @Parameter(description = "변경된 순서로의 목적지 ID 리스트")
+            @RequestBody TripPlaceReq.ReorderRequest request
     );
 
     @TrackApi(description = "일차에 지정된 목적지 삭제")
