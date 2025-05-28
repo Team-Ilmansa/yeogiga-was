@@ -309,4 +309,40 @@ public class TripQueryServiceTest {
             assertEquals(TripErrorType.TRIP_NOT_FOUND, exception.getErrorType());
         }
     }
+
+    @Nested
+    @DisplayName("준비 중 여행 조회")
+    class GetSettingTrip {
+        private final Long userId = 1L;
+
+        private Trip trip = Trip.builder()
+                .title("title")
+                .leaderId(userId)
+                .travelStatus(TravelStatus.SETTING)
+                .build();
+
+        @BeforeEach
+        void setUp() {
+            ReflectionTestUtils.setField(trip, "id", 1L);
+        }
+
+        @Test
+        @DisplayName("성공")
+        void success() {
+            // given
+            when(tripMemberService.readAllSettingTripByUserId(userId)).thenReturn(List.of(trip));
+
+            // when
+            List<TripRes.SettingTripInfo> result = tripQueryService.getSettingTrip(userId);
+
+            // then
+            System.out.println(result);
+            assertThat(result).hasSize(1);
+
+            TripRes.SettingTripInfo settingTripInfo = result.get(0);
+            assertEquals(trip.getId(), settingTripInfo.tripId());
+            assertEquals(trip.getTitle(), settingTripInfo.title());
+            assertEquals(TravelStatus.SETTING, settingTripInfo.status());
+        }
+    }
 }

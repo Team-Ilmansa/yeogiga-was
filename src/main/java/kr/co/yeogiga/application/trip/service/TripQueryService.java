@@ -158,4 +158,19 @@ public class TripQueryService {
 
         return TripRes.TripSummary.from(trip, members);
     }
+
+    /**
+     * 준비 상태의 여행 목록을 조회하는 메서드
+     *
+     * @param userId        사용자 ID
+     * @return              준비 상태 여행 DTO 목록
+     */
+    @Transactional(readOnly = true)
+    public List<TripRes.SettingTripInfo> getSettingTrip(Long userId) {
+        List<Trip> settingTripList = tripMemberService.readAllSettingTripByUserId(userId);
+
+        return settingTripList.stream()
+                .map(TripRes.SettingTripInfo::from)
+                .toList();
+    }
 }

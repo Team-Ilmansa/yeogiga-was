@@ -264,6 +264,28 @@ public interface TripApi {
     })
     ResponseEntity<?> getAllTrip(@AuthenticationPrincipal CustomUserDetails userDetails);
 
+    @TrackApi(description = "준비 중 여행 조회")
+    @Operation(summary = "준비 중 여행 조회", description = "준비 중 여행 조회 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "준비 중 여행 조회 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "준비 중 여행 조회 성공", value = """
+                                             {
+                                                       "code": 200,
+                                                       "message": "요청이 성공하였습니다.",
+                                                       "data": [
+                                                           {
+                                                               "tripId": 3,
+                                                               "title": "여행3",
+                                                               "status": "SETTING"
+                                                           }
+                                                       ]
+                                                   }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> getSettingTrip(@AuthenticationPrincipal CustomUserDetails userDetails);
+
     @TrackApi(description = "여행 생성")
     @Operation(summary = "여행 생성", description = "여행 생성 API")
     @ApiResponses({

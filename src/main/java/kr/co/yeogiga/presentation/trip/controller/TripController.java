@@ -55,6 +55,13 @@ public class TripController implements TripApi {
     }
 
     @Override
+    @GetMapping("/setting")
+    public ResponseEntity<?> getSettingTrip(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok()
+                .body(SuccessResponse.from(tripQueryService.getSettingTrip(userDetails.getUserId())));
+    }
+
+    @Override
     @PostMapping
     public ResponseEntity<?> createTrip(
             @AuthenticationPrincipal CustomUserDetails userDetails,

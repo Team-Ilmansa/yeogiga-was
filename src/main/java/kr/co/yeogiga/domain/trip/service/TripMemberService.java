@@ -22,6 +22,10 @@ public class TripMemberService {
         return tripMemberRepository.findAllTripByUserId(userId);
     }
 
+    public List<Trip> readAllSettingTripByUserId(Long userId) {
+        return tripMemberRepository.findAllSettingTripByUserId(userId);
+    }
+
     public List<User> readAllUserByTripId(Long tripId) {
         return tripMemberRepository.findAllUserByTripId(tripId);
     }

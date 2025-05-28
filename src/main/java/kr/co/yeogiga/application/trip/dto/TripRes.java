@@ -3,11 +3,11 @@ package kr.co.yeogiga.application.trip.dto;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
-
 import kr.co.yeogiga.domain.user.entity.User;
 import lombok.Builder;
-import java.util.List;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class TripRes {
 
@@ -53,6 +53,21 @@ public class TripRes {
                     .endedAt(trip.getEndedAt())
                     .status(trip.getTravelStatus())
                     .members(members.stream().map(TripMemberRes.MemberInfo::fromEntity).toList())
+                    .build();
+        }
+    }
+
+    @Builder
+    public record SettingTripInfo(
+            Long tripId,
+            String title,
+            TravelStatus status
+    ) {
+        public static SettingTripInfo from(Trip trip) {
+            return SettingTripInfo.builder()
+                    .tripId(trip.getId())
+                    .title(trip.getTitle())
+                    .status(trip.getTravelStatus())
                     .build();
         }
     }
