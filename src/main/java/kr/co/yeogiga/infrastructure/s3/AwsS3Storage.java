@@ -26,10 +26,14 @@ public class AwsS3Storage {
      * @param imageUploadRequest : 업로드할 이미지 정보가 담긴 DTO
      * @return 업로드된 이미지의 S3 URL
      */
-    public String upload(ImageUploadRequest imageUploadRequest) {
+    public String upload(
+            ImageUploadRequest.AwsUploadInfo imageUploadRequest,
+            ImageUploadRequest.ImageType imageType
+    ) {
         String fileName = generateFileName(
+                imageType,
                 imageUploadRequest.originalFilename(),
-                imageUploadRequest.tripId()
+                imageUploadRequest.id()
         );
         ObjectMetadata metadata = createObjectMetadata(
                 imageUploadRequest.contentType(),
@@ -62,8 +66,13 @@ public class AwsS3Storage {
      * @param id               : 이미지가 속한 DB PK값
      * @return S3에 저장할 파일 경로
      */
-    private String generateFileName(String originalFileName, Long id) {
-        return "image/" + id + "/" + UUID.randomUUID() + "-" + originalFileName;
+    private String generateFileName(ImageUploadRequest.ImageType imageType, String originalFileName, Long id) {
+        String rootDir = switch (imageType) {
+            case TRIP -> "image/";
+            case PROFILE -> "profile/";
+        };
+
+        return rootDir +  id + "/" + UUID.randomUUID() + "-" + originalFileName;
     }
 
     /**

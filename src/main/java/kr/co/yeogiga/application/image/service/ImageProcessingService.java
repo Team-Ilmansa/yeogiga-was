@@ -26,13 +26,13 @@ public class ImageProcessingService {
      * @param imageUploadRequest 업로드할 이미지 및 관련 정보가 담긴 DTO
      */
     @Async
-    public void processImageUpload(ImageUploadRequest imageUploadRequest) {
+    public void processImageUpload(ImageUploadRequest.TripImage imageUploadRequest) {
         try {
             ImageMetadataDto metadata = imageMetadataService.extractMetadata(
                     imageUploadRequest.bytes(), imageUploadRequest.originalFilename()
             );
 
-            String url = awsS3Storage.upload(imageUploadRequest);
+            String url = awsS3Storage.upload(imageUploadRequest.toAwsUploadInfo(), ImageUploadRequest.ImageType.TRIP);
 
             Image image = Image.builder()
                     .url(url)

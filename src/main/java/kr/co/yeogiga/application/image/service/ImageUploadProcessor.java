@@ -26,7 +26,7 @@ public class ImageUploadProcessor {
     public void process(List<MultipartFile> images, Long tripId, String tripDayPlaceId) {
         for (MultipartFile image : images) {
             try {
-                ImageUploadRequest imageUploadRequest = ImageUploadRequest.from(image, tripId, tripDayPlaceId);
+                ImageUploadRequest.TripImage imageUploadRequest = ImageUploadRequest.TripImage.from(image, tripId, tripDayPlaceId);
                 imageProcessingService.processImageUpload(imageUploadRequest);
             } catch (IOException e) {
                 log.error("Failed to process image - filename: {}", image.getOriginalFilename(), e);
