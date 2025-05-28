@@ -47,8 +47,8 @@ public class TripDayPlaceService {
         return tripDayPlaceRepository.findByTripIdSorted(tripId);
     }
 
-    public Double readOrderByIdAndPlaceId(String id, String placeId) {
-        return tripDayPlaceRepository.findOrderByIdAndPlaceId(id, placeId);
+    public Double readMaxOrderById(String id) {
+        return tripDayPlaceRepository.findMaxOrderById(id);
     }
 
     public Optional<Place> readPlaceByIdAndPlaceId(String id, String placeId) {

@@ -1,6 +1,5 @@
 package kr.co.yeogiga.domain.tripplace.repository;
 
-import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.tripplace.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
@@ -12,7 +11,7 @@ public interface CustomTripDayPlaceRepository {
     void savePlace(String id, Place place);
     void saveImage(String id, String placeId, Image image);
     void saveImageToUnmatched(String id, Image image);
-    Double findOrderByIdAndPlaceId(String id, String placeId);
+    Double findMaxOrderById(String id);
     Optional<TripDayPlace> findByIdSorted(String id);
     List<TripDayPlace> findByTripIdSorted(Long tripId);
     Optional<Place> findPlaceByIdAndPlaceId(String id, String placeId);

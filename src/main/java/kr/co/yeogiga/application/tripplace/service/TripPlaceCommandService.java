@@ -22,64 +22,32 @@ public class TripPlaceCommandService {
 
     /**
      * 여행 일차에 새로운 목적지를 삽입 메서드
-     * 삽입 위치는 prevPlaceId, nextPlaceId를 기준으로 order를 계산하여 결정
+     * 삽입 위치는 현재 목적지 order 중 최대값을 기준으로 order를 계산하여 결정
      *
-     * @param tripPlaceId   여행 일차(TripDayPlace)의 ID
-     * @param insertRequest 삽입할 장소 정보 및 위치 기준 정보
+     * @param tripDayPlaceId 여행 일차(TripDayPlace)의 ID
+     * @param insertRequest  삽입할 장소 정보 및 위치 기준 정보
      */
-    public void addNewPlace(String tripPlaceId, TripPlaceReq.InsertRequest insertRequest) {
-        Double prevPlaceOrder = getPlaceOrder(tripPlaceId, insertRequest.prevPlaceId());
-        Double nextPlaceOrder = getPlaceOrder(tripPlaceId, insertRequest.nextPlaceId());
+    public void addNewPlace(String tripDayPlaceId, TripPlaceReq.InsertRequest insertRequest) {
+        Double maxPlaceOrder = tripDayPlaceService.readMaxOrderById(tripDayPlaceId);
 
         tripDayPlaceService.savePlace(
-                tripPlaceId,
-                createPlace(insertRequest, prevPlaceOrder, nextPlaceOrder)
+                tripDayPlaceId,
+                createPlace(insertRequest, maxPlaceOrder)
         );
     }
 
     /**
-     * 목적지의 순서(order)를 반환하는 메서드
-     * - 주어진 placeId가 존재할 경우, 해당 place의 order 값을 반환
-     *
-     * @param tripPlaceId 여행 일차 ID
-     * @param placeId     참조할 목적지 ID (nullable)
-     * @return order 값 또는 null
-     */
-    private Double getPlaceOrder(String tripPlaceId, String placeId) {
-        if (placeId != null) {
-            return tripDayPlaceService.readOrderByIdAndPlaceId(tripPlaceId, placeId);
-        }
-
-        return null;
-    }
-
-    /**
      * 목적지 객체를 만드는 메서드
-     * 삽입 기준이 되는 prev/next order 값을 기반으로 새로운 order를 계산하여 새로운 Place 객체를 생성
-     * 1. prev/next 모두 null => 존재하는 목적지가 없는 상황
-     * 2. prev가 null => 목적지를 가장 앞에 추가하는 상황
-     * 3. next가 null => 목적지를 가장 뒤에 추가하는 상황
-     * 4. prev/next 모두 null x => 목적지 사이에 추가하는 상황
+     * 현재 목적지 order 최대값 기반으로 새로운 order를 계산하여 새로운 Place 객체를 생성
+     * 1. maxPlaceOrder : 0.0 => 존재하는 목적지가 없는 상황
+     * 2. maxPlaceOrder : 0.0 x => 마지막 목적지 뒤에 추가하는 상화
      *
-     * @param insertRequest  사용자 요청 정보
-     * @param prevPlaceOrder 이전 목적지의 order 값 (nullable)
-     * @param nextPlaceOrder 다음 목적지의 order 값 (nullable)
+     * @param insertRequest 사용자 요청 정보
+     * @param maxPlaceOrder 현재 목적지 order 중 최대값 (nullable)
      * @return 생성된 Place 객체
      */
-    private Place createPlace(TripPlaceReq.InsertRequest insertRequest, Double prevPlaceOrder, Double nextPlaceOrder) {
-        if (prevPlaceOrder == null && nextPlaceOrder == null) {
-            return insertRequest.toEntity(10.0);
-        }
-
-        if (prevPlaceOrder == null) {
-            return insertRequest.toEntity(nextPlaceOrder / 2);
-        }
-
-        if (nextPlaceOrder == null) {
-            return insertRequest.toEntity(prevPlaceOrder + 10.0);
-        }
-
-        return insertRequest.toEntity((prevPlaceOrder + nextPlaceOrder) / 2);
+    private Place createPlace(TripPlaceReq.InsertRequest insertRequest, Double maxPlaceOrder) {
+        return insertRequest.toEntity(maxPlaceOrder + 10.0);
     }
 
     /**

@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/trip")
 @RequiredArgsConstructor
@@ -44,11 +42,11 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
 
     @Override
     @PutMapping("/{tripId}/days/{day}/places")
-    public ResponseEntity<?> updatePlaces(@PathVariable Long tripId,
+    public ResponseEntity<?> reorderPlaces(@PathVariable Long tripId,
                                           @PathVariable int day,
-                                          @RequestBody List<TripPlaceReq.Request> requests) {
+                                          @RequestBody TripPlaceReq.ReorderRequest request) {
 
-        tripPlaceEditingService.updatePlaces(tripId, day, requests);
+        tripPlaceEditingService.reorderPlaces(tripId, day, request);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 

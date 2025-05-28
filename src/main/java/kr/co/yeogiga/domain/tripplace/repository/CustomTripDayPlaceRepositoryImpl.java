@@ -1,6 +1,5 @@
 package kr.co.yeogiga.domain.tripplace.repository;
 
-import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.tripplace.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
@@ -47,20 +46,19 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
     }
 
     @Override
-    public Double findOrderByIdAndPlaceId(String id, String placeId) {
-        Query query = new Query(
-                Criteria.where("_id").is(id)
-                        .and("places.id").is(placeId)
+    public Double findMaxOrderById(String id) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("_id").is(id)),
+                Aggregation.unwind("places"),
+                Aggregation.sort(Sort.by(Sort.Direction.DESC, "places.order")),
+                Aggregation.limit(1),
+                Aggregation.project().and("places.order").as("order")
         );
 
-        query.fields().include("places.$");
-        TripDayPlace result = mongoTemplate.findOne(query, TripDayPlace.class);
+        Document doc = mongoTemplate.aggregate(aggregation, "trip_day_place", Document.class)
+                .getUniqueMappedResult();
 
-        if (result == null || result.getPlaces().isEmpty()) {
-            throw new RuntimeException("Place not found");
-        }
-
-        return result.getPlaces().get(0).getOrder();
+        return doc != null ? doc.getDouble("order") : 0.0;
     }
 
     @Override

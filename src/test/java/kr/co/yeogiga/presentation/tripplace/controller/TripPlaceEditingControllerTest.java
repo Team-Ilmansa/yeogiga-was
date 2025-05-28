@@ -123,20 +123,18 @@ public class TripPlaceEditingControllerTest {
 
     @Test
     @DisplayName("목적지 수정 성공")
-    void updatePlacesSuccess() throws Exception {
+    void reorderPlacesSuccess() throws Exception {
         // given
-        List<TripPlaceReq.Request> requests = List.of(
-                TripPlaceReq.Request.builder().name("목적지1").latitude(0.0).longitude(0.0).placeType("관광명소").build(),
-                TripPlaceReq.Request.builder().name("목적지2").latitude(0.0).longitude(0.0).placeType("카페").build()
-        );
+        TripPlaceReq.ReorderRequest request =
+                new TripPlaceReq.ReorderRequest(List.of("place3-id", "place1-id", "place2-id"));
 
-        doNothing().when(tripPlaceEditingService).updatePlaces(anyLong(), anyInt(), Mockito.anyList());
+        doNothing().when(tripPlaceEditingService).reorderPlaces(anyLong(), anyInt(), any());
 
         // when
         ResultActions resultActions = mockMvc.perform(
                 put("/api/v1/trip/{tripId}/days/{day}/places", tripId, day)
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requests))
+                        .content(objectMapper.writeValueAsString(request))
         );
 
         // then
