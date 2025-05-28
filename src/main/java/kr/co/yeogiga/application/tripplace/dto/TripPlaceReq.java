@@ -57,11 +57,7 @@ public class TripPlaceReq {
             @Schema(description = "경도", example = "126.98")
             double longitude,
             @Schema(description = "장소 타입", example = "관광명소")
-            String placeType,
-            @Schema(description = "이전 목적지 ID (nullable)", example = "prevId")
-            String prevPlaceId,
-            @Schema(description = "다음 목적지 ID (nullable)", example = "nextId")
-            String nextPlaceId
+            String placeType
     ) {
         public Place toEntity(Double order) {
             return Place.builder()
