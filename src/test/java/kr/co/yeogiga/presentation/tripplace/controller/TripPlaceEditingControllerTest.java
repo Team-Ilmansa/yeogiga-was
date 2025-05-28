@@ -3,6 +3,7 @@ package kr.co.yeogiga.presentation.tripplace.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceEditingService;
+import kr.co.yeogiga.application.tripplace.service.TripPlaceSortService;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
@@ -56,6 +57,9 @@ public class TripPlaceEditingControllerTest {
 
     @MockBean
     private TripPlaceEditingService tripPlaceEditingService;
+
+    @MockBean
+    private TripPlaceSortService tripPlaceSortService;
 
     private final Long tripId = 1L;
     private final int day = 1;
@@ -182,5 +186,23 @@ public class TripPlaceEditingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].name").value("목적지1"))
                 .andExpect(jsonPath("$.data[0].placeCategory").value("식당"));
+    }
+
+    @Test
+    @DisplayName("목적지 순서 추천 정렬 알고리즘 성공")
+    void sortDayTripPlacesSuccess() throws Exception {
+        // given
+        doNothing().when(tripPlaceSortService).sortDayTripPlaces(tripId, day);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                put("/api/v1/trip/{tripId}/days/{day}/places/sort", tripId, day)
+        );
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
     }
 }

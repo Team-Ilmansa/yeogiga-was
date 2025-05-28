@@ -2,6 +2,7 @@ package kr.co.yeogiga.presentation.tripplace.controller;
 
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceEditingService;
+import kr.co.yeogiga.application.tripplace.service.TripPlaceSortService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.presentation.tripplace.api.TripPlaceEditingApi;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class TripPlaceEditingController implements TripPlaceEditingApi {
     private final TripPlaceEditingService tripPlaceEditingService;
+    private final TripPlaceSortService tripPlaceSortService;
 
     @Override
     @PostMapping("/{tripId}/days/{day}/places")
@@ -47,6 +49,14 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
                                           @RequestBody TripPlaceReq.ReorderRequest request) {
 
         tripPlaceEditingService.reorderPlaces(tripId, day, request);
+        return ResponseEntity.ok(SuccessResponse.ok());
+    }
+
+    @Override
+    @PutMapping("/{tripId}/days/{day}/places/sort")
+    public ResponseEntity<?> sortDayTripPlaces(@PathVariable Long tripId,
+                                               @PathVariable int day) {
+        tripPlaceSortService.sortDayTripPlaces(tripId, day);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
