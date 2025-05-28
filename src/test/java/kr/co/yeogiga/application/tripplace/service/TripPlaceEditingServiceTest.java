@@ -128,31 +128,28 @@ public class TripPlaceEditingServiceTest {
 
     @Test
     @DisplayName("목적지 순서 수정 성공")
-    void updatePlacesInEditingSuccess() {
+    void reorderPlacesInEditingSuccess() {
         // given
-        TripPlaceReq.Request place1 = TripPlaceReq.Request.builder()
-                .name("목적지1")
-                .latitude(0.0)
-                .longitude(0.0)
-                .placeType("카페")
-                .build();
+        List<TripPlaceReq.StoredFormat> storedPlace = List.of(
+                new TripPlaceReq.StoredFormat("place1-id", "목적지1", 33.1, 126.1, PlaceCategory.CAFE.getGroupName()),
+                new TripPlaceReq.StoredFormat("place2-id", "목적지2", 33.2, 126.2, PlaceCategory.CAFE.getGroupName()),
+                new TripPlaceReq.StoredFormat("place3-id", "목적지3", 33.3, 126.3, PlaceCategory.CAFE.getGroupName())
+        );
 
-        TripPlaceReq.Request place2 = TripPlaceReq.Request.builder()
-                .name("목적지2")
-                .latitude(0.0)
-                .longitude(0.0)
-                .placeType("카페")
-                .build();
+        TripPlaceReq.ReorderRequest request =
+                new TripPlaceReq.ReorderRequest(List.of("place3-id", "place1-id", "place2-id"));
 
-        List<TripPlaceReq.Request> newPlaces = List.of(place2, place1);
+        String listKey = "trip:1:day:1:places";
+
+        given(redisRepository.getList(listKey, TripPlaceReq.StoredFormat.class)).willReturn(storedPlace);
 
         // when
-        tripPlaceEditingService.updatePlaces(tripId, day, newPlaces);
+        tripPlaceEditingService.reorderPlaces(tripId, day, request);
 
         // then
         verify(redisRepository, times(2)).del(anyString());
-        verify(redisRepository, times(2)).setList(anyString(), any(TripPlaceReq.StoredFormat.class));
-        verify(redisRepository, times(2)).addToSet(anyString(), anyString());
+        verify(redisRepository, times(3)).setList(anyString(), any(TripPlaceReq.StoredFormat.class));
+        verify(redisRepository, times(3)).addToSet(anyString(), anyString());
     }
 
     @Test
