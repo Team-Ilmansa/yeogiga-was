@@ -269,33 +269,17 @@ public interface TripApi {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "준비 중 여행 조회 성공",
                     content = @Content(mediaType = "application/json", examples = {
-                            @ExampleObject(name = "준비 중 여행 조회 성공", description = "방장 w2m 설정 안 된 경우 null 값 응답", value = """
-                                             {
-                                                      "code": 200,
-                                                      "message": "요청이 성공하였습니다.",
-                                                      "data": [
-                                                          {
-                                                              "tripId": 1,
-                                                              "title": "여행1",
-                                                              "startedAt": null,
-                                                              "endedAt": null,
-                                                              "status": "SETTING"
-                                                          },
-                                                          {
-                                                              "tripId": 2,
-                                                              "title": "여행1",
-                                                              "startedAt": "2025-07-01",
-                                                              "endedAt": "2025-07-10",
-                                                              "status": "SETTING"
-                                                          }
-                                                      ]
-                                                  }
-                                    """),
-                            @ExampleObject(name = "준비 중 여행 조회 성공 - 준비 중 여행이 없는 경우", value = """
+                            @ExampleObject(name = "준비 중 여행 조회 성공", value = """
                                              {
                                                        "code": 200,
                                                        "message": "요청이 성공하였습니다.",
-                                                       "data": []
+                                                       "data": [
+                                                           {
+                                                               "tripId": 3,
+                                                               "title": "여행3",
+                                                               "status": "SETTING"
+                                                           }
+                                                       ]
                                                    }
                                     """)
                     }))
