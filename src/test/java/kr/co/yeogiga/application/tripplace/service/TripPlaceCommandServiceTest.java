@@ -49,34 +49,12 @@ public class TripPlaceCommandServiceTest {
         @DisplayName("가장 처음 추가되는 경우 - 기존에 목적지 없는 상태")
         void addPlaceFirst() {
             // given
+            given(tripDayPlaceService.readMaxOrderById(tripDayPlaceId)).willReturn(0.0);
             TripPlaceReq.InsertRequest insertRequest = TripPlaceReq.InsertRequest.builder()
                     .name("목적지1")
                     .latitude(0.0)
                     .longitude(0.0)
                     .placeType("카페")
-                    .build();
-
-            // when
-            tripPlaceCommandService.addNewPlace(tripDayPlaceId, insertRequest);
-
-            // then
-            verify(tripDayPlaceService).savePlace(eq(tripDayPlaceId), placeCaptor.capture());
-
-            Place captured = placeCaptor.getValue();
-            assertEquals(10.0, captured.getOrder());
-        }
-
-        @Test
-        @DisplayName("가장 앞에 추가되는 경우")
-        void addPlaceFront() {
-            // given
-            given(tripDayPlaceService.readOrderByIdAndPlaceId(tripDayPlaceId, "nextId")).willReturn(20.0);
-            TripPlaceReq.InsertRequest insertRequest = TripPlaceReq.InsertRequest.builder()
-                    .name("목적지1")
-                    .latitude(0.0)
-                    .longitude(0.0)
-                    .placeType("카페")
-                    .nextPlaceId("nextId")
                     .build();
 
             // when
@@ -93,13 +71,12 @@ public class TripPlaceCommandServiceTest {
         @DisplayName("가장 뒤에 추가되는 경우")
         void addPlaceBack() {
             // given
-            given(tripDayPlaceService.readOrderByIdAndPlaceId(tripDayPlaceId, "prevId")).willReturn(20.0);
+            given(tripDayPlaceService.readMaxOrderById(tripDayPlaceId)).willReturn(20.0);
             TripPlaceReq.InsertRequest insertRequest = TripPlaceReq.InsertRequest.builder()
                     .name("목적지1")
                     .latitude(0.0)
                     .longitude(0.0)
                     .placeType("카페")
-                    .prevPlaceId("prevId")
                     .build();
 
             // when
@@ -112,31 +89,6 @@ public class TripPlaceCommandServiceTest {
             assertEquals(30.0, captured.getOrder());
         }
 
-        @Test
-        @DisplayName("중간에 추가되는 경우")
-        void addPlaceBetween() {
-            // given
-            given(tripDayPlaceService.readOrderByIdAndPlaceId(tripDayPlaceId, "prevId")).willReturn(10.0);
-            given(tripDayPlaceService.readOrderByIdAndPlaceId(tripDayPlaceId, "nextId")).willReturn(30.0);
-
-            TripPlaceReq.InsertRequest insertRequest = TripPlaceReq.InsertRequest.builder()
-                    .name("목적지1")
-                    .latitude(0.0)
-                    .longitude(0.0)
-                    .placeType("카페")
-                    .prevPlaceId("prevId")
-                    .nextPlaceId("nextId")
-                    .build();
-
-            // when
-            tripPlaceCommandService.addNewPlace(tripDayPlaceId, insertRequest);
-
-            // then
-            verify(tripDayPlaceService).savePlace(eq(tripDayPlaceId), placeCaptor.capture());
-
-            Place captured = placeCaptor.getValue();
-            assertEquals(20.0, captured.getOrder());
-        }
     }
 
 

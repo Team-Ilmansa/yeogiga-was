@@ -105,8 +105,6 @@ public class TripPlaceControllerTest {
                 .latitude(0.0)
                 .longitude(0.0)
                 .placeType("카페")
-                .prevPlaceId("prevId")
-                .nextPlaceId("nextId")
                 .build();
         doNothing().when(tripPlaceCommandService).addNewPlace(tripDayPlaceId, insertRequest);
 
