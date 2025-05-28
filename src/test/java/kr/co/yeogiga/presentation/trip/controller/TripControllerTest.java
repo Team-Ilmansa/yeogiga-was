@@ -556,8 +556,6 @@ public class TripControllerTest {
                 .tripId(1L)
                 .title("title")
                 .status(TravelStatus.SETTING)
-                .startedAt(LocalDate.of(2025, 7, 1))
-                .endedAt(LocalDate.of(2025, 7, 10))
                 .build();
 
         @Test
@@ -577,9 +575,7 @@ public class TripControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data[0].tripId").value(settingTripInfo.tripId()))
                     .andExpect(jsonPath("$.data[0].title").value(settingTripInfo.title()))
-                    .andExpect(jsonPath("$.data[0].status").value(settingTripInfo.status().name()))
-                    .andExpect(jsonPath("$.data[0].startedAt").value(settingTripInfo.startedAt().toString()))
-                    .andExpect(jsonPath("$.data[0].endedAt").value(settingTripInfo.endedAt().toString()));
+                    .andExpect(jsonPath("$.data[0].status").value(settingTripInfo.status().name()));
         }
     }
 }
