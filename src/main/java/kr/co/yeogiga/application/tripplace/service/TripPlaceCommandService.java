@@ -29,7 +29,7 @@ public class TripPlaceCommandService {
      */
     public void addNewPlace(String tripDayPlaceId, TripPlaceReq.InsertRequest insertRequest) {
         Double maxPlaceOrder = tripDayPlaceService.readMaxOrderById(tripDayPlaceId);
-        System.out.println(maxPlaceOrder);
+
         tripDayPlaceService.savePlace(
                 tripDayPlaceId,
                 createPlace(insertRequest, maxPlaceOrder)
@@ -38,7 +38,7 @@ public class TripPlaceCommandService {
 
     /**
      * 목적지 객체를 만드는 메서드
-     * 현재 목적지 order 최대값 기준으로 값을 기반으로 새로운 order를 계산하여 새로운 Place 객체를 생성
+     * 현재 목적지 order 최대값 기반으로 새로운 order를 계산하여 새로운 Place 객체를 생성
      * 1. maxPlaceOrder : 0.0 => 존재하는 목적지가 없는 상황
      * 2. maxPlaceOrder : 0.0 x => 마지막 목적지 뒤에 추가하는 상화
      *
