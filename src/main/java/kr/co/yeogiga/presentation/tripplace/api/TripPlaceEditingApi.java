@@ -115,6 +115,27 @@ public interface TripPlaceEditingApi {
             @RequestBody List<TripPlaceReq.Request> requests
     );
 
+    @TrackApi(description = "일차별 목적지의 순서 추천 알고리즘")
+    @Operation(summary = "일차별 목적지의 순서 추천 알고리즘", description = "일차별 목적지의 순서 추천 알고리즘 API입니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "목적지 순서 추천 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다."
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> sortDayTripPlaces(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
+
+            @Parameter(description = "추천받고자 하는 일차")
+            @PathVariable int day
+    );
+
     @TrackApi(description = "일차에 지정된 목적지 삭제")
     @Operation(summary = "일차에 지정된 목적지 삭제", description = "일차에 지정된 목적지 삭제하는 API입니다.")
     @ApiResponses({

@@ -54,6 +54,7 @@ public class TripPlaceEditingController implements TripPlaceEditingApi {
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
+    @Override
     @PutMapping("/{tripId}/days/{day}/places/sort")
     public ResponseEntity<?> sortDayTripPlaces(@PathVariable Long tripId,
                                                @PathVariable int day) {
