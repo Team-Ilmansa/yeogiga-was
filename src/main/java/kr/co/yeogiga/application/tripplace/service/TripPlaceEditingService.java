@@ -129,8 +129,8 @@ public class TripPlaceEditingService {
         redisRepository.del(dayPlacesKey);
         redisRepository.del(dayPlaceSetKey);
 
+        redisRepository.setListAll(dayPlacesKey, reordered);
         for (TripPlaceReq.StoredFormat place : reordered) {
-            redisRepository.setList(dayPlacesKey, place);
             String placeUniqueKey = makeUniqueKey(place.name(), place.latitude(), place.longitude());
             redisRepository.addToSet(dayPlaceSetKey, placeUniqueKey);
         }

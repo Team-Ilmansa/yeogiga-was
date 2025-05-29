@@ -52,9 +52,7 @@ public class TripPlaceSortService {
         sorted.addAll(lodgings);
 
         redisRepository.del(listKey);
-        for (TripPlaceReq.StoredFormat place : sorted) {
-            redisRepository.setList(listKey, place);
-        }
+        redisRepository.setListAll(listKey, sorted);
     }
 
     /**

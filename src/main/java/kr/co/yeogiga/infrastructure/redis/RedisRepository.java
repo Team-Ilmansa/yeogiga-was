@@ -36,8 +36,16 @@ public class RedisRepository {
         redisTemplate.opsForList().rightPush(key, value);
     }
 
+    public <T> void setListAll(String key, Collection<T> values) {
+        redisTemplate.opsForList().rightPushAll(key, (Collection<Object>) values);
+    }
+
     public void setValueInList(String key, long index, Object value) {
         redisTemplate.opsForList().set(key, index, value);
+    }
+
+    public void expire(String key, Duration duration) {
+        redisTemplate.expire(key, duration);
     }
 
     public <T> List<T> getList(String key, Class<T> clazz) {

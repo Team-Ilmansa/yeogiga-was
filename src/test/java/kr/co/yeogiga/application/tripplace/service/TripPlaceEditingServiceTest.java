@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -148,7 +149,7 @@ public class TripPlaceEditingServiceTest {
 
         // then
         verify(redisRepository, times(2)).del(anyString());
-        verify(redisRepository, times(3)).setList(anyString(), any(TripPlaceReq.StoredFormat.class));
+        verify(redisRepository, times(1)).setListAll(anyString(), anyList());
         verify(redisRepository, times(3)).addToSet(anyString(), anyString());
     }
 
