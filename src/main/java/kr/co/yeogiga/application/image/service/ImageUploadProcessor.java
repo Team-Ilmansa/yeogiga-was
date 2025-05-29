@@ -26,11 +26,11 @@ public class ImageUploadProcessor {
      * @param tripId         : 이미지가 속한 여행 ID
      * @param tripDayPlaceId : 이미지가 속할 여행 일차 ID
      */
-    public void process(List<MultipartFile> images, Long tripId, String tripDayPlaceId) {
+    public void uploadTripImage(List<MultipartFile> images, Long tripId, String tripDayPlaceId) {
         for (MultipartFile image : images) {
             try {
                 ImageUploadRequest.TripImage imageUploadRequest = ImageUploadRequest.TripImage.from(image, tripId, tripDayPlaceId);
-                imageProcessingService.processImageUpload(imageUploadRequest);
+                imageProcessingService.processTripImageUpload(imageUploadRequest);
             } catch (IOException e) {
                 log.error("Failed to process image - filename: {}", image.getOriginalFilename(), e);
             }

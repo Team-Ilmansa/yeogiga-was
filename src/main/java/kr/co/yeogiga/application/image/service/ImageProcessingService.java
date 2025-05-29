@@ -32,7 +32,7 @@ public class ImageProcessingService {
      * @param imageUploadRequest 업로드할 이미지 및 관련 정보가 담긴 DTO
      */
     @Async
-    public void processImageUpload(ImageUploadRequest.TripImage imageUploadRequest) {
+    public void processTripImageUpload(ImageUploadRequest.TripImage imageUploadRequest) {
         try {
             ImageMetadataDto metadata = imageMetadataService.extractMetadata(
                     imageUploadRequest.bytes(), imageUploadRequest.originalFilename()
