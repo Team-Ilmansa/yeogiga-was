@@ -24,7 +24,7 @@ public class ImageProcessingService {
     private final UserService userService;
 
     /**
-     * 이미지 업로드 및 메타데이터 추출을 비동기로 처리하는 메서드.
+     * 여행 이미지 업로드 및 메타데이터 추출을 비동기로 처리하는 메서드.
      * - 입력 받은 이미지 정보를 기반으로 메타데이터를 추출
      * - 이미지를 S3에 업로드
      * - 업로드된 이미지 이미지 임시 저장소에 저장
@@ -32,26 +32,21 @@ public class ImageProcessingService {
      * @param imageUploadRequest 업로드할 이미지 및 관련 정보가 담긴 DTO
      */
     @Async
-    public void processImageUpload(ImageUploadRequest.TripImage imageUploadRequest) {
-        try {
-            ImageMetadataDto metadata = imageMetadataService.extractMetadata(
-                    imageUploadRequest.bytes(), imageUploadRequest.originalFilename()
-            );
+    public void processTripImageUpload(ImageUploadRequest.TripImage imageUploadRequest) {
+        ImageMetadataDto metadata = imageMetadataService.extractMetadata(
+                imageUploadRequest.bytes(), imageUploadRequest.originalFilename()
+        );
 
-            String url = awsS3Storage.upload(imageUploadRequest.toAwsUploadInfo(), ImageUploadRequest.ImageType.TRIP);
+        String url = awsS3Storage.upload(imageUploadRequest.toAwsUploadInfo(), ImageUploadRequest.ImageType.TRIP);
 
-            Image image = Image.builder()
-                    .url(url)
-                    .latitude(metadata.latitude())
-                    .longitude(metadata.longitude())
-                    .date(metadata.date())
-                    .build();
+        Image image = Image.builder()
+                .url(url)
+                .latitude(metadata.latitude())
+                .longitude(metadata.longitude())
+                .date(metadata.date())
+                .build();
 
-            tempPlaceImagesCommandService.addImageToTripDayPlace(imageUploadRequest.tripDayPlaceId(), image);
-
-        } catch (Exception e) {
-            log.error("Error processing image - filename: {}", imageUploadRequest.originalFilename(), e);
-        }
+        tempPlaceImagesCommandService.addImageToTripDayPlace(imageUploadRequest.tripDayPlaceId(), image);
     }
 
     /**

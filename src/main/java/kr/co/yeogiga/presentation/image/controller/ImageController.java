@@ -36,7 +36,7 @@ public class ImageController implements ImageApi {
     public ResponseEntity<?> uploadImages(@RequestPart(value = "images", required = false) List<MultipartFile> images,
                                           @PathVariable Long tripId,
                                           @PathVariable String tripDayPlaceId) {
-        imageUploadProcessor.process(images, tripId, tripDayPlaceId);
+        imageUploadProcessor.uploadTripImage(images, tripId, tripDayPlaceId);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
