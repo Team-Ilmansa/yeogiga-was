@@ -3,6 +3,7 @@ package kr.co.yeogiga.presentation.user.api;
 import api.link.checker.annotation.ApiGroup;
 import api.link.checker.annotation.TrackApi;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
 @ApiGroup(value = "[사용자 관련 API]")
 @Tag(name = "[사용자 관련 API]", description = "사용지 관련 API")
@@ -182,6 +185,35 @@ public interface UserApi {
     ResponseEntity<?> update(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody UserInfoUpdateReq userInfoUpdateReq
+    );
+
+    @TrackApi(description = "사용자 프로필 등록 및 수정")
+    @Operation(summary = "사용자 프로필 등록 및 수정", description = "사용자 프로필 등록 및 수정 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "사용자 프로필 등록 및 수정 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "성공", value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다."
+                                        }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "400", description = "회원 정보 수정 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "이미지를 첨부하지 않은 경우", value = """
+                                        {
+                                             "code": "I002",
+                                             "message": "이미지는 필수 입력값입니다."
+                                         }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> updateProfile(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+
+            @Parameter(description = "업로드할 이미지")
+            @RequestPart(name = "image") MultipartFile image
     );
 
     @TrackApi(description = "Fcm Token 저장")

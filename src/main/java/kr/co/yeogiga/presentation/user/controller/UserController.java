@@ -76,6 +76,7 @@ public class UserController implements UserApi {
         return ResponseEntity.ok().body(SuccessResponse.ok());
     }
 
+    @Override
     @PutMapping("/profile")
     public ResponseEntity<?> updateProfile(
             @AuthenticationPrincipal CustomUserDetails userDetails,
