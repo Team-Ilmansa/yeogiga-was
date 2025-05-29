@@ -68,7 +68,7 @@ public class AwsS3Storage {
      */
     private String generateFileName(ImageUploadRequest.ImageType imageType, String originalFileName, Long id) {
         String rootDir = switch (imageType) {
-            case TRIP -> "image/";
+            case TRIP -> "trip/";
             case PROFILE -> "profile/";
         };
 
