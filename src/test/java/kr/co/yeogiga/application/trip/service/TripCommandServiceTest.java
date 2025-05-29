@@ -2,6 +2,7 @@ package kr.co.yeogiga.application.trip.service;
 
 import kr.co.yeogiga.application.trip.dto.TripReq;
 import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.domain.trip.dto.TripFcmTokenQueryDto;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.service.TripMemberService;
@@ -10,6 +11,8 @@ import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.service.UserService;
 import kr.co.yeogiga.domain.user.type.Role;
+import kr.co.yeogiga.infrastructure.redis.RedisRepository;
+import kr.co.yeogiga.infrastructure.redis.constant.TripMemberTokenConstant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,12 +31,17 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,6 +56,9 @@ public class TripCommandServiceTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private RedisRepository redisRepository;
 
     @InjectMocks
     private TripCommandService tripCommandService;
@@ -255,6 +266,49 @@ public class TripCommandServiceTest {
                 // then
                 assertEquals(TripErrorType.PERMISSION_DENIED_NOT_LEADER, exception.getErrorType());
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("여행 상태 변경")
+    class UpdateTravelStatus {
+
+        private final Long tripId = 1L;
+
+        @Test
+        @DisplayName("시작되는 여행이 존재하는 경우 - Redis에 멤버들의 Fcm Token을 저장")
+        void shouldStoreFcmTokensToRedisWhenTripStarts() {
+            // given
+            LocalDateTime now = LocalDateTime.of(2025, 5, 29, 12, 0);
+            TripFcmTokenQueryDto dto = new TripFcmTokenQueryDto(1L, "fcm-token", now.plusDays(1));
+            given(tripService.readTripFcmTokensByTime(now)).willReturn(List.of(dto));
+
+            // when
+            tripCommandService.updateTravelStatus(now);
+
+            // then
+            String redisKey = TripMemberTokenConstant.tripTokenKey(tripId);
+            verify(redisRepository, times(1)).setListAll(redisKey, List.of("fcm-token"));
+            verify(redisRepository, times(1)).expire(anyString(), any());
+            verify(tripService, times(1)).updateAllTravelStatusToInProgress(now);
+            verify(tripService, times(1)).updateAllTravelStatusToCompleted(now);
+        }
+
+        @Test
+        @DisplayName("시작되는 여행이 없는 경우 - 아무것도 저장하지 않고 상태만 갱신")
+        void shouldOnlyUpdateStatusWhenNoTripsToStart() {
+            // given
+            LocalDateTime now = LocalDateTime.of(2025, 5, 29, 14, 0);
+            given(tripService.readTripFcmTokensByTime(now)).willReturn(List.of());
+
+            // when
+            tripCommandService.updateTravelStatus(now);
+
+            // then
+            verify(redisRepository, never()).setListAll(any(), any());
+            verify(redisRepository, never()).expire(any(), any());
+            verify(tripService, times(1)).updateAllTravelStatusToInProgress(now);
+            verify(tripService, times(1)).updateAllTravelStatusToCompleted(now);
         }
     }
 
