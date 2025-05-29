@@ -2,6 +2,7 @@ package kr.co.yeogiga.application.trip.service;
 
 import kr.co.yeogiga.application.trip.dto.TripReq;
 import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.domain.trip.dto.TripFcmTokenQueryDto;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.entity.TripMember;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
@@ -11,11 +12,18 @@ import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.exception.UserErrorType;
 import kr.co.yeogiga.domain.user.service.UserService;
+import kr.co.yeogiga.infrastructure.redis.RedisRepository;
+import kr.co.yeogiga.infrastructure.redis.constant.TripMemberTokenConstant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +31,7 @@ public class TripCommandService {
     private final TripService tripService;
     private final TripMemberService tripMemberService;
     private final UserService userService;
+    private final RedisRepository redisRepository;
 
     /**
      * 여행 생성 메서드
@@ -86,13 +95,71 @@ public class TripCommandService {
 
     /**
      * 여행 상태 갱신 메서드
+     * 1. 진행 상태로 변화하는 여행 멤버의 Fcm Token을 Redis에 저장
+     * 2. 조건에 만족하는 여행 상태 데이터 변경
      *
      * @param time      현재 시간
      */
     @Transactional
     public void updateTravelStatus(LocalDateTime time) {
+        List<TripFcmTokenQueryDto> tripFcmTokens = tripService.readTripFcmTokensByTime(time);
+
+        // FCM Token 저장 로직
+        cacheTripFcmTokensToRedis(tripFcmTokens);
+
         tripService.updateAllTravelStatusToInProgress(time);
         tripService.updateAllTravelStatusToCompleted(time);
+    }
+
+    /**
+     * 여행 ID별로 그룹화된 FCM 토큰 목록을 Redis에 저장하는 메서드
+     *
+     * @param tripFcmTokens 시간 조건에 맞는 여행 FCM 토큰 목록
+     */
+    private void cacheTripFcmTokensToRedis(List<TripFcmTokenQueryDto> tripFcmTokens) {
+        Map<Long, List<TripFcmTokenQueryDto>> grouped = tripFcmTokens.stream()
+                .collect(Collectors.groupingBy(TripFcmTokenQueryDto::tripId));
+
+        for (Map.Entry<Long, List<TripFcmTokenQueryDto>> entry : grouped.entrySet()) {
+            Long tripId = entry.getKey();
+            List<TripFcmTokenQueryDto> dtos = entry.getValue();
+
+            if (dtos.isEmpty()) continue;
+
+            saveTripFcmTokensToRedis(tripId, dtos);
+        }
+    }
+
+    /**
+     * 특정 여행 ID에 대한 FCM 토큰 리스트를 Redis에 저장하고 만료 시간 설정 메서드
+     *
+     * @param tripId    여행 ID
+     * @param dtos      해당 여행의 FCM 토큰 및 종료 시간 정보
+     */
+    private void saveTripFcmTokensToRedis(Long tripId, List<TripFcmTokenQueryDto> dtos) {
+        String redisKey = TripMemberTokenConstant.tripTokenKey(tripId);
+
+        // 토큰 리스트 추출
+        List<String> tokens = dtos.stream()
+                .map(TripFcmTokenQueryDto::fcmToken)
+                .filter(Objects::nonNull)
+                .toList();
+
+        // 여행 종료 시간
+        LocalDateTime endedAt = dtos.get(0).endedAt();
+
+        redisRepository.setListAll(redisKey, tokens);
+        redisRepository.expire(redisKey, calculateDuration(endedAt));
+    }
+
+    /**
+     * Redis 만료 기한(TTL)을 계산하는 메서드
+     *
+     * @param time          여행 종료 시간
+     * @return              redis 만료 기한
+     */
+    private Duration calculateDuration(LocalDateTime time) {
+        return Duration.between(LocalDateTime.now(), time);
     }
 
     /**
