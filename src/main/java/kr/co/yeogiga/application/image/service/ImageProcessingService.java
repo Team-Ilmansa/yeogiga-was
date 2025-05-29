@@ -33,25 +33,20 @@ public class ImageProcessingService {
      */
     @Async
     public void processTripImageUpload(ImageUploadRequest.TripImage imageUploadRequest) {
-        try {
-            ImageMetadataDto metadata = imageMetadataService.extractMetadata(
-                    imageUploadRequest.bytes(), imageUploadRequest.originalFilename()
-            );
+        ImageMetadataDto metadata = imageMetadataService.extractMetadata(
+                imageUploadRequest.bytes(), imageUploadRequest.originalFilename()
+        );
 
-            String url = awsS3Storage.upload(imageUploadRequest.toAwsUploadInfo(), ImageUploadRequest.ImageType.TRIP);
+        String url = awsS3Storage.upload(imageUploadRequest.toAwsUploadInfo(), ImageUploadRequest.ImageType.TRIP);
 
-            Image image = Image.builder()
-                    .url(url)
-                    .latitude(metadata.latitude())
-                    .longitude(metadata.longitude())
-                    .date(metadata.date())
-                    .build();
+        Image image = Image.builder()
+                .url(url)
+                .latitude(metadata.latitude())
+                .longitude(metadata.longitude())
+                .date(metadata.date())
+                .build();
 
-            tempPlaceImagesCommandService.addImageToTripDayPlace(imageUploadRequest.tripDayPlaceId(), image);
-
-        } catch (Exception e) {
-            log.error("Error processing image - filename: {}", imageUploadRequest.originalFilename(), e);
-        }
+        tempPlaceImagesCommandService.addImageToTripDayPlace(imageUploadRequest.tripDayPlaceId(), image);
     }
 
     /**

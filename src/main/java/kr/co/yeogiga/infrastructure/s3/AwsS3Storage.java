@@ -5,13 +5,14 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import kr.co.yeogiga.application.image.dto.ImageUploadRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.UUID;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AwsS3Storage {
@@ -42,8 +43,8 @@ public class AwsS3Storage {
 
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(imageUploadRequest.bytes())) {
             amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, metadata));
-        } catch (IOException e) {
-            throw new IllegalArgumentException("이미지 업로드 중 오류 발생", e);
+        } catch (Exception e) {
+            log.error("Error while uploading image to AWS S3 - filename : {}", imageUploadRequest.originalFilename(), e);
         }
 
         return getFileUrl(fileName);
