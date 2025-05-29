@@ -23,6 +23,14 @@ public class ImageUploadRequest {
             long size,
             Long userId
     ) {
+        public static ProfileImage from(MultipartFile file, Long userId) throws IOException {
+            return new ProfileImage(
+                    file.getBytes(), file.getOriginalFilename(),
+                    file.getContentType(), file.getSize(),
+                    userId
+            );
+        }
+
         public AwsUploadInfo toAwsUploadInfo() {
             return AwsUploadInfo.builder()
                     .bytes(bytes)
