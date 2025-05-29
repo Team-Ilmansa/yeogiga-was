@@ -40,3 +40,5 @@ out/
 
 ### firebase ###
 /src/main/resources/*.json
+
+/src/main/generated
