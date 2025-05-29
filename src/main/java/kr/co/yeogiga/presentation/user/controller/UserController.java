@@ -1,6 +1,7 @@
 package kr.co.yeogiga.presentation.user.controller;
 
 import jakarta.validation.Valid;
+import kr.co.yeogiga.application.image.service.ImageUploadProcessor;
 import kr.co.yeogiga.application.user.dto.FcmTokenReq;
 import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
 import kr.co.yeogiga.application.user.dto.UserInfoUpdateReq;
@@ -21,7 +22,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import static kr.co.yeogiga.application.auth.constant.AuthConstants.REFRESH_TOKEN_PREFIX;
 
@@ -31,6 +34,7 @@ import static kr.co.yeogiga.application.auth.constant.AuthConstants.REFRESH_TOKE
 public class UserController implements UserApi {
     private final UserManagementService userManagementService;
     private final UserFcmTokenService userFcmTokenService;
+    private final ImageUploadProcessor imageUploadProcessor;
 
     @Override
     @PatchMapping("/password")
@@ -69,6 +73,16 @@ public class UserController implements UserApi {
             @Valid @RequestBody UserInfoUpdateReq userInfoUpdateReq
     ) {
         userManagementService.updateUserInfo(userDetails.getUserId(), userInfoUpdateReq);
+        return ResponseEntity.ok().body(SuccessResponse.ok());
+    }
+
+    @Override
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateProfile(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestPart(name = "image") MultipartFile image
+    ) {
+        imageUploadProcessor.uploadProfileImage(image, userDetails.getUserId());
         return ResponseEntity.ok().body(SuccessResponse.ok());
     }
 

@@ -2,6 +2,7 @@ package kr.co.yeogiga.presentation.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.auth.constant.AuthConstants;
+import kr.co.yeogiga.application.image.service.ImageUploadProcessor;
 import kr.co.yeogiga.application.user.dto.FcmTokenReq;
 import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
 import kr.co.yeogiga.application.user.dto.UserInfoRes;
@@ -15,6 +16,7 @@ import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
+import kr.co.yeogiga.domain.tripplace.exception.ImageErrorType;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.exception.UserErrorType;
 import kr.co.yeogiga.domain.user.type.Role;
@@ -31,6 +33,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -46,6 +49,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -74,6 +78,9 @@ public class UserControllerTest {
 
     @MockBean
     private UserFcmTokenService userFcmTokenService;
+
+    @MockBean
+    private ImageUploadProcessor imageUploadProcessor;
 
     private CustomUserDetails userDetails;
 
@@ -461,6 +468,80 @@ public class UserControllerTest {
             resultActions
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+        }
+    }
+
+    @Nested
+    @DisplayName("사용자 프로필 갱신")
+    class UpdateUserProfile {
+
+        @BeforeEach
+        void setUp() {
+            setUpUserDetails(Role.USER);
+        }
+
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            MockMultipartFile mockImage = new MockMultipartFile(
+                    "image",
+                    "test.jpg",
+                    "image/jpeg",
+                    "test image content".getBytes()
+            );
+
+            doNothing().when(imageUploadProcessor).uploadProfileImage(any(), any());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    multipart("/api/v1/users/profile")
+                            .file(mockImage)
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .with(request -> {
+                                request.setMethod("PUT");
+                                return request;
+                            })
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").value(SuccessResponse.ok().code()))
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+        }
+
+        @Test
+        @DisplayName("실패 - 이미지 미업로드")
+        void failIfImageNotUploaded() throws Exception {
+            // given
+            MockMultipartFile mockImage = new MockMultipartFile(
+                    "image",
+                    "",
+                    "image/jpeg",
+                    new byte[]{}
+            );
+
+            doThrow(new CustomException(ImageErrorType.IMAGE_REQUIRED)).when(imageUploadProcessor).uploadProfileImage(any(), any());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    multipart("/api/v1/users/profile")
+                            .file(mockImage)
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .with(request -> {
+                                request.setMethod("PUT");
+                                return request;
+                            })
+                            .with(user(userDetails))
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(ImageErrorType.IMAGE_REQUIRED.getCode()))
+                    .andExpect(jsonPath("$.message").value(ImageErrorType.IMAGE_REQUIRED.getMessage()));
         }
     }
 }
