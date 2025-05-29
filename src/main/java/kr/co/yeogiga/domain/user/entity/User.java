@@ -92,4 +92,8 @@ public class User extends BaseTimeEntity {
     public void clearFcmToken() {
         this.fcmToken = null;
     }
+
+    public void updateProfileImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }
