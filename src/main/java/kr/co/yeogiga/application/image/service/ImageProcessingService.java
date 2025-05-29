@@ -24,7 +24,7 @@ public class ImageProcessingService {
     private final UserService userService;
 
     /**
-     * 이미지 업로드 및 메타데이터 추출을 비동기로 처리하는 메서드.
+     * 여행 이미지 업로드 및 메타데이터 추출을 비동기로 처리하는 메서드.
      * - 입력 받은 이미지 정보를 기반으로 메타데이터를 추출
      * - 이미지를 S3에 업로드
      * - 업로드된 이미지 이미지 임시 저장소에 저장
