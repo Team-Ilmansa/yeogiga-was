@@ -8,6 +8,7 @@ import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.type.Role;
 import kr.co.yeogiga.infrastructure.TestObjectMapperConfig;
 import kr.co.yeogiga.infrastructure.config.JpaConfig;
+import kr.co.yeogiga.infrastructure.config.QueryDslConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestPropertySource(locations = "classpath:application-test.yml")
-@Import({JpaConfig.class, TestObjectMapperConfig.class})
+@Import({JpaConfig.class, TestObjectMapperConfig.class, QueryDslConfig.class})
 public class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
