@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 public class TripScheduler {
     private final TripCommandService tripCommandService;
 
-    @Scheduled(cron = "0 55 * * * *")
+    @Scheduled(cron = "0 */30 * * * *")
     public void runUpdateTravelStatusJob() {
-        tripCommandService.updateTravelStatus(LocalDateTime.now().plusMinutes(5));
+        tripCommandService.updateTravelStatus(LocalDateTime.now());
     }
 }
