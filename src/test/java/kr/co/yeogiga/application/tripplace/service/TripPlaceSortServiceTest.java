@@ -11,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -70,11 +72,13 @@ class TripPlaceSortServiceTest {
         tripPlaceSortService.sortDayTripPlaces(tripId, day);
 
         // then
-        ArgumentCaptor<TripPlaceReq.StoredFormat> captor = ArgumentCaptor.forClass(TripPlaceReq.StoredFormat.class);
-        verify(redisRepository, times(3)).setList(eq(listKey), captor.capture());
+        ArgumentCaptor<Collection<TripPlaceReq.StoredFormat>> captor =
+                ArgumentCaptor.forClass(Collection.class);
 
-        List<TripPlaceReq.StoredFormat> saved = captor.getAllValues();
-        assertEquals("숙소", saved.get(2).placeCategory(), "마지막 장소는 숙소여야 함");
+        verify(redisRepository, times(1)).setListAll(eq(listKey), captor.capture());
+
+        List<TripPlaceReq.StoredFormat> saved = new ArrayList<>(captor.getValue());
+        assertEquals("숙소", saved.get(2).placeCategory());
     }
 
     @Test
@@ -98,9 +102,10 @@ class TripPlaceSortServiceTest {
         tripPlaceSortService.sortDayTripPlaces(tripId, day);
 
         // then
-        ArgumentCaptor<TripPlaceReq.StoredFormat> captor = ArgumentCaptor.forClass(TripPlaceReq.StoredFormat.class);
-        verify(redisRepository, times(5)).setList(eq(listKey), captor.capture());
-        List<TripPlaceReq.StoredFormat> saved = captor.getAllValues();
+        ArgumentCaptor<Collection<TripPlaceReq.StoredFormat>> captor =
+                ArgumentCaptor.forClass(Collection.class);
+        verify(redisRepository, times(1)).setListAll(eq(listKey), captor.capture());
+        List<TripPlaceReq.StoredFormat> saved = new ArrayList<>(captor.getValue());
 
         // 식당 카테고리가 3번 이상 연속하지 않는지 확인
         int maxConsecutiveRestaurants = 0;
