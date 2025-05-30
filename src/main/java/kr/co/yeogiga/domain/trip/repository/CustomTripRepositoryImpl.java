@@ -26,6 +26,7 @@ public class CustomTripRepositoryImpl implements CustomTripRepository {
                 .select(Projections.constructor(
                         TripFcmTokenQueryDto.class,
                         trip.id,
+                        trip.title,
                         user.fcmToken,
                         trip.endedAt
                 ))
@@ -33,8 +34,7 @@ public class CustomTripRepositoryImpl implements CustomTripRepository {
                 .join(tripMember.trip, trip)
                 .join(tripMember.user, user)
                 .where(
-                        trip.travelStatus.ne(TravelStatus.IN_PROGRESS),
-                        trip.travelStatus.ne(TravelStatus.SETTING),
+                        trip.travelStatus.notIn(TravelStatus.IN_PROGRESS, TravelStatus.SETTING),
                         trip.startedAt.loe(time),
                         trip.endedAt.goe(time)
                 )
