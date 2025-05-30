@@ -1,5 +1,6 @@
 package kr.co.yeogiga.application.trip.service;
 
+import kr.co.yeogiga.application.fcm.service.TripPushSender;
 import kr.co.yeogiga.application.trip.dto.TripReq;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.dto.TripFcmTokenQueryDto;
@@ -32,6 +33,7 @@ public class TripCommandService {
     private final TripMemberService tripMemberService;
     private final UserService userService;
     private final RedisRepository redisRepository;
+    private final TripPushSender tripPushSender;
 
     /**
      * 여행 생성 메서드
@@ -105,9 +107,11 @@ public class TripCommandService {
         List<TripFcmTokenQueryDto> tripFcmTokens = tripService.readTripFcmTokensByTime(time);
 
         // FCM Token 저장 로직
-        cacheTripFcmTokensToRedis(tripFcmTokens);
+        if (!tripFcmTokens.isEmpty()) {
+            cacheTripFcmTokensToRedis(tripFcmTokens);
+            tripService.updateAllTravelStatusToInProgress(time);
+        }
 
-        tripService.updateAllTravelStatusToInProgress(time);
         tripService.updateAllTravelStatusToCompleted(time);
     }
 
@@ -148,8 +152,14 @@ public class TripCommandService {
         // 여행 종료 시간
         LocalDateTime endedAt = dtos.get(0).endedAt();
 
+        String title = dtos.get(0).title();
+
+        // FCM Token Redis Im-Memory 저장 및 TTL 설정
         redisRepository.setListAll(redisKey, tokens);
         redisRepository.expire(redisKey, calculateDuration(endedAt));
+
+        // Push 알림 전송
+        tripPushSender.sendPush(tripId, title, redisKey, tokens);
     }
 
     /**
