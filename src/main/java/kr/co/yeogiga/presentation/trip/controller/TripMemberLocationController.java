@@ -1,5 +1,6 @@
 package kr.co.yeogiga.presentation.trip.controller;
 
+import jakarta.validation.Valid;
 import kr.co.yeogiga.application.trip.dto.TripMemberLocationDto;
 import kr.co.yeogiga.application.trip.service.TripMemberLocationCommandService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
@@ -24,7 +25,7 @@ public class TripMemberLocationController {
     public ResponseEntity<?> saveLocation(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long tripId,
-            @RequestBody TripMemberLocationDto.Request request
+            @Valid @RequestBody TripMemberLocationDto.Request request
     ) {
         tripMemberLocationCommandService.saveLocation(tripId, userDetails.getUserId(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
