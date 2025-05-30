@@ -96,4 +96,18 @@ public class RedisRepository {
             redisTemplate.delete(keys);
         }
     }
+
+    public void setHash(String key, String subKey, Object value) {
+        redisTemplate.opsForHash().put(key, subKey, value);
+    }
+
+    public void setHashExpire(String key, String subKey, Duration duration) {
+        redisTemplate.opsForHash().expire(key, duration, List.of(subKey));
+    }
+
+    public Set<String> getHashKeys(String key) {
+        return redisTemplate.opsForHash().keys(key).stream()
+                .map(String::valueOf)
+                .collect(Collectors.toSet());
+    }
 }
