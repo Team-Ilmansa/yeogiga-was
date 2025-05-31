@@ -8,7 +8,6 @@ import kr.co.yeogiga.infrastructure.redis.RedisRepository;
 import kr.co.yeogiga.infrastructure.redis.constant.TripMemberLocationConstant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 
@@ -27,7 +26,6 @@ public class TripMemberLocationCommandService {
      * @param userId        사용자 ID
      * @param location      사용자 위치 정보 DTO
      */
-    @Transactional(readOnly = true)
     public void saveLocation(Long tripId, Long userId, TripMemberLocationDto.Request location) {
         if (!tripMemberService.existsByTripIdAndUserId(tripId, userId)) {
             throw new CustomException(TripMemberErrorType.IS_NOT_MEMBER);
