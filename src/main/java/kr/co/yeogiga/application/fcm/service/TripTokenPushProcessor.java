@@ -50,9 +50,7 @@ public class TripTokenPushProcessor {
             return;
         }
 
-        for (String fcmToken : fcmTokens) {
-            tripPushSender.sendPush(tripId, redisListKey, fcmToken);
-        }
+        tripPushSender.sendPush(tripId, redisListKey, fcmTokens);
     }
 
     /**

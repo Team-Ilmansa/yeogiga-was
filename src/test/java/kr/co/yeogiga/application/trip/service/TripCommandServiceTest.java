@@ -1,5 +1,6 @@
 package kr.co.yeogiga.application.trip.service;
 
+import kr.co.yeogiga.application.fcm.service.TripPushSender;
 import kr.co.yeogiga.application.trip.dto.TripReq;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.dto.TripFcmTokenQueryDto;
@@ -31,13 +32,14 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -59,6 +61,9 @@ public class TripCommandServiceTest {
 
     @Mock
     private RedisRepository redisRepository;
+
+    @Mock
+    private TripPushSender tripPushSender;
 
     @InjectMocks
     private TripCommandService tripCommandService;
@@ -280,7 +285,7 @@ public class TripCommandServiceTest {
         void shouldStoreFcmTokensToRedisWhenTripStarts() {
             // given
             LocalDateTime now = LocalDateTime.of(2025, 5, 29, 12, 0);
-            TripFcmTokenQueryDto dto = new TripFcmTokenQueryDto(1L, "fcm-token", now.plusDays(1));
+            TripFcmTokenQueryDto dto = new TripFcmTokenQueryDto(1L, "여행 제목", "fcm-token", now.plusDays(1));
             given(tripService.readTripFcmTokensByTime(now)).willReturn(List.of(dto));
 
             // when
@@ -292,6 +297,7 @@ public class TripCommandServiceTest {
             verify(redisRepository, times(1)).expire(anyString(), any());
             verify(tripService, times(1)).updateAllTravelStatusToInProgress(now);
             verify(tripService, times(1)).updateAllTravelStatusToCompleted(now);
+            verify(tripPushSender, times(1)).sendPush(anyLong(), anyString(), anyString(), anyList());
         }
 
         @Test
@@ -307,7 +313,6 @@ public class TripCommandServiceTest {
             // then
             verify(redisRepository, never()).setListAll(any(), any());
             verify(redisRepository, never()).expire(any(), any());
-            verify(tripService, times(1)).updateAllTravelStatusToInProgress(now);
             verify(tripService, times(1)).updateAllTravelStatusToCompleted(now);
         }
     }

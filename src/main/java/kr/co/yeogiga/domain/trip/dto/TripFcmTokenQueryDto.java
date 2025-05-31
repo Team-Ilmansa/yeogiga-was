@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 public record TripFcmTokenQueryDto(
         Long tripId,
+        String title,
         String fcmToken,
         LocalDateTime endedAt
 ) {
