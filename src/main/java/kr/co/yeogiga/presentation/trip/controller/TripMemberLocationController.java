@@ -36,6 +36,7 @@ public class TripMemberLocationController implements TripMemberLocationApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
     
+    @Override
     @GetMapping("/{tripId}/members/location")
     public ResponseEntity<?> getLocations(
             @AuthenticationPrincipal CustomUserDetails userDetails,
