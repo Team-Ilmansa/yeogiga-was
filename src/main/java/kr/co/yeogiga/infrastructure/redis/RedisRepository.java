@@ -110,4 +110,13 @@ public class RedisRepository {
                 .map(String::valueOf)
                 .collect(Collectors.toSet());
     }
+    
+    public <T> List<T> getHashAll(String key, Collection<String> hashKeys, Class<T> clazz) {
+        return redisTemplate.opsForHash().multiGet(
+                key,
+                hashKeys.stream()
+                        .map(Object.class::cast)
+                        .toList()
+        ).stream().map(clazz::cast).toList();
+    }
 }
