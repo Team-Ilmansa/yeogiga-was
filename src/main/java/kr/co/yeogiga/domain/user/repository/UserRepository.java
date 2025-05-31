@@ -56,8 +56,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByFcmToken(String fcmToken);
     
-    @Query("SELECT u FROM users u WHERE u.id IN :ids")
-    List<User> findAllByIds(List<Long> ids);
+    List<User> findAllByIdIn(List<Long> ids);
 
     @Modifying
     @Query(value = "DELETE " +

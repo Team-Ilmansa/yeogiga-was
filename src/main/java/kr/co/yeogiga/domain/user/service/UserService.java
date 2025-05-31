@@ -24,7 +24,7 @@ public class UserService {
     }
     
     public List<User> readAllByIds(List<Long> ids) {
-        return userRepository.findAllByIds(ids);
+        return userRepository.findAllByIdIn(ids);
     }
 
     public Optional<User> readIncludeDeletedUserById(Long id) {
