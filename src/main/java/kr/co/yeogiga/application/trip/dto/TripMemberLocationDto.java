@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import kr.co.yeogiga.domain.user.entity.User;
+import lombok.Builder;
 
 public class TripMemberLocationDto {
 
@@ -31,4 +33,23 @@ public class TripMemberLocationDto {
             Double longitude,
             Long userId
     ) { }
+    
+    @Builder
+    public record Response (
+            Double latitude,
+            Double longitude,
+            Long userId,
+            String nickname,
+            String imageUrl
+    ) {
+        public static Response from(StoredFormat locationInfo, User user) {
+            return Response.builder()
+                    .latitude(locationInfo.latitude())
+                    .longitude(locationInfo.longitude())
+                    .userId(locationInfo.userId())
+                    .nickname(user.getNickname())
+                    .imageUrl(user.getImageUrl())
+                    .build();
+        }
+    }
 }
