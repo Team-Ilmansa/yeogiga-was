@@ -1,4 +1,4 @@
-package kr.co.yeogiga.presentation.pin.controller.api;
+package kr.co.yeogiga.presentation.pin.api;
 
 import api.link.checker.annotation.ApiGroup;
 import api.link.checker.annotation.TrackApi;

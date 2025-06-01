@@ -5,7 +5,7 @@ import kr.co.yeogiga.application.pin.dto.PinReq;
 import kr.co.yeogiga.application.pin.service.PinCommandService;
 import kr.co.yeogiga.application.pin.service.PinQueryService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
-import kr.co.yeogiga.presentation.pin.controller.api.PinApi;
+import kr.co.yeogiga.presentation.pin.api.PinApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
