@@ -29,7 +29,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -75,7 +74,7 @@ public class PinCommandServiceTest {
 
             when(tripService.existsById(tripId)).thenReturn(true);
             when(tripService.readTripFcmTokenInfosById(tripId)).thenReturn(List.of(fcmTokenInfoDto));
-            doNothing().when(tripPushSender).sendPinPush(anyLong(), anyString(), any(), anyString(), anyList());
+            doNothing().when(tripPushSender).sendPush(anyLong(), anyString(), anyString(), anyList());
 
             try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
                 String date = "2025-05-25T12:00:00Z";
@@ -88,7 +87,7 @@ public class PinCommandServiceTest {
 
                 // then
                 verify(redisRepository, times(1)).set(isA(String.class), isA(Pin.class), isA(Duration.class));
-                verify(tripPushSender, times(1)).sendPinPush(anyLong(), anyString(), any(), anyString(), anyList());
+                verify(tripPushSender, times(1)).sendPush(anyLong(), anyString(), anyString(), anyList());
             }
 
         }
@@ -111,7 +110,7 @@ public class PinCommandServiceTest {
 
                 // then
                 verify(redisRepository, times(1)).set(isA(String.class), isA(Pin.class), isA(Duration.class));
-                verify(tripPushSender,never()).sendPinPush(anyLong(), anyString(), any(), anyString(), anyList());
+                verify(tripPushSender,never()).sendPush(anyLong(), anyString(), anyString(), anyList());
             }
         }
 
