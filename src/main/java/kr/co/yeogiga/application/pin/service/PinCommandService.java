@@ -3,6 +3,7 @@ package kr.co.yeogiga.application.pin.service;
 import kr.co.yeogiga.application.fcm.service.TripPushSender;
 import kr.co.yeogiga.application.pin.dto.PinReq;
 import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.common.response.error.type.CommonErrorType;
 import kr.co.yeogiga.domain.trip.dto.TripFcmTokenInfoDto;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.service.TripService;
@@ -50,6 +51,12 @@ public class PinCommandService {
      * @return              집결지 핀 만료 기한
      */
     private Duration calculatePinDuration(LocalDateTime time) {
+        LocalDateTime now = LocalDateTime.now();
+
+        if (time.isBefore(now)) {
+            throw new CustomException(CommonErrorType.TIME_SHOULD_NOT_BEFORE_NOW);
+        }
+
         return Duration.between(LocalDateTime.now(), time);
     }
 
