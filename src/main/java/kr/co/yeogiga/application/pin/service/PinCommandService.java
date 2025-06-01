@@ -1,5 +1,6 @@
 package kr.co.yeogiga.application.pin.service;
 
+import kr.co.yeogiga.application.fcm.constant.FcmConstant;
 import kr.co.yeogiga.application.fcm.service.TripPushSender;
 import kr.co.yeogiga.application.pin.dto.PinReq;
 import kr.co.yeogiga.common.exception.CustomException;
@@ -41,7 +42,7 @@ public class PinCommandService {
         redisRepository.set(pinKey, pin.toEntity(), calculatePinDuration(pin.time()));
 
         // Push 알림 전송
-        sendPinPush(tripId, pin);
+        sendPinPush(tripId);
     }
 
     /**
@@ -64,9 +65,8 @@ public class PinCommandService {
      * 집결지(Pin) 생성 후 Push 알림을 보내는 메서드
      *
      * @param tripId    알림 대상 여행 ID
-     * @param pin       집결지 정보
      */
-    private void sendPinPush(Long tripId, PinReq.Creation pin) {
+    private void sendPinPush(Long tripId) {
         List<TripFcmTokenInfoDto> fcmTokenInfos = tripService.readTripFcmTokenInfosById(tripId);
 
         if (fcmTokenInfos.isEmpty()) return;
@@ -79,6 +79,6 @@ public class PinCommandService {
 
         String redisKey = TripMemberTokenConstant.tripTokenKey(tripId);
 
-        tripPushSender.sendPinPush(tripId, title, pin.toEntity(), redisKey, fcmTokens);
+        tripPushSender.sendPush(tripId, FcmConstant.formatPinTitle(title), redisKey, fcmTokens);
     }
 }

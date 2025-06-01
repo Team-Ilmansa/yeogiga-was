@@ -1,5 +1,6 @@
 package kr.co.yeogiga.application.trip.service;
 
+import kr.co.yeogiga.application.fcm.constant.FcmConstant;
 import kr.co.yeogiga.application.fcm.service.TripPushSender;
 import kr.co.yeogiga.application.trip.dto.TripReq;
 import kr.co.yeogiga.common.exception.CustomException;
@@ -159,7 +160,7 @@ public class TripCommandService {
         redisRepository.expire(redisKey, calculateDuration(endedAt));
 
         // Push 알림 전송
-        tripPushSender.sendPush(tripId, title, redisKey, tokens);
+        tripPushSender.sendPush(tripId, FcmConstant.formatTitle(title), redisKey, tokens);
     }
 
     /**
