@@ -76,6 +76,12 @@ public interface PinApi {
                                                   "longitude": "경도는 필수 입력값입니다."
                                               }
                                           }
+                                    """),
+                            @ExampleObject(name = "요청 시간이 현재 시간보다 이전인 경우", value = """
+                                        {
+                                              "code": "G004",
+                                              "message" : "요청 시각은 현재 시각 이전이 될 수 없습니다."
+                                          }
                                     """)
                     })),
             @ApiResponse(responseCode = "404", description = "집결지 핀 생성 실패",
