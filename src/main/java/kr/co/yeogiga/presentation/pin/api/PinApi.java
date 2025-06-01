@@ -1,4 +1,4 @@
-package kr.co.yeogiga.presentation.pin.controller.api;
+package kr.co.yeogiga.presentation.pin.api;
 
 import api.link.checker.annotation.ApiGroup;
 import api.link.checker.annotation.TrackApi;
@@ -75,6 +75,12 @@ public interface PinApi {
                                                   "time": "집결 시간은 필수 입력값입니다.",
                                                   "longitude": "경도는 필수 입력값입니다."
                                               }
+                                          }
+                                    """),
+                            @ExampleObject(name = "요청 시간이 현재 시간보다 이전인 경우", value = """
+                                        {
+                                              "code": "G004",
+                                              "message" : "요청 시각은 현재 시각 이전이 될 수 없습니다."
                                           }
                                     """)
                     })),

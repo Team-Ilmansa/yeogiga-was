@@ -2,6 +2,7 @@ package kr.co.yeogiga.application.fcm.service;
 
 import kr.co.yeogiga.application.fcm.constant.FcmConstant;
 import kr.co.yeogiga.application.user.service.UserFcmTokenService;
+import kr.co.yeogiga.domain.pin.entity.Pin;
 import kr.co.yeogiga.infrastructure.fcm.FcmNotificationSender;
 import kr.co.yeogiga.infrastructure.fcm.response.FcmSendResult;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;

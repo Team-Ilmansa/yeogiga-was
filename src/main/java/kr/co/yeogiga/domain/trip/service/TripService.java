@@ -1,5 +1,6 @@
 package kr.co.yeogiga.domain.trip.service;
 
+import kr.co.yeogiga.domain.trip.dto.TripFcmTokenInfoDto;
 import kr.co.yeogiga.domain.trip.dto.TripFcmTokenQueryDto;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.repository.TripRepository;
@@ -34,6 +35,10 @@ public class TripService {
 
     public List<TripFcmTokenQueryDto> readTripFcmTokensByTime(LocalDateTime time) {
         return tripRepository.findTripFcmTokensByTime(time);
+    }
+
+    public List<TripFcmTokenInfoDto> readTripFcmTokenInfosById(Long tripId) {
+        return tripRepository.findTripFcmTokenInfosById(tripId);
     }
 
     public boolean existsById(Long tripId) {

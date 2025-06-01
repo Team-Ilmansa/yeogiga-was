@@ -42,7 +42,7 @@ public class Trip {
     @Column(name = "ended_at")
     private LocalDateTime endedAt;
 
-    @Column(name = "deleted_At")
+    @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
     @Column(name = "travel_status", nullable = false)
