@@ -2,6 +2,7 @@ package kr.co.yeogiga.application.fcm.service;
 
 import kr.co.yeogiga.application.fcm.constant.FcmConstant;
 import kr.co.yeogiga.application.user.service.UserFcmTokenService;
+import kr.co.yeogiga.domain.pin.entity.Pin;
 import kr.co.yeogiga.infrastructure.fcm.FcmNotificationSender;
 import kr.co.yeogiga.infrastructure.fcm.response.FcmSendResult;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;
@@ -66,6 +67,31 @@ public class TripPushSender {
     }
 
     /**
+     * FCM 토큰을 통해 집결지(Pin) Notification Push를 비동기로 전송하는 메서드
+     * - 유효하지 않은 토큰은 Redis 및 RDB에서 제거
+     *
+     * @param tripId        알림 대상 여행 ID
+     * @param title         알림 대상 여행 제목
+     * @param pin           Pin 정보
+     * @param redisListKey  FCM 토큰이 저장된 Redis 리스트 키
+     * @param fcmTokens     푸시 알림 전송 대상 FCM 토큰 List
+     */
+    @Async
+    public void sendPinPush(Long tripId, String title, Pin pin, String redisListKey, List<String> fcmTokens) {
+        Map<String, String> notificationData = buildPinPushData(tripId, pin);
+        String pushTitle = FcmConstant.formatPinTitle(title);
+        String body = FcmConstant.PIN_FCM_BODY;
+
+        for (String fcmToken : fcmTokens) {
+            FcmSendResult result = fcmNotificationSender.sendNotification(fcmToken, pushTitle, body, notificationData);
+
+            if (result.shouldRemoveToken()) {
+                deleteFcmToken(redisListKey, fcmToken);
+            }
+        }
+    }
+
+    /**
      * 유효하지 않은 FCM Token을 삭제하는 메서드
      * - Redis 및 RDB에 저장된 FCM Token 정보를 삭제
      *
@@ -87,5 +113,22 @@ public class TripPushSender {
         Map<String, String> data = new HashMap<>();
         data.put("tripId", tripId.toString());
         return data;
+    }
+
+    /**
+     * 집결지(Pin) Push data 생성 메서드
+     *
+     * @param tripId    알림 대상 여행 ID
+     * @param pin       집결지 정보
+     * @return          집결지 정보가 저장된 Map 자료구조
+     */
+    private Map<String, String> buildPinPushData(Long tripId, Pin pin) {
+        return Map.of(
+                "tripId", tripId.toString(),
+                "place", pin.getPlace(),
+                "latitude", pin.getLatitude().toString(),
+                "longitude", pin.getLongitude().toString(),
+                "time", pin.getTime().toString()
+        );
     }
 }
