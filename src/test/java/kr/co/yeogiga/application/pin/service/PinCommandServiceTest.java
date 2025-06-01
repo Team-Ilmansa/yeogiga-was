@@ -3,6 +3,7 @@ package kr.co.yeogiga.application.pin.service;
 import kr.co.yeogiga.application.fcm.service.TripPushSender;
 import kr.co.yeogiga.application.pin.dto.PinReq;
 import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.common.response.error.type.CommonErrorType;
 import kr.co.yeogiga.domain.pin.entity.Pin;
 import kr.co.yeogiga.domain.trip.dto.TripFcmTokenInfoDto;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
@@ -14,10 +15,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 
@@ -71,12 +77,20 @@ public class PinCommandServiceTest {
             when(tripService.readTripFcmTokenInfosById(tripId)).thenReturn(List.of(fcmTokenInfoDto));
             doNothing().when(tripPushSender).sendPinPush(anyLong(), anyString(), any(), anyString(), anyList());
 
-            // when
-            pinCommandService.createPin(tripId, request);
+            try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+                String date = "2025-05-25T12:00:00Z";
+                Clock clock = Clock.fixed(Instant.parse(date), ZoneId.of("UTC"));
+                LocalDateTime mockNow = LocalDateTime.now(clock);
+                mockedLocalDateTime.when(LocalDateTime::now).thenReturn(mockNow);
 
-            // then
-            verify(redisRepository, times(1)).set(isA(String.class), isA(Pin.class), isA(Duration.class));
-            verify(tripPushSender, times(1)).sendPinPush(anyLong(), anyString(), any(), anyString(), anyList());
+                // when
+                pinCommandService.createPin(tripId, request);
+
+                // then
+                verify(redisRepository, times(1)).set(isA(String.class), isA(Pin.class), isA(Duration.class));
+                verify(tripPushSender, times(1)).sendPinPush(anyLong(), anyString(), any(), anyString(), anyList());
+            }
+
         }
 
         @Test
@@ -86,12 +100,19 @@ public class PinCommandServiceTest {
             when(tripService.existsById(tripId)).thenReturn(true);
             when(tripService.readTripFcmTokenInfosById(tripId)).thenReturn(Collections.emptyList());
 
-            // when
-            pinCommandService.createPin(tripId, request);
+            try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+                String date = "2025-05-25T12:00:00Z";
+                Clock clock = Clock.fixed(Instant.parse(date), ZoneId.of("UTC"));
+                LocalDateTime mockNow = LocalDateTime.now(clock);
+                mockedLocalDateTime.when(LocalDateTime::now).thenReturn(mockNow);
 
-            // then
-            verify(redisRepository, times(1)).set(isA(String.class), isA(Pin.class), isA(Duration.class));
-            verify(tripPushSender,never()).sendPinPush(anyLong(), anyString(), any(), anyString(), anyList());
+                // when
+                pinCommandService.createPin(tripId, request);
+
+                // then
+                verify(redisRepository, times(1)).set(isA(String.class), isA(Pin.class), isA(Duration.class));
+                verify(tripPushSender,never()).sendPinPush(anyLong(), anyString(), any(), anyString(), anyList());
+            }
         }
 
         @Test
@@ -106,6 +127,26 @@ public class PinCommandServiceTest {
 
             // then
             assertEquals(TripErrorType.TRIP_NOT_FOUND, exception.getErrorType());
+        }
+
+        @Test
+        @DisplayName("실패 - 요청 시각이 현재 시각보다 이전인 경우")
+        void failIfRequestTimeIsBeforeNow() {
+            when(tripService.existsById(tripId)).thenReturn(true);
+
+            try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+                String date = "2025-07-01T12:00:00Z";
+                Clock clock = Clock.fixed(Instant.parse(date), ZoneId.of("UTC"));
+                LocalDateTime mockNow = LocalDateTime.now(clock);
+                mockedLocalDateTime.when(LocalDateTime::now).thenReturn(mockNow);
+
+                // when
+                CustomException exception = assertThrows(CustomException.class,
+                        () -> pinCommandService.createPin(tripId, request));
+
+                // then
+                assertEquals(CommonErrorType.TIME_SHOULD_NOT_BEFORE_NOW, exception.getErrorType());
+            }
         }
     }
 
