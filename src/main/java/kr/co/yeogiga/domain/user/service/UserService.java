@@ -40,7 +40,7 @@ public class UserService {
     }
 
     public Optional<User> readIncludeDeletedUserByPlatformAndPlatformId(OAuthPlatform platform, String platformId) {
-        return userRepository.findUserIncludeDeletedByPlatformAndPlatformId(platform, platformId);
+        return userRepository.findUserIncludeDeletedByPlatformAndPlatformId(platform.name(), platformId);
     }
 
     public List<Long> readDeletedUserIdBefore(LocalDate date) {

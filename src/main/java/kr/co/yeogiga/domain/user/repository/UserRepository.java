@@ -17,7 +17,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
                    "FROM users u " +
                    "INNER JOIN oauth o ON u.id = o.user_id " +
                    "WHERE o.platform = :platform AND o.platform_id = :platformId", nativeQuery = true)
-    Optional<User> findUserIncludeDeletedByPlatformAndPlatformId(@Param(value = "platform") OAuthPlatform platform, @Param("platformId") String platformId);
+    Optional<User> findUserIncludeDeletedByPlatformAndPlatformId(@Param(value = "platform") String platform, @Param("platformId") String platformId);
 
     @Query(value = "SELECT * " +
                    "FROM users " +
