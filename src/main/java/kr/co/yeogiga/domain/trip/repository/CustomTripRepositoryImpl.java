@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class CustomTripRepositoryImpl implements CustomTripRepository {
@@ -60,5 +61,41 @@ public class CustomTripRepositoryImpl implements CustomTripRepository {
                                 .and(user.fcmToken.isNotNull())
                 )
                 .fetch();
+    }
+
+    @Override
+    public Optional<Long> findLeaderIdById(Long tripId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(trip.leaderId)
+                        .from(trip)
+                        .where(trip.id.eq(tripId))
+                        .fetchOne()
+        );
+    }
+
+    @Override
+    public void updateTravelStatusInProgress(LocalDateTime time) {
+        jpaQueryFactory
+                .update(trip)
+                .set(trip.travelStatus, TravelStatus.IN_PROGRESS)
+                .where(
+                        trip.travelStatus.notIn(TravelStatus.IN_PROGRESS, TravelStatus.SETTING),
+                        trip.startedAt.loe(time),
+                        trip.endedAt.goe(time)
+                )
+                .execute();
+    }
+
+    @Override
+    public void updateTravelStatusCompleted(LocalDateTime time) {
+        jpaQueryFactory
+                .update(trip)
+                .set(trip.travelStatus, TravelStatus.COMPLETED)
+                .where(
+                        trip.travelStatus.notIn(TravelStatus.COMPLETED, TravelStatus.SETTING),
+                        trip.endedAt.loe(time)
+                )
+                .execute();
     }
 }
