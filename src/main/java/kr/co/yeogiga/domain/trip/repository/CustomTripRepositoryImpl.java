@@ -80,8 +80,7 @@ public class CustomTripRepositoryImpl implements CustomTripRepository {
                 .update(trip)
                 .set(trip.travelStatus, TravelStatus.IN_PROGRESS)
                 .where(
-                        trip.travelStatus.ne(TravelStatus.IN_PROGRESS),
-                        trip.travelStatus.ne(TravelStatus.SETTING),
+                        trip.travelStatus.notIn(TravelStatus.IN_PROGRESS, TravelStatus.SETTING),
                         trip.startedAt.loe(time),
                         trip.endedAt.goe(time)
                 )
@@ -94,8 +93,7 @@ public class CustomTripRepositoryImpl implements CustomTripRepository {
                 .update(trip)
                 .set(trip.travelStatus, TravelStatus.COMPLETED)
                 .where(
-                        trip.travelStatus.ne(TravelStatus.COMPLETED),
-                        trip.travelStatus.ne(TravelStatus.SETTING),
+                        trip.travelStatus.notIn(TravelStatus.COMPLETED, TravelStatus.SETTING),
                         trip.endedAt.loe(time)
                 )
                 .execute();
