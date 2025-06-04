@@ -94,6 +94,8 @@ public class TripCommandService {
             throw new CustomException(TripErrorType.PERMISSION_DENIED_NOT_LEADER);
         }
 
+        // TODO : 앞당겨진 일정의 경우, 앞에 일차 추가 고려
+
         // 날짜 변경에 따른 MongoDB 동기화 (기존 값이 null이 아닌 경우만)
         if (trip.getStartedAt() != null && trip.getEndedAt() != null) {
             restructureTripDayPlaces(tripId, trip.getStartedAt(), trip.getEndedAt(), time.start(), time.end());
