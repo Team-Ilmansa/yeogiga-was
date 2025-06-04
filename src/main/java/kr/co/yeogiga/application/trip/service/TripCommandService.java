@@ -10,6 +10,8 @@ import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.service.TripMemberService;
 import kr.co.yeogiga.domain.trip.service.TripService;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
+import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
+import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.exception.UserErrorType;
 import kr.co.yeogiga.domain.user.service.UserService;
@@ -20,7 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -31,6 +36,7 @@ import java.util.stream.Collectors;
 public class TripCommandService {
     private final TripService tripService;
     private final TripMemberService tripMemberService;
+    private final TripDayPlaceService tripDayPlaceService;
     private final UserService userService;
     private final RedisRepository redisRepository;
     private final TripPushSender tripPushSender;
@@ -65,6 +71,7 @@ public class TripCommandService {
     /**
      * 여행 시간 수정 메서드
      * - 여행 일정과 목적지까지 확정이 나지 않은 상태(SETTING)일 경우, 여행 상태(TravelStatus)값 미변경
+     * - 기존 일정에서 일차 수의 변화가 생긴다면, 일차 정보를 담은 MongoDB 동기화
      *
      * @param tripId        여행 ID
      * @param userId        요청자 ID
@@ -87,12 +94,59 @@ public class TripCommandService {
             throw new CustomException(TripErrorType.PERMISSION_DENIED_NOT_LEADER);
         }
 
+        // 날짜 변경에 따른 MongoDB 동기화 (기존 값이 null이 아닌 경우만)
+        if (trip.getStartedAt() != null && trip.getEndedAt() != null) {
+            restructureTripDayPlaces(tripId, trip.getStartedAt(), trip.getEndedAt(), time.start(), time.end());
+        }
+
         if (trip.getTravelStatus() != TravelStatus.SETTING) {
             TravelStatus status = TravelStatus.resolveStatus(time.start(), time.end());
             trip.updateStatus(status);
         }
 
         trip.updateTime(time.start(), time.end());
+    }
+
+    /**
+     * 여행 시작일/종료일 변경 시, 일차별 장소(trip_day_place)를 동기화하는 메서드
+     * - 기존보다 늘어나면 새로 생성하고, 줄어들면 해당 날짜 이후의 데이터를 삭제
+     *
+     * @param tripId          여행 ID
+     * @param currentStart    기존 시작일
+     * @param currentEnd      기존 종료일
+     * @param newStart        변경된 시작일
+     * @param newEnd          변경된 종료일
+     */
+    private void restructureTripDayPlaces(
+            Long tripId,
+            LocalDateTime currentStart,
+            LocalDateTime currentEnd,
+            LocalDateTime newStart,
+            LocalDateTime newEnd
+    ) {
+        int currentDays = calculateTripDays(currentStart.toLocalDate(), currentEnd.toLocalDate());
+        int newDays = calculateTripDays(newStart.toLocalDate(), newEnd.toLocalDate());
+
+        if (newDays > currentDays) {    // 여행일이 늘어난 경우, 부족한 일차 추가
+            for (int day = currentDays + 1 ; day <= newDays; day++) {
+                TripDayPlace newDayPlace = TripDayPlace.builder()
+                        .tripId(tripId)
+                        .day(day)
+                        .places(new ArrayList<>())
+                        .build();
+                tripDayPlaceService.save(newDayPlace);
+            }
+        } else if (newDays < currentDays) {     // 여행일이 줄어든 경우, 초과된 일차 삭제
+            tripDayPlaceService.deleteByTripIdAndDayGreaterThan(tripId, newDays);
+        }
+    }
+
+    /**
+     * 시작일과 종료일을 기준으로 여행 총 일수 계산 메서드
+     * @return 여행 총 일수
+     */
+    private int calculateTripDays(LocalDate start, LocalDate end) {
+        return (int) ChronoUnit.DAYS.between(start, end) + 1;
     }
 
     /**
