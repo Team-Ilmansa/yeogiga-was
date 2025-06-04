@@ -9,6 +9,7 @@ import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.service.TripMemberService;
 import kr.co.yeogiga.domain.trip.service.TripService;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
+import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.service.UserService;
 import kr.co.yeogiga.domain.user.type.Role;
@@ -38,6 +39,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -55,6 +57,9 @@ public class TripCommandServiceTest {
 
     @Mock
     private TripMemberService tripMemberService;
+
+    @Mock
+    private TripDayPlaceService tripDayPlaceService;
 
     @Mock
     private UserService userService;
@@ -215,6 +220,60 @@ public class TripCommandServiceTest {
                 // then
                 assertEquals(TravelStatus.COMPLETED, trip.getTravelStatus());
             }
+        }
+
+        @Test
+        @DisplayName("여행 기간이 늘어난 경우 - 부족한 일차 데이터를 생성")
+        void tripDayPlaceIncreaseTest() {
+            // given
+            LocalDateTime currentStart = LocalDateTime.of(2025, 6, 1, 0, 0);
+            LocalDateTime currentEnd = LocalDateTime.of(2025, 6, 3, 0, 0);
+            LocalDateTime newStart = LocalDateTime.of(2025, 6, 1, 0, 0);
+            LocalDateTime newEnd = LocalDateTime.of(2025, 6, 5, 0, 0);
+
+            Trip trip = Trip.builder()
+                    .leaderId(userId)
+                    .travelStatus(TravelStatus.SETTING)
+                    .build();
+            trip.updateTime(currentStart, currentEnd);
+
+            TripReq.Time time = new TripReq.Time(newStart, newEnd);
+
+            given(tripService.readById(tripId)).willReturn(Optional.of(trip));
+
+            // when
+            tripCommandService.updateTime(tripId, userId, time);
+
+            // then
+            verify(tripDayPlaceService, times(2)).save(any());
+            verify(tripDayPlaceService, never()).deleteByTripIdAndDayGreaterThan(anyLong(), anyInt());
+        }
+
+        @Test
+        @DisplayName("여행 기간이 줄어든 경우 - 초과 일차 데이터를 삭제")
+        void tripDayPlaceDecreaseTest() {
+            // given
+            LocalDateTime currentStart = LocalDateTime.of(2025, 6, 1, 0, 0);
+            LocalDateTime currentEnd = LocalDateTime.of(2025, 6, 5, 0, 0);
+            LocalDateTime newStart = LocalDateTime.of(2025, 6, 1, 0, 0);
+            LocalDateTime newEnd = LocalDateTime.of(2025, 6, 3, 0, 0);
+
+            Trip trip = Trip.builder()
+                    .leaderId(userId)
+                    .travelStatus(TravelStatus.SETTING)
+                    .build();
+            trip.updateTime(currentStart, currentEnd);
+
+            TripReq.Time time = new TripReq.Time(newStart, newEnd);
+
+            given(tripService.readById(tripId)).willReturn(Optional.of(trip));
+
+            // when
+            tripCommandService.updateTime(tripId, userId, time);
+
+            // then
+            verify(tripDayPlaceService, never()).save(any());
+            verify(tripDayPlaceService, times(1)).deleteByTripIdAndDayGreaterThan(anyLong(), anyInt());
         }
 
         @Test

@@ -6,8 +6,8 @@ spring:
 spring:
   servlet:
     multipart:
-      max-file-size: 20MB
-      max-request-size: 20MB
+      max-file-size: 30MB
+      max-request-size: 30MB
 
 --- # api link checker
 api:
