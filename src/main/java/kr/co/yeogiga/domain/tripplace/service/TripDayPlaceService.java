@@ -94,4 +94,8 @@ public class TripDayPlaceService {
     public void deleteImagesByTripId(Long tripId, List<String> imageIds) {
         tripDayPlaceRepository.deleteImagesByTripId(tripId, imageIds);
     }
+
+    public void deleteByTripIdAndDayGreaterThan(Long tripId, int day) {
+        tripDayPlaceRepository.deleteByTripIdAndDayGreaterThan(tripId, day);
+    }
 }
