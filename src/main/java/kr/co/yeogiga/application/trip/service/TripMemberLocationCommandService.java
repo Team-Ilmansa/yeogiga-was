@@ -1,20 +1,28 @@
 package kr.co.yeogiga.application.trip.service;
 
+import kr.co.yeogiga.application.route.service.TripLeaderCommandService;
 import kr.co.yeogiga.application.trip.dto.TripMemberLocationDto;
 import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.common.util.DateTimeUtils;
+import kr.co.yeogiga.domain.trip.entity.Trip;
+import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.exception.TripMemberErrorType;
 import kr.co.yeogiga.domain.trip.service.TripMemberService;
+import kr.co.yeogiga.domain.trip.service.TripService;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;
 import kr.co.yeogiga.infrastructure.redis.constant.TripMemberLocationConstant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
 public class TripMemberLocationCommandService {
     private final TripMemberService tripMemberService;
+    private final TripService tripService;
+    private final TripLeaderCommandService tripLeaderCommandService;
     private final RedisRepository redisRepository;
 
     /**
@@ -36,5 +44,17 @@ public class TripMemberLocationCommandService {
 
         redisRepository.setHash(key, subKey, location.toStoredFormat(userId));
         redisRepository.setHashExpire(key, subKey, Duration.ofMinutes(30));
+
+        // TODO : 여행 방장 ID 및 여행 시간을 캐싱하여 DB로의 조회를 최소화
+        Trip trip = tripService.readById(tripId)
+                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
+
+        // 방장일 경우, 경로 저장
+        if (trip.getLeaderId().equals(userId)) {
+            int day = DateTimeUtils.calculateDays(trip.getStartedAt().toLocalDate(), LocalDate.now());
+
+            tripLeaderCommandService.storeLeaderRouteInRedis(tripId, day, location.latitude(), location.longitude());
+        }
     }
+
 }

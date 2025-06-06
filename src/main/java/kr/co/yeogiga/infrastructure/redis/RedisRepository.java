@@ -87,6 +87,7 @@ public class RedisRepository {
         return Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(key, value));
     }
 
+    // TODO : SCAN 형식으로 변환
     public Set<String> getKeysByPattern(String pattern) {
         return redisTemplate.keys(pattern);
     }

@@ -1,7 +1,6 @@
 package kr.co.yeogiga.presentation.route.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.yeogiga.application.route.dto.RouteReq;
 import kr.co.yeogiga.application.route.dto.RouteRes;
 import kr.co.yeogiga.application.route.service.TripLeaderCommandService;
 import kr.co.yeogiga.application.route.service.TripRouteQueryService;
@@ -16,7 +15,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -27,7 +25,6 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,12 +40,6 @@ public class RouteControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
-    private TripLeaderCommandService tripLeaderCommandService;
-
     @MockBean
     private TripRouteQueryService tripRouteQueryService;
 
@@ -60,27 +51,6 @@ public class RouteControllerTest {
         this.mockMvc = MockMvcBuilders
                 .webAppContextSetup(webApplicationContext)
                 .build();
-    }
-
-    @Test
-    @DisplayName("방장 경로 저장 테스트")
-    void storeLeaderRouteTest() throws Exception {
-        // given
-        RouteReq.Request routeReq =
-                new RouteReq.Request(37.123456, 127.123456);
-
-        // whe
-        ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/trip/{tripId}/days/{day}/routes", tripId, day)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(routeReq))
-        );
-
-        // then
-        resultActions
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."));
     }
 
     @Test

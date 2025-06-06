@@ -45,6 +45,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -274,6 +275,21 @@ public class TripCommandServiceTest {
             // then
             verify(tripDayPlaceService, never()).save(any());
             verify(tripDayPlaceService, times(1)).deleteByTripIdAndDayGreaterThan(anyLong(), anyInt());
+        }
+
+        @Test
+        @DisplayName("실패 - 이미 진행 중이거나 완료된 여행")
+        void failInvalidTripStatus() {
+            // given
+            Trip inValidTrip = Trip.builder().travelStatus(TravelStatus.IN_PROGRESS).build();
+            when(tripService.readById(tripId)).thenReturn(Optional.of(inValidTrip));
+            TripReq.Time time = mock(TripReq.Time.class);
+
+            // when
+            CustomException exception = assertThrows(CustomException.class, () -> tripCommandService.updateTime(tripId, 2L, time));
+
+            // then
+            assertEquals(TripErrorType.TRIP_ALREADY_STARTED_OR_COMPLETED, exception.getErrorType());
         }
 
         @Test
