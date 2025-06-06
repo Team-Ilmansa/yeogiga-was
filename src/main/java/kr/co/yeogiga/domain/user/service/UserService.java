@@ -52,15 +52,15 @@ public class UserService {
     }
 
     public boolean existsIncludeDeletedByUsername(String username) {
-        return userRepository.findUserIdIncludeDeletedByUsername(username).isPresent();
+        return userRepository.existsIncludeDeletedByUsername(username);
     }
 
     public boolean existsIncludeDeletedByNickname(String nickname) {
-        return userRepository.findUserIdIncludeDeletedByNickname(nickname).isPresent();
+        return userRepository.existsIncludeDeletedByNickname(nickname);
     }
 
     public boolean existsIncludeDeletedByEmail(String email) {
-        return userRepository.findUserIdIncludeDeletedByEmail(email).isPresent();
+        return userRepository.existsIdIncludeDeletedByEmail(email);
     }
 
     public void deleteById(Long userId) {
@@ -68,6 +68,6 @@ public class UserService {
     }
 
     public void deleteHardAllByIds(List<Long> ids) {
-        userRepository.deleteHardAllByIds(ids);
+        userRepository.deleteHardAllByIdIn(ids);
     }
 }
