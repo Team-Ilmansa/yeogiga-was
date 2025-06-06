@@ -25,8 +25,6 @@ public enum TripErrorType implements BaseErrorType {
     SAME_TRIP_TITLE(HttpStatus.CONFLICT, "T011", "기존과 동일한 여행 제목입니다."),
     TRIP_ALREADY_STARTED_OR_COMPLETED(HttpStatus.CONFLICT, "T012", "이미 시작되었거나 완료된 여행은 수정할 수 없습니다.");
 
-
-
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
