@@ -4,6 +4,7 @@ import kr.co.yeogiga.application.fcm.constant.FcmConstant;
 import kr.co.yeogiga.application.fcm.service.TripPushSender;
 import kr.co.yeogiga.application.trip.dto.TripReq;
 import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.common.util.DateTimeUtils;
 import kr.co.yeogiga.domain.trip.dto.TripFcmTokenQueryDto;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.entity.TripMember;
@@ -23,9 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -87,13 +86,8 @@ public class TripCommandService {
         Trip trip = tripService.readById(tripId)
                 .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
 
-        if (!time.isValid()) {
-            throw new CustomException(TripErrorType.INVALID_DATE_RANGE);
-        }
-
-        if (!trip.getLeaderId().equals(userId)) {
-            throw new CustomException(TripErrorType.PERMISSION_DENIED_NOT_LEADER);
-        }
+        // 시간 수정 유효성 검사
+        validateTripUpdatePermission(trip, userId, time);
 
         // TODO : 앞당겨진 일정의 경우, 앞에 일차 추가 고려
 
@@ -108,6 +102,30 @@ public class TripCommandService {
         }
 
         trip.updateTime(time.start(), time.end());
+    }
+
+    /**
+     * 여행 일정 변경 전에 사용자 권한 및 여행 상태 유효성을 검증 메서드
+     *
+     * @param trip     수정 대상 여행
+     * @param userId   요청한 사용자 ID
+     * @param time     새로 변경할 여행 기간 정보
+     */
+    private void validateTripUpdatePermission(Trip trip, Long userId, TripReq.Time time) {
+        // 진행중 및 완료된 여행 예외 처리
+        if (trip.getTravelStatus() == TravelStatus.IN_PROGRESS || trip.getTravelStatus() == TravelStatus.COMPLETED) {
+            throw new CustomException(TripErrorType.TRIP_ALREADY_STARTED_OR_COMPLETED);
+        }
+
+        // 올바르지 않은 시간 입력 예외 처리
+        if (!time.isValid()) {
+            throw new CustomException(TripErrorType.INVALID_DATE_RANGE);
+        }
+
+        // 방장이 아닌 경우 예외처리
+        if (!trip.getLeaderId().equals(userId)) {
+            throw new CustomException(TripErrorType.PERMISSION_DENIED_NOT_LEADER);
+        }
     }
 
     /**
@@ -127,8 +145,8 @@ public class TripCommandService {
             LocalDateTime newStart,
             LocalDateTime newEnd
     ) {
-        int currentDays = calculateTripDays(currentStart.toLocalDate(), currentEnd.toLocalDate());
-        int newDays = calculateTripDays(newStart.toLocalDate(), newEnd.toLocalDate());
+        int currentDays = DateTimeUtils.calculateDays(currentStart.toLocalDate(), currentEnd.toLocalDate());
+        int newDays = DateTimeUtils.calculateDays(newStart.toLocalDate(), newEnd.toLocalDate());
 
         if (newDays > currentDays) {    // 여행일이 늘어난 경우, 부족한 일차 추가
             for (int day = currentDays + 1 ; day <= newDays; day++) {
@@ -142,14 +160,6 @@ public class TripCommandService {
         } else if (newDays < currentDays) {     // 여행일이 줄어든 경우, 초과된 일차 삭제
             tripDayPlaceService.deleteByTripIdAndDayGreaterThan(tripId, newDays);
         }
-    }
-
-    /**
-     * 시작일과 종료일을 기준으로 여행 총 일수 계산 메서드
-     * @return 여행 총 일수
-     */
-    private int calculateTripDays(LocalDate start, LocalDate end) {
-        return (int) ChronoUnit.DAYS.between(start, end) + 1;
     }
 
     /**
