@@ -35,7 +35,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -226,6 +225,35 @@ public class TripControllerTest {
             resultActions
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errors.end").exists());
+        }
+
+        @Test
+        @DisplayName("실패 - 이미 시작된 여행")
+        void failAlreadyStart() throws Exception {
+            // given
+            LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 00);
+            LocalDateTime endTime = LocalDateTime.of(2025, 5, 2, 12, 00);
+            TripReq.Time request = TripReq.Time.builder()
+                    .start(startTime)
+                    .end(endTime)
+                    .build();
+
+            doThrow(new CustomException(TripErrorType.TRIP_ALREADY_STARTED_OR_COMPLETED))
+                    .when(tripCommandService).updateTime(any(), any(), any());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    put("/api/v1/trip/{tripId}/time", 1L)
+                            .with(user(userDetails))
+                            .content(objectMapper.writeValueAsBytes(request))
+                            .contentType(MediaType.APPLICATION_JSON)
+            );
+
+            // then
+            resultActions
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.code").value(TripErrorType.TRIP_ALREADY_STARTED_OR_COMPLETED.getCode()))
+                    .andExpect(jsonPath("$.message").value(TripErrorType.TRIP_ALREADY_STARTED_OR_COMPLETED.getMessage()));
         }
     }
 
