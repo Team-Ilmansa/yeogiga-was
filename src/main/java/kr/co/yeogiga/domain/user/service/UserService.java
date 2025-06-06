@@ -68,6 +68,6 @@ public class UserService {
     }
 
     public void deleteHardAllByIds(List<Long> ids) {
-        userRepository.deleteHarAllByIdIn(ids);
+        userRepository.deleteHardAllByIdIn(ids);
     }
 }

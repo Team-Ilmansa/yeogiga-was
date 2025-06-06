@@ -15,5 +15,5 @@ public interface CustomUserRepository {
     boolean existsIncludeDeletedByUsername(String username);
     boolean existsIncludeDeletedByNickname(String nickname);
     boolean existsIdIncludeDeletedByEmail(String email);
-    void deleteHarAllByIdIn(List<Long> ids);
+    void deleteHardAllByIdIn(List<Long> ids);
 }

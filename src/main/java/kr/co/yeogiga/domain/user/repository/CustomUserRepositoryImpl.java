@@ -184,7 +184,7 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
     }
     
     @Override
-    public void deleteHarAllByIdIn(List<Long> ids) {
+    public void deleteHardAllByIdIn(List<Long> ids) {
         jpaQueryFactory
                 .delete(user)
                 .where(user.id.in(ids)).execute();
