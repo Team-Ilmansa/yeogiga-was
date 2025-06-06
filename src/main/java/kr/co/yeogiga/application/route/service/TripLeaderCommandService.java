@@ -1,6 +1,6 @@
 package kr.co.yeogiga.application.route.service;
 
-import kr.co.yeogiga.application.route.dto.RouteReq;
+import kr.co.yeogiga.application.route.dto.RouteDto;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.service.TripService;
 import kr.co.yeogiga.domain.triproute.entity.Route;
@@ -35,25 +35,26 @@ public class TripLeaderCommandService {
      * - 직전 저장 위치와 현재 위치가 거의 같으면 덮어쓰기 수행
      * - 위치가 다르면 새로운 위치로 추가 저장
      *
-     * @param tripId   여행 ID
-     * @param day      여행 일차
-     * @param routeReq 클라이언트에서 보낸 위치 정보 (위도, 경도)
+     * @param tripId    여행 ID
+     * @param day       여행 일차
+     * @param latitude  위도
+     * @param longitude 경도
      */
-    public void storeLeaderRouteInRedis(Long tripId, int day, RouteReq.Request routeReq) {
+    public void storeLeaderRouteInRedis(Long tripId, int day, double latitude, double longitude) {
         String tripRouteKey = RouteConstant.TripRouteKey(tripId, day);
 
-        RouteReq.StoredFormat routeStoredFormat = routeReq.toStoredFormat();
+        RouteDto routeDto = RouteDto.toStoredFormat(latitude, longitude);
 
-        RouteReq.StoredFormat lastRoute =
-                redisRepository.getLastFromList(tripRouteKey, RouteReq.StoredFormat.class);
+        RouteDto lastRoute =
+                redisRepository.getLastFromList(tripRouteKey, RouteDto.class);
 
         // 마지막 위치와 현재 위치가 거의 같다면 → 시간만 갱신해서 덮어쓰기
-        if (lastRoute != null && isSimilarLocation(lastRoute, routeStoredFormat)) {
-            redisRepository.setValueInList(tripRouteKey, -1, routeStoredFormat);
+        if (lastRoute != null && isSimilarLocation(lastRoute, routeDto)) {
+            redisRepository.setValueInList(tripRouteKey, -1, routeDto);
             return;
         }
 
-        redisRepository.setList(tripRouteKey, routeStoredFormat);
+        redisRepository.setList(tripRouteKey, routeDto);
     }
 
     /**
@@ -63,7 +64,7 @@ public class TripLeaderCommandService {
      * @param nowRoute  현재 위치
      * @return 동일한 위치인지 판단 값
      */
-    private boolean isSimilarLocation(RouteReq.StoredFormat prevRoute, RouteReq.StoredFormat nowRoute) {
+    private boolean isSimilarLocation(RouteDto prevRoute, RouteDto nowRoute) {
         double latDiff = Math.abs(prevRoute.latitude() - nowRoute.latitude());
         double lonDiff = Math.abs(prevRoute.longitude() - nowRoute.longitude());
 
@@ -118,7 +119,7 @@ public class TripLeaderCommandService {
         Long tripId = Long.parseLong(parts[2]);
         int day = Integer.parseInt(parts[3]);
 
-        List<RouteReq.StoredFormat> storedRoutes = redisRepository.getList(key, RouteReq.StoredFormat.class);
+        List<RouteDto> storedRoutes = redisRepository.getList(key, RouteDto.class);
 
         if (storedRoutes == null || storedRoutes.isEmpty()) {
             return null;
