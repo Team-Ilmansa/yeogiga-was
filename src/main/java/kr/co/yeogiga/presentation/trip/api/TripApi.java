@@ -421,7 +421,16 @@ public interface TripApi {
                                                  "message": "여행 시작 시간과 종료 시간을 확인하세요."
                                              }
                                     """)
-                    }))
+                    })),
+            @ApiResponse(responseCode = "409", description = "여행 시간 수정 실패 - 이미 시작된 여행",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "존재하지 않는 여행", value = """
+                                             {
+                                                 "code": "T012",
+                                                 "message": "이미 시작되었거나 완료된 여행은 수정할 수 없습니다."
+                                             }
+                                    """)
+                    })),
     })
     ResponseEntity<?> updateTripTime(
             @AuthenticationPrincipal CustomUserDetails userDetails,
