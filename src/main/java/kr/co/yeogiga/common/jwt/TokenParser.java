@@ -17,10 +17,10 @@ public class TokenParser {
 
     @Autowired
     public TokenParser(JwtProperties jwtProperties) {
-        Decoder<InputStream, InputStream> base54UrlDecoder = new CustomBase64UrlDecoder();
+        Decoder<InputStream, InputStream> base64UrlDecoder = new CustomBase64UrlDecoder();
         this.jwtParser = Jwts.parser()
                 .verifyWith(jwtProperties.getSecretKey())
-                .b64Url(base54UrlDecoder)
+                .b64Url(base64UrlDecoder)
                 .build();
     }
 
