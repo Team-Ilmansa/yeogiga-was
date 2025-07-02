@@ -10,6 +10,7 @@ import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,7 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
     private final ObjectMapper objectMapper;
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, org.springframework.security.core.AuthenticationException authException) throws IOException, ServletException {
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         BaseErrorType error = AuthErrorType.NOT_AUTHORIZATION;
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
