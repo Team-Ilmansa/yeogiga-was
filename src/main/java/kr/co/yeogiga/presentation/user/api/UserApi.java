@@ -123,8 +123,10 @@ public interface UserApi {
                                             "code": 200,
                                             "message": "요청이 성공하였습니다.",
                                             "data": {
+                                                "username": null,
                                                 "nickname": "test",
-                                                "email": "test@test.com"
+                                                "email": "test@test.com",
+                                                "imageUrl": "https://image.com"
                                             }
                                         }
                                     """),
@@ -135,7 +137,8 @@ public interface UserApi {
                                             "data": {
                                                 "username": "test",
                                                 "nickname": "test",
-                                                "email": "test@test.com"
+                                                "email": "test@test.com",
+                                                "imageUrl": "https://image.com"
                                             }
                                         }
                                     """)
