@@ -5,17 +5,18 @@ import kr.co.yeogiga.domain.user.entity.User;
 import lombok.Builder;
 
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public record UserInfoRes(
         String username,
         String nickname,
-        String email
+        String email,
+        String imageUrl
 ) {
     public static UserInfoRes fromNormalUser(User user) {
         return UserInfoRes.builder()
                 .username(user.getUsername())
                 .nickname(user.getNickname())
                 .email(user.getEmail())
+                .imageUrl(user.getImageUrl())
                 .build();
     }
 
@@ -23,6 +24,7 @@ public record UserInfoRes(
         return UserInfoRes.builder()
                 .nickname(user.getNickname())
                 .email(user.getEmail())
+                .imageUrl(user.getImageUrl())
                 .build();
     }
 }
