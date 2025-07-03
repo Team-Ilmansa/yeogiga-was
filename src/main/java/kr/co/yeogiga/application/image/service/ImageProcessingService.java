@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -61,7 +62,9 @@ public class ImageProcessingService {
 
         if (user.isEmpty()) return;
 
-        awsS3Storage.deleteImage(user.get().getImageUrl());
+        if (Objects.nonNull(user.get().getImageUrl())) {
+            awsS3Storage.deleteImage(user.get().getImageUrl());
+        }
 
         String url = awsS3Storage.upload(imageUploadRequest.toAwsUploadInfo(), ImageUploadRequest.ImageType.PROFILE);
 
