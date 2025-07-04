@@ -67,6 +67,8 @@ dependencies {
     implementation 'io.lettuce:lettuce-core:6.5.5.RELEASE'
     implementation 'org.springframework.data:spring-data-redis:3.5.0'
 
+    /* Java Mail */
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 
     /* JAXB */
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
