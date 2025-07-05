@@ -25,7 +25,7 @@ public class VerificationController {
     }
     
     @PostMapping("/verify")
-    public ResponseEntity<?> verifyEmailVerificationCode(@Valid @RequestBody VerificationCodeDto.VerificationDto request) {
+    public ResponseEntity<?> verifyEmailVerificationCode(@Valid @RequestBody VerificationCodeDto.VerificationRequest request) {
         verificationCodeService.verifyCode(request.email(), request.code());
         return ResponseEntity.ok(SuccessResponse.builder()
                         .code(HttpStatus.OK.value())
