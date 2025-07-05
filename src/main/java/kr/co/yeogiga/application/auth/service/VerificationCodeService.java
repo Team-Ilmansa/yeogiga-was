@@ -1,5 +1,7 @@
 package kr.co.yeogiga.application.auth.service;
 
+import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
 import kr.co.yeogiga.domain.auth.repository.VerificationCodeCache;
 import kr.co.yeogiga.infrastructure.mail.VerificationCodeEmailSender;
 import lombok.RequiredArgsConstructor;
@@ -18,5 +20,16 @@ public class VerificationCodeService {
         verificationCodeCache.save(email, code);
         
         verificationCodeEmailSender.send(email, code);
+    }
+    
+    public void verifyCode(String email, String code) {
+        String verifiedCode = verificationCodeCache.getCode(email)
+                .orElseThrow(() -> new CustomException(AuthErrorType.EMAIL_VERIFICATION_TIMEOUT));
+        
+        if (!verifiedCode.equals(code)) {
+            throw new CustomException(AuthErrorType.EMAIL_VERIFICATION_CODE_MISMATCH);
+        }
+        
+        verificationCodeCache.delete(email);
     }
 }
