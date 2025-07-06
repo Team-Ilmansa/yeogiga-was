@@ -38,6 +38,12 @@ public interface VerificationApi {
                                                 "email": "잘못된 이메일 형식입니다."
                                             }
                                         }
+                                    """),
+                            @ExampleObject(name = "이메일 인증 요청 시도 횟수 초과", description = "발송 후 1분 이내 재요청한 경우", value = """
+                                        {
+                                            "code": "A016",
+                                            "message": "이메일 인증 시도 횟수를 초과하였습니다. 잠시 후 시도해주세요."
+                                        }
                                     """)
                     }))
     })
@@ -48,7 +54,7 @@ public interface VerificationApi {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "검증 성공",
                     content = @Content(mediaType = "application/json", examples = {
-                            @ExampleObject(name = "이메일 인증 번호 발송 성공", value = """
+                            @ExampleObject(name = "이메일 인증 번호 검증 성공", value = """
                                         {
                                              "code": 200,
                                              "message": "인증에 성공하였습니다."
