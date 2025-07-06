@@ -14,16 +14,23 @@ public class VerificationCodeService {
     private final VerificationCodeRepository verificationCodeRepository;
     private final VerificationCodeEmailSender verificationCodeEmailSender;
     
+    private final Long VERIFICATION_CODE_SEND_TIME_LIMIT = 2 * 60L;
+    
     /**
      * 사용자가 인증 요청한 이메일로 인증 번호를 발송하는 메서드
+     * @throws CustomException AuthErrorType.EMAIL_VERIFICATION_TIME_LIMIT - 이메일 인증 시도 횟수 초과 (1분 이내 재요청)
      *
      * @param email 인증 요청 이메일
      */
     public void issueCode(String email) {
         String code = VerificationCodeGenerator.generate();
         
-        verificationCodeRepository.save(email, code);
+        Long expiration = verificationCodeRepository.getExpire(email);
+        if (expiration > VERIFICATION_CODE_SEND_TIME_LIMIT) {
+            throw new CustomException(AuthErrorType.EMAIL_VERIFICATION_TIME_LIMIT);
+        }
         
+        verificationCodeRepository.save(email, code);
         verificationCodeEmailSender.send(email, code);
     }
     
