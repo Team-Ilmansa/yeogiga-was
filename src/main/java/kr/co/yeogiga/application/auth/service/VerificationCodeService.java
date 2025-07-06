@@ -2,7 +2,7 @@ package kr.co.yeogiga.application.auth.service;
 
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
-import kr.co.yeogiga.domain.auth.repository.VerificationCodeCache;
+import kr.co.yeogiga.domain.auth.repository.VerificationCodeRepository;
 import kr.co.yeogiga.infrastructure.mail.VerificationCodeEmailSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class VerificationCodeService {
-    private final VerificationCodeCache verificationCodeCache;
+    private final VerificationCodeRepository verificationCodeRepository;
     private final VerificationCodeGenerator verificationCodeGenerator;
     private final VerificationCodeEmailSender verificationCodeEmailSender;
     
@@ -22,7 +22,7 @@ public class VerificationCodeService {
     public void issueCode(String email) {
         String code = verificationCodeGenerator.generate();
         
-        verificationCodeCache.save(email, code);
+        verificationCodeRepository.save(email, code);
         
         verificationCodeEmailSender.send(email, code);
     }
@@ -36,13 +36,13 @@ public class VerificationCodeService {
      * @throws CustomException AuthErrorType.EMAIL_VERIFICATION_CODE_MISMATCH - 이메일 인증 번호 불일치
      */
     public void verifyCode(String email, String code) {
-        String verifiedCode = verificationCodeCache.getCode(email)
+        String verifiedCode = verificationCodeRepository.getCode(email)
                 .orElseThrow(() -> new CustomException(AuthErrorType.EMAIL_VERIFICATION_TIMEOUT));
         
         if (!verifiedCode.equals(code)) {
             throw new CustomException(AuthErrorType.EMAIL_VERIFICATION_CODE_MISMATCH);
         }
         
-        verificationCodeCache.delete(email);
+        verificationCodeRepository.delete(email);
     }
 }
