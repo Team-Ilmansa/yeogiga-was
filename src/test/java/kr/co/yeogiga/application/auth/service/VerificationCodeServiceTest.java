@@ -46,14 +46,29 @@ public class VerificationCodeServiceTest {
         void success() {
             // given
             doNothing().when(verificationCodeCache).save(anyString(), anyString());
+            when(verificationCodeCache.getExpire(anyString())).thenReturn(-1L);
             doNothing().when(verificationCodeEmailSender).send(anyString(), anyString());
             
             // when
             verificationCodeService.issueCode(email);
             
             // then
-            verify(verificationCodeCache, times(1)).save(eq(email), eq(code));
-            verify(verificationCodeEmailSender, times(1)).send(eq(email), eq(code));
+            verify(verificationCodeCache, times(1)).save(eq(email), anyString());
+            verify(verificationCodeEmailSender, times(1)).send(eq(email), anyString());
+        }
+        
+        @Test
+        @DisplayName("실패 - 재요청 횟수 초과 (1분 이내 재요청 시)")
+        void failIfRetryLessThan1Minute() {
+            // given
+            when(verificationCodeCache.getExpire(anyString())).thenReturn(140L);
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> verificationCodeService.issueCode(email));
+            
+            // then
+            assertEquals(AuthErrorType.EMAIL_VERIFICATION_TIME_LIMIT, exception.getErrorType());
         }
     }
     
