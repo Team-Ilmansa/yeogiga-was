@@ -1,12 +1,9 @@
-package kr.co.yeogiga.application.auth.service;
-
-import org.springframework.stereotype.Component;
+package kr.co.yeogiga.common.util;
 
 import java.security.SecureRandom;
 
-@Component
 public class VerificationCodeGenerator {
-    private final SecureRandom secureRandom = new SecureRandom();
+    private static final SecureRandom secureRandom = new SecureRandom();
     
     /**
      * 6자리 난수를 생성하는 메서드
@@ -14,7 +11,7 @@ public class VerificationCodeGenerator {
      *
      * @return 6자리 난수
      */
-    public String generate() {
+    public static String generate() {
         return String.valueOf(secureRandom.nextInt(900000) + 100000);
     }
 }

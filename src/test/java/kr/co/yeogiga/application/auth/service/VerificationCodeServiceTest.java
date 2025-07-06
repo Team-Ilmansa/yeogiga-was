@@ -30,9 +30,6 @@ public class VerificationCodeServiceTest {
     private VerificationCodeCache verificationCodeCache;
     
     @Mock
-    private VerificationCodeGenerator verificationCodeGenerator;
-    
-    @Mock
     private VerificationCodeEmailSender verificationCodeEmailSender;
     
     @InjectMocks
@@ -48,8 +45,6 @@ public class VerificationCodeServiceTest {
         @DisplayName("성공")
         void success() {
             // given
-            
-            when(verificationCodeGenerator.generate()).thenReturn(code);
             doNothing().when(verificationCodeCache).save(anyString(), anyString());
             doNothing().when(verificationCodeEmailSender).send(anyString(), anyString());
             

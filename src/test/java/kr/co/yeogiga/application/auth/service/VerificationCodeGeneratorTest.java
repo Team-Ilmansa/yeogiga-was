@@ -1,5 +1,6 @@
 package kr.co.yeogiga.application.auth.service;
 
+import kr.co.yeogiga.common.util.VerificationCodeGenerator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;

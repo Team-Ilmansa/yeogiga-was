@@ -1,6 +1,7 @@
 package kr.co.yeogiga.application.auth.service;
 
 import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.common.util.VerificationCodeGenerator;
 import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
 import kr.co.yeogiga.domain.auth.repository.VerificationCodeRepository;
 import kr.co.yeogiga.infrastructure.mail.VerificationCodeEmailSender;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class VerificationCodeService {
     private final VerificationCodeRepository verificationCodeRepository;
-    private final VerificationCodeGenerator verificationCodeGenerator;
     private final VerificationCodeEmailSender verificationCodeEmailSender;
     
     /**
@@ -20,7 +20,7 @@ public class VerificationCodeService {
      * @param email 인증 요청 이메일
      */
     public void issueCode(String email) {
-        String code = verificationCodeGenerator.generate();
+        String code = VerificationCodeGenerator.generate();
         
         verificationCodeRepository.save(email, code);
         
