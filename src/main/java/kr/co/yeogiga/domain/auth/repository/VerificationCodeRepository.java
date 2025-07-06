@@ -7,5 +7,7 @@ public interface VerificationCodeRepository {
     
     Optional<String> getCode(String email);
     
+    Long getExpire(String email);
+    
     void delete(String email);
 }

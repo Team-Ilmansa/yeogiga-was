@@ -19,6 +19,10 @@ public class RedisRepository {
     public Object get(String key) {
         return redisTemplate.opsForValue().get(key);
     }
+    
+    public Long getExpire(String key) {
+        return redisTemplate.getExpire(key);
+    }
 
     public void set(String key, Object value, Duration duration) {
         redisTemplate.opsForValue().set(key, value, duration);

@@ -28,6 +28,12 @@ public class VerificationCodeCache implements VerificationCodeRepository {
     }
     
     @Override
+    public Long getExpire(String email) {
+        String key = MailConstant.formatVerificationCodePrefix(email);
+        return redisRepository.getExpire(key);
+    }
+    
+    @Override
     public void delete(String email) {
         String key = MailConstant.formatVerificationCodePrefix(email);
         redisRepository.del(key);
