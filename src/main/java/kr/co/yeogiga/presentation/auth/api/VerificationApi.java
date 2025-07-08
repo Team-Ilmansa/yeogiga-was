@@ -45,6 +45,15 @@ public interface VerificationApi {
                                             "message": "이메일 인증 시도 횟수를 초과하였습니다. 잠시 후 시도해주세요."
                                         }
                                     """)
+                    })),
+            @ApiResponse(responseCode = "409", description = "인증번호 발송 요청 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "이미 사용 중인 이메일", value = """
+                                        {
+                                             "code": "A013",
+                                             "message": "이미 사용 중인 이메일입니다."
+                                         }
+                                    """)
                     }))
     })
     ResponseEntity<?> sendEmailVerificationCode(@Valid @RequestBody VerificationCodeDto.SendRequest request);
