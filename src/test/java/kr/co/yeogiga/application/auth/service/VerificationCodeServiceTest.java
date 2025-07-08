@@ -3,6 +3,7 @@ package kr.co.yeogiga.application.auth.service;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
 import kr.co.yeogiga.domain.auth.repository.VerificationCodeCache;
+import kr.co.yeogiga.domain.user.service.UserService;
 import kr.co.yeogiga.infrastructure.mail.VerificationCodeEmailSender;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -32,6 +33,9 @@ public class VerificationCodeServiceTest {
     @Mock
     private VerificationCodeEmailSender verificationCodeEmailSender;
     
+    @Mock
+    private UserService userService;
+    
     @InjectMocks
     private VerificationCodeService verificationCodeService;
     
@@ -45,6 +49,7 @@ public class VerificationCodeServiceTest {
         @DisplayName("성공")
         void success() {
             // given
+            when(userService.existsIncludeDeletedByEmail(anyString())).thenReturn(false);
             doNothing().when(verificationCodeCache).save(anyString(), anyString());
             when(verificationCodeCache.getExpire(anyString())).thenReturn(-1L);
             doNothing().when(verificationCodeEmailSender).send(anyString(), anyString());
@@ -69,6 +74,20 @@ public class VerificationCodeServiceTest {
             
             // then
             assertEquals(AuthErrorType.EMAIL_VERIFICATION_TIME_LIMIT, exception.getErrorType());
+        }
+        
+        @Test
+        @DisplayName("실패 - 이미 가입된 이메일")
+        void failIfEmailAlreadyRegistered() {
+            // given
+            when(userService.existsIncludeDeletedByEmail(anyString())).thenReturn(true);
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> verificationCodeService.issueCode(email));
+            
+            // then
+            assertEquals(AuthErrorType.ALREADY_USED_EMAIL, exception.getErrorType());
         }
     }
     
