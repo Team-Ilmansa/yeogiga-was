@@ -24,7 +24,11 @@ public enum AuthErrorType implements BaseErrorType {
 
     ALREADY_USED_USERNAME(HttpStatus.CONFLICT, "A011", "이미 사용 중인 아이디입니다."),
     ALREADY_USED_NICKNAME(HttpStatus.CONFLICT, "A012", "이미 사용 중인 닉네임입니다."),
-    ALREADY_USED_EMAIL(HttpStatus.CONFLICT, "A013", "이미 사용 중인 이메일입니다.");
+    ALREADY_USED_EMAIL(HttpStatus.CONFLICT, "A013", "이미 사용 중인 이메일입니다."),
+    
+    EMAIL_VERIFICATION_TIMEOUT(HttpStatus.BAD_REQUEST, "A014", "이메일 인증 시간을 초과하였습니다."),
+    EMAIL_VERIFICATION_CODE_MISMATCH(HttpStatus.BAD_REQUEST, "A015", "이메일 인증 번호가 일치하지 않습니다."),
+    EMAIL_VERIFICATION_TIME_LIMIT(HttpStatus.BAD_REQUEST, "A016", "이메일 인증 시도 횟수를 초과하였습니다. 잠시 후 시도해주세요.");
 
 
     private final HttpStatus httpStatus;
