@@ -58,17 +58,13 @@ firebase:
 --- # email
 spring:
   mail:
-    host: smtp.gmail.com
-    port: 587
+    protocol: smtps
+    host: smtp.daum.net
+    port: 465
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
     properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: false
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
+      smtp:
+        auth: true
+        starttls:
+          enable: true
