@@ -262,48 +262,45 @@ public class TripQueryServiceTest {
     @Nested
     @DisplayName("특정 여행 조회")
     class GetTrip {
-
-        private User user = User.builder()
-                .username("username")
-                .password("password")
+        private final Long userId = 1L;
+        
+        private TripMemberRes.MemberInfo member = TripMemberRes.MemberInfo.builder()
+                .userId(userId)
                 .nickname("nickname")
-                .email("test@test.com")
-                .role(Role.USER)
+                .imageUrl("https://image.com")
                 .build();
-
-        private Trip trip = Trip.builder()
-                .title("title")
-                .city("대구광역시")
-                .leaderId(1L)
-                .travelStatus(TravelStatus.IN_PROGRESS)
+        
+        private List<TripMemberRes.MemberInfo> members = List.of(member);
+        
+        private TripRes.TripSummary tripSummary = TripRes.TripSummary.builder()
+                .tripId(1L)
+                .title("졸업여행")
+                .city("대구")
+                .leaderId(userId)
+                .startedAt(LocalDateTime.of(2025, 7, 20, 12, 0))
+                .endedAt(LocalDateTime.of(2025, 7, 30, 12, 0))
+                .status(TravelStatus.PLANNED)
+                .members(members)
                 .build();
-
-        @BeforeEach
-        void setUp() {
-            ReflectionTestUtils.setField(trip, "id", 1L);
-        }
 
         @Test
         @DisplayName("성공")
         void success() {
             // given
-            when(tripService.readById(trip.getId())).thenReturn(Optional.of(trip));
-            when(tripMemberService.readAllUserByTripId(trip.getId())).thenReturn((List.of(user)));
+            when(tripMemberService.readTripSummaryByTripId(1L)).thenReturn(Optional.of(tripSummary));
 
             // when
             TripRes.TripSummary result = tripQueryService.getTrip(1L);
 
             // then
-            assertEquals(trip.getId(), result.tripId());
-            assertEquals(trip.getTitle(), result.title());
-            assertThat(result.members()).hasSize(1);
+            assertEquals(tripSummary.tripId(), result.tripId());
         }
 
         @Test
         @DisplayName("실패 - 존재하지 않는 여행")
         void failIfTripNotFound() {
             // given
-            when(tripService.readById(trip.getId())).thenReturn(Optional.empty());
+            when(tripMemberService.readTripSummaryByTripId(1L)).thenReturn(Optional.empty());
 
             // when
             CustomException exception = assertThrows(CustomException.class,
