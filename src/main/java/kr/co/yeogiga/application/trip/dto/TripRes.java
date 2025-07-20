@@ -43,7 +43,7 @@ public class TripRes {
             TravelStatus status,
             List<TripMemberRes.MemberInfo> members
     ) {
-        public static TripSummary from(Trip trip, List<User> members) {
+        public static TripSummary from(Trip trip, List<TripMemberRes.MemberInfo> members) {
             return TripSummary.builder()
                     .tripId(trip.getId())
                     .title(trip.getTitle())
@@ -52,7 +52,7 @@ public class TripRes {
                     .startedAt(trip.getStartedAt())
                     .endedAt(trip.getEndedAt())
                     .status(trip.getTravelStatus())
-                    .members(members.stream().map(TripMemberRes.MemberInfo::fromEntity).toList())
+                    .members(members)
                     .build();
         }
     }

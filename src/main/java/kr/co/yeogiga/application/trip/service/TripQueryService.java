@@ -135,12 +135,7 @@ public class TripQueryService {
      */
     @Transactional(readOnly = true)
     public List<TripRes.TripSummary> getAllTrip(Long userId) {
-        return tripMemberService.readAllTripByUserId(userId).stream()
-                .map(trip -> {
-                    List<User> members = tripMemberService.readAllUserByTripId(trip.getId());
-                    return TripRes.TripSummary.from(trip, members);
-                })
-                .toList();
+        return tripMemberService.readAllTripSummaryByUserId(userId);
     }
 
     /**
