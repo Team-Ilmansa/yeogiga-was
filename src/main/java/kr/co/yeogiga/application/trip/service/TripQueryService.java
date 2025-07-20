@@ -146,12 +146,8 @@ public class TripQueryService {
      */
     @Transactional(readOnly = true)
     public TripRes.TripSummary getTrip(Long tripId) {
-        Trip trip = tripService.readById(tripId)
+        return tripMemberService.readTripSummaryByTripId(tripId)
                 .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
-
-        List<User> members = tripMemberService.readAllUserByTripId(tripId);
-
-        return TripRes.TripSummary.from(trip, members);
     }
 
     /**
