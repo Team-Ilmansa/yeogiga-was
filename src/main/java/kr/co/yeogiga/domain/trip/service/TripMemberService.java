@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,10 @@ public class TripMemberService {
 
     public List<Trip> readAllTripByUserId(Long userId) {
         return tripMemberRepository.findAllTripByUserId(userId);
+    }
+    
+    public Optional<TripRes.TripSummary> readTripSummaryByTripId(Long tripId) {
+        return tripMemberRepository.findTripSummaryByTripId(tripId);
     }
     
     public List<TripRes.TripSummary> readAllTripSummaryByUserId(Long userId) {

@@ -1,6 +1,7 @@
 package kr.co.yeogiga.domain.trip.repository;
 
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.yeogiga.application.trip.dto.TripMemberRes;
 import kr.co.yeogiga.application.trip.dto.TripRes;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -22,6 +25,35 @@ public class CustomTripMemberRepositoryImpl implements CustomTripMemberRepositor
     private final QTripMember tripMember = QTripMember.tripMember;
     private final QTrip trip = QTrip.trip;
     private final QUser user = QUser.user;
+    
+    @Override
+    public Optional<TripRes.TripSummary> findTripSummaryByTripId(Long tripId) {
+        Trip tripEntity = jpaQueryFactory
+                .select(trip)
+                .from(trip)
+                .where(trip.id.eq(tripId))
+                .fetchOne();
+        
+        if (Objects.isNull(tripEntity)) {
+            return Optional.empty();
+        }
+        
+        List<TripMemberRes.MemberInfo> members = jpaQueryFactory
+                .select(
+                        Projections.constructor(
+                                TripMemberRes.MemberInfo.class,
+                                user.id,
+                                user.nickname,
+                                user.imageUrl
+                        )
+                )
+                .from(tripMember)
+                .join(tripMember.user, user)
+                .where(tripMember.trip.id.eq(tripId))
+                .fetch();
+        
+        return Optional.of(TripRes.TripSummary.from(tripEntity, members));
+    }
     
     @Override
     public List<TripRes.TripSummary> findAllTripSummaryByUserId(Long userId) {
