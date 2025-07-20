@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface TripMemberRepository extends JpaRepository<TripMember, Long> {
+public interface TripMemberRepository extends JpaRepository<TripMember, Long>, CustomTripMemberRepository {
     boolean existsByTripIdAndUserId(Long tripId, Long userId);
 
     @Query("SELECT tm.trip FROM trip_member tm WHERE tm.user.id = :userId ORDER BY tm.trip.startedAt ASC NULLS LAST")
