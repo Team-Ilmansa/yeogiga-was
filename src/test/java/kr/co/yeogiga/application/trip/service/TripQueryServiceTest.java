@@ -1,5 +1,6 @@
 package kr.co.yeogiga.application.trip.service;
 
+import kr.co.yeogiga.application.trip.dto.TripMemberRes;
 import kr.co.yeogiga.application.trip.dto.TripRes;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.entity.Trip;
@@ -34,7 +35,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -211,19 +212,23 @@ public class TripQueryServiceTest {
     class GetAllTrip {
         private final Long userId = 1L;
 
-        private Trip trip = Trip.builder()
-                .title("title")
-                .city("대구광역시")
-                .leaderId(userId)
-                .travelStatus(TravelStatus.PLANNED)
-                .build();
-      
-        private User user = User.builder()
-                .username("username")
-                .password("password")
+        private TripMemberRes.MemberInfo member = TripMemberRes.MemberInfo.builder()
+                .userId(userId)
                 .nickname("nickname")
-                .email("test@test.com")
-                .role(Role.USER)
+                .imageUrl("https://image.com")
+                .build();
+        
+        private List<TripMemberRes.MemberInfo> members = List.of(member);
+        
+        private TripRes.TripSummary tripSummary = TripRes.TripSummary.builder()
+                .tripId(1L)
+                .title("졸업여행")
+                .city("대구")
+                .leaderId(userId)
+                .startedAt(LocalDateTime.of(2025, 7, 20, 12, 0))
+                .endedAt(LocalDateTime.of(2025, 7, 30, 12, 0))
+                .status(TravelStatus.PLANNED)
+                .members(members)
                 .build();
 
 
@@ -231,8 +236,7 @@ public class TripQueryServiceTest {
         @DisplayName("성공")
         void success() {
             // given
-            when(tripMemberService.readAllTripByUserId(userId)).thenReturn(List.of(trip));
-            when(tripMemberService.readAllUserByTripId(any())).thenReturn(List.of(user));
+            when(tripMemberService.readAllTripSummaryByUserId(anyLong())).thenReturn(List.of(tripSummary));
 
             // when
             List<TripRes.TripSummary> result = tripQueryService.getAllTrip(userId);
@@ -245,7 +249,7 @@ public class TripQueryServiceTest {
         @DisplayName("성공 - 빈 배열 반환")
         void successEmptyList() {
             // given
-            when(tripMemberService.readAllTripByUserId(userId)).thenReturn(List.of());
+            when(tripMemberService.readAllTripSummaryByUserId(userId)).thenReturn(List.of());
 
             // when
             List<TripRes.TripSummary> result = tripQueryService.getAllTrip(userId);
