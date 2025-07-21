@@ -536,12 +536,14 @@ public class TripControllerTest {
                 .email("test@test.com")
                 .role(Role.USER)
                 .build();
+        
+        private TripMemberRes.MemberInfo member = TripMemberRes.MemberInfo.fromEntity(user);
 
         @Test
         @DisplayName("성공")
         void success() throws Exception {
             // given
-            TripRes.TripSummary tripSummary = TripRes.TripSummary.from(trip, List.of(user));
+            TripRes.TripSummary tripSummary = TripRes.TripSummary.from(trip, List.of(member));
             when(tripQueryService.getTrip(tripId)).thenReturn(tripSummary);
 
             // when

@@ -135,12 +135,7 @@ public class TripQueryService {
      */
     @Transactional(readOnly = true)
     public List<TripRes.TripSummary> getAllTrip(Long userId) {
-        return tripMemberService.readAllTripByUserId(userId).stream()
-                .map(trip -> {
-                    List<User> members = tripMemberService.readAllUserByTripId(trip.getId());
-                    return TripRes.TripSummary.from(trip, members);
-                })
-                .toList();
+        return tripMemberService.readAllTripSummaryByUserId(userId);
     }
 
     /**
@@ -151,12 +146,8 @@ public class TripQueryService {
      */
     @Transactional(readOnly = true)
     public TripRes.TripSummary getTrip(Long tripId) {
-        Trip trip = tripService.readById(tripId)
+        return tripMemberService.readTripSummaryByTripId(tripId)
                 .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
-
-        List<User> members = tripMemberService.readAllUserByTripId(tripId);
-
-        return TripRes.TripSummary.from(trip, members);
     }
 
     /**
