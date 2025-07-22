@@ -8,6 +8,7 @@ import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 import kr.co.yeogiga.domain.tripplace.exception.ImageErrorType;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
+import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -50,7 +51,7 @@ public class TripPlaceImageMovementServiceTest {
     private Place buildPlace(String id, String name, List<Image> images) {
         Place place = Place.builder()
                 .id(id).name(name).latitude(1.0).longitude(1.0)
-                .placeType("카페")
+                .placeType(PlaceCategory.RESTAURANT)
                 .build();
         place.addImages(images);
         return place;

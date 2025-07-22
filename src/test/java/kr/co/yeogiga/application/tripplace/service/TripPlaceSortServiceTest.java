@@ -1,6 +1,7 @@
 package kr.co.yeogiga.application.tripplace.service;
 
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;
 import kr.co.yeogiga.infrastructure.redis.constant.PlaceConstant;
 import org.junit.jupiter.api.DisplayName;
@@ -60,9 +61,9 @@ class TripPlaceSortServiceTest {
         String listKey = PlaceConstant.dayPlacesKey(tripId, day);
 
         List<TripPlaceReq.StoredFormat> input = List.of(
-                new TripPlaceReq.StoredFormat("1", "PlaceA", 35.1, 128.1, "식당"),
-                new TripPlaceReq.StoredFormat("2", "PlaceB", 35.2, 128.2, "관광지"),
-                new TripPlaceReq.StoredFormat("3", "PlaceC", 35.3, 128.3, "숙소")
+                new TripPlaceReq.StoredFormat("1", "PlaceA", 35.1, 128.1, PlaceCategory.RESTAURANT),
+                new TripPlaceReq.StoredFormat("2", "PlaceB", 35.2, 128.2, PlaceCategory.TOURISM),
+                new TripPlaceReq.StoredFormat("3", "PlaceC", 35.3, 128.3, PlaceCategory.LODGING)
         );
 
         given(redisRepository.getList(eq(listKey), eq(TripPlaceReq.StoredFormat.class)))
@@ -78,7 +79,7 @@ class TripPlaceSortServiceTest {
         verify(redisRepository, times(1)).setListAll(eq(listKey), captor.capture());
 
         List<TripPlaceReq.StoredFormat> saved = new ArrayList<>(captor.getValue());
-        assertEquals("숙소", saved.get(2).placeCategory());
+        assertEquals(PlaceCategory.LODGING, saved.get(2).placeCategory());
     }
 
     @Test
@@ -88,11 +89,11 @@ class TripPlaceSortServiceTest {
         String listKey = PlaceConstant.dayPlacesKey(tripId, day);
 
         List<TripPlaceReq.StoredFormat> input = List.of(
-                new TripPlaceReq.StoredFormat("1", "A", 35.0, 128.0, "식당"),
-                new TripPlaceReq.StoredFormat("2", "B", 35.1, 128.1, "식당"),
-                new TripPlaceReq.StoredFormat("3", "C", 35.2, 128.2, "식당"),
-                new TripPlaceReq.StoredFormat("4", "D", 35.3, 128.3, "숙소"),
-                new TripPlaceReq.StoredFormat("5", "E", 35.4, 128.4, "관광지")
+                new TripPlaceReq.StoredFormat("1", "A", 35.0, 128.0, PlaceCategory.RESTAURANT),
+                new TripPlaceReq.StoredFormat("2", "B", 35.1, 128.1, PlaceCategory.RESTAURANT),
+                new TripPlaceReq.StoredFormat("3", "C", 35.2, 128.2, PlaceCategory.RESTAURANT),
+                new TripPlaceReq.StoredFormat("4", "D", 35.3, 128.3, PlaceCategory.LODGING),
+                new TripPlaceReq.StoredFormat("5", "E", 35.4, 128.4, PlaceCategory.TOURISM)
         );
 
         given(redisRepository.getList(eq(listKey), eq(TripPlaceReq.StoredFormat.class)))
@@ -111,7 +112,7 @@ class TripPlaceSortServiceTest {
         int maxConsecutiveRestaurants = 0;
         int currentCount = 0;
         for (TripPlaceReq.StoredFormat place : saved) {
-            if ("식당".equals(place.placeCategory())) {
+            if (PlaceCategory.RESTAURANT == place.placeCategory()) {
                 currentCount++;
                 maxConsecutiveRestaurants = Math.max(maxConsecutiveRestaurants, currentCount);
             } else {

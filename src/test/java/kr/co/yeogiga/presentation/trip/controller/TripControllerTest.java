@@ -16,6 +16,7 @@ import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
+import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.type.Role;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
@@ -267,7 +268,7 @@ public class TripControllerTest {
                 .latitude(11.11)
                 .longitude(12.12)
                 .order(10.0)
-                .placeType("관광 명소")
+                .placeType(PlaceCategory.TOURISM)
                 .build();
 
         private TripPlaceRes.PlaceSummary placeSummary = TripPlaceRes.PlaceSummary.from(place);

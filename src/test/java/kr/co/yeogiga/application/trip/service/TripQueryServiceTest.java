@@ -11,6 +11,7 @@ import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
+import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.type.Role;
 import org.junit.jupiter.api.BeforeEach;
@@ -89,7 +90,7 @@ public class TripQueryServiceTest {
                     .latitude(11.11)
                     .longitude(12.12)
                     .order(10.0)
-                    .placeType("관광 명소")
+                    .placeType(PlaceCategory.TOURISM)
                     .build();
 
             when(tripMemberService.readAllTripByUserId(userId)).thenReturn(List.of(trip1, trip2));
@@ -159,7 +160,7 @@ public class TripQueryServiceTest {
                     .latitude(11.11)
                     .longitude(12.12)
                     .order(10.0)
-                    .placeType("관광 명소")
+                    .placeType(PlaceCategory.TOURISM)
                     .build();
 
             TripDayPlace tripDayPlace = TripDayPlace.builder()
