@@ -46,7 +46,7 @@ public class TripDaySummaryRes {
                     place.getName(),
                     place.getLatitude(),
                     place.getLongitude(),
-                    place.getPlaceType(),
+                    place.getPlaceType().getLabel(),
                     place.getImages().stream()
                             .findFirst()
                             .map(ImageDto::from)
