@@ -26,7 +26,7 @@ public class TripPlaceImageRes {
                     place.getName(),
                     place.getLatitude(),
                     place.getLongitude(),
-                    place.getPlaceType(),
+                    place.getPlaceType().getLabel(),
                     place.getImages().stream()
                             .map(ImageDto::from)
                             .collect(Collectors.toList())

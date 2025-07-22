@@ -7,6 +7,7 @@ import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
+import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -49,7 +50,7 @@ public class TripPlaceImageQueryServiceTest {
             .name("카페")
             .latitude(1.1)
             .longitude(2.2)
-            .placeType("식당")
+            .placeType(PlaceCategory.RESTAURANT)
             .order(10.0)
             .build();
 

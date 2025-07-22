@@ -61,7 +61,7 @@ public interface TripPlaceApi {
             @PathVariable String tripDayPlaceId,
 
             @Parameter(description = "추가할 목적지 정보")
-            @RequestBody TripPlaceReq.InsertRequest insertRequest
+            @RequestBody TripPlaceReq.Request request
     );
 
     @TrackApi(description = "여행 일정 정보 불러오기 (여행 목적지 지정 확정 후)")

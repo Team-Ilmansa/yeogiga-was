@@ -8,6 +8,7 @@ import kr.co.yeogiga.domain.tripplace.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
+import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -33,8 +34,8 @@ public class TripPlaceQueryServiceTest {
     @InjectMocks
     private TripPlaceQueryService tripPlaceQueryService;
 
-    private final Place place1 = Place.builder().id("id1").name("목적지1").latitude(0.0).longitude(1.1).placeType("카페").order(10.0).build();
-    private final Place place2 = Place.builder().id("id2").name("목적지2").latitude(2.2).longitude(3.3).placeType("카페").order(20.0).build();
+    private final Place place1 = Place.builder().id("id1").name("목적지1").latitude(0.0).longitude(1.1).placeType(PlaceCategory.RESTAURANT).order(10.0).build();
+    private final Place place2 = Place.builder().id("id2").name("목적지2").latitude(2.2).longitude(3.3).placeType(PlaceCategory.RESTAURANT).order(20.0).build();
 
     private final Long tripId = 1L;
     private final String tripDayPlaceId = "day1";
@@ -117,7 +118,7 @@ public class TripPlaceQueryServiceTest {
                 .name("목적지")
                 .latitude(1.0)
                 .longitude(2.0)
-                .placeType("음식")
+                .placeType(PlaceCategory.RESTAURANT)
                 .build();
         place.addImages(List.of(image));
 

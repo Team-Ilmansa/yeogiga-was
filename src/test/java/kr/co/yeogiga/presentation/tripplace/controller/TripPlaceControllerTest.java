@@ -11,6 +11,7 @@ import kr.co.yeogiga.application.tripplace.service.TripPlaceSavingService;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
+import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -100,19 +101,19 @@ public class TripPlaceControllerTest {
     @DisplayName("목적지 추가 성공")
     void addNewPlaceSuccess() throws Exception {
         // given
-        TripPlaceReq.InsertRequest insertRequest = TripPlaceReq.InsertRequest.builder()
+        TripPlaceReq.Request request = TripPlaceReq.Request.builder()
                 .name("목적지1")
                 .latitude(0.0)
                 .longitude(0.0)
-                .placeType("카페")
+                .placeType(PlaceCategory.RESTAURANT)
                 .build();
-        doNothing().when(tripPlaceCommandService).addNewPlace(tripDayPlaceId, insertRequest);
+        doNothing().when(tripPlaceCommandService).addNewPlace(tripDayPlaceId, request);
 
         // when
         ResultActions resultActions = mockMvc.perform(
                 post("/api/v1/trip/{tripId}/day-place/{tripDayPlaceId}/places", tripId, tripDayPlaceId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(insertRequest))
+                        .content(objectMapper.writeValueAsString(request))
         );
 
         // then

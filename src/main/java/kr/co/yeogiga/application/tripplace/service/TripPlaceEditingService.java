@@ -1,6 +1,7 @@
 package kr.co.yeogiga.application.tripplace.service;
 
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;
@@ -52,11 +53,14 @@ public class TripPlaceEditingService {
      *
      * @param tripId : 여행 ID
      * @param day    : 여행 일차 (1일차, 2일차 등)
-     * @return : 저장된 TripPlaceDto.StoredFormat 리스트
+     * @return : 저장된 TripPlaceRes.TempPlaceInfo 리스트
      */
-    public List<TripPlaceReq.StoredFormat> getAssignedPlaces(Long tripId, int day) {
+    public List<TripPlaceRes.TempPlaceInfo> getAssignedPlaces(Long tripId, int day) {
         String dayPlacesKey = PlaceConstant.dayPlacesKey(tripId, day);
-        return redisRepository.getList(dayPlacesKey, TripPlaceReq.StoredFormat.class);
+        List<TripPlaceReq.StoredFormat> places =
+                redisRepository.getList(dayPlacesKey, TripPlaceReq.StoredFormat.class);
+
+        return places.stream().map(TripPlaceRes.TempPlaceInfo::from).toList();
     }
 
     /**

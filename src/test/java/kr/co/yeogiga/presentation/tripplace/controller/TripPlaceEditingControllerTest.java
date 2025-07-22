@@ -2,6 +2,7 @@ package kr.co.yeogiga.presentation.tripplace.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceEditingService;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceSortService;
 import kr.co.yeogiga.common.exception.CustomException;
@@ -79,7 +80,7 @@ public class TripPlaceEditingControllerTest {
                 .name("목적지1")
                 .latitude(0.0)
                 .longitude(0.0)
-                .placeType("카페")
+                .placeType(PlaceCategory.RESTAURANT)
                 .build();
 
         @Test
@@ -170,8 +171,8 @@ public class TripPlaceEditingControllerTest {
     @DisplayName("목적지 조회 성공")
     void getAssignedPlacesSuccess() throws Exception {
         // given
-        List<TripPlaceReq.StoredFormat> mockPlaces = List.of(
-                new TripPlaceReq.StoredFormat("place-id", "목적지1", 33.123, 126.456, PlaceCategory.CAFE.getGroupName())
+        List<TripPlaceRes.TempPlaceInfo> mockPlaces = List.of(
+                new TripPlaceRes.TempPlaceInfo("place-id", "목적지1", 33.123, 126.456, PlaceCategory.RESTAURANT.getLabel())
         );
         given(tripPlaceEditingService.getAssignedPlaces(tripId, day)).willReturn(mockPlaces);
 
@@ -185,7 +186,7 @@ public class TripPlaceEditingControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].name").value("목적지1"))
-                .andExpect(jsonPath("$.data[0].placeCategory").value("식당"));
+                .andExpect(jsonPath("$.data[0].placeCategory").value(PlaceCategory.RESTAURANT.getLabel()));
     }
 
     @Test

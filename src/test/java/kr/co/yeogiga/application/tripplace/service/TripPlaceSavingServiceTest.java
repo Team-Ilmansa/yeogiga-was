@@ -5,6 +5,7 @@ import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.service.TripService;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
+import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;
 import kr.co.yeogiga.infrastructure.redis.constant.PlaceConstant;
 import org.junit.jupiter.api.DisplayName;
@@ -61,10 +62,10 @@ public class TripPlaceSavingServiceTest {
     void completeTripSuccessPlanned() {
         // given
         TripPlaceReq.StoredFormat place1 = new TripPlaceReq.StoredFormat(
-                "id1", "장소1", 33.123, 126.456, "관광지"
+                "id1", "장소1", 33.123, 126.456, PlaceCategory.TOURISM
         );
         TripPlaceReq.StoredFormat place2 = new TripPlaceReq.StoredFormat(
-                "id2", "장소2", 33.789, 126.987, "식당"
+                "id2", "장소2", 33.789, 126.987, PlaceCategory.RESTAURANT
         );
 
         when(redisRepository.getList(anyString(), eq(TripPlaceReq.StoredFormat.class)))
@@ -103,10 +104,10 @@ public class TripPlaceSavingServiceTest {
     void completeTripSuccessInProgress() {
         // given
         TripPlaceReq.StoredFormat place1 = new TripPlaceReq.StoredFormat(
-                "id1", "장소1", 33.123, 126.456, "관광지"
+                "id1", "장소1", 33.123, 126.456, PlaceCategory.TOURISM
         );
         TripPlaceReq.StoredFormat place2 = new TripPlaceReq.StoredFormat(
-                "id2", "장소2", 33.789, 126.987, "식당"
+                "id2", "장소2", 33.789, 126.987, PlaceCategory.RESTAURANT
         );
 
         when(redisRepository.getList(anyString(), eq(TripPlaceReq.StoredFormat.class)))
@@ -145,10 +146,10 @@ public class TripPlaceSavingServiceTest {
     void completeTripSuccessCompleted() {
         // given
         TripPlaceReq.StoredFormat place1 = new TripPlaceReq.StoredFormat(
-                "id1", "장소1", 33.123, 126.456, "관광지"
+                "id1", "장소1", 33.123, 126.456, PlaceCategory.TOURISM
         );
         TripPlaceReq.StoredFormat place2 = new TripPlaceReq.StoredFormat(
-                "id2", "장소2", 33.789, 126.987, "식당"
+                "id2", "장소2", 33.789, 126.987, PlaceCategory.RESTAURANT
         );
 
         when(redisRepository.getList(anyString(), eq(TripPlaceReq.StoredFormat.class)))

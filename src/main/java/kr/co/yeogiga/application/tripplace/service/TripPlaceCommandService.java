@@ -27,9 +27,10 @@ public class TripPlaceCommandService {
      * @param tripDayPlaceId 여행 일차(TripDayPlace)의 ID
      * @param insertRequest  삽입할 장소 정보 및 위치 기준 정보
      */
-    public void addNewPlace(String tripDayPlaceId, TripPlaceReq.InsertRequest insertRequest) {
+    public void addNewPlace(String tripDayPlaceId, TripPlaceReq.Request insertRequest) {
         Double maxPlaceOrder = tripDayPlaceService.readMaxOrderById(tripDayPlaceId);
 
+        // TODO : 중복여행 못담기게
         tripDayPlaceService.savePlace(
                 tripDayPlaceId,
                 createPlace(insertRequest, maxPlaceOrder)
@@ -42,12 +43,12 @@ public class TripPlaceCommandService {
      * 1. maxPlaceOrder : 0.0 => 존재하는 목적지가 없는 상황
      * 2. maxPlaceOrder : 0.0 x => 마지막 목적지 뒤에 추가하는 상화
      *
-     * @param insertRequest 사용자 요청 정보
+     * @param request       사용자 요청 정보
      * @param maxPlaceOrder 현재 목적지 order 중 최대값 (nullable)
      * @return 생성된 Place 객체
      */
-    private Place createPlace(TripPlaceReq.InsertRequest insertRequest, Double maxPlaceOrder) {
-        return insertRequest.toEntity(maxPlaceOrder + 10.0);
+    private Place createPlace(TripPlaceReq.Request request, Double maxPlaceOrder) {
+        return request.toEntity(maxPlaceOrder + 10.0);
     }
 
     /**

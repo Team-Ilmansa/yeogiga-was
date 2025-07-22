@@ -6,6 +6,7 @@ import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
+import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -50,15 +51,15 @@ public class TripPlaceCommandServiceTest {
         void addPlaceFirst() {
             // given
             given(tripDayPlaceService.readMaxOrderById(tripDayPlaceId)).willReturn(0.0);
-            TripPlaceReq.InsertRequest insertRequest = TripPlaceReq.InsertRequest.builder()
+            TripPlaceReq.Request request = TripPlaceReq.Request.builder()
                     .name("목적지1")
                     .latitude(0.0)
                     .longitude(0.0)
-                    .placeType("카페")
+                    .placeType(PlaceCategory.RESTAURANT)
                     .build();
 
             // when
-            tripPlaceCommandService.addNewPlace(tripDayPlaceId, insertRequest);
+            tripPlaceCommandService.addNewPlace(tripDayPlaceId, request);
 
             // then
             verify(tripDayPlaceService).savePlace(eq(tripDayPlaceId), placeCaptor.capture());
@@ -72,15 +73,15 @@ public class TripPlaceCommandServiceTest {
         void addPlaceBack() {
             // given
             given(tripDayPlaceService.readMaxOrderById(tripDayPlaceId)).willReturn(20.0);
-            TripPlaceReq.InsertRequest insertRequest = TripPlaceReq.InsertRequest.builder()
+            TripPlaceReq.Request request = TripPlaceReq.Request.builder()
                     .name("목적지1")
                     .latitude(0.0)
                     .longitude(0.0)
-                    .placeType("카페")
+                    .placeType(PlaceCategory.RESTAURANT)
                     .build();
 
             // when
-            tripPlaceCommandService.addNewPlace(tripDayPlaceId, insertRequest);
+            tripPlaceCommandService.addNewPlace(tripDayPlaceId, request);
 
             // then
             verify(tripDayPlaceService).savePlace(eq(tripDayPlaceId), placeCaptor.capture());
@@ -101,9 +102,9 @@ public class TripPlaceCommandServiceTest {
         void reorderSuccess() {
             // given
             List<Place> places = List.of(
-                    Place.builder().id("id1").name("목적지1").latitude(0.0).longitude(0.0).placeType("식당").order(10.0).build(),
-                    Place.builder().id("id2").name("목적지2").latitude(0.0).longitude(0.0).placeType("식당").order(20.0).build(),
-                    Place.builder().id("id3").name("목적지3").latitude(0.0).longitude(0.0).placeType("식당").order(30.0).build()
+                    Place.builder().id("id1").name("목적지1").latitude(0.0).longitude(0.0).placeType(PlaceCategory.RESTAURANT).order(10.0).build(),
+                    Place.builder().id("id2").name("목적지2").latitude(0.0).longitude(0.0).placeType(PlaceCategory.RESTAURANT).order(20.0).build(),
+                    Place.builder().id("id3").name("목적지3").latitude(0.0).longitude(0.0).placeType(PlaceCategory.RESTAURANT).order(30.0).build()
             );
             TripDayPlace tripDayPlace = TripDayPlace.builder().day(1).places(places).build();
             TripPlaceReq.ReorderRequest reorderRequest = new TripPlaceReq.ReorderRequest(List.of("id3", "id1", "id2"));

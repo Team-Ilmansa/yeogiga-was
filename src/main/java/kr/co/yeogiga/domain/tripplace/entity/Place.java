@@ -1,5 +1,6 @@
 package kr.co.yeogiga.domain.tripplace.entity;
 
+import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -14,14 +15,14 @@ public class Place {
     private String name;
     private Double latitude;
     private Double longitude;
-    private String placeType;
+    private PlaceCategory placeType;
     private Double order;
     private List<Image> images;
     private boolean isVisited;
 
     @Builder
     public Place(String id, String name, Double latitude,
-                 Double longitude, String placeType, Double order) {
+                 Double longitude, PlaceCategory placeType, Double order) {
         this.id = id;
         this.name = name;
         this.latitude = latitude;

@@ -28,7 +28,10 @@ public class TripPlaceRes {
             boolean isVisited
     ) {
         public static PlaceSummary from(Place place) {
-            return new PlaceSummary(place.getId(), place.getName(), place.getPlaceType(), place.isVisited());
+            return new PlaceSummary(
+                    place.getId(), place.getName(),
+                    place.getPlaceType().getLabel(), place.isVisited()
+            );
         }
     }
 
@@ -41,8 +44,25 @@ public class TripPlaceRes {
             boolean isVisited
     ) {
         public static PlaceDetails from(Place place) {
-            return new PlaceDetails(place.getId(), place.getName(), place.getLatitude(),
-                    place.getLongitude(), place.getPlaceType(), place.isVisited());
+            return new PlaceDetails(
+                    place.getId(), place.getName(), place.getLatitude(),
+                    place.getLongitude(), place.getPlaceType().getLabel(), place.isVisited()
+            );
+        }
+    }
+
+    public record TempPlaceInfo(
+            String id,
+            String name,
+            double latitude,
+            double longitude,
+            String placeCategory
+    ) {
+        public static TempPlaceInfo from(TripPlaceReq.StoredFormat place) {
+            return new TempPlaceInfo(
+                    place.id(), place.name(), place.latitude(),
+                    place.longitude(), place.placeCategory().getLabel()
+            );
         }
     }
 }
