@@ -41,9 +41,9 @@ public class TripPlaceController implements TripPlaceApi {
     @PostMapping("/{tripId}/day-place/{tripDayPlaceId}/places")
     public ResponseEntity<?> addNewPlace(@PathVariable Long tripId,
                                          @PathVariable String tripDayPlaceId,
-                                         @RequestBody TripPlaceReq.InsertRequest insertRequest) {
+                                         @RequestBody TripPlaceReq.Request request) {
 
-        tripPlaceCommandService.addNewPlace(tripDayPlaceId, insertRequest);
+        tripPlaceCommandService.addNewPlace(tripDayPlaceId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
