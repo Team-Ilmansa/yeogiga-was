@@ -2,6 +2,7 @@ package kr.co.yeogiga.application.tripplace.service;
 
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
 import kr.co.yeogiga.common.util.DistanceUtils;
+import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;
 import kr.co.yeogiga.infrastructure.redis.constant.PlaceConstant;
 import lombok.RequiredArgsConstructor;
@@ -68,7 +69,7 @@ public class TripPlaceSortService {
             List<TripPlaceReq.StoredFormat> lodgings
     ) {
         for (TripPlaceReq.StoredFormat place : places) {
-            if ("숙소".equals(place.placeCategory())) {
+            if (PlaceCategory.LODGING == place.placeCategory()) {
                 lodgings.add(place);
             } else {
                 otherPlaces.add(place);
@@ -166,6 +167,6 @@ public class TripPlaceSortService {
      * @return true = 식당, false = 식당 아님
      */
     private boolean isRestaurant(TripPlaceReq.StoredFormat place) {
-        return "식당".equals(place.placeCategory());
+        return PlaceCategory.RESTAURANT == place.placeCategory();
     }
 }
