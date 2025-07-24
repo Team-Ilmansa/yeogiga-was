@@ -5,6 +5,7 @@ import kr.co.yeogiga.application.notice.dto.NoticeReq;
 import kr.co.yeogiga.application.notice.service.NoticeCommandService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
+import kr.co.yeogiga.presentation.notice.api.NoticeApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/trip")
-public class NoticeController {
+public class NoticeController implements NoticeApi {
     private final NoticeCommandService noticeCommandService;
     
+    @Override
     @PostMapping("/{tripId}/notices")
     public ResponseEntity<?> createNotice(
             @PathVariable(name = "tripId") Long tripId,
