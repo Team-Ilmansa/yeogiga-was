@@ -60,7 +60,8 @@ public class User extends BaseTimeEntity {
     private LocalDateTime deletedAt;
 
     @Builder
-    public User(String username, String password, String nickname, String email, Role role) {
+    public User(Long id, String username, String password, String nickname, String email, Role role) {
+        this.id = id;
         this.username = username;
         this.password = password;
         this.nickname = nickname;
