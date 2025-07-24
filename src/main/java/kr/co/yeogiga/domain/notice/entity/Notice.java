@@ -2,7 +2,6 @@ package kr.co.yeogiga.domain.notice.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,15 +10,12 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import kr.co.yeogiga.domain.common.entity.BaseTimeEntity;
 import kr.co.yeogiga.domain.user.entity.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -30,8 +26,7 @@ import java.time.LocalDateTime;
         }
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
-public class Notice {
+public class Notice extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -48,10 +43,6 @@ public class Notice {
     
     @Column(name = "trip_id", nullable = false)
     private Long tripId;
-    
-    @CreatedDate
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
     
     @Builder
     public Notice(String title, User author, String description, Long tripId) {
