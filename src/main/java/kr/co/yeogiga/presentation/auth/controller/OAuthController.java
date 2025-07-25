@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import kr.co.yeogiga.application.auth.dto.SignInDto;
 import kr.co.yeogiga.application.auth.dto.SignUpDto;
 import kr.co.yeogiga.application.auth.service.OAuthManagementService;
-import kr.co.yeogiga.application.auth.type.Device;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.util.CookieUtil;
@@ -18,11 +17,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
+
 import static kr.co.yeogiga.application.auth.constant.AuthConstants.REFRESH_TOKEN_PREFIX;
 
 @RestController
@@ -32,12 +31,30 @@ public class OAuthController implements OAuthApi {
     private final OAuthManagementService oAuthManagementService;
 
     @Override
-    @PostMapping("/sign-in/{platform}")
+    @PostMapping("/sign-in/{platform}/web")
     public ResponseEntity<?> signIn(
-            @RequestHeader(value = "device") Device device,
             @PathVariable(name = "platform") OAuthPlatform platform,
-            @Valid @RequestBody SignInDto.OAuthRequest request) {
-        return createSignInResponse(device, oAuthManagementService.signIn(platform, request.code()));
+            @Valid @RequestBody SignInDto.OAuthRequest.Web request
+    ) {
+        SignInDto.Response response = oAuthManagementService.signInOnWeb(platform, request.code());
+        
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, CookieUtil.createCookie(
+                        REFRESH_TOKEN_PREFIX,
+                        response.token().refreshToken(),
+                        Duration.ofDays(7).toSeconds()).toString())
+                .body(SuccessResponse.from(response.toWebResponse()));
+    }
+    
+    @Override
+    @PostMapping("/sign-in/{platform}/mobile")
+    public ResponseEntity<?> signIn(
+            @PathVariable(name = "platform") OAuthPlatform platform,
+            @Valid @RequestBody SignInDto.OAuthRequest.Mobile request
+    ) {
+        SignInDto.Response response = oAuthManagementService.signInOnMobile(platform, request.accessToken());
+        
+        return ResponseEntity.ok(SuccessResponse.from(response));
     }
 
     @Override
@@ -47,18 +64,6 @@ public class OAuthController implements OAuthApi {
             @Valid @RequestBody SignUpDto.Register request) {
         oAuthManagementService.register(userDetails.getUserId(), request);
         return ResponseEntity.ok(SuccessResponse.ok());
-    }
-
-    private ResponseEntity<?> createSignInResponse(Device device, SignInDto.Response response) {
-        return switch (device) {
-            case MOBILE -> ResponseEntity.ok(SuccessResponse.from(response));
-            case WEB -> ResponseEntity.ok()
-                        .header(HttpHeaders.SET_COOKIE, CookieUtil.createCookie(
-                                REFRESH_TOKEN_PREFIX,
-                                response.token().refreshToken(),
-                                Duration.ofDays(7).toSeconds()).toString())
-                        .body(SuccessResponse.from(response.toWebResponse()));
-        };
     }
 }
 
