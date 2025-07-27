@@ -39,6 +39,7 @@ public class NoticeController implements NoticeApi {
                 .body(SuccessResponse.created());
     }
     
+    @Override
     @GetMapping("/{tripId}/notices")
     public ResponseEntity<?> getNotices(
             @PathVariable(name = "tripId") Long tripId,
