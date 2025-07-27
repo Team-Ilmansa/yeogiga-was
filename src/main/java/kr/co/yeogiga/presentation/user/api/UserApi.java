@@ -13,7 +13,7 @@ import jakarta.validation.Valid;
 import kr.co.yeogiga.application.user.dto.FcmTokenReq;
 import kr.co.yeogiga.application.user.dto.PasswordUpdateReq;
 import kr.co.yeogiga.application.user.dto.UserInfoUpdateReq;
-import kr.co.yeogiga.common.security.auth.CustomUserDetails;
+import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -74,7 +74,7 @@ public interface UserApi {
                     }))
     })
     ResponseEntity<?> updatePassword(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @Valid @RequestBody PasswordUpdateReq passwordUpdateReq
     );
 
@@ -110,7 +110,7 @@ public interface UserApi {
                     }))
     })
     ResponseEntity<?> withdraw(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails
     );
 
     @TrackApi(description = "회원 정보 조회")
@@ -154,7 +154,7 @@ public interface UserApi {
                     }))
     })
     ResponseEntity<?> getUserInfo(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails
     );
 
     @TrackApi(description = "회원 정보 수정")
@@ -186,7 +186,7 @@ public interface UserApi {
                     }))
     })
     ResponseEntity<?> update(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @Valid @RequestBody UserInfoUpdateReq userInfoUpdateReq
     );
 
@@ -213,7 +213,7 @@ public interface UserApi {
                     }))
     })
     ResponseEntity<?> updateProfile(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
 
             @Parameter(description = "업로드할 이미지")
             @RequestPart(name = "image") MultipartFile image
@@ -242,7 +242,7 @@ public interface UserApi {
                     }))
     })
     ResponseEntity<?> registerFcmToken(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @RequestBody FcmTokenReq fcmTokenReq
     );
 
@@ -269,6 +269,6 @@ public interface UserApi {
                     }))
     })
     ResponseEntity<?> deleteFcmToken(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails
     );
 }

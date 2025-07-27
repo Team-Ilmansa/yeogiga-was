@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.co.yeogiga.application.calendar.dto.CalendarReq;
-import kr.co.yeogiga.common.security.auth.CustomUserDetails;
+import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,7 +64,7 @@ public interface CalendarApi {
                     }))
     })
     ResponseEntity<?> createCalendar(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
 
             @Parameter(description = "여행 ID")
             @PathVariable Long tripId,
@@ -102,7 +102,7 @@ public interface CalendarApi {
                     }))
     })
     ResponseEntity<?> getUserAvailability(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
 
             @Parameter(description = "여행 ID")
             @PathVariable Long tripId
@@ -179,7 +179,7 @@ public interface CalendarApi {
                     }))
     })
     ResponseEntity<?> updateAvailableDates(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
 
             @Parameter(description = "여행 ID")
             @PathVariable Long tripId,

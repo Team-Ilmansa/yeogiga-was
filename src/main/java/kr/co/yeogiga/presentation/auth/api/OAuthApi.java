@@ -12,7 +12,7 @@ import jakarta.validation.Valid;
 import kr.co.yeogiga.application.auth.dto.SignInDto;
 import kr.co.yeogiga.application.auth.dto.SignUpDto;
 import kr.co.yeogiga.application.auth.type.Device;
-import kr.co.yeogiga.common.security.auth.CustomUserDetails;
+import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.domain.oauth.type.OAuthPlatform;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -143,5 +143,5 @@ public interface OAuthApi {
                     }))
 
     })
-    ResponseEntity<?> register(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody SignUpDto.Register request);
+    ResponseEntity<?> register(@AuthenticationPrincipal CustomUserDetailsImpl userDetails, @RequestBody SignUpDto.Register request);
 }

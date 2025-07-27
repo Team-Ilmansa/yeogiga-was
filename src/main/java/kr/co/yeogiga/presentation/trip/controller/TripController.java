@@ -7,6 +7,7 @@ import kr.co.yeogiga.application.trip.service.TripCommandService;
 import kr.co.yeogiga.application.trip.service.TripQueryService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
+import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.presentation.trip.api.TripApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ public class TripController implements TripApi {
     @Override
     @GetMapping("/main")
     public ResponseEntity<?> getMainTrip(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails
     ) {
         TripRes.TripMainInfo tripMainInfo = tripQueryService.getTripMainInfo(userDetails.getUserId());
         return ResponseEntity.ok().body(SuccessResponse.from(tripMainInfo));
@@ -49,14 +50,14 @@ public class TripController implements TripApi {
 
     @Override
     @GetMapping
-    public ResponseEntity<?> getAllTrip(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<?> getAllTrip(@AuthenticationPrincipal CustomUserDetailsImpl userDetails) {
         List<TripRes.TripSummary> tripList = tripQueryService.getAllTrip(userDetails.getUserId());
         return ResponseEntity.ok().body(SuccessResponse.from(tripList));
     }
 
     @Override
     @GetMapping("/setting")
-    public ResponseEntity<?> getSettingTrip(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<?> getSettingTrip(@AuthenticationPrincipal CustomUserDetailsImpl userDetails) {
         return ResponseEntity.ok()
                 .body(SuccessResponse.from(tripQueryService.getSettingTrip(userDetails.getUserId())));
     }
@@ -64,7 +65,7 @@ public class TripController implements TripApi {
     @Override
     @PostMapping
     public ResponseEntity<?> createTrip(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @Valid @RequestBody TripReq.Creation request
     ) {
         Long tripId = tripCommandService.create(userDetails.getUserId(), request);
@@ -84,7 +85,7 @@ public class TripController implements TripApi {
     @Override
     @PutMapping("/{tripId}/time")
     public ResponseEntity<?> updateTripTime(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @PathVariable Long tripId,
             @Valid @RequestBody TripReq.Time request
     ) {
