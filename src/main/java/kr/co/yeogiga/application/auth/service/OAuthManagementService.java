@@ -31,14 +31,14 @@ public class OAuthManagementService {
     private final UserService userService;
 
     /**
-     * OAuth2 로그인
+     * 웹 이용자 OAuth2 로그인 메서드
      *
      * @param platform      OAuth 로그인 플랫폼
      * @param code          OAuth 리소스 서버 제공 인증 코드
      * @return              로그인 응답 정보 (JWT, 추가 정보 입력 필요 여부)
      */
     @Transactional
-    public SignInDto.Response signIn(OAuthPlatform platform, String code) {
+    public SignInDto.Response signInOnWeb(OAuthPlatform platform, String code) {
         OAuthClient oAuthClient = oAuthClientFactory.getOAuthClient(platform);
 
         String accessToken = oAuthClient.fetchAccessToken(code);
@@ -46,6 +46,24 @@ public class OAuthManagementService {
 
         UserStatusDto userStatus = getUserStatus(platform, userInfo);
 
+        return getSignInResponse(userStatus);
+    }
+    
+    /**
+     * 모바일 이용자 OAuth2 로그인 메서드
+     *
+     * @param platform      OAuth 로그인 플랫폼
+     * @param accessToken   OAuth 리소스 서버 제공 액세스 토큰
+     * @return              로그인 응답 정보 (JWT, 추가 정보 입력 필요 여부)
+     */
+    @Transactional
+    public SignInDto.Response signInOnMobile(OAuthPlatform platform, String accessToken) {
+        OAuthClient oAuthClient = oAuthClientFactory.getOAuthClient(platform);
+        
+        UserInfoDto userInfo = oAuthClient.fetchUserInfo(accessToken);
+        
+        UserStatusDto userStatus = getUserStatus(platform, userInfo);
+        
         return getSignInResponse(userStatus);
     }
 

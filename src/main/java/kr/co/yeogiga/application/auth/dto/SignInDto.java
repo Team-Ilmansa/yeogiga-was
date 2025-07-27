@@ -19,13 +19,23 @@ public class SignInDto {
     ) {
     }
 
-    @Builder
-    @Schema(name = "OAuthRequest", description = "OAuth 로그인 요청 DTO")
-    public record OAuthRequest(
-            @Schema(description = "OAuth 리소스 서버에서 발급받은 인증 코드", example = "abcd123")
-            @NotBlank(message = "인증 코드값은 필수입니다.")
-            String code
-    ) {
+    
+    public static class OAuthRequest {
+        @Builder
+        @Schema(name = "OAuthRequest.Web", description = "웹 이용자 OAuth 로그인 요청 DTO")
+        public record Web(
+                @Schema(description = "OAuth 리소스 서버에서 발급받은 인증 코드", example = "abcd123")
+                @NotBlank(message = "인증 코드값은 필수입니다.")
+                String code
+        ) { }
+        
+        @Builder
+        @Schema(name = "OAuthRequest.Mobile", description = "모바일 이용자 OAuth 로그인 요청 DTO")
+        public record Mobile(
+                @Schema(description = "OAuth 리소스 서버에서 발급받은 액세스 토큰", example = "xxx.xxx.xxx")
+                @NotBlank(message = "액세스 토큰 값은 필수입니다.")
+                String accessToken
+        ) { }
     }
 
     @Builder
