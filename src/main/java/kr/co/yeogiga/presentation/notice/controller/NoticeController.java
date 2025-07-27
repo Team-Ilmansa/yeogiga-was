@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import kr.co.yeogiga.application.notice.dto.NoticeReq;
 import kr.co.yeogiga.application.notice.service.NoticeCommandService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
-import kr.co.yeogiga.common.security.auth.CustomUserDetails;
+import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.presentation.notice.api.NoticeApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,7 @@ public class NoticeController implements NoticeApi {
     @PostMapping("/{tripId}/notices")
     public ResponseEntity<?> createNotice(
             @PathVariable(name = "tripId") Long tripId,
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @Valid @RequestBody NoticeReq.Creation request
     ) {
         noticeCommandService.createNotice(userDetails.getUserId(), tripId, request);
