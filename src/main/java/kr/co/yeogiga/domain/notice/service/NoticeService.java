@@ -1,8 +1,11 @@
 package kr.co.yeogiga.domain.notice.service;
 
+import kr.co.yeogiga.domain.notice.dto.NoticeDto;
 import kr.co.yeogiga.domain.notice.entity.Notice;
 import kr.co.yeogiga.domain.notice.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,5 +15,9 @@ public class NoticeService {
     
     public void save(Notice notice) {
         noticeRepository.save(notice);
+    }
+    
+    public Page<NoticeDto.Detail> readAllNoticeDetailByTripId(Long tripId, Pageable pageable) {
+        return noticeRepository.findAllNoticeDetailByTripId(tripId, pageable);
     }
 }
