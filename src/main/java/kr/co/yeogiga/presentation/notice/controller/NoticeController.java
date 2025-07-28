@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,5 +48,15 @@ public class NoticeController implements NoticeApi {
     ) {
         return ResponseEntity.ok()
                 .body(SuccessResponse.from(noticeQueryService.getAllNotices(tripId, pageable)));
+    }
+    
+    @PutMapping("/{tripId}/notices/{noticeId}")
+    public ResponseEntity<?> updateNotice(
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
+            @PathVariable(name = "noticeId") Long noticeId,
+            @Valid @RequestBody NoticeReq.Creation request
+    ) {
+        noticeCommandService.updateNotice(noticeId, userDetails.getUserId(), request);
+        return ResponseEntity.ok(SuccessResponse.ok());
     }
 }
