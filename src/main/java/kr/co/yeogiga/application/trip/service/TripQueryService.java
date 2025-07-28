@@ -3,14 +3,13 @@ package kr.co.yeogiga.application.trip.service;
 import kr.co.yeogiga.application.trip.dto.TripRes;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.domain.trip.dto.TripDto;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.service.TripMemberService;
-import kr.co.yeogiga.domain.trip.service.TripService;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
-import kr.co.yeogiga.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +24,6 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class TripQueryService {
-    private final TripService tripService;
     private final TripMemberService tripMemberService;
     private final TripDayPlaceService tripDayPlaceService;
 
@@ -134,7 +132,7 @@ public class TripQueryService {
      * @return              사용자가 속한 여행 목록
      */
     @Transactional(readOnly = true)
-    public List<TripRes.TripSummary> getAllTrip(Long userId) {
+    public List<TripDto.Summary> getAllTrip(Long userId) {
         return tripMemberService.readAllTripSummaryByUserId(userId);
     }
 
@@ -145,7 +143,7 @@ public class TripQueryService {
      * @return              여행 정보
      */
     @Transactional(readOnly = true)
-    public TripRes.TripSummary getTrip(Long tripId) {
+    public TripDto.Summary getTrip(Long tripId) {
         return tripMemberService.readTripSummaryByTripId(tripId)
                 .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
     }

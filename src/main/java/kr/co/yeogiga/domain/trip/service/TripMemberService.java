@@ -1,6 +1,6 @@
 package kr.co.yeogiga.domain.trip.service;
 
-import kr.co.yeogiga.application.trip.dto.TripRes;
+import kr.co.yeogiga.domain.trip.dto.TripDto;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.entity.TripMember;
 import kr.co.yeogiga.domain.trip.repository.TripMemberRepository;
@@ -24,11 +24,11 @@ public class TripMemberService {
         return tripMemberRepository.findAllTripByUserId(userId);
     }
     
-    public Optional<TripRes.TripSummary> readTripSummaryByTripId(Long tripId) {
+    public Optional<TripDto.Summary> readTripSummaryByTripId(Long tripId) {
         return tripMemberRepository.findTripSummaryByTripId(tripId);
     }
     
-    public List<TripRes.TripSummary> readAllTripSummaryByUserId(Long userId) {
+    public List<TripDto.Summary> readAllTripSummaryByUserId(Long userId) {
         return tripMemberRepository.findAllTripSummaryByUserId(userId);
     }
 

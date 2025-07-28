@@ -3,8 +3,7 @@ package kr.co.yeogiga.domain.trip.repository;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import kr.co.yeogiga.application.trip.dto.TripMemberRes;
-import kr.co.yeogiga.application.trip.dto.TripRes;
+import kr.co.yeogiga.domain.trip.dto.TripDto;
 import kr.co.yeogiga.domain.trip.entity.QTrip;
 import kr.co.yeogiga.domain.trip.entity.QTripMember;
 import kr.co.yeogiga.domain.trip.entity.Trip;
@@ -27,7 +26,7 @@ public class CustomTripMemberRepositoryImpl implements CustomTripMemberRepositor
     private final QUser user = QUser.user;
     
     @Override
-    public Optional<TripRes.TripSummary> findTripSummaryByTripId(Long tripId) {
+    public Optional<TripDto.Summary> findTripSummaryByTripId(Long tripId) {
         Trip tripEntity = jpaQueryFactory
                 .select(trip)
                 .from(trip)
@@ -38,10 +37,10 @@ public class CustomTripMemberRepositoryImpl implements CustomTripMemberRepositor
             return Optional.empty();
         }
         
-        List<TripMemberRes.MemberInfo> members = jpaQueryFactory
+        List<TripDto.MemberInfo> members = jpaQueryFactory
                 .select(
                         Projections.constructor(
-                                TripMemberRes.MemberInfo.class,
+                                TripDto.MemberInfo.class,
                                 user.id,
                                 user.nickname,
                                 user.imageUrl
@@ -52,11 +51,11 @@ public class CustomTripMemberRepositoryImpl implements CustomTripMemberRepositor
                 .where(tripMember.trip.id.eq(tripId))
                 .fetch();
         
-        return Optional.of(TripRes.TripSummary.from(tripEntity, members));
+        return Optional.of(TripDto.Summary.from(tripEntity, members));
     }
     
     @Override
-    public List<TripRes.TripSummary> findAllTripSummaryByUserId(Long userId) {
+    public List<TripDto.Summary> findAllTripSummaryByUserId(Long userId) {
         List<Trip> tripList = jpaQueryFactory
                 .select(trip)
                 .from(tripMember)
@@ -87,10 +86,10 @@ public class CustomTripMemberRepositoryImpl implements CustomTripMemberRepositor
                 )
                 .fetch();
         
-        Map<Long, List<TripMemberRes.MemberInfo>> memberInfoMap = userList.stream()
+        Map<Long, List<TripDto.MemberInfo>> memberInfoMap = userList.stream()
                 .collect(Collectors.groupingBy(
                         tuple -> tuple.get(trip.id),
-                        Collectors.mapping(tuple -> TripMemberRes.MemberInfo.builder()
+                        Collectors.mapping(tuple -> TripDto.MemberInfo.builder()
                                 .userId(tuple.get(user.id))
                                 .nickname(tuple.get(user.nickname))
                                 .imageUrl(tuple.get(user.imageUrl))
@@ -99,7 +98,7 @@ public class CustomTripMemberRepositoryImpl implements CustomTripMemberRepositor
                 ));
         
         return tripList.stream()
-                .map(trip -> TripRes.TripSummary.from(
+                .map(trip -> TripDto.Summary.from(
                         trip,
                         memberInfoMap.getOrDefault(trip.getId(), List.of()))
                 ).toList();
