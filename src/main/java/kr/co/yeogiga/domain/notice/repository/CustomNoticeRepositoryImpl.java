@@ -8,6 +8,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.yeogiga.domain.notice.dto.NoticeDto;
+import kr.co.yeogiga.domain.notice.entity.Notice;
 import kr.co.yeogiga.domain.notice.entity.QNotice;
 import kr.co.yeogiga.domain.user.entity.QUser;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +17,26 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
-public class CustomNoticeRepositoryImpl implements CustomNoticeRepository{
+public class CustomNoticeRepositoryImpl implements CustomNoticeRepository {
     private final JPAQueryFactory jpaQueryFactory;
     
     private final QNotice notice = QNotice.notice;
     private final QUser user = QUser.user;
     
+    @Override
+    public Optional<Notice> findByIdJoinUser(Long id) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(notice)
+                        .from(notice)
+                        .join(notice.author, user)
+                        .where(notice.id.eq(id))
+                        .fetchFirst()
+        );
+    }
     
     @Override
     public Page<NoticeDto.Detail> findAllNoticeDetailByTripId(Long tripId, Pageable pageable) {
