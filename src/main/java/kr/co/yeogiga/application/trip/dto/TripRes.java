@@ -3,7 +3,6 @@ package kr.co.yeogiga.application.trip.dto;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
-import kr.co.yeogiga.domain.user.entity.User;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -28,31 +27,6 @@ public class TripRes {
                     .day(day)
                     .travelStatus(trip.getTravelStatus())
                     .places(places)
-                    .build();
-        }
-    }
-
-    @Builder
-    public record TripSummary(
-            Long tripId,
-            String title,
-            String city,
-            Long leaderId,
-            LocalDateTime startedAt,
-            LocalDateTime endedAt,
-            TravelStatus status,
-            List<TripMemberRes.MemberInfo> members
-    ) {
-        public static TripSummary from(Trip trip, List<TripMemberRes.MemberInfo> members) {
-            return TripSummary.builder()
-                    .tripId(trip.getId())
-                    .title(trip.getTitle())
-                    .city(trip.getCity())
-                    .leaderId(trip.getLeaderId())
-                    .startedAt(trip.getStartedAt())
-                    .endedAt(trip.getEndedAt())
-                    .status(trip.getTravelStatus())
-                    .members(members)
                     .build();
         }
     }
