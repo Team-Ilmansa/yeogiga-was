@@ -116,4 +116,53 @@ public interface NoticeApi {
             @Parameter(example = "page=0&size=10&sort=createdAt,desc", hidden = true)
             @PageableDefault(size = 10) Pageable pageable
     );
+    
+    @TrackApi(description = "공지사항 수정")
+    @Operation(summary = "공지사항 수정", description = "공지사항 수정 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "공지사항 수정 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                             {
+                                                  "code": 200,
+                                                  "message": "요청이 성공하였습니다."
+                                              }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "400", description = "공지사항 수정 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "유효성 검증 실패", value = """
+                                             {
+                                                   "code": "G002",
+                                                   "errors": {
+                                                       "description": "내용은 필수 입력값입니다.",
+                                                       "title": "제목은 필수 입력값입니다."
+                                                   }
+                                               }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "403", description = "공지사항 수정 실패 - 공지사항의 작성자가 아닌 경우",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "공지사항 작성자가 아닌 경우", value = """
+                                             {
+                                                    "code": "N001",
+                                                    "message": "공지사항의 작성자가 아닙니다."
+                                                }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "공지사항 수정 실패 - 존재하지 않는 공지사항",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "공지사항이 존재하지 않는 경우", value = """
+                                             {
+                                                     "code": "N000",
+                                                     "message": "존재하지 않는 공지사항입니다."
+                                                 }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> updateNotice(
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
+            @PathVariable(name = "noticeId") Long noticeId,
+            @Valid @RequestBody NoticeReq.Creation request
+    );
 }

@@ -50,6 +50,7 @@ public class NoticeController implements NoticeApi {
                 .body(SuccessResponse.from(noticeQueryService.getAllNotices(tripId, pageable)));
     }
     
+    @Override
     @PutMapping("/{tripId}/notices/{noticeId}")
     public ResponseEntity<?> updateNotice(
             @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
