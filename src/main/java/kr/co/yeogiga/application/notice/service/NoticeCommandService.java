@@ -47,7 +47,7 @@ public class NoticeCommandService {
         Notice notice = noticeService.readByIdJoinUser(noticeId)
                 .orElseThrow(() -> new CustomException(NoticeErrorType.NOT_FOUND));
         
-        if (!userId.equals(notice.getAuthorId())) {
+        if (!notice.isAuthor(userId)) {
             throw new CustomException(NoticeErrorType.UNAUTHORIZED_AUTHOR);
         }
         

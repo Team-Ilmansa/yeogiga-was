@@ -59,4 +59,8 @@ public class Notice extends BaseTimeEntity {
         this.title = title;
         this.description = description;
     }
+    
+    public boolean isAuthor(Long userId) {
+        return this.author != null && this.authorId.equals(userId);
+    }
 }
