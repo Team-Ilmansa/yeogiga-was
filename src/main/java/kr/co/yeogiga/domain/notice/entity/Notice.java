@@ -38,6 +38,9 @@ public class Notice extends BaseTimeEntity {
     @JoinColumn(name = "author_id")
     private User author;
     
+    @Column(name = "author_id", insertable = false, updatable = false)
+    private Long authorId;
+    
     @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
     

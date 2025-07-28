@@ -32,7 +32,6 @@ public class CustomNoticeRepositoryImpl implements CustomNoticeRepository {
                 jpaQueryFactory
                         .select(notice)
                         .from(notice)
-                        .join(notice.author, user)
                         .where(notice.id.eq(id))
                         .fetchFirst()
         );
