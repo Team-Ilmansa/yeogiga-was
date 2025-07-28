@@ -7,6 +7,7 @@ import kr.co.yeogiga.domain.notice.exception.NoticeErrorType;
 import kr.co.yeogiga.domain.notice.service.NoticeService;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.type.Role;
+import org.aspectj.util.Reflection;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -120,6 +121,7 @@ public class NoticeCommandServiceTest {
         @DisplayName("실패 - 작성자가 아닌 경우")
         void failUnauthorizedAuthor() {
             // given
+            ReflectionTestUtils.setField(notice, "authorId", 1L);
             when(noticeService.readByIdJoinUser(anyLong())).thenReturn(Optional.of(notice));
             
             // when
