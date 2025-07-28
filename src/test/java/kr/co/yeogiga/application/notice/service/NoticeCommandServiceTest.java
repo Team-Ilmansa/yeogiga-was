@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 
@@ -90,6 +91,7 @@ public class NoticeCommandServiceTest {
         @DisplayName("성공")
         void success() {
             // given
+            ReflectionTestUtils.setField(notice, "authorId", 1L);
             when(noticeService.readByIdJoinUser(2L)).thenReturn(Optional.of(notice));
             
             // when
