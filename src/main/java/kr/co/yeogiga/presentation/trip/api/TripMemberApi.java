@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.yeogiga.common.security.auth.CustomUserDetails;
+import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -96,7 +96,7 @@ public interface TripMemberApi {
                     }))
     })
     ResponseEntity<?> joinTrip(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
 
             @Parameter(description = "여행 ID")
             @PathVariable Long tripId
@@ -131,7 +131,7 @@ public interface TripMemberApi {
                     }))
     })
     ResponseEntity<?> leaveTrip(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
 
             @Parameter(description = "여행 ID")
             @PathVariable Long tripId
@@ -169,7 +169,7 @@ public interface TripMemberApi {
                     }))
     })
     ResponseEntity<?> leaveTrip(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
 
             @Parameter(description = "여행 ID")
             @PathVariable Long tripId,

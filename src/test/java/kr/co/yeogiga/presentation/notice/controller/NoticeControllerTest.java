@@ -3,9 +3,11 @@ package kr.co.yeogiga.presentation.notice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.notice.dto.NoticeReq;
 import kr.co.yeogiga.application.notice.service.NoticeCommandService;
+import kr.co.yeogiga.application.notice.service.NoticeQueryService;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
+import kr.co.yeogiga.domain.notice.dto.NoticeDto;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.type.Role;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
@@ -18,6 +20,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,11 +30,18 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -52,10 +64,15 @@ public class NoticeControllerTest {
     @MockBean
     private NoticeCommandService noticeCommandService;
     
+    @MockBean
+    private NoticeQueryService noticeQueryService;
+    
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext) {
         this.mockMvc = MockMvcBuilders
                 .webAppContextSetup(webApplicationContext)
+                .apply(springSecurity())
+                .defaultRequest(post("/**").with(csrf()))
                 .alwaysDo(print())
                 .build();
         
@@ -124,6 +141,43 @@ public class NoticeControllerTest {
                     .andExpect(jsonPath("$.errors.title").exists())
                     .andExpect(jsonPath("$.errors.description").exists());
             
+        }
+    }
+    
+    @Nested
+    @DisplayName("전체 공지사항 조회")
+    class getNotices {
+        private final Long noticeId = 1L;
+        private final Long userId = 2L;
+        private final Long tripId = 3L;
+        private Pageable pageable = PageRequest.of(0, 10);
+        private NoticeDto.Detail noticeDetail = NoticeDto.Detail.builder()
+                .id(noticeId)
+                .title("title")
+                .description("description")
+                .nickname("nickname")
+                .imageUrl("image")
+                .createdAt(LocalDateTime.of(2025, 7, 27, 16, 30))
+                .authorId(userId)
+                .build();
+        
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            when(noticeQueryService.getAllNotices(tripId, pageable)).thenReturn(new PageImpl<>(List.of(noticeDetail)));
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/{tripId}/notices", tripId)
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.content[0].id").value(noticeDetail.id()))
+                    .andExpect(jsonPath("$.data.content.length()").value(1));
         }
     }
 }

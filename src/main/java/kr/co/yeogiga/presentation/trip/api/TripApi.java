@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.co.yeogiga.application.trip.dto.TripReq;
-import kr.co.yeogiga.common.security.auth.CustomUserDetails;
+import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -101,7 +101,7 @@ public interface TripApi {
                     }))
     })
     ResponseEntity<?> getMainTrip(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails
     );
 
     @TrackApi(description = "특정 여행 조회")
@@ -262,7 +262,7 @@ public interface TripApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> getAllTrip(@AuthenticationPrincipal CustomUserDetails userDetails);
+    ResponseEntity<?> getAllTrip(@AuthenticationPrincipal CustomUserDetailsImpl userDetails);
 
     @TrackApi(description = "준비 중 여행 조회")
     @Operation(summary = "준비 중 여행 조회", description = "준비 중 여행 조회 API")
@@ -284,7 +284,7 @@ public interface TripApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> getSettingTrip(@AuthenticationPrincipal CustomUserDetails userDetails);
+    ResponseEntity<?> getSettingTrip(@AuthenticationPrincipal CustomUserDetailsImpl userDetails);
 
     @TrackApi(description = "여행 생성")
     @Operation(summary = "여행 생성", description = "여행 생성 API")
@@ -322,7 +322,7 @@ public interface TripApi {
                     }))
     })
     ResponseEntity<?> createTrip(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @RequestBody TripReq.Creation request
     );
 
@@ -433,7 +433,7 @@ public interface TripApi {
                     })),
     })
     ResponseEntity<?> updateTripTime(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
 
             @Parameter(description = "여행 ID")
             @PathVariable Long tripId,

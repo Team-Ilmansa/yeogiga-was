@@ -5,7 +5,7 @@ import kr.co.yeogiga.application.auth.dto.SignInDto;
 import kr.co.yeogiga.application.auth.dto.SignUpDto;
 import kr.co.yeogiga.application.auth.service.OAuthManagementService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
-import kr.co.yeogiga.common.security.auth.CustomUserDetails;
+import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.common.util.CookieUtil;
 import kr.co.yeogiga.domain.oauth.type.OAuthPlatform;
 import kr.co.yeogiga.presentation.auth.api.OAuthApi;
@@ -60,7 +60,7 @@ public class OAuthController implements OAuthApi {
     @Override
     @PutMapping("/register")
     public ResponseEntity<?> register(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @Valid @RequestBody SignUpDto.Register request) {
         oAuthManagementService.register(userDetails.getUserId(), request);
         return ResponseEntity.ok(SuccessResponse.ok());

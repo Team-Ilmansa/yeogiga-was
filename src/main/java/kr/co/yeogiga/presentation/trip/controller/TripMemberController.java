@@ -3,7 +3,7 @@ package kr.co.yeogiga.presentation.trip.controller;
 import kr.co.yeogiga.application.trip.service.TripMemberCommandService;
 import kr.co.yeogiga.application.trip.service.TripMemberQueryService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
-import kr.co.yeogiga.common.security.auth.CustomUserDetails;
+import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.presentation.trip.api.TripMemberApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,7 +32,7 @@ public class TripMemberController implements TripMemberApi {
     @Override
     @PostMapping("/{tripId}/members")
     public ResponseEntity<?> joinTrip(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @PathVariable Long tripId
     ) {
         tripMemberCommandService.joinTrip(tripId, userDetails.getUserId());
@@ -42,7 +42,7 @@ public class TripMemberController implements TripMemberApi {
     @Override
     @DeleteMapping("/{tripId}/members")
     public ResponseEntity<?> leaveTrip(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @PathVariable Long tripId
     ) {
         tripMemberCommandService.leaveTrip(tripId, userDetails.getUserId());
@@ -52,7 +52,7 @@ public class TripMemberController implements TripMemberApi {
     @Override
     @DeleteMapping("/{tripId}/members/{memberId}")
     public ResponseEntity<?> leaveTrip(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @PathVariable Long tripId,
             @PathVariable Long memberId
     ) {

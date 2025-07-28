@@ -5,7 +5,7 @@ import kr.co.yeogiga.application.calendar.dto.CalendarReq;
 import kr.co.yeogiga.application.calendar.service.CalendarCommandService;
 import kr.co.yeogiga.application.calendar.service.CalendarQueryService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
-import kr.co.yeogiga.common.security.auth.CustomUserDetails;
+import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.presentation.calendar.api.CalendarApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,7 +29,7 @@ public class CalendarController implements CalendarApi {
     @Override
     @PostMapping("/{tripId}/calendars")
     public ResponseEntity<?> createCalendar(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @PathVariable Long tripId,
             @Valid @RequestBody CalendarReq calendarReq
     ) {
@@ -40,7 +40,7 @@ public class CalendarController implements CalendarApi {
     @Override
     @GetMapping("/{tripId}/calendars/me")
     public ResponseEntity<?> getUserAvailability(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @PathVariable Long tripId
     ) {
         return ResponseEntity.ok(
@@ -65,7 +65,7 @@ public class CalendarController implements CalendarApi {
     @Override
     @PutMapping("/{tripId}/calendars")
     public ResponseEntity<?> updateAvailableDates(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @PathVariable Long tripId,
             @Valid @RequestBody CalendarReq calendarReq
     ) {

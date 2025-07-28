@@ -5,14 +5,19 @@ import api.link.checker.annotation.ApiGroup;
 import api.link.checker.annotation.TrackApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.co.yeogiga.application.notice.dto.NoticeReq;
-import kr.co.yeogiga.common.security.auth.CustomUserDetails;
+import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,11 +53,67 @@ public interface NoticeApi {
                     }))
     })
     ResponseEntity<?> createNotice(
+            @PathVariable(name = "tripId") Long tripId,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
+            @Valid @RequestBody NoticeReq.Creation request
+    );
+    
+    @TrackApi(description = "전체 공지사항 조회")
+    @Operation(summary = "전체 공지사항 조회", description = "전체 공지사항 조회 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "전체 공지사항 조회 성공. 기본 페이지 별 공지사항 갯수(size): 10",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                             {
+                                                  "code": 200,
+                                                  "message": "요청이 성공하였습니다.",
+                                                  "data": {
+                                                      "content": [
+                                                          {
+                                                              "id": 24,
+                                                              "title": "준비물 챙기세요.",
+                                                              "description": "수건, 양말...",
+                                                              "createdAt": "2025-07-27T11:56:34.546218",
+                                                              "authorId": 13,
+                                                              "nickname": "nick13",
+                                                              "imageUrl": "https://image.com/image.png"
+                                                          },
+                                                          {
+                                                              "id": 23,
+                                                              "title": "여행 전 주의사항",
+                                                              "description": "여행 전 해당 내용 인지하시길 바랍니다.",
+                                                              "createdAt": "2025-07-27T11:56:29.82594",
+                                                              "authorId": 13,
+                                                              "nickname": "nick13",
+                                                              "imageUrl": "https://image.com/image.png"
+                                                          },
+                                                          {
+                                                              "id": 22,
+                                                              "title": "여행 경비 안내",
+                                                              "description": "여행 경비는 인당...",
+                                                              "createdAt": "2025-07-27T11:56:27.579067",
+                                                              "authorId": 13,
+                                                              "nickname": "nick13",
+                                                              "imageUrl": "https://image.com/image.png"
+                                                          }
+                                                      ],
+                                                      "page": {
+                                                          "size": 10,
+                                                          "number": 0,
+                                                          "totalElements": 12,
+                                                          "totalPages": 4
+                                                      }
+                                                  }
+                                              }
+                                    """)
+                    }))
+    })
+    @Parameter(name = "page", description = "페이지네이션", example = "page=0&size=10&sort=createdAt,desc", schema = @Schema(type = "string"), in = ParameterIn.QUERY)
+    ResponseEntity<?> getNotices(
             @Parameter(description = "여행 ID")
             @PathVariable(name = "tripId") Long tripId,
             
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            
-            @Valid @RequestBody NoticeReq.Creation request
+            @Parameter(example = "page=0&size=10&sort=createdAt,desc", hidden = true)
+            @PageableDefault(size = 10) Pageable pageable
     );
 }

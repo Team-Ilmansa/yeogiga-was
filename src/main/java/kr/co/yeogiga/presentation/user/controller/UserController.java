@@ -8,7 +8,7 @@ import kr.co.yeogiga.application.user.dto.UserInfoUpdateReq;
 import kr.co.yeogiga.application.user.service.UserFcmTokenService;
 import kr.co.yeogiga.application.user.service.UserManagementService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
-import kr.co.yeogiga.common.security.auth.CustomUserDetails;
+import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.common.util.CookieUtil;
 import kr.co.yeogiga.presentation.user.api.UserApi;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class UserController implements UserApi {
     @Override
     @PatchMapping("/password")
     public ResponseEntity<?> updatePassword(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @Valid @RequestBody PasswordUpdateReq passwordUpdateReq
     ) {
         userManagementService.updatePassword(userDetails.getUserId(), passwordUpdateReq);
@@ -49,7 +49,7 @@ public class UserController implements UserApi {
     @Override
     @DeleteMapping
     public ResponseEntity<?> withdraw(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails
     ) {
         userManagementService.withdraw(userDetails.getUserId());
         return ResponseEntity.ok()
@@ -60,7 +60,7 @@ public class UserController implements UserApi {
     @Override
     @GetMapping("/my")
     public ResponseEntity<?> getUserInfo(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails
     ) {
         return ResponseEntity.ok()
                 .body(SuccessResponse.from(userManagementService.getUserInfo(userDetails.getUserId())));
@@ -69,7 +69,7 @@ public class UserController implements UserApi {
     @Override
     @PutMapping
     public ResponseEntity<?> update(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @Valid @RequestBody UserInfoUpdateReq userInfoUpdateReq
     ) {
         userManagementService.updateUserInfo(userDetails.getUserId(), userInfoUpdateReq);
@@ -79,7 +79,7 @@ public class UserController implements UserApi {
     @Override
     @PutMapping("/profile")
     public ResponseEntity<?> updateProfile(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @RequestPart(name = "image") MultipartFile image
     ) {
         imageUploadProcessor.uploadProfileImage(image, userDetails.getUserId());
@@ -89,7 +89,7 @@ public class UserController implements UserApi {
     @Override
     @PostMapping("/fcm-token")
     public ResponseEntity<?> registerFcmToken(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @RequestBody FcmTokenReq fcmTokenReq
     ) {
         userFcmTokenService.registerFcmToken(userDetails.getUserId(), fcmTokenReq);
@@ -99,7 +99,7 @@ public class UserController implements UserApi {
     @Override
     @DeleteMapping("/fcm-token")
     public ResponseEntity<?> deleteFcmToken(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails
     ) {
         userFcmTokenService.deleteFcmToken(userDetails.getUserId());
         return ResponseEntity.ok(SuccessResponse.ok());
