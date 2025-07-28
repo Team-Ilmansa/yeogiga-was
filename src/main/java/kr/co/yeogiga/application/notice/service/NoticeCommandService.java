@@ -44,7 +44,7 @@ public class NoticeCommandService {
      */
     @Transactional
     public void updateNotice(Long noticeId, Long userId, NoticeReq.Creation dto) {
-        Notice notice = noticeService.readByIdJoinUser(noticeId)
+        Notice notice = noticeService.readById(noticeId)
                 .orElseThrow(() -> new CustomException(NoticeErrorType.NOT_FOUND));
         
         if (!notice.isAuthor(userId)) {
