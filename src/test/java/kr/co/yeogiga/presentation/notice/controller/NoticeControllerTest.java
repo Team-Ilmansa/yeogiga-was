@@ -4,10 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.notice.dto.NoticeReq;
 import kr.co.yeogiga.application.notice.service.NoticeCommandService;
 import kr.co.yeogiga.application.notice.service.NoticeQueryService;
+import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.common.response.error.type.CommonErrorType;
+import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.domain.notice.dto.NoticeDto;
+import kr.co.yeogiga.domain.notice.exception.NoticeErrorType;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.type.Role;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
@@ -35,13 +39,16 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -178,6 +185,104 @@ public class NoticeControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data.content[0].id").value(noticeDetail.id()))
                     .andExpect(jsonPath("$.data.content.length()").value(1));
+        }
+    }
+    
+    @Nested
+    @DisplayName("공지사항 수정")
+    class UpdateNotice {
+        
+        private NoticeReq.Creation request = NoticeReq.Creation.builder()
+                .title("new title")
+                .description("new description")
+                .build();
+        
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            doNothing().when(noticeCommandService).updateNotice(eq(1L), eq(1L), any(NoticeReq.Creation.class));
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    put("/api/v1/trip/{tripId}/notices/{noticeId}", 2L, 1L)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsBytes(request))
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+        }
+        
+        @Test
+        @DisplayName("실패 - 작성자가 아닌 경우")
+        void failUnauthorizedAuthor() throws Exception {
+            // given
+            doThrow(new CustomException(NoticeErrorType.UNAUTHORIZED_AUTHOR))
+                    .when(noticeCommandService).updateNotice(eq(1L), eq(1L), any(NoticeReq.Creation.class));
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    put("/api/v1/trip/{tripId}/notices/{noticeId}", 2L, 1L)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsBytes(request))
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.message").value(NoticeErrorType.UNAUTHORIZED_AUTHOR.getMessage()));
+        }
+        
+        @Test
+        @DisplayName("실패 - 공지사항이 존재하지 않는 경우")
+        void failIfNoticeNotFound() throws Exception {
+            // given
+            doThrow(new CustomException(NoticeErrorType.NOT_FOUND))
+                    .when(noticeCommandService).updateNotice(eq(1L), eq(1L), any(NoticeReq.Creation.class));
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    put("/api/v1/trip/{tripId}/notices/{noticeId}", 2L, 1L)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsBytes(request))
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value(NoticeErrorType.NOT_FOUND.getCode()))
+                    .andExpect(jsonPath("$.message").value(NoticeErrorType.NOT_FOUND.getMessage()));
+        }
+        
+        @Test
+        @DisplayName("실패 - 유효성 검증 실패")
+        void failValidation() throws Exception {
+            // given
+            NoticeReq.Creation request = NoticeReq.Creation.builder()
+                    .title(" ")
+                    .description(" ")
+                    .build();
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    put("/api/v1/trip/{tripId}/notices/{noticeId}", 2L, 1L)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsBytes(request))
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(CommonErrorType.VALIDATION_ERROR.getCode()))
+                    .andExpect(jsonPath("$.errors.title").exists())
+                    .andExpect(jsonPath("$.errors.description").exists());
         }
     }
 }
