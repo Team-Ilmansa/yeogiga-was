@@ -1,19 +1,16 @@
 package kr.co.yeogiga.application.trip.service;
 
-import kr.co.yeogiga.application.trip.dto.TripMemberRes;
 import kr.co.yeogiga.application.trip.dto.TripRes;
 import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.domain.trip.dto.TripDto;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.service.TripMemberService;
-import kr.co.yeogiga.domain.trip.service.TripService;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
-import kr.co.yeogiga.domain.user.entity.User;
-import kr.co.yeogiga.domain.user.type.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -42,9 +39,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class TripQueryServiceTest {
-
-    @Mock
-    private TripService tripService;
 
     @Mock
     private TripMemberService tripMemberService;
@@ -213,15 +207,15 @@ public class TripQueryServiceTest {
     class GetAllTrip {
         private final Long userId = 1L;
 
-        private TripMemberRes.MemberInfo member = TripMemberRes.MemberInfo.builder()
+        private TripDto.MemberInfo member = TripDto.MemberInfo.builder()
                 .userId(userId)
                 .nickname("nickname")
                 .imageUrl("https://image.com")
                 .build();
         
-        private List<TripMemberRes.MemberInfo> members = List.of(member);
+        private List<TripDto.MemberInfo> members = List.of(member);
         
-        private TripRes.TripSummary tripSummary = TripRes.TripSummary.builder()
+        private TripDto.Summary tripSummary = TripDto.Summary.builder()
                 .tripId(1L)
                 .title("졸업여행")
                 .city("대구")
@@ -240,7 +234,7 @@ public class TripQueryServiceTest {
             when(tripMemberService.readAllTripSummaryByUserId(anyLong())).thenReturn(List.of(tripSummary));
 
             // when
-            List<TripRes.TripSummary> result = tripQueryService.getAllTrip(userId);
+            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId);
 
             // then
             assertThat(result).hasSize(1);
@@ -253,7 +247,7 @@ public class TripQueryServiceTest {
             when(tripMemberService.readAllTripSummaryByUserId(userId)).thenReturn(List.of());
 
             // when
-            List<TripRes.TripSummary> result = tripQueryService.getAllTrip(userId);
+            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId);
 
             // then
             assertThat(result).hasSize(0);
@@ -265,15 +259,15 @@ public class TripQueryServiceTest {
     class GetTrip {
         private final Long userId = 1L;
         
-        private TripMemberRes.MemberInfo member = TripMemberRes.MemberInfo.builder()
+        private TripDto.MemberInfo member = TripDto.MemberInfo.builder()
                 .userId(userId)
                 .nickname("nickname")
                 .imageUrl("https://image.com")
                 .build();
         
-        private List<TripMemberRes.MemberInfo> members = List.of(member);
+        private List<TripDto.MemberInfo> members = List.of(member);
         
-        private TripRes.TripSummary tripSummary = TripRes.TripSummary.builder()
+        private TripDto.Summary tripSummary = TripDto.Summary.builder()
                 .tripId(1L)
                 .title("졸업여행")
                 .city("대구")
@@ -291,7 +285,7 @@ public class TripQueryServiceTest {
             when(tripMemberService.readTripSummaryByTripId(1L)).thenReturn(Optional.of(tripSummary));
 
             // when
-            TripRes.TripSummary result = tripQueryService.getTrip(1L);
+            TripDto.Summary result = tripQueryService.getTrip(1L);
 
             // then
             assertEquals(tripSummary.tripId(), result.tripId());

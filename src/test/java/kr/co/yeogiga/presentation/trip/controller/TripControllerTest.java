@@ -1,7 +1,6 @@
 package kr.co.yeogiga.presentation.trip.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.yeogiga.application.trip.dto.TripMemberRes;
 import kr.co.yeogiga.application.trip.dto.TripReq;
 import kr.co.yeogiga.application.trip.dto.TripRes;
 import kr.co.yeogiga.application.trip.service.TripCommandService;
@@ -12,6 +11,7 @@ import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
+import kr.co.yeogiga.domain.trip.dto.TripDto;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
@@ -50,7 +50,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -359,24 +358,21 @@ public class TripControllerTest {
     @Nested
     @DisplayName("사용자가 속한 여행 조회")
     class GetAllTrip {
-        private User user = User.builder()
-                .username("username")
-                .password("password")
-                .email("test@test.com")
-                .nickname("nickname")
-                .role(Role.USER)
-                .build();
         @Test
         @DisplayName("성공")
         void success() throws Exception {
             // given
-            TripRes.TripSummary tripSummary = TripRes.TripSummary.builder()
+            TripDto.Summary tripSummary = TripDto.Summary.builder()
                     .tripId(1L)
                     .title("title")
                     .startedAt(LocalDateTime.of(2025, 5, 19, 12, 0))
                     .endedAt(LocalDateTime.of(2025, 5, 20, 12, 0))
                     .status(TravelStatus.IN_PROGRESS)
-                    .members(List.of(TripMemberRes.MemberInfo.fromEntity(user)))
+                    .members(List.of(TripDto.MemberInfo.builder()
+                                    .userId(1L)
+                                    .nickname("nickname")
+                                    .imageUrl("https://imgee.com/image")
+                                    .build()))
                     .build();
 
             when(tripQueryService.getAllTrip(any())).thenReturn(List.of(tripSummary));
@@ -537,21 +533,17 @@ public class TripControllerTest {
                 .travelStatus(TravelStatus.IN_PROGRESS)
                 .build();
 
-        private User user = User.builder()
-                .username("username")
-                .password("password")
+        private TripDto.MemberInfo member = TripDto.MemberInfo.builder()
+                .userId(1L)
                 .nickname("nickname")
-                .email("test@test.com")
-                .role(Role.USER)
+                .imageUrl("https://image.com/image")
                 .build();
-        
-        private TripMemberRes.MemberInfo member = TripMemberRes.MemberInfo.fromEntity(user);
 
         @Test
         @DisplayName("성공")
         void success() throws Exception {
             // given
-            TripRes.TripSummary tripSummary = TripRes.TripSummary.from(trip, List.of(member));
+            TripDto.Summary tripSummary = TripDto.Summary.from(trip, List.of(member));
             when(tripQueryService.getTrip(tripId)).thenReturn(tripSummary);
 
             // when
@@ -564,7 +556,7 @@ public class TripControllerTest {
             resultActions
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data.title").value(trip.getTitle()))
-                    .andExpect(jsonPath("$.data.members[0].nickname").value(user.getNickname()));
+                    .andExpect(jsonPath("$.data.members[0].nickname").value(member.nickname()));
         }
 
         @Test
