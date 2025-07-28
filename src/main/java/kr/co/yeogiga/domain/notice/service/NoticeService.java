@@ -19,8 +19,8 @@ public class NoticeService {
         noticeRepository.save(notice);
     }
     
-    public Optional<Notice> readByIdJoinUser(Long id) {
-        return noticeRepository.findByIdJoinUser(id);
+    public Optional<Notice> readById(Long id) {
+        return noticeRepository.findById(id);
     }
     
     public Page<NoticeDto.Detail> readAllNoticeDetailByTripId(Long tripId, Pageable pageable) {
