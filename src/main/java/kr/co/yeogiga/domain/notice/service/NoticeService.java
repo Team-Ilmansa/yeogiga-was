@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class NoticeService {
@@ -15,6 +17,10 @@ public class NoticeService {
     
     public void save(Notice notice) {
         noticeRepository.save(notice);
+    }
+    
+    public Optional<Notice> readByIdJoinUser(Long id) {
+        return noticeRepository.findByIdJoinUser(id);
     }
     
     public Page<NoticeDto.Detail> readAllNoticeDetailByTripId(Long tripId, Pageable pageable) {
