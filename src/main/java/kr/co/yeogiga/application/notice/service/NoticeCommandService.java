@@ -1,11 +1,14 @@
 package kr.co.yeogiga.application.notice.service;
 
 import kr.co.yeogiga.application.notice.dto.NoticeReq;
+import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.notice.entity.Notice;
+import kr.co.yeogiga.domain.notice.exception.NoticeErrorType;
 import kr.co.yeogiga.domain.notice.service.NoticeService;
 import kr.co.yeogiga.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,5 +31,26 @@ public class NoticeCommandService {
                 .build();
         
         noticeService.save(notice);
+    }
+    
+    /**
+     * 여행 공지사항을 수정하는 메서드
+     *
+     * @param noticeId  공지사항 ID
+     * @param userId    사용자 ID
+     * @param dto       공자사항 요청 DTO
+     *
+     * @throws CustomException  NoticeErrorType.UNAUTHORIZED_AUTHOR - 공지사항 작성자가 아닌 경우
+     */
+    @Transactional
+    public void updateNotice(Long noticeId, Long userId, NoticeReq.Creation dto) {
+        Notice notice = noticeService.readById(noticeId)
+                .orElseThrow(() -> new CustomException(NoticeErrorType.NOT_FOUND));
+        
+        if (!notice.isAuthor(userId)) {
+            throw new CustomException(NoticeErrorType.UNAUTHORIZED_AUTHOR);
+        }
+        
+        notice.update(dto.title(), dto.description());
     }
 }

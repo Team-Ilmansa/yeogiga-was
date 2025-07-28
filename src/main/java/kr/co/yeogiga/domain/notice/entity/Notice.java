@@ -38,6 +38,9 @@ public class Notice extends BaseTimeEntity {
     @JoinColumn(name = "author_id")
     private User author;
     
+    @Column(name = "author_id", insertable = false, updatable = false)
+    private Long authorId;
+    
     @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
     
@@ -50,5 +53,14 @@ public class Notice extends BaseTimeEntity {
         this.author = author;
         this.description = description;
         this.tripId = tripId;
+    }
+    
+    public void update(String title, String description) {
+        this.title = title;
+        this.description = description;
+    }
+    
+    public boolean isAuthor(Long userId) {
+        return this.author != null && this.authorId.equals(userId);
     }
 }

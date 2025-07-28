@@ -18,12 +18,11 @@ import org.springframework.data.support.PageableExecutionUtils;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class CustomNoticeRepositoryImpl implements CustomNoticeRepository{
+public class CustomNoticeRepositoryImpl implements CustomNoticeRepository {
     private final JPAQueryFactory jpaQueryFactory;
     
     private final QNotice notice = QNotice.notice;
     private final QUser user = QUser.user;
-    
     
     @Override
     public Page<NoticeDto.Detail> findAllNoticeDetailByTripId(Long tripId, Pageable pageable) {
