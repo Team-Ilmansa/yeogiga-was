@@ -6,8 +6,8 @@ import kr.co.yeogiga.application.trip.dto.TripRes;
 import kr.co.yeogiga.application.trip.service.TripCommandService;
 import kr.co.yeogiga.application.trip.service.TripQueryService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
-import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
+import kr.co.yeogiga.domain.trip.dto.TripDto;
 import kr.co.yeogiga.presentation.trip.api.TripApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -51,7 +51,7 @@ public class TripController implements TripApi {
     @Override
     @GetMapping
     public ResponseEntity<?> getAllTrip(@AuthenticationPrincipal CustomUserDetailsImpl userDetails) {
-        List<TripRes.TripSummary> tripList = tripQueryService.getAllTrip(userDetails.getUserId());
+        List<TripDto.Summary> tripList = tripQueryService.getAllTrip(userDetails.getUserId());
         return ResponseEntity.ok().body(SuccessResponse.from(tripList));
     }
 
