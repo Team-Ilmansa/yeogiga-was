@@ -7,7 +7,6 @@ import kr.co.yeogiga.domain.notice.exception.NoticeErrorType;
 import kr.co.yeogiga.domain.notice.service.NoticeService;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.type.Role;
-import org.aspectj.util.Reflection;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -93,7 +92,7 @@ public class NoticeCommandServiceTest {
         void success() {
             // given
             ReflectionTestUtils.setField(notice, "authorId", 1L);
-            when(noticeService.readByIdJoinUser(2L)).thenReturn(Optional.of(notice));
+            when(noticeService.readById(2L)).thenReturn(Optional.of(notice));
             
             // when
             noticeCommandService.updateNotice(2L, 1L, dto);
@@ -107,7 +106,7 @@ public class NoticeCommandServiceTest {
         @DisplayName("실패 - 존재하지 않는 공지사항")
         void failIfNoticeNotFound() {
             // given
-            when(noticeService.readByIdJoinUser(anyLong())).thenReturn(Optional.empty());
+            when(noticeService.readById(anyLong())).thenReturn(Optional.empty());
             
             // when
             CustomException exception = assertThrows(CustomException.class, ()
@@ -122,7 +121,7 @@ public class NoticeCommandServiceTest {
         void failUnauthorizedAuthor() {
             // given
             ReflectionTestUtils.setField(notice, "authorId", 1L);
-            when(noticeService.readByIdJoinUser(anyLong())).thenReturn(Optional.of(notice));
+            when(noticeService.readById(anyLong())).thenReturn(Optional.of(notice));
             
             // when
             CustomException exception = assertThrows(CustomException.class, ()
