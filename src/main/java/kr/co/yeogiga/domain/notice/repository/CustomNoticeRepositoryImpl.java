@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class CustomNoticeRepositoryImpl implements CustomNoticeRepository {
@@ -23,6 +24,17 @@ public class CustomNoticeRepositoryImpl implements CustomNoticeRepository {
     
     private final QNotice notice = QNotice.notice;
     private final QUser user = QUser.user;
+    
+    @Override
+    public Optional<Long> findAuthorIdById(Long id) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(notice.authorId)
+                        .from(notice)
+                        .where(notice.id.eq(id))
+                        .fetchFirst()
+        );
+    }
     
     @Override
     public Page<NoticeDto.Detail> findAllNoticeDetailByTripId(Long tripId, Pageable pageable) {
