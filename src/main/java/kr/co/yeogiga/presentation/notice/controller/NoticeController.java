@@ -62,6 +62,7 @@ public class NoticeController implements NoticeApi {
         return ResponseEntity.ok(SuccessResponse.ok());
     }
     
+    @Override
     @DeleteMapping("/{tripId}/notices/{noticeId}")
     public ResponseEntity<?> deleteNotice(
             @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
