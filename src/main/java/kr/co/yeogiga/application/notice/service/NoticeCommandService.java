@@ -53,4 +53,24 @@ public class NoticeCommandService {
         
         notice.update(dto.title(), dto.description());
     }
+    
+    /**
+     * 여행 공지사항을 삭제하는 메서드
+     *
+     * @param noticeId  공지사항 ID
+     * @param userId    사용자 ID
+     *
+     * @throws CustomException  NoticeErrorType.UNAUTHORIZED_AUTHOR - 공지사항 작성자가 아닌 경우
+     */
+    @Transactional
+    public void deleteNotice(Long noticeId, Long userId) {
+        Long authorId = noticeService.readAuthorIdById(noticeId)
+                .orElseThrow(() -> new CustomException(NoticeErrorType.NOT_FOUND));
+        
+        if (!authorId.equals(userId)) {
+            throw new CustomException(NoticeErrorType.UNAUTHORIZED_AUTHOR);
+        }
+        
+        noticeService.deleteById(noticeId);
+    }
 }
