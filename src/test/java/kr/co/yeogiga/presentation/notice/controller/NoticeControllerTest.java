@@ -49,6 +49,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -283,6 +284,71 @@ public class NoticeControllerTest {
                     .andExpect(jsonPath("$.code").value(CommonErrorType.VALIDATION_ERROR.getCode()))
                     .andExpect(jsonPath("$.errors.title").exists())
                     .andExpect(jsonPath("$.errors.description").exists());
+        }
+    }
+    
+    @Nested
+    @DisplayName("공지사항 삭제")
+    class DeleteNotice {
+        private final Long noticeId = 1L;
+        
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            doNothing().when(noticeCommandService).deleteNotice(noticeId, userDetails.getUserId());
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    delete("/api/v1/trip/{tripId}/notices/{noticeId}", 1L, noticeId)
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+        }
+        
+        @Test
+        @DisplayName("실패 - 존재하지 않는 공지사항")
+        void failIfNoticeNotFound() throws Exception {
+            // given
+            doThrow(new CustomException(NoticeErrorType.NOT_FOUND)).when(noticeCommandService)
+                    .deleteNotice(noticeId, userDetails.getUserId());
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    delete("/api/v1/trip/{tripId}/notices/{noticeId}", 1L, noticeId)
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value(NoticeErrorType.NOT_FOUND.getCode()))
+                    .andExpect(jsonPath("$.message").value(NoticeErrorType.NOT_FOUND.getMessage()));
+        }
+        
+        @Test
+        @DisplayName("실패 - 공지사항 작성자가 아닌 경우")
+        void failIfUnauthorizedAuthor() throws Exception {
+            // given
+            doThrow(new CustomException(NoticeErrorType.UNAUTHORIZED_AUTHOR)).when(noticeCommandService)
+                    .deleteNotice(noticeId, userDetails.getUserId());
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    delete("/api/v1/trip/{tripId}/notices/{noticeId}", 1L, noticeId)
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.code").value(NoticeErrorType.UNAUTHORIZED_AUTHOR.getCode()))
+                    .andExpect(jsonPath("$.message").value(NoticeErrorType.UNAUTHORIZED_AUTHOR.getMessage()));
+            
         }
     }
 }
