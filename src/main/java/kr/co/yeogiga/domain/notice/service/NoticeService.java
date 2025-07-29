@@ -23,7 +23,15 @@ public class NoticeService {
         return noticeRepository.findById(id);
     }
     
+    public Optional<Long> readAuthorIdById(Long id) {
+        return noticeRepository.findAuthorIdById(id);
+    }
+    
     public Page<NoticeDto.Detail> readAllNoticeDetailByTripId(Long tripId, Pageable pageable) {
         return noticeRepository.findAllNoticeDetailByTripId(tripId, pageable);
+    }
+    
+    public void deleteById(Long id) {
+        noticeRepository.deleteById(id);
     }
 }
