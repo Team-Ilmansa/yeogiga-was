@@ -229,8 +229,10 @@ public class UserManagementServiceTest {
     class UpdateUserInfo {
         private final Long userId = 1L;
 
-        @Mock
-        private User user;
+        private User user = User.builder()
+            .id(userId)
+            .nickname("nickname")
+            .build();
 
         private UserInfoUpdateReq userInfoUpdateReq = UserInfoUpdateReq.builder()
                 .nickname("newNickname")
@@ -240,15 +242,14 @@ public class UserManagementServiceTest {
         @DisplayName("성공")
         void success() {
             // given
-            when(user.getNickname()).thenReturn("nickname");
-            when(userService.existsIncludeDeletedByNickname(eq("newNickname"))).thenReturn(false);
             when(userService.readById(eq(userId))).thenReturn(Optional.of(user));
+            when(userService.existsIncludeDeletedByNickname(eq("newNickname"))).thenReturn(false);
 
             // when
             userManagementService.updateUserInfo(userId, userInfoUpdateReq);
 
             // then
-            verify(user).updateNickname("newNickname");
+            assertEquals(userInfoUpdateReq.nickname(), user.getNickname());
 
         }
 
@@ -256,7 +257,6 @@ public class UserManagementServiceTest {
         @DisplayName("실패 - 이미 사용 중인 닉네임")
         void failAlreadyUsedNickname() {
             // given
-            when(user.getNickname()).thenReturn("nickname");
             when(userService.readById(userId)).thenReturn(Optional.of(user));
             when(userService.existsIncludeDeletedByNickname("newNickname")).thenReturn(true);
 
@@ -272,12 +272,15 @@ public class UserManagementServiceTest {
         @DisplayName("실패 - 기존과 동일한 닉네임")
         void failSameNickname() {
             // given
-            when(user.getNickname()).thenReturn("newNickname");
+            UserInfoUpdateReq sameUserInfoUpdateReq = UserInfoUpdateReq.builder()
+                    .nickname("nickname")
+                    .build();
+            
             when(userService.readById(eq(userId))).thenReturn(Optional.of(user));
 
             // when
             CustomException exception = assertThrows(CustomException.class,
-                    () -> userManagementService.updateUserInfo(userId, userInfoUpdateReq));
+                    () -> userManagementService.updateUserInfo(userId, sameUserInfoUpdateReq));
 
             // then
             assertEquals(UserErrorType.SAME_NICKNAME, exception.getErrorType());
