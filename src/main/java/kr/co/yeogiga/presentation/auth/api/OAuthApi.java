@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @ApiGroup(value = "[OAuth2 인증 API]")
 @Tag(name = "[OAuth2 인증 API]", description = "OAuth2 인증 관련 API")
@@ -179,5 +180,11 @@ public interface OAuthApi {
                     }))
 
     })
-    ResponseEntity<?> register(@AuthenticationPrincipal CustomUserDetailsImpl userDetails, @RequestBody SignUpDto.Register request);
+    ResponseEntity<?> register(
+            @Parameter(description = "클라이언트 장치", example = "MOBILE, WEB")
+            @RequestHeader(name = "device") Device device,
+            
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
+            
+            @RequestBody SignUpDto.Register request);
 }
