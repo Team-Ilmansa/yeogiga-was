@@ -34,4 +34,8 @@ public class NoticeService {
     public void deleteById(Long id) {
         noticeRepository.deleteById(id);
     }
+    
+    public void delete(Notice notice) {
+        noticeRepository.delete(notice);
+    }
 }

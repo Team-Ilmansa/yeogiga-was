@@ -64,13 +64,13 @@ public class NoticeCommandService {
      */
     @Transactional
     public void deleteNotice(Long noticeId, Long userId) {
-        Long authorId = noticeService.readAuthorIdById(noticeId)
+        Notice notice = noticeService.readById(noticeId)
                 .orElseThrow(() -> new CustomException(NoticeErrorType.NOT_FOUND));
         
-        if (!authorId.equals(userId)) {
+        if (!notice.isAuthor(userId)) {
             throw new CustomException(NoticeErrorType.UNAUTHORIZED_AUTHOR);
         }
         
-        noticeService.deleteById(noticeId);
+        noticeService.delete(notice);
     }
 }
