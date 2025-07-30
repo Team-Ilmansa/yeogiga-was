@@ -165,4 +165,40 @@ public interface NoticeApi {
             @PathVariable(name = "noticeId") Long noticeId,
             @Valid @RequestBody NoticeReq.Creation request
     );
+    
+    @TrackApi(description = "공지사항 삭제")
+    @Operation(summary = "공지사항 삭제", description = "공지사항 삭제 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "공지사항 삭제 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                             {
+                                                  "code": 200,
+                                                  "message": "요청이 성공하였습니다."
+                                              }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "403", description = "공지사항 삭제 실패 - 공지사항의 작성자가 아닌 경우",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "공지사항 작성자가 아닌 경우", value = """
+                                             {
+                                                    "code": "N001",
+                                                    "message": "공지사항의 작성자가 아닙니다."
+                                                }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "공지사항 삭제 실패 - 존재하지 않는 공지사항",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "공지사항이 존재하지 않는 경우", value = """
+                                             {
+                                                     "code": "N000",
+                                                     "message": "존재하지 않는 공지사항입니다."
+                                                 }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> deleteNotice(
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
+            @PathVariable(name = "noticeId") Long noticeId
+    );
 }

@@ -7,6 +7,7 @@ import kr.co.yeogiga.domain.notice.exception.NoticeErrorType;
 import kr.co.yeogiga.domain.notice.service.NoticeService;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.type.Role;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.assertArg;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -126,6 +128,69 @@ public class NoticeCommandServiceTest {
             // when
             CustomException exception = assertThrows(CustomException.class, ()
                     -> noticeCommandService.updateNotice(2L, 3L, dto));
+            
+            // then
+            assertEquals(NoticeErrorType.UNAUTHORIZED_AUTHOR, exception.getErrorType());
+        }
+    }
+    
+    @Nested
+    @DisplayName("공지사항 삭제")
+    class DeleteNotice {
+        private final Long noticeId = 1L;
+        
+        private User user = User.builder()
+                .id(2L)
+                .nickname("nickname")
+                .build();
+        
+        private Notice notice = Notice.builder()
+                .title("title")
+                .description("description")
+                .author(user)
+                .build();
+        
+        @BeforeEach
+        void setUp() {
+            ReflectionTestUtils.setField(notice, "authorId", 2L);
+        }
+        
+        @Test
+        @DisplayName("성공")
+        void success() {
+            // given
+            when(noticeService.readById(noticeId)).thenReturn(Optional.of(notice));
+            
+            // when
+            noticeCommandService.deleteNotice(1L, 2L);
+            
+            // then
+            verify(noticeService, times(1)).delete(eq(notice));
+        }
+        
+        @Test
+        @DisplayName("실패 - 존재하지 않는 공지사항")
+        void failIfNoticeNotFound() {
+            // given
+            when(noticeService.readById(noticeId)).thenReturn(Optional.empty());
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> noticeCommandService.deleteNotice(1L, 2L));
+            
+            // then
+            assertEquals(NoticeErrorType.NOT_FOUND, exception.getErrorType());
+        }
+        
+        @Test
+        @DisplayName("실패 - 작성자가 아닌 경우")
+        void failIfUnauthorizedAuthor() {
+            // given
+            when(noticeService.readById(noticeId)).thenReturn(Optional.of(notice));
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> noticeCommandService.deleteNotice(1L, 3L));
             
             // then
             assertEquals(NoticeErrorType.UNAUTHORIZED_AUTHOR, exception.getErrorType());

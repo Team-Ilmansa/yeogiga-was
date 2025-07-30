@@ -18,7 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Entity
+@Entity(name = "notice")
 @Table(
         name = "notice",
         indexes = {
