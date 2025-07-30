@@ -97,4 +97,8 @@ public class User extends BaseTimeEntity {
     public void updateProfileImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+    
+    public boolean isSameNickname(String nickname) {
+        return this.nickname.equals(nickname);
+    }
 }
