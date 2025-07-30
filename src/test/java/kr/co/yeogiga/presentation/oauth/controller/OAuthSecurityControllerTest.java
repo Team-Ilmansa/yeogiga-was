@@ -2,8 +2,8 @@ package kr.co.yeogiga.presentation.oauth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.auth.dto.SignUpDto;
+import kr.co.yeogiga.application.auth.dto.TokenDto;
 import kr.co.yeogiga.application.auth.service.OAuthManagementService;
-import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
@@ -30,11 +30,13 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -79,6 +81,11 @@ public class OAuthSecurityControllerTest {
                 .build();
 
         private CustomUserDetails userDetails;
+        
+        private TokenDto token = TokenDto.builder()
+                .accessToken("accessToken.xxx.xxx")
+                .refreshToken("refreshToken.xxx.xxx")
+                .build();
 
         @BeforeEach
         void setUp() {
@@ -88,13 +95,15 @@ public class OAuthSecurityControllerTest {
         }
 
         @Test
-        @DisplayName("성공")
-        void success() throws Exception {
+        @DisplayName("성공 - 웹")
+        void successWeb() throws Exception {
             // given
             SignUpDto.Register request = new SignUpDto.Register("newNick");
+            when(oAuthManagementService.register(userDetails.getUserId(), request)).thenReturn(token);
 
             // when
             ResultActions resultActions = mockMvc.perform(put("/api/v1/oauth/register")
+                    .header("device", "WEB")
                     .with(user(userDetails))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsBytes(request))
@@ -103,8 +112,37 @@ public class OAuthSecurityControllerTest {
             // then
             resultActions
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+                    .andExpect(cookie().value("refreshToken", token.refreshToken()))
+                    .andExpect(jsonPath("$.data.accessToken").value(token.accessToken()))
+                    .andExpect(jsonPath("$.data.refreshToken").doesNotExist());
+                    
 
+            verify(oAuthManagementService, times(1)).register(any(), any());
+        }
+        
+        @Test
+        @DisplayName("성공 - 모바일")
+        void successMobile() throws Exception {
+            // given
+            SignUpDto.Register request = new SignUpDto.Register("newNick");
+            when(oAuthManagementService.register(userDetails.getUserId(), request)).thenReturn(token);
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(put("/api/v1/oauth/register")
+                    .header("device", "MOBILE")
+                    .with(user(userDetails))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsBytes(request))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(cookie().doesNotExist("refreshToken"))
+                    .andExpect(jsonPath("$.data.accessToken").value(token.accessToken()))
+                    .andExpect(jsonPath("$.data.refreshToken").value(token.refreshToken()));
+            
+            
             verify(oAuthManagementService, times(1)).register(any(), any());
         }
 
@@ -117,6 +155,7 @@ public class OAuthSecurityControllerTest {
             // when
             ResultActions resultActions = mockMvc.perform(
                     put("/api/v1/oauth/register")
+                            .header("device", "WEB")
                             .with(user(userDetails))
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsBytes(request))
