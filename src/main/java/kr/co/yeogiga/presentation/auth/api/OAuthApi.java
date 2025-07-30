@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @ApiGroup(value = "[OAuth2 인증 API]")
 @Tag(name = "[OAuth2 인증 API]", description = "OAuth2 인증 관련 API")
@@ -141,12 +142,27 @@ public interface OAuthApi {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "회원 등록 성공",
                     content = @Content(mediaType = "application/json", examples = {
-                            @ExampleObject(name = "회원 등록 성공", value = """
+                            @ExampleObject(name = "웹 장치 이용자", description = "웹은 리프레시 토큰이 쿠키(refreshToken)으로 전달", value = """
                                         {
                                              "code": 200,
-                                             "message": "요청이 성공하였습니다."
+                                             "message": "요청이 성공하였습니다.",
+                                             "data": {
+                                                 "token": {
+                                                     "accessToken": "xxxxx.xxxxx.xxxxx"
+                                                 }
+                                             }
                                          }
                                     """),
+                            @ExampleObject(name = "모바일 장치 이용자", value = """
+                                        {
+                                              "code": 200,
+                                              "message": "요청이 성공하였습니다.",
+                                              "data": {
+                                                  "accessToken": "xxx.xxx.xxx",
+                                                  "refreshToken": "xxx.xxx.xxx"
+                                              }
+                                          }
+                                    """)
                     })),
             @ApiResponse(responseCode = "400", description = "유효성 검증 실패",
                     content = @Content(mediaType = "application/json", examples = {
@@ -179,5 +195,11 @@ public interface OAuthApi {
                     }))
 
     })
-    ResponseEntity<?> register(@AuthenticationPrincipal CustomUserDetailsImpl userDetails, @RequestBody SignUpDto.Register request);
+    ResponseEntity<?> register(
+            @Parameter(description = "클라이언트 장치", example = "MOBILE, WEB")
+            @RequestHeader(name = "device") Device device,
+            
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
+            
+            @RequestBody SignUpDto.Register request);
 }

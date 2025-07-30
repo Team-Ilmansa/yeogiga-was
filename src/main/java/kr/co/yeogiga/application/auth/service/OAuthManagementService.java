@@ -74,7 +74,7 @@ public class OAuthManagementService {
      * @param request       회원 등록 요청 dto (nickname)
      */
     @Transactional
-    public void register(Long userId, SignUpDto.Register request) {
+    public TokenDto register(Long userId, SignUpDto.Register request) {
         User user = userService.readById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
 
@@ -84,6 +84,8 @@ public class OAuthManagementService {
 
         user.updateNickname(request.nickname());
         user.upgradeRoleToUser();
+        
+        return jwtService.generateToken(user.getNickname(), user.getId(), LoginType.SOCIAL);
     }
 
     /**

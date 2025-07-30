@@ -9,6 +9,7 @@ import kr.co.yeogiga.application.auth.type.Device;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.util.CookieUtil;
+import kr.co.yeogiga.common.util.TokenResponseUtil;
 import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
 import kr.co.yeogiga.presentation.auth.api.AuthApi;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +24,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.Duration;
-import java.util.Map;
 
 import static kr.co.yeogiga.application.auth.constant.AuthConstants.REFRESH_TOKEN_PREFIX;
 
@@ -49,7 +47,7 @@ public class AuthController implements AuthApi {
             @Valid @RequestBody SignInDto.Request request
     ) {
         TokenDto token = authService.signIn(request);
-        return createTokenResponse(device, token);
+        return TokenResponseUtil.createTokenResponse(device, token);
     }
 
     @Override
@@ -65,8 +63,8 @@ public class AuthController implements AuthApi {
         }
 
         return switch (device) {
-            case MOBILE -> createTokenResponse(device, authService.reissueToken(refreshTokenInHeader));
-            case WEB -> createTokenResponse(device, authService.reissueToken(refreshTokenInCookie));
+            case MOBILE -> TokenResponseUtil.createTokenResponse(device, authService.reissueToken(refreshTokenInHeader));
+            case WEB -> TokenResponseUtil.createTokenResponse(device, authService.reissueToken(refreshTokenInCookie));
         };
     }
 
@@ -106,25 +104,5 @@ public class AuthController implements AuthApi {
                 .code(HttpStatus.OK.value())
                 .message("사용 가능한 닉네임입니다.")
                 .build());
-    }
-
-    /**
-     * 토큰 응답 생성 메서드
-     *
-     * @param device            사용자 장치(WEB, MOBILE)
-     * @param token             토큰(accessToken, refreshToken)
-     * @return                  MOBILE -> accessToken(body), refreshToken(body)
-     *                          WEB    -> accessToken(body), refreshToken(cookie)
-     */
-    private ResponseEntity<?> createTokenResponse(Device device, TokenDto token) {
-        return switch (device) {
-            case MOBILE -> ResponseEntity.ok(SuccessResponse.from(token));
-            case WEB -> ResponseEntity.ok()
-                    .header(HttpHeaders.SET_COOKIE, CookieUtil.createCookie(
-                            REFRESH_TOKEN_PREFIX,
-                            token.refreshToken(),
-                            Duration.ofDays(7).toSeconds()).toString()
-                    ).body(SuccessResponse.from(Map.of("accessToken", token.accessToken())));
-        };
     }
 }

@@ -98,7 +98,7 @@ public class UserManagementService {
         User user = userService.readById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
 
-        if (user.getNickname().equals(nickname)) {
+        if (user.isSameNickname(nickname)) {
             throw new CustomException(UserErrorType.SAME_NICKNAME);
         }
 

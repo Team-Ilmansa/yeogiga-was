@@ -3,10 +3,13 @@ package kr.co.yeogiga.presentation.auth.controller;
 import jakarta.validation.Valid;
 import kr.co.yeogiga.application.auth.dto.SignInDto;
 import kr.co.yeogiga.application.auth.dto.SignUpDto;
+import kr.co.yeogiga.application.auth.dto.TokenDto;
 import kr.co.yeogiga.application.auth.service.OAuthManagementService;
+import kr.co.yeogiga.application.auth.type.Device;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.common.util.CookieUtil;
+import kr.co.yeogiga.common.util.TokenResponseUtil;
 import kr.co.yeogiga.domain.oauth.type.OAuthPlatform;
 import kr.co.yeogiga.presentation.auth.api.OAuthApi;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -60,10 +64,12 @@ public class OAuthController implements OAuthApi {
     @Override
     @PutMapping("/register")
     public ResponseEntity<?> register(
+            @RequestHeader(name = "device") Device device,
             @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @Valid @RequestBody SignUpDto.Register request) {
-        oAuthManagementService.register(userDetails.getUserId(), request);
-        return ResponseEntity.ok(SuccessResponse.ok());
+        TokenDto token = oAuthManagementService.register(userDetails.getUserId(), request);
+        
+        return TokenResponseUtil.createTokenResponse(device, token);
     }
 }
 
