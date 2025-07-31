@@ -42,7 +42,7 @@ public class CustomNoticeRepositoryImpl implements CustomNoticeRepository {
         return Optional.ofNullable(
                 jpaQueryFactory
                         .selectFrom(notice)
-                        .join(notice.author, user)
+                        .join(notice.author, user).fetchJoin()
                         .where(notice.id.eq(id))
                         .fetchFirst()
         );
