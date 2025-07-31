@@ -51,6 +51,14 @@ public class NoticeController implements NoticeApi {
                 .body(SuccessResponse.from(noticeQueryService.getAllNotices(tripId, pageable)));
     }
     
+    @GetMapping("/{tripId}/notices/{noticeId}")
+    public ResponseEntity<?> getNotice(
+            @PathVariable(name = "noticeId") Long noticeId
+    ) {
+        return ResponseEntity
+                .ok(SuccessResponse.from(noticeQueryService.getNotice(noticeId)));
+    }
+    
     @Override
     @PutMapping("/{tripId}/notices/{noticeId}")
     public ResponseEntity<?> updateNotice(
