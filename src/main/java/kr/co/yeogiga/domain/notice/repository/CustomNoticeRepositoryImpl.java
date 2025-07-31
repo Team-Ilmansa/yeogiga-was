@@ -38,7 +38,7 @@ public class CustomNoticeRepositoryImpl implements CustomNoticeRepository {
     }
     
     @Override
-    public Optional<Notice> findNoticeJoinUser(Long id) {
+    public Optional<Notice> findNoticeJoinUserById(Long id) {
         return Optional.ofNullable(
                 jpaQueryFactory
                         .selectFrom(notice)

@@ -24,7 +24,7 @@ public class NoticeService {
     }
     
     public Optional<Notice> readJoinUserById(Long id) {
-        return noticeRepository.findNoticeJoinUser(id);
+        return noticeRepository.findNoticeJoinUserById(id);
     }
     
     public Optional<Long> readAuthorIdById(Long id) {

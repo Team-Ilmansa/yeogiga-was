@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface CustomNoticeRepository {
     Optional<Long> findAuthorIdById(Long id);
-    Optional<Notice> findNoticeJoinUser(Long id);
+    Optional<Notice> findNoticeJoinUserById(Long id);
     Page<NoticeDto.Detail> findAllNoticeDetailByTripId(Long tripId, Pageable pageable);
 }
