@@ -8,6 +8,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.yeogiga.domain.notice.dto.NoticeDto;
+import kr.co.yeogiga.domain.notice.entity.Notice;
 import kr.co.yeogiga.domain.notice.entity.QNotice;
 import kr.co.yeogiga.domain.user.entity.QUser;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,17 @@ public class CustomNoticeRepositoryImpl implements CustomNoticeRepository {
                 jpaQueryFactory
                         .select(notice.authorId)
                         .from(notice)
+                        .where(notice.id.eq(id))
+                        .fetchFirst()
+        );
+    }
+    
+    @Override
+    public Optional<Notice> findNoticeJoinUser(Long id) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(notice)
+                        .join(notice.author, user)
                         .where(notice.id.eq(id))
                         .fetchFirst()
         );
