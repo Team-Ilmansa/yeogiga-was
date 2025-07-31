@@ -117,6 +117,42 @@ public interface NoticeApi {
             @PageableDefault(size = 10) Pageable pageable
     );
     
+    @TrackApi(description = "특정 공지사항 조회")
+    @Operation(summary = "특정 공지사항 조회", description = "특정 공지사항 조회 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "특정 공지사항 조회 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                             {
+                                                   "code": 200,
+                                                   "message": "요청이 성공하였습니다.",
+                                                   "data": {
+                                                       "id": 22,
+                                                       "title": "중요 공지입니다.",
+                                                       "description": "설명입니다.",
+                                                       "createdAt": "2025-07-27T11:56:27.579067",
+                                                       "authorId": 13,
+                                                       "nickname": "nick",
+                                                       "imageUrl": "https://image.com/image"
+                                                   }
+                                               }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "공지사항 수정 실패 - 존재하지 않는 공지사항",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "공지사항이 존재하지 않는 경우", value = """
+                                             {
+                                                     "code": "N000",
+                                                     "message": "존재하지 않는 공지사항입니다."
+                                                 }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> getNotice(
+            @Parameter(description = "여행 ID", example = "1")
+            @PathVariable(name = "noticeId") Long noticeId
+    );
+    
     @TrackApi(description = "공지사항 수정")
     @Operation(summary = "공지사항 수정", description = "공지사항 수정 API")
     @ApiResponses({
