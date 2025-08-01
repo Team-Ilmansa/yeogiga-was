@@ -190,6 +190,60 @@ public class NoticeControllerTest {
     }
     
     @Nested
+    @DisplayName("특정 공지사항 조회")
+    class GetNotice {
+        private final Long noticeId = 1L;
+        
+        private NoticeDto.Detail dto = NoticeDto.Detail.builder()
+                .id(noticeId)
+                .title("title")
+                .description("description")
+                .authorId(1L)
+                .createdAt(LocalDateTime.now().minusDays(1))
+                .imageUrl("http://image.com/image")
+                .build();
+        
+        
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            when(noticeQueryService.getNotice(noticeId)).thenReturn(dto);
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/{tripId}/notices/{noticeId}", 1L, noticeId)
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.id").value(dto.id()))
+                    .andExpect(jsonPath("$.data.authorId").value(dto.authorId()));
+        }
+        
+        @Test
+        @DisplayName("실패 - 존재하지 않는 공지사항")
+        void failIfNoticeNotFound() throws Exception {
+            // given
+            doThrow(new CustomException(NoticeErrorType.NOT_FOUND)).when(noticeQueryService).getNotice(noticeId);
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/{tripId}/notices/{noticeId}", 1L, noticeId)
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value(NoticeErrorType.NOT_FOUND.getCode()))
+                    .andExpect(jsonPath("$.message").value(NoticeErrorType.NOT_FOUND.getMessage()));
+        }
+    }
+    
+    @Nested
     @DisplayName("공지사항 수정")
     class UpdateNotice {
         

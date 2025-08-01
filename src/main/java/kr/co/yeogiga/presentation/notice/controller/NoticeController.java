@@ -52,6 +52,15 @@ public class NoticeController implements NoticeApi {
     }
     
     @Override
+    @GetMapping("/{tripId}/notices/{noticeId}")
+    public ResponseEntity<?> getNotice(
+            @PathVariable(name = "noticeId") Long noticeId
+    ) {
+        return ResponseEntity
+                .ok(SuccessResponse.from(noticeQueryService.getNotice(noticeId)));
+    }
+    
+    @Override
     @PutMapping("/{tripId}/notices/{noticeId}")
     public ResponseEntity<?> updateNotice(
             @AuthenticationPrincipal CustomUserDetailsImpl userDetails,

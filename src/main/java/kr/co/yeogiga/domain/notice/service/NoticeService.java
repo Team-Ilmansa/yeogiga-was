@@ -23,6 +23,10 @@ public class NoticeService {
         return noticeRepository.findById(id);
     }
     
+    public Optional<Notice> readJoinUserById(Long id) {
+        return noticeRepository.findNoticeJoinUserById(id);
+    }
+    
     public Optional<Long> readAuthorIdById(Long id) {
         return noticeRepository.findAuthorIdById(id);
     }
