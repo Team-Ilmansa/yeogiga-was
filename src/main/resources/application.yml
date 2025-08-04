@@ -68,3 +68,10 @@ spring:
         auth: true
         starttls:
           enable: true
+
+--- # map
+map:
+  naver:
+    uri: ${NAVER_API_URI}
+    client-id: ${NAVER_CLIENT_ID}
+    client-secret: ${NAVER_CLIENT_SECRET}
