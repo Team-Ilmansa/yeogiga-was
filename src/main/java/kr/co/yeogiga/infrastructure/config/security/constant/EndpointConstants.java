@@ -12,6 +12,7 @@ public final class EndpointConstants {
     public static final String[] USER_ENDPOINTS = {
             "/api/v1/trip/**",
             "/api/v1/users/**",
+            "/api/v1/places/**"
     };
 
     public static final String[] GUEST_ENDPOINTS = {
