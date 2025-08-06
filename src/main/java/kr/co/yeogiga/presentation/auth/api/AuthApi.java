@@ -97,7 +97,7 @@ public interface AuthApi {
                                         }
                                     """)
                     })),
-            @ApiResponse(responseCode = "400", description = "유효성 검증 실패",
+            @ApiResponse(responseCode = "400", description = "로그인 실패",
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(name = "유효성 검증 실패", value = """
                                         {
@@ -107,6 +107,18 @@ public interface AuthApi {
                                                  "username": "아이디는 필수 입력값입니다."
                                              }
                                         }
+                                    """),
+                            @ExampleObject(name = "이미 탈퇴된 사용자", description = "탈퇴(Soft Delete)된 사용자에 대한 응답", value = """
+                                        {
+                                             "code": "U003",
+                                             "message": "이미 회원탈퇴한 사용자입니다."
+                                         }
+                                    """),
+                            @ExampleObject(name = "인증 실패", description = "아이디 또는 비밀번호 불일치", value = """
+                                        {
+                                              "code": "A010",
+                                              "message": "로그인에 실패하였습니다. 아이디 또는 비밀번호를 확인해주세요."
+                                          }
                                     """)
                     }))
     })
