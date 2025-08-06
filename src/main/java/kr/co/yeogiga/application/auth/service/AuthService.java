@@ -130,4 +130,23 @@ public class AuthService {
             throw new CustomException(AuthErrorType.ALREADY_USED_NICKNAME);
         }
     }
+    
+    /**
+     * 탈퇴(soft delete)된 사용자의 계정을 복구하는 메서드
+     *
+     * @param userId    사용자 ID
+     *
+     * @ throws CustomException AuthErrorType.NOT_WITHDRAWN - 탈퇴하지 않은 사용자인 경우
+     */
+    @Transactional
+    public void restoreUser(Long userId) {
+        User user = userService.readIncludeDeletedUserById(userId)
+                .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
+        
+        if (!user.isDeleted()) {
+            throw new CustomException(AuthErrorType.NOT_WITHDRAWN);
+        }
+        
+        user.revertWithdrawal();
+    }
 }
