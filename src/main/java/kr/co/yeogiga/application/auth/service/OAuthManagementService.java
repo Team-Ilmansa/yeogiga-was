@@ -20,8 +20,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
-
 @Service
 @RequiredArgsConstructor
 public class OAuthManagementService {
@@ -66,12 +64,15 @@ public class OAuthManagementService {
         
         return getSignInResponse(userStatus);
     }
-
+    
     /**
      * GUEST 사용자의 권한 승격을 위한 회원 등록 메서드
      *
      * @param userId        사용자 ID
-     * @param request       회원 등록 요청 dto (nickname)
+     * @param request       회원 등록 요청 DTO (nickname)
+     * @return              JWT 토큰
+     *
+     * @throws CustomException AuthErrorType.ALREADY_USED_NICKNAME - 이미 사용 중인 닉네임일 경우
      */
     @Transactional
     public TokenDto register(Long userId, SignUpDto.Register request) {
