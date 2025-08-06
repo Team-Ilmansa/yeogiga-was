@@ -33,6 +33,7 @@ import java.time.LocalDateTime;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -198,5 +199,25 @@ public class PinControllerTest {
                     .andExpect(jsonPath("$.data.longitude").value(pin.getLongitude()))
                     .andExpect(jsonPath("$.data.time").value("2025-05-26T13:00:00"));
         }
+    }
+
+    @Test
+    @DisplayName("핀 삭제 성공")
+    void deletePinSuccess() throws Exception {
+        // given
+        Long tripId = 1L;
+        doNothing().when(pinCommandService).deletePin(tripId);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                delete("/api/v1/trip/{tripId}/pin", tripId)
+                        .with(user(userDetails))
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(SuccessResponse.ok().code()))
+                .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
     }
 }

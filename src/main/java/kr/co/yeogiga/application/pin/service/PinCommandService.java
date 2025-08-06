@@ -81,4 +81,14 @@ public class PinCommandService {
 
         tripPushSender.sendPush(tripId, FcmConstant.formatPinTitle(title), redisKey, fcmTokens);
     }
+
+    /**
+     * 집결지 핀 삭제 요청 메서드
+     *
+     * @param tripId 여행 ID
+     */
+    public void deletePin(Long tripId) {
+        String pinKey = PinConstant.pinKey(tripId);
+        redisRepository.del(pinKey);
+    }
 }

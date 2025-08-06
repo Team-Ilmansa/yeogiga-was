@@ -41,7 +41,7 @@ public interface PinApi {
     ResponseEntity<?> getPin(
             @Parameter(description = "여행 ID")
             @PathVariable Long tripId)
-   ;
+            ;
 
     @TrackApi(description = "집결지 핀 생성")
     @Operation(summary = "집결지 핀 생성", description = "집결지 핀 생성 API")
@@ -99,5 +99,22 @@ public interface PinApi {
             @PathVariable Long tripId,
 
             @Valid @RequestBody PinReq.Creation request
+    );
+
+    @TrackApi(description = "집결지 핀 삭제")
+    @Operation(summary = "집결지 핀 삭제", description = "집결지 핀 삭제 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "집결지 핀 삭제 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다."
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> deletePin(
+            @PathVariable Long tripId
     );
 }
