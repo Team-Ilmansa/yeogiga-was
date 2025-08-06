@@ -55,7 +55,7 @@ public interface OAuthApi {
                                          }
                                     """)
                     })),
-            @ApiResponse(responseCode = "400", description = "유효성 검사 실패",
+            @ApiResponse(responseCode = "400", description = "로그인 실패",
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(name = "인증 코드 유효성 검사 실패", value = """
                                         {
@@ -70,6 +70,12 @@ public interface OAuthApi {
                                             "code": "G003",
                                             "message": "지원하지 않는 Path Variable 값입니다."
                                         }
+                                    """),
+                            @ExampleObject(name = "이미 탈퇴한 사용자", description = "탈퇴(Soft Delete)된 사용자에 대한 응답", value = """
+                                        {
+                                             "code": "U003",
+                                             "message": "이미 회원탈퇴한 사용자입니다."
+                                         }
                                     """)
                     }))
     })
@@ -127,6 +133,12 @@ public interface OAuthApi {
                                             "code": "G003",
                                             "message": "지원하지 않는 Path Variable 값입니다."
                                         }
+                                    """),
+                            @ExampleObject(name = "이미 탈퇴한 사용자", description = "탈퇴(Soft Delete)된 사용자에 대한 응답", value = """
+                                        {
+                                             "code": "U003",
+                                             "message": "이미 회원탈퇴한 사용자입니다."
+                                         }
                                     """)
                     }))
     })
