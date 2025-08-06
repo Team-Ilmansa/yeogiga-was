@@ -14,6 +14,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @RestControllerAdvice
@@ -24,6 +25,13 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<?> handleCustomException(final CustomException e) {
         BaseErrorType error = e.getErrorType();
         log.error("[Error Occurred] {}", error.getMessage());
+        
+        Object data = e.getData();
+        
+        if (Objects.nonNull(data)) {
+            return ResponseEntity.status(error.getHttpStatus()).body(ErrorResponse.from(error, data));
+        }
+        
         return ResponseEntity.status(error.getHttpStatus()).body(ErrorResponse.from(error));
     }
 
