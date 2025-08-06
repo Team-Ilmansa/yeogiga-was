@@ -19,7 +19,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -261,6 +263,29 @@ public class AuthServiceTest {
 
             // then
             assertEquals(exception.getErrorType(), AuthErrorType.AUTHENTICATION_FAIL);
+        }
+        
+        @Test
+        @DisplayName("실패 - 이미 탈퇴(소프트 딜리트)한 사용자")
+        void failWhenDeletedUserSignIn() {
+            // given
+            User user = User.builder()
+                    .username("testid")
+                    .email("test@test.com")
+                    .nickname("testnick")
+                    .password("testpw")
+                    .build();
+            
+            ReflectionTestUtils.setField(user, "deletedAt", LocalDateTime.now());
+            
+            when(userService.readIncludeDeletedUserByUsername(request.username())).thenReturn(Optional.of(user));
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> authService.signIn(request));
+            
+            // then
+            assertEquals(UserErrorType.ALREADY_WITHDRAW, exception.getErrorType());
         }
     }
 
