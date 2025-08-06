@@ -9,6 +9,7 @@ import kr.co.yeogiga.domain.trip.dto.TripFcmTokenInfoDto;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.service.TripService;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;
+import kr.co.yeogiga.infrastructure.redis.constant.PinConstant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -147,6 +148,21 @@ public class PinCommandServiceTest {
                 assertEquals(CommonErrorType.TIME_SHOULD_NOT_BEFORE_NOW, exception.getErrorType());
             }
         }
+    }
+
+    @Test
+    @DisplayName("핀 삭제 성공")
+    void deletePinSuccess() {
+        // given
+        Long tripId = 1L;
+        String redisKey = PinConstant.pinKey(tripId);
+        doNothing().when(redisRepository).del(redisKey);
+
+        // when
+        pinCommandService.deletePin(tripId);
+
+        // then
+        verify(redisRepository, times(1)).del(redisKey);
     }
 
 }
