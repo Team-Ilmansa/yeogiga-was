@@ -94,12 +94,14 @@ public class OAuthManagementService {
      * @param platform      OAuth 로그인 플랫폼
      * @param userInfo      OAuth 리소스 서버 제공 사용자 정보
      * @return              User, 추가 정보 입력 필요 여부
+     *
+     * @throws CustomException UserErrorType.ALREADY_WITHDRAW - 이미 탈퇴한 사용자
      */
     private UserStatusDto getUserStatus(OAuthPlatform platform, UserInfoDto userInfo) {
         return userService.readIncludeDeletedUserByPlatformAndPlatformId(platform, userInfo.platformId())
                 .map(user -> {
-                    if (!Objects.isNull(user.getDeletedAt())) {
-                        user.revertWithdrawal();
+                    if (user.isDeleted()) {
+                        throw new CustomException(UserErrorType.ALREADY_WITHDRAW);
                     }
 
                     return user.isSignedUp()
