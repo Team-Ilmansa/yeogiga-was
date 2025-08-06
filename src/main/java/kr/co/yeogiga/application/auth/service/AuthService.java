@@ -14,8 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
-
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -56,14 +54,21 @@ public class AuthService {
      * @param request               로그인 요청 dto(username, password)
      * @throws CustomException      AuthErrorType.AUTHENTICATION_FAIL 아이디 및 비밀번호 불일치
      * @return                      토큰(accessToken, refreshToken)
+     *
+     * @throws CustomException      UserErrorType.ALREADY_WITHDRAW - 이미 탈퇴한 사용자
+     *                              AuthErrorType.AUTHENTICATION_FAIL - 아이디 미존재
+     *                              AuthErrorType.AUTHENTICATION_FAIL - 비밀번호 불일치
      */
     @Transactional
     public TokenDto signIn(SignInDto.Request request) {
         User user = userService.readIncludeDeletedUserByUsername(request.username())
                 .orElseThrow(() -> new CustomException(AuthErrorType.AUTHENTICATION_FAIL));
 
-        if (Objects.nonNull(user.getDeletedAt())) {
-            user.revertWithdrawal();
+        if (user.isDeleted()) {
+            throw new CustomException(
+                    UserErrorType.ALREADY_WITHDRAW,
+                    SignInDto.WithdrawnUserInfo.of(user.getId(), user.getDeletedAt())
+            );
         }
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
@@ -124,5 +129,24 @@ public class AuthService {
         if (userService.existsIncludeDeletedByNickname(nickname)) {
             throw new CustomException(AuthErrorType.ALREADY_USED_NICKNAME);
         }
+    }
+    
+    /**
+     * 탈퇴(soft delete)된 사용자의 계정을 복구하는 메서드
+     *
+     * @param userId    사용자 ID
+     *
+     * @ throws CustomException AuthErrorType.NOT_WITHDRAWN - 탈퇴하지 않은 사용자인 경우
+     */
+    @Transactional
+    public void restoreUser(Long userId) {
+        User user = userService.readIncludeDeletedUserById(userId)
+                .orElseThrow(() -> new CustomException(UserErrorType.NOT_FOUND));
+        
+        if (!user.isDeleted()) {
+            throw new CustomException(AuthErrorType.NOT_WITHDRAWN);
+        }
+        
+        user.revertWithdrawal();
     }
 }

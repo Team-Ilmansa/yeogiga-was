@@ -1,6 +1,7 @@
 package kr.co.yeogiga.presentation.auth.controller;
 
 import jakarta.validation.Valid;
+import kr.co.yeogiga.application.auth.dto.RestoreDto;
 import kr.co.yeogiga.application.auth.dto.SignInDto;
 import kr.co.yeogiga.application.auth.dto.SignUpDto;
 import kr.co.yeogiga.application.auth.dto.TokenDto;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -104,5 +106,12 @@ public class AuthController implements AuthApi {
                 .code(HttpStatus.OK.value())
                 .message("사용 가능한 닉네임입니다.")
                 .build());
+    }
+    
+    @Override
+    @PutMapping("/restore")
+    public ResponseEntity<?> restoreUser(@Valid @RequestBody RestoreDto.Request request) {
+        authService.restoreUser(request.userId());
+        return ResponseEntity.ok(SuccessResponse.ok());
     }
 }
