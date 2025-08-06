@@ -19,6 +19,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -100,5 +101,9 @@ public class User extends BaseTimeEntity {
     
     public boolean isSameNickname(String nickname) {
         return this.nickname.equals(nickname);
+    }
+    
+    public boolean isDeleted() {
+        return Objects.nonNull(this.deletedAt);
     }
 }
