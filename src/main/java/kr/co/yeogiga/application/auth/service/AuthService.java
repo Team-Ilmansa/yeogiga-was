@@ -14,8 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
-
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -67,7 +65,10 @@ public class AuthService {
                 .orElseThrow(() -> new CustomException(AuthErrorType.AUTHENTICATION_FAIL));
 
         if (user.isDeleted()) {
-            throw new CustomException(UserErrorType.ALREADY_WITHDRAW);
+            throw new CustomException(
+                    UserErrorType.ALREADY_WITHDRAW,
+                    SignInDto.WithdrawnUserInfo.of(user.getId(), user.getDeletedAt())
+            );
         }
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {

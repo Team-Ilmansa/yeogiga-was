@@ -102,7 +102,10 @@ public class OAuthManagementService {
         return userService.readIncludeDeletedUserByPlatformAndPlatformId(platform, userInfo.platformId())
                 .map(user -> {
                     if (user.isDeleted()) {
-                        throw new CustomException(UserErrorType.ALREADY_WITHDRAW);
+                        throw new CustomException(
+                                UserErrorType.ALREADY_WITHDRAW,
+                                SignInDto.WithdrawnUserInfo.of(user.getId(), user.getDeletedAt())
+                        );
                     }
 
                     return user.isSignedUp()

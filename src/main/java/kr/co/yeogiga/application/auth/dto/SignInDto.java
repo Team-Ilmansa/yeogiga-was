@@ -4,6 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 public class SignInDto {
 
     @Builder
@@ -49,6 +52,19 @@ public class SignInDto {
                             .accessToken(this.token.accessToken())
                             .build())
                     .shouldSignup(this.shouldSignup)
+                    .build();
+        }
+    }
+    
+    @Builder
+    public record WithdrawnUserInfo(
+            Long userId,
+            LocalDate deletionExpiration
+    ) {
+        public static WithdrawnUserInfo of(Long userId, LocalDateTime deletedAt) {
+            return WithdrawnUserInfo.builder()
+                    .userId(userId)
+                    .deletionExpiration(deletedAt.toLocalDate().plusDays(7))
                     .build();
         }
     }
