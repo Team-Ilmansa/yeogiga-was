@@ -8,7 +8,7 @@ import java.util.Map;
 
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record ErrorResponse (
+public record ErrorResponse(
         String code,
         String message,
         Map<String, String> errors,
