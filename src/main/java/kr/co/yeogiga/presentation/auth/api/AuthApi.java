@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import kr.co.yeogiga.application.auth.dto.RestoreDto;
 import kr.co.yeogiga.application.auth.dto.SignInDto;
 import kr.co.yeogiga.application.auth.dto.SignUpDto;
 import kr.co.yeogiga.application.auth.type.Device;
@@ -253,4 +254,51 @@ public interface AuthApi {
                     }))
     })
     ResponseEntity<?> checkDuplicatedNickname(@RequestParam(name = "value") String nickname);
+    
+    @TrackApi(description = "계정 복구")
+    @Operation(summary = "계정 복구", description = "탈퇴(soft delete)된 사용자가 계정을 복구하는 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "계정 복구 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "계정 복구 성공", value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다."
+                                        }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "400", description = "계정 복구 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "유효성 검증 실패", value = """
+                                        {
+                                            "code": "G002",
+                                            "errors": {
+                                                "userId": "사용자 ID는 필수 입력값입니다."
+                                            }
+                                        }
+                                    """),
+                            @ExampleObject(name = "탈퇴하지 않은 사용자", value = """
+                                        {
+                                             "code": "A017",
+                                             "message": "탈퇴한 사용자가 아닙니다."
+                                         }
+                                    """),
+                            @ExampleObject(name = "존재하지 않는 사용자", value = """
+                                        {
+                                              "code": "U000",
+                                              "message": "존재하지 않는 사용자입니다."
+                                          }
+                                    """),
+                    })),
+            @ApiResponse(responseCode = "404", description = "계정 복구 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "존재하지 않는 사용자", value = """
+                                        {
+                                              "code": "U000",
+                                              "message": "존재하지 않는 사용자입니다."
+                                          }
+                                    """),
+                    }))
+    })
+    ResponseEntity<?> restoreUser(@Valid @RequestBody RestoreDto.Request request);
 }

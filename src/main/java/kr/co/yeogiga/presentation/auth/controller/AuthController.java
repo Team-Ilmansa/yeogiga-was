@@ -108,6 +108,7 @@ public class AuthController implements AuthApi {
                 .build());
     }
     
+    @Override
     @PutMapping("/restore")
     public ResponseEntity<?> restoreUser(@Valid @RequestBody RestoreDto.Request request) {
         authService.restoreUser(request.userId());
