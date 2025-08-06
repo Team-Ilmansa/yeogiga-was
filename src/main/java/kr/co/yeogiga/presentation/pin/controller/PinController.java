@@ -42,6 +42,7 @@ public class PinController implements PinApi {
                 .body(SuccessResponse.created());
     }
 
+    @Override
     @DeleteMapping("/{tripId}/pin")
     public ResponseEntity<?> deletePin(
             @PathVariable Long tripId
