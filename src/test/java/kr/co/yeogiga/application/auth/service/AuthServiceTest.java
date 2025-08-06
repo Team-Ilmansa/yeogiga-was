@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -349,6 +350,60 @@ public class AuthServiceTest {
 
             // then
             assertEquals(AuthErrorType.ALREADY_USED_NICKNAME, exception.getErrorType());
+        }
+    }
+    
+    @Nested
+    @DisplayName("계정 복구")
+    class RestoreUser {
+        private final Long userId = 1L;
+        private User user = User.builder()
+                .id(userId)
+                .username("username")
+                .nickname("nickname")
+                .password("password")
+                .build();
+        
+        @Test
+        @DisplayName("성공")
+        void success() {
+            // given
+            ReflectionTestUtils.setField(user, "deletedAt", LocalDateTime.now());
+            when(userService.readIncludeDeletedUserById(userId)).thenReturn(Optional.of(user));
+            
+            // when
+            authService.restoreUser(userId);
+            
+            // then
+            assertThat(user.getDeletedAt()).isNull();
+        }
+        
+        @Test
+        @DisplayName("실패 - 존재하지 않는 유저")
+        void failIfUserNotFound() {
+            // given
+            when(userService.readIncludeDeletedUserById(userId)).thenReturn(Optional.empty());
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> authService.restoreUser(userId));
+            
+            // then
+            assertEquals(UserErrorType.NOT_FOUND, exception.getErrorType());
+        }
+        
+        @Test
+        @DisplayName("실패 - 탈퇴하지 않은 사용자")
+        void failIfNotWithdrawnUser() {
+            // given
+            when(userService.readIncludeDeletedUserById(userId)).thenReturn(Optional.of(user));
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> authService.restoreUser(userId));
+            
+            // then
+            assertEquals(AuthErrorType.NOT_WITHDRAWN, exception.getErrorType());
         }
     }
 }
