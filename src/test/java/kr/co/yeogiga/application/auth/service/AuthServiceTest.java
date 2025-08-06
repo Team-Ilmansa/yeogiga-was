@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -270,6 +271,7 @@ public class AuthServiceTest {
         void failWhenDeletedUserSignIn() {
             // given
             User user = User.builder()
+                    .id(1L)
                     .username("testid")
                     .email("test@test.com")
                     .nickname("testnick")
@@ -286,6 +288,9 @@ public class AuthServiceTest {
             
             // then
             assertEquals(UserErrorType.ALREADY_WITHDRAW, exception.getErrorType());
+            SignInDto.WithdrawnUserInfo withdrawnUserInfo = (SignInDto.WithdrawnUserInfo) exception.getData();
+            assertEquals(1L, withdrawnUserInfo.userId());
+            assertEquals(LocalDate.now().plusDays(7), withdrawnUserInfo.deletionExpiration());
         }
     }
 

@@ -13,6 +13,7 @@ import kr.co.yeogiga.common.response.error.type.CommonErrorType;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
+import kr.co.yeogiga.domain.user.exception.UserErrorType;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +30,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -461,6 +465,37 @@ public class AuthControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code").value(AuthErrorType.AUTHENTICATION_FAIL.getCode()))
                     .andExpect(jsonPath("$.message").value(AuthErrorType.AUTHENTICATION_FAIL.getMessage()));;
+        }
+        
+        @Test
+        @DisplayName("실패 - 탈퇴한 사용자")
+        void failAlreadyWithdrawnUser() throws Exception {
+            // given
+            SignInDto.Request request = SignInDto.Request.builder()
+                    .username("testid")
+                    .password("testpw")
+                    .build();
+            
+            doThrow(new CustomException(
+                    UserErrorType.ALREADY_WITHDRAW,
+                    SignInDto.WithdrawnUserInfo.of(1L, LocalDateTime.now()))
+            ).when(authService).signIn(request);
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    post("/api/v1/auth/sign-in")
+                            .header("device", Device.WEB)
+                            .content(objectMapper.writeValueAsBytes(request))
+                            .contentType(MediaType.APPLICATION_JSON)
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(UserErrorType.ALREADY_WITHDRAW.getCode()))
+                    .andExpect(jsonPath("$.message").value(UserErrorType.ALREADY_WITHDRAW.getMessage()))
+                    .andExpect(jsonPath("$.data.userId").value(1L))
+                    .andExpect(jsonPath("$.data.deletionExpiration").value(LocalDate.now().plusDays(7).toString()));
         }
     }
 
