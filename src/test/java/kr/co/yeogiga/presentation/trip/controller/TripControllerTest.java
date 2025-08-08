@@ -40,6 +40,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -375,11 +377,12 @@ public class TripControllerTest {
                                     .build()))
                     .build();
 
-            when(tripQueryService.getAllTrip(any())).thenReturn(List.of(tripSummary));
+            when(tripQueryService.getAllTrip(anyLong(), anyString())).thenReturn(List.of(tripSummary));
 
             // when
             ResultActions resultActions = mockMvc.perform(
                     get("/api/v1/trip")
+                            .queryParam("status", "all")
                             .with(user(userDetails))
             );
 
@@ -389,6 +392,27 @@ public class TripControllerTest {
                     .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()))
                     .andExpect(jsonPath("$.data").isArray())
                     .andExpect(jsonPath("$.data[0].members").isArray());
+        }
+        
+        @Test
+        @DisplayName("실패 - TripStatus 바인딩 불가")
+        void failTripStatusCanNotBinding() throws Exception {
+            // given
+            doThrow(new CustomException(TripErrorType.NOT_SUPPORTED_TRIP_STATUS))
+                    .when(tripQueryService).getAllTrip(anyLong(), anyString());
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip")
+                            .queryParam("status", "fakeValue")
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(TripErrorType.NOT_SUPPORTED_TRIP_STATUS.getCode()))
+                    .andExpect(jsonPath("$.message").value(TripErrorType.NOT_SUPPORTED_TRIP_STATUS.getMessage()));
         }
     }
 
