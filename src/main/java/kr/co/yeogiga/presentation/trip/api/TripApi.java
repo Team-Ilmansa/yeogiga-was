@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @ApiGroup(value = "[여행 API]")
 @Tag(name = "[여행 API]", description = "여행 관련 API")
@@ -162,7 +163,7 @@ public interface TripApi {
             @PathVariable Long tripId);
 
     @TrackApi(description = "사용자가 속한 여행 조회")
-    @Operation(summary = "사용자가 속한 여행 조회", description = "사용자가 속한 여행 조회 API")
+    @Operation(summary = "사용자가 속한 여행 조회", description = "사용자가 속한 여행 조회 API | 여행 상태(All, SETTING, PLANNED, IN_PROGRESS, COMPLETED)에 따른 여행 요약 정보 리스트 반환")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "사용자가 속한 여행 조회 성공",
                     content = @Content(mediaType = "application/json", examples = {
@@ -260,9 +261,29 @@ public interface TripApi {
                                                  "data": []
                                              }
                                     """)
+                    })),
+            @ApiResponse(responseCode = "400", description = "여행 조회 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "여행 상태 바인딩 실패", value = """
+                                             {
+                                                  "code": "T013",
+                                                  "message": "지원하지 않는 여행 타입입니다."
+                                              }
+                                    """)
                     }))
     })
-    ResponseEntity<?> getAllTrip(@AuthenticationPrincipal CustomUserDetailsImpl userDetails);
+    ResponseEntity<?> getAllTrip(
+            @Parameter(description = "여행 상태", examples = {
+                    @ExampleObject(name = "null", value = "null", description = "null 값 시 ALL로 간주"),
+                    @ExampleObject(name = "ALL", value = "ALL"),
+                    @ExampleObject(name = "SETTING", value = "SETTING"),
+                    @ExampleObject(name = "PLANNED", value = "PLANNED"),
+                    @ExampleObject(name = "IN_PROGRESS", value = "IN_PROGRESS"),
+                    @ExampleObject(name = "COMPLETED", value = "COMPLETED"),
+            })
+            @RequestParam(name = "status") String status,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails
+    );
 
     @TrackApi(description = "준비 중 여행 조회")
     @Operation(summary = "준비 중 여행 조회", description = "준비 중 여행 조회 API")
