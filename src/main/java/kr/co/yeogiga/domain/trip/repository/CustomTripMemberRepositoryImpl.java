@@ -2,11 +2,13 @@ package kr.co.yeogiga.domain.trip.repository;
 
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.yeogiga.domain.trip.dto.TripDto;
 import kr.co.yeogiga.domain.trip.entity.QTrip;
 import kr.co.yeogiga.domain.trip.entity.QTripMember;
 import kr.co.yeogiga.domain.trip.entity.Trip;
+import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.user.entity.QUser;
 import lombok.RequiredArgsConstructor;
 
@@ -55,12 +57,15 @@ public class CustomTripMemberRepositoryImpl implements CustomTripMemberRepositor
     }
     
     @Override
-    public List<TripDto.Summary> findAllTripSummaryByUserId(Long userId) {
+    public List<TripDto.Summary> findAllTripSummaryByUserId(Long userId, TravelStatus status) {
         List<Trip> tripList = jpaQueryFactory
                 .select(trip)
                 .from(tripMember)
                 .join(tripMember.trip, trip)
-                .where(tripMember.user.id.eq(userId))
+                .where(
+                        tripMember.user.id.eq(userId),
+                        eqTravelStatus(status)
+                )
                 .fetch();
         
         if (tripList.isEmpty()) {
@@ -102,5 +107,15 @@ public class CustomTripMemberRepositoryImpl implements CustomTripMemberRepositor
                         trip,
                         memberInfoMap.getOrDefault(trip.getId(), List.of()))
                 ).toList();
+    }
+    
+    /**
+     * 여행 상태(TravelStatus) 일치 여부 조건 BooleanExpression 반환 메서드
+     *
+     * @param travelStatus  여행 상태
+     * @return              여행 상태 일치 여부 조건문
+     */
+    private BooleanExpression eqTravelStatus(TravelStatus travelStatus) {
+        return travelStatus == null ? null : trip.travelStatus.eq(travelStatus);
     }
 }
