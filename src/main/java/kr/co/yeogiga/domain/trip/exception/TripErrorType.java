@@ -23,7 +23,12 @@ public enum TripErrorType implements BaseErrorType {
     CALENDAR_ALREADY_EXISTS(HttpStatus.CONFLICT, "T010", "이미 가능한 날짜 정보가 등록되어 있습니다."),
 
     SAME_TRIP_TITLE(HttpStatus.CONFLICT, "T011", "기존과 동일한 여행 제목입니다."),
-    TRIP_ALREADY_STARTED_OR_COMPLETED(HttpStatus.CONFLICT, "T012", "이미 시작되었거나 완료된 여행은 수정할 수 없습니다.");
+    TRIP_ALREADY_STARTED_OR_COMPLETED(HttpStatus.CONFLICT, "T012", "이미 시작되었거나 완료된 여행은 수정할 수 없습니다."),
+    
+    NOT_SUPPORTED_TRIP_STATUS(HttpStatus.BAD_REQUEST, "T013", "지원하지 않는 여행 타입입니다.");
+    
+    
+    
 
     private final HttpStatus httpStatus;
     private final String code;

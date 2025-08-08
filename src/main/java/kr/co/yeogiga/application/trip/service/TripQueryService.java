@@ -1,6 +1,7 @@
 package kr.co.yeogiga.application.trip.service;
 
 import kr.co.yeogiga.application.trip.dto.TripRes;
+import kr.co.yeogiga.application.trip.type.TripStatus;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.dto.TripDto;
@@ -20,6 +21,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -132,8 +134,13 @@ public class TripQueryService {
      * @return              사용자가 속한 여행 목록
      */
     @Transactional(readOnly = true)
-    public List<TripDto.Summary> getAllTrip(Long userId) {
-        return tripMemberService.readAllTripSummaryByUserId(userId);
+    public List<TripDto.Summary> getAllTrip(Long userId, TripStatus tripStatus) {
+        if (tripStatus == TripStatus.ALL) {
+            return tripMemberService.readAllTripSummaryByUserId(userId);
+        } else {
+            TravelStatus travelStatus = TravelStatus.valueOf(tripStatus.name());
+            return tripMemberService.readAllTripSummaryByUserId(userId, travelStatus);
+        }
     }
 
     /**

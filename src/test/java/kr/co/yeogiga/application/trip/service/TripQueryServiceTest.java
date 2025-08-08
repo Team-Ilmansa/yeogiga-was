@@ -1,6 +1,7 @@
 package kr.co.yeogiga.application.trip.service;
 
 import kr.co.yeogiga.application.trip.dto.TripRes;
+import kr.co.yeogiga.application.trip.type.TripStatus;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.dto.TripDto;
 import kr.co.yeogiga.domain.trip.entity.Trip;
@@ -206,36 +207,107 @@ public class TripQueryServiceTest {
     @DisplayName("전체 여행 목록 조회")
     class GetAllTrip {
         private final Long userId = 1L;
-
-        private TripDto.MemberInfo member = TripDto.MemberInfo.builder()
-                .userId(userId)
-                .nickname("nickname")
-                .imageUrl("https://image.com")
-                .build();
         
-        private List<TripDto.MemberInfo> members = List.of(member);
+        public TripDto.Summary generateTripSummary(TravelStatus travelStatus) {
+            TripDto.MemberInfo member = TripDto.MemberInfo.builder()
+                    .userId(userId)
+                    .nickname("nickname")
+                    .imageUrl("https://image.com")
+                    .build();
+            
+            List<TripDto.MemberInfo> members = List.of(member);
+            
+            return TripDto.Summary.builder()
+                    .tripId(1L)
+                    .title("졸업여행")
+                    .city("대구")
+                    .leaderId(userId)
+                    .startedAt(LocalDateTime.now())
+                    .endedAt(LocalDateTime.now().plusDays(7))
+                    .status(travelStatus)
+                    .members(members)
+                    .build();
+        }
         
-        private TripDto.Summary tripSummary = TripDto.Summary.builder()
-                .tripId(1L)
-                .title("졸업여행")
-                .city("대구")
-                .leaderId(userId)
-                .startedAt(LocalDateTime.of(2025, 7, 20, 12, 0))
-                .endedAt(LocalDateTime.of(2025, 7, 30, 12, 0))
-                .status(TravelStatus.PLANNED)
-                .members(members)
-                .build();
-
-
         @Test
-        @DisplayName("성공")
-        void success() {
+        @DisplayName("성공 - status가 ALL인 경우 전체 조회")
+        void successGetAllTripWhenStatusIsALL() {
             // given
-            when(tripMemberService.readAllTripSummaryByUserId(anyLong())).thenReturn(List.of(tripSummary));
-
+            TripDto.Summary trip1 = generateTripSummary(TravelStatus.SETTING);
+            TripDto.Summary trip2 = generateTripSummary(TravelStatus.PLANNED);
+            TripDto.Summary trip3 = generateTripSummary(TravelStatus.IN_PROGRESS);
+            TripDto.Summary trip4 = generateTripSummary(TravelStatus.COMPLETED);
+            
+            when(tripMemberService.readAllTripSummaryByUserId(userId))
+                    .thenReturn(List.of(trip1, trip2, trip3, trip4));
+            
             // when
-            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId);
-
+            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.ALL);
+            
+            // then
+            assertThat(result).hasSize(4);
+        }
+        
+        @Test
+        @DisplayName("성공 - status가 Setting인 경우 전체 조회")
+        void successGetAllTripWhenStatusIsSetting() {
+            // given
+            TripDto.Summary trip1 = generateTripSummary(TravelStatus.SETTING);
+            
+            when(tripMemberService.readAllTripSummaryByUserId(userId, TravelStatus.SETTING))
+                    .thenReturn(List.of(trip1));
+            
+            // when
+            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.SETTING);
+            
+            // then
+            assertThat(result).hasSize(1);
+        }
+        
+        @Test
+        @DisplayName("성공 - status가 Planned인 경우 전체 조회")
+        void successGetAllTripWhenStatusIsPlanned() {
+            // give
+            TripDto.Summary trip1 = generateTripSummary(TravelStatus.PLANNED);
+            
+            when(tripMemberService.readAllTripSummaryByUserId(userId, TravelStatus.PLANNED))
+                    .thenReturn(List.of(trip1));
+            
+            // when
+            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.PLANNED);
+            
+            // then
+            assertThat(result).hasSize(1);
+        }
+        
+        @Test
+        @DisplayName("성공 - status가 In_Progress인 경우 전체 조회")
+        void successGetAllTripWhenStatusISInProgress() {
+            // give
+            TripDto.Summary trip1 = generateTripSummary(TravelStatus.IN_PROGRESS);
+            
+            when(tripMemberService.readAllTripSummaryByUserId(userId, TravelStatus.IN_PROGRESS))
+                    .thenReturn(List.of(trip1));
+            
+            // when
+            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.IN_PROGRESS);
+            
+            // then
+            assertThat(result).hasSize(1);
+        }
+        
+        @Test
+        @DisplayName("성공 - status가 Completed인 경우 전체 조회")
+        void successGetAllTripWhenStatusISInCOMPLETED() {
+            // give
+            TripDto.Summary trip1 = generateTripSummary(TravelStatus.COMPLETED);
+            
+            when(tripMemberService.readAllTripSummaryByUserId(userId, TravelStatus.COMPLETED))
+                    .thenReturn(List.of(trip1));
+            
+            // when
+            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.COMPLETED);
+            
             // then
             assertThat(result).hasSize(1);
         }
@@ -247,7 +319,7 @@ public class TripQueryServiceTest {
             when(tripMemberService.readAllTripSummaryByUserId(userId)).thenReturn(List.of());
 
             // when
-            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId);
+            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.ALL);
 
             // then
             assertThat(result).hasSize(0);

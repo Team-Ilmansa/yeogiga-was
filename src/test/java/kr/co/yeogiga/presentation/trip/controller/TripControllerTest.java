@@ -5,8 +5,10 @@ import kr.co.yeogiga.application.trip.dto.TripReq;
 import kr.co.yeogiga.application.trip.dto.TripRes;
 import kr.co.yeogiga.application.trip.service.TripCommandService;
 import kr.co.yeogiga.application.trip.service.TripQueryService;
+import kr.co.yeogiga.application.trip.type.TripStatus;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.common.response.error.type.CommonErrorType;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
@@ -40,6 +42,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -375,11 +379,12 @@ public class TripControllerTest {
                                     .build()))
                     .build();
 
-            when(tripQueryService.getAllTrip(any())).thenReturn(List.of(tripSummary));
+            when(tripQueryService.getAllTrip(anyLong(), any(TripStatus.class))).thenReturn(List.of(tripSummary));
 
             // when
             ResultActions resultActions = mockMvc.perform(
                     get("/api/v1/trip")
+                            .queryParam("status", "ALL")
                             .with(user(userDetails))
             );
 
@@ -389,6 +394,23 @@ public class TripControllerTest {
                     .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()))
                     .andExpect(jsonPath("$.data").isArray())
                     .andExpect(jsonPath("$.data[0].members").isArray());
+        }
+        
+        @Test
+        @DisplayName("실패 - 미지원 TripStatus 입력")
+        void failTripStatusCanNotBinding() throws Exception {
+            // given & when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip")
+                            .queryParam("status", "fakeValue")
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(CommonErrorType.QUERY_STRING_VALIDATION_ERROR.getCode()))
+                    .andExpect(jsonPath("$.message").value(CommonErrorType.QUERY_STRING_VALIDATION_ERROR.getMessage()));
         }
     }
 

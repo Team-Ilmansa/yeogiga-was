@@ -5,6 +5,7 @@ import kr.co.yeogiga.application.trip.dto.TripReq;
 import kr.co.yeogiga.application.trip.dto.TripRes;
 import kr.co.yeogiga.application.trip.service.TripCommandService;
 import kr.co.yeogiga.application.trip.service.TripQueryService;
+import kr.co.yeogiga.application.trip.type.TripStatus;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.domain.trip.dto.TripDto;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -50,9 +52,12 @@ public class TripController implements TripApi {
 
     @Override
     @GetMapping
-    public ResponseEntity<?> getAllTrip(@AuthenticationPrincipal CustomUserDetailsImpl userDetails) {
-        List<TripDto.Summary> tripList = tripQueryService.getAllTrip(userDetails.getUserId());
-        return ResponseEntity.ok().body(SuccessResponse.from(tripList));
+    public ResponseEntity<?> getAllTrip(
+            @RequestParam(name = "status", required = false) TripStatus status,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails
+    ) {
+        List<TripDto.Summary> result = tripQueryService.getAllTrip(userDetails.getUserId(), status);
+        return ResponseEntity.ok().body(SuccessResponse.from(result));
     }
 
     @Override

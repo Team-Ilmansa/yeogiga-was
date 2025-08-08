@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
@@ -52,8 +54,15 @@ public class GlobalExceptionHandler {
     /* Path Variable 예외 처리 */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ResponseEntity<?> handleValidationException(final MethodArgumentTypeMismatchException e) {
+        BaseErrorType error = CommonErrorType.INTERNAL_SERVER_ERROR;;
+        
+        if (e.getParameter().hasParameterAnnotation(PathVariable.class)) {
+            error = CommonErrorType.PATH_VARIABLE_VALIDATION_ERROR;
+        } else if (e.getParameter().hasParameterAnnotation(RequestParam.class)) {
+            error = CommonErrorType.QUERY_STRING_VALIDATION_ERROR;
+        }
+        
         log.error("[Error Occurred] {}", e.getMessage());
-        BaseErrorType error = CommonErrorType.PATH_VARIABLE_VALIDATION_ERROR;
         return ResponseEntity.status(error.getHttpStatus()).body(ErrorResponse.from(error));
     }
 
