@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.co.yeogiga.application.trip.dto.TripReq;
+import kr.co.yeogiga.application.trip.type.TripStatus;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -272,16 +273,9 @@ public interface TripApi {
                                     """)
                     }))
     })
-    ResponseEntity<?> getAllTrip(
-            @Parameter(description = "여행 상태", examples = {
-                    @ExampleObject(name = "null", value = "null", description = "null 값 시 ALL로 간주"),
-                    @ExampleObject(name = "ALL", value = "ALL"),
-                    @ExampleObject(name = "SETTING", value = "SETTING"),
-                    @ExampleObject(name = "PLANNED", value = "PLANNED"),
-                    @ExampleObject(name = "IN_PROGRESS", value = "IN_PROGRESS"),
-                    @ExampleObject(name = "COMPLETED", value = "COMPLETED"),
-            })
-            @RequestParam(name = "status") String status,
+    public ResponseEntity<?> getAllTrip(
+            @Parameter(description = "여행 상태")
+            @RequestParam(name = "status", required = false) TripStatus status,
             @AuthenticationPrincipal CustomUserDetailsImpl userDetails
     );
 
