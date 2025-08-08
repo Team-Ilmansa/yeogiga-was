@@ -5,8 +5,10 @@ import kr.co.yeogiga.application.trip.dto.TripReq;
 import kr.co.yeogiga.application.trip.dto.TripRes;
 import kr.co.yeogiga.application.trip.service.TripCommandService;
 import kr.co.yeogiga.application.trip.service.TripQueryService;
+import kr.co.yeogiga.application.trip.type.TripStatus;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.common.response.error.type.CommonErrorType;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
@@ -377,12 +379,12 @@ public class TripControllerTest {
                                     .build()))
                     .build();
 
-            when(tripQueryService.getAllTrip(anyLong(), anyString())).thenReturn(List.of(tripSummary));
+            when(tripQueryService.getAllTrip(anyLong(), any(TripStatus.class))).thenReturn(List.of(tripSummary));
 
             // when
             ResultActions resultActions = mockMvc.perform(
                     get("/api/v1/trip")
-                            .queryParam("status", "all")
+                            .queryParam("status", "ALL")
                             .with(user(userDetails))
             );
 
@@ -395,13 +397,9 @@ public class TripControllerTest {
         }
         
         @Test
-        @DisplayName("실패 - TripStatus 바인딩 불가")
+        @DisplayName("실패 - 미지원 TripStatus 입력")
         void failTripStatusCanNotBinding() throws Exception {
-            // given
-            doThrow(new CustomException(TripErrorType.NOT_SUPPORTED_TRIP_STATUS))
-                    .when(tripQueryService).getAllTrip(anyLong(), anyString());
-            
-            // when
+            // given & when
             ResultActions resultActions = mockMvc.perform(
                     get("/api/v1/trip")
                             .queryParam("status", "fakeValue")
@@ -411,8 +409,8 @@ public class TripControllerTest {
             // then
             resultActions
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.code").value(TripErrorType.NOT_SUPPORTED_TRIP_STATUS.getCode()))
-                    .andExpect(jsonPath("$.message").value(TripErrorType.NOT_SUPPORTED_TRIP_STATUS.getMessage()));
+                    .andExpect(jsonPath("$.code").value(CommonErrorType.QUERY_STRING_VALIDATION_ERROR.getCode()))
+                    .andExpect(jsonPath("$.message").value(CommonErrorType.QUERY_STRING_VALIDATION_ERROR.getMessage()));
         }
     }
 
