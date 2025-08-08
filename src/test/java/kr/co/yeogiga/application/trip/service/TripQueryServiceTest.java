@@ -1,6 +1,7 @@
 package kr.co.yeogiga.application.trip.service;
 
 import kr.co.yeogiga.application.trip.dto.TripRes;
+import kr.co.yeogiga.application.trip.type.TripStatus;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.dto.TripDto;
 import kr.co.yeogiga.domain.trip.entity.Trip;
@@ -229,25 +230,6 @@ public class TripQueryServiceTest {
         }
         
         @Test
-        @DisplayName("성공 - status가 null인 경우 전체 조회")
-        void successGetAllTripWhenStatusIsNull() {
-            // given
-            TripDto.Summary trip1 = generateTripSummary(TravelStatus.SETTING);
-            TripDto.Summary trip2 = generateTripSummary(TravelStatus.PLANNED);
-            TripDto.Summary trip3 = generateTripSummary(TravelStatus.IN_PROGRESS);
-            TripDto.Summary trip4 = generateTripSummary(TravelStatus.COMPLETED);
-            
-            when(tripMemberService.readAllTripSummaryByUserId(userId))
-                    .thenReturn(List.of(trip1, trip2, trip3, trip4));
-
-            // when
-            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, null);
-
-            // then
-            assertThat(result).hasSize(4);
-        }
-        
-        @Test
         @DisplayName("성공 - status가 ALL인 경우 전체 조회")
         void successGetAllTripWhenStatusIsALL() {
             // given
@@ -260,7 +242,7 @@ public class TripQueryServiceTest {
                     .thenReturn(List.of(trip1, trip2, trip3, trip4));
             
             // when
-            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, "all");
+            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.ALL);
             
             // then
             assertThat(result).hasSize(4);
@@ -276,7 +258,7 @@ public class TripQueryServiceTest {
                     .thenReturn(List.of(trip1));
             
             // when
-            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, "setting");
+            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.SETTING);
             
             // then
             assertThat(result).hasSize(1);
@@ -292,7 +274,7 @@ public class TripQueryServiceTest {
                     .thenReturn(List.of(trip1));
             
             // when
-            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, "planned");
+            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.PLANNED);
             
             // then
             assertThat(result).hasSize(1);
@@ -308,14 +290,14 @@ public class TripQueryServiceTest {
                     .thenReturn(List.of(trip1));
             
             // when
-            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, "in_progress");
+            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.IN_PROGRESS);
             
             // then
             assertThat(result).hasSize(1);
         }
         
         @Test
-        @DisplayName("성공 - status가 COMPLETED인 경우 전체 조회")
+        @DisplayName("성공 - status가 Completed인 경우 전체 조회")
         void successGetAllTripWhenStatusISInCOMPLETED() {
             // give
             TripDto.Summary trip1 = generateTripSummary(TravelStatus.COMPLETED);
@@ -324,7 +306,7 @@ public class TripQueryServiceTest {
                     .thenReturn(List.of(trip1));
             
             // when
-            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, "completed");
+            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.COMPLETED);
             
             // then
             assertThat(result).hasSize(1);
@@ -337,21 +319,10 @@ public class TripQueryServiceTest {
             when(tripMemberService.readAllTripSummaryByUserId(userId)).thenReturn(List.of());
 
             // when
-            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, null);
+            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.ALL);
 
             // then
             assertThat(result).hasSize(0);
-        }
-        
-        @Test
-        @DisplayName("실패 - tripStatus 값 바인딩 불가")
-        void failIfTripStatusCanNotBinding() {
-            // given & when
-            CustomException exception = assertThrows(CustomException.class, ()
-                    -> tripQueryService.getAllTrip(userId, "fakeValue"));
-            
-            // then
-            assertEquals(TripErrorType.NOT_SUPPORTED_TRIP_STATUS, exception.getErrorType());
         }
     }
 
