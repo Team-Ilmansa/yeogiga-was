@@ -134,13 +134,7 @@ public class TripQueryService {
      * @return              사용자가 속한 여행 목록
      */
     @Transactional(readOnly = true)
-    public List<TripDto.Summary> getAllTrip(Long userId, String status) {
-        TripStatus tripStatus = TripStatus.resolveStatus(status);
-        
-        if (Objects.isNull(tripStatus)) {
-            throw new CustomException(TripErrorType.NOT_SUPPORTED_TRIP_STATUS);
-        }
-        
+    public List<TripDto.Summary> getAllTrip(Long userId, TripStatus tripStatus) {
         if (tripStatus == TripStatus.ALL) {
             return tripMemberService.readAllTripSummaryByUserId(userId);
         } else {
