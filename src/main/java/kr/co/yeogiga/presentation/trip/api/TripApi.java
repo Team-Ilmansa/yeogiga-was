@@ -13,6 +13,8 @@ import jakarta.validation.Valid;
 import kr.co.yeogiga.application.trip.dto.TripReq;
 import kr.co.yeogiga.application.trip.type.TripStatus;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -168,99 +170,302 @@ public interface TripApi {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "사용자가 속한 여행 조회 성공",
                     content = @Content(mediaType = "application/json", examples = {
-                            @ExampleObject(name = "조회 성공", value = """
+                            @ExampleObject(name = "조회 성공 - 전체", value = """
                                              {
-                                                   "code": 200,
-                                                   "message": "요청이 성공하였습니다.",
-                                                   "data": [
-                                                       {
-                                                           "tripId": 1,
-                                                           "title": "새로운 여행1",
-                                                           "city": "경주시",
-                                                           "leaderId": 2,
-                                                           "startedAt": "2025-05-01T12:00:00",
-                                                           "endedAt": "2025-05-02T12:01:00",
-                                                           "status": "COMPLETED",
-                                                           "members": [
+                                                    "code": 200,
+                                                    "message": "요청이 성공하였습니다.",
+                                                    "data": {
+                                                        "content": [
+                                                            {
+                                                                "tripId": 1,
+                                                                "title": "여행1",
+                                                                "city": null,
+                                                                "leaderId": 15,
+                                                                "startedAt": null,
+                                                                "endedAt": null,
+                                                                "status": "SETTING",
+                                                                "members": [
+                                                                    {
+                                                                        "userId": 15,
+                                                                        "nickname": "nick15",
+                                                                        "imageUrl": "https://image.com/image"
+                                                                    },
+                                                                    {
+                                                                        "userId": 14,
+                                                                        "nickname": "nick14",
+                                                                        "imageUrl": null
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "tripId": 3,
+                                                                "title": "여행3",
+                                                                "city": null,
+                                                                "leaderId": 15,
+                                                                "startedAt": null,
+                                                                "endedAt": null,
+                                                                "status": "COMPLETED",
+                                                                "members": [
+                                                                    {
+                                                                        "userId": 15,
+                                                                        "nickname": "nick15",
+                                                                        "imageUrl": "https://image.com/image"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "tripId": 7,
+                                                                "title": "여행6",
+                                                                "city": null,
+                                                                "leaderId": 15,
+                                                                "startedAt": "2025-09-14T12:51:36",
+                                                                "endedAt": "2025-09-18T12:51:40",
+                                                                "status": "PLANNED",
+                                                                "members": [
+                                                                    {
+                                                                        "userId": 15,
+                                                                        "nickname": "nick15",
+                                                                        "imageUrl": "https://image.com/image"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "tripId": 2,
+                                                                "title": "여행2",
+                                                                "city": null,
+                                                                "leaderId": 15,
+                                                                "startedAt": "2025-08-17T12:52:26",
+                                                                "endedAt": "2025-08-23T12:52:40",
+                                                                "status": "SETTING",
+                                                                "members": [
+                                                                    {
+                                                                        "userId": 15,
+                                                                        "nickname": "nick15",
+                                                                        "imageUrl": "https://image.com/image"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "tripId": 6,
+                                                                "title": "여행6",
+                                                                "city": null,
+                                                                "leaderId": 15,
+                                                                "startedAt": "2025-08-16T12:51:14",
+                                                                "endedAt": "2025-08-20T12:51:21",
+                                                                "status": "PLANNED",
+                                                                "members": [
+                                                                    {
+                                                                        "userId": 15,
+                                                                        "nickname": "nick15",
+                                                                        "imageUrl": "https://image.com/image"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ],
+                                                        "page": {
+                                                            "size": 5,
+                                                            "number": 0,
+                                                            "totalElements": 7,
+                                                            "totalPages": 2
+                                                        }
+                                                    }
+                                                }
+                                    """),
+                            @ExampleObject(name = "조회 성공 - SETTING", value = """
+                                             {
+                                                     "code": 200,
+                                                     "message": "요청이 성공하였습니다.",
+                                                     "data": {
+                                                         "content": [
+                                                             {
+                                                                 "tripId": 2,
+                                                                 "title": "여행2",
+                                                                 "city": null,
+                                                                 "leaderId": 15,
+                                                                 "startedAt": "2025-08-17T12:52:26",
+                                                                 "endedAt": "2025-08-23T12:52:40",
+                                                                 "status": "SETTING",
+                                                                 "members": [
+                                                                     {
+                                                                         "userId": 15,
+                                                                         "nickname": "nick15",
+                                                                         "imageUrl": "https://image.com/image"
+                                                                     }
+                                                                 ]
+                                                             },
+                                                             {
+                                                                 "tripId": 1,
+                                                                 "title": "여행1",
+                                                                 "city": null,
+                                                                 "leaderId": 15,
+                                                                 "startedAt": null,
+                                                                 "endedAt": null,
+                                                                 "status": "SETTING",
+                                                                 "members": [
+                                                                     {
+                                                                         "userId": 15,
+                                                                         "nickname": "nick15",
+                                                                         "imageUrl": "https://image.com/image"
+                                                                     },
+                                                                     {
+                                                                         "userId": 14,
+                                                                         "nickname": "nick14",
+                                                                         "imageUrl": null
+                                                                     }
+                                                                 ]
+                                                             }
+                                                         ],
+                                                         "page": {
+                                                             "size": 5,
+                                                             "number": 0,
+                                                             "totalElements": 2,
+                                                             "totalPages": 1
+                                                         }
+                                                     }
+                                                 }
+                                    """),
+                            @ExampleObject(name = "조회 성공 - PLANNED", value = """
+                                             {
+                                                      "code": 200,
+                                                      "message": "요청이 성공하였습니다.",
+                                                      "data": {
+                                                          "content": [
+                                                              {
+                                                                  "tripId": 6,
+                                                                  "title": "여행6",
+                                                                  "city": null,
+                                                                  "leaderId": 15,
+                                                                  "startedAt": "2025-08-16T12:51:14",
+                                                                  "endedAt": "2025-08-20T12:51:21",
+                                                                  "status": "PLANNED",
+                                                                  "members": [
+                                                                      {
+                                                                          "userId": 15,
+                                                                          "nickname": "nick15",
+                                                                          "imageUrl": "https://image.com/image"
+                                                                      }
+                                                                  ]
+                                                              },
+                                                              {
+                                                                  "tripId": 7,
+                                                                  "title": "여행6",
+                                                                  "city": null,
+                                                                  "leaderId": 15,
+                                                                  "startedAt": "2025-09-14T12:51:36",
+                                                                  "endedAt": "2025-09-18T12:51:40",
+                                                                  "status": "PLANNED",
+                                                                  "members": [
+                                                                      {
+                                                                          "userId": 15,
+                                                                          "nickname": "nick15",
+                                                                          "imageUrl": "https://image.com/image"
+                                                                      }
+                                                                  ]
+                                                              }
+                                                          ],
+                                                          "page": {
+                                                              "size": 5,
+                                                              "number": 0,
+                                                              "totalElements": 2,
+                                                              "totalPages": 1
+                                                          }
+                                                      }
+                                                  }
+                                    """),
+                            @ExampleObject(name = "조회 성공 - IN_PROGRESS", value = """
+                                             {
+                                                       "code": 200,
+                                                       "message": "요청이 성공하였습니다.",
+                                                       "data": {
+                                                           "content": [
                                                                {
-                                                                   "userId": 1,
-                                                                   "nickname": "nick3",
-                                                                   "imageUrl": null
-                                                               },
-                                                               {
-                                                                   "userId": 2,
-                                                                   "nickname": "nick",
-                                                                   "imageUrl": null
-                                                               },
-                                                               {
-                                                                   "userId": 3,
-                                                                   "nickname": "nick2",
-                                                                   "imageUrl": null
-                                                               },
-                                                               {
-                                                                   "userId": 4,
-                                                                   "nickname": "testNick",
-                                                                   "imageUrl": null
+                                                                   "tripId": 4,
+                                                                   "title": "여행4",
+                                                                   "city": null,
+                                                                   "leaderId": 15,
+                                                                   "startedAt": "2025-08-13T12:30:54",
+                                                                   "endedAt": "2025-08-20T12:31:08",
+                                                                   "status": "IN_PROGRESS",
+                                                                   "members": [
+                                                                       {
+                                                                           "userId": 15,
+                                                                           "nickname": "nick15",
+                                                                           "imageUrl": "https://image.com/image"
+                                                                       }
+                                                                   ]
                                                                }
-                                                           ]
-                                                       },
-                                                       {
-                                                           "tripId": 2,
-                                                           "title": "여행2",
-                                                           "city": "대구광역시",
-                                                           "leaderId": 2,
-                                                           "startedAt": "2025-05-01T12:00:00",
-                                                           "endedAt": "2025-05-02T12:01:00",
-                                                           "status": "COMPLETED",
-                                                           "members": [
-                                                               {
-                                                                   "userId": 2,
-                                                                   "nickname": "nick",
-                                                                   "imageUrl": null
-                                                               }
-                                                           ]
-                                                       },
-                                                       {
-                                                           "tripId": 3,
-                                                           "title": "여행3",
-                                                           "city": "부산광역시",
-                                                           "leaderId": 2,
-                                                           "startedAt": "2025-05-01T12:00:00",
-                                                           "endedAt": "2025-05-02T12:01:00",
-                                                           "status": "COMPLETED",
-                                                           "members": [
-                                                               {
-                                                                   "userId": 2,
-                                                                   "nickname": "nick",
-                                                                   "imageUrl": null
-                                                               }
-                                                           ]
-                                                       },
-                                                       {
-                                                           "tripId": 4,
-                                                           "title": "여행4",
-                                                           "city": "가평",
-                                                           "leaderId": 2,
-                                                           "startedAt": "2025-05-17T12:00:00",
-                                                           "endedAt": "2025-05-25T12:01:00",
-                                                           "status": "IN_PROGRESS",
-                                                           "members": [
-                                                               {
-                                                                   "userId": 2,
-                                                                   "nickname": "nick",
-                                                                   "imageUrl": null
-                                                               }
-                                                           ]
+                                                           ],
+                                                           "page": {
+                                                               "size": 5,
+                                                               "number": 0,
+                                                               "totalElements": 1,
+                                                               "totalPages": 1
+                                                           }
                                                        }
-                                                   ]
-                                               }
+                                                   }
+                                    """),
+                            @ExampleObject(name = "조회 성공 - COMPLETED", value = """
+                                             {
+                                                        "code": 200,
+                                                        "message": "요청이 성공하였습니다.",
+                                                        "data": {
+                                                            "content": [
+                                                                {
+                                                                    "tripId": 5,
+                                                                    "title": "여행5",
+                                                                    "city": null,
+                                                                    "leaderId": 15,
+                                                                    "startedAt": "2025-08-10T12:32:27",
+                                                                    "endedAt": "2025-08-12T12:32:13",
+                                                                    "status": "COMPLETED",
+                                                                    "members": [
+                                                                        {
+                                                                            "userId": 15,
+                                                                            "nickname": "nick15",
+                                                                            "imageUrl": "https://image.com/image"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "tripId": 3,
+                                                                    "title": "여행3",
+                                                                    "city": null,
+                                                                    "leaderId": 15,
+                                                                    "startedAt": null,
+                                                                    "endedAt": null,
+                                                                    "status": "COMPLETED",
+                                                                    "members": [
+                                                                        {
+                                                                            "userId": 15,
+                                                                            "nickname": "nick15",
+                                                                            "imageUrl": "https://image.com/image"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "page": {
+                                                                "size": 5,
+                                                                "number": 0,
+                                                                "totalElements": 2,
+                                                                "totalPages": 1
+                                                            }
+                                                        }
+                                                    }
                                     """),
                             @ExampleObject(name = "조회 성공 - 속한 여행 없는 경우 빈 배열 반환", value = """
                                              {
-                                                 "code": 200,
-                                                 "message": "요청이 성공하였습니다.",
-                                                 "data": []
-                                             }
+                                                  "code": 200,
+                                                  "message": "요청이 성공하였습니다.",
+                                                  "data": {
+                                                      "content": [],
+                                                      "page": {
+                                                          "size": 0,
+                                                          "number": 0,
+                                                          "totalElements": 0,
+                                                          "totalPages": 1
+                                                      }
+                                                  }
+                                              }
                                     """)
                     })),
             @ApiResponse(responseCode = "400", description = "여행 조회 실패",
@@ -276,6 +481,10 @@ public interface TripApi {
     public ResponseEntity<?> getAllTrip(
             @Parameter(description = "여행 상태")
             @RequestParam(name = "status", required = false) TripStatus status,
+            
+            @Parameter(example = "page=0&size=10&sort=createdAt,desc", hidden = true)
+            @PageableDefault(size = 5) Pageable pageable,
+            
             @AuthenticationPrincipal CustomUserDetailsImpl userDetails
     );
 
