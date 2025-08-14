@@ -136,7 +136,8 @@ public class TripQueryService {
      */
     @Transactional(readOnly = true)
     public Page<TripDto.Summary> getAllTrip(Long userId, TripStatus tripStatus, Pageable pageable) {
-        if (tripStatus == TripStatus.ALL) {
+        // TODO: 기존 프론트엔드 API 호환성을 위한 null 값 처리 유지. 차후 프론트 API 호출 로직 변경 시 null값 처리 삭제 예정
+        if (tripStatus == TripStatus.ALL || tripStatus == null) {
             return tripMemberService.readAllTripSummaryByUserId(userId, pageable);
         } else {
             TravelStatus travelStatus = TravelStatus.valueOf(tripStatus.name());
