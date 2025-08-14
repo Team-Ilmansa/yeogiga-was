@@ -12,6 +12,8 @@ import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +23,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -134,12 +135,13 @@ public class TripQueryService {
      * @return              사용자가 속한 여행 목록
      */
     @Transactional(readOnly = true)
-    public List<TripDto.Summary> getAllTrip(Long userId, TripStatus tripStatus) {
-        if (tripStatus == TripStatus.ALL) {
-            return tripMemberService.readAllTripSummaryByUserId(userId);
+    public Page<TripDto.Summary> getAllTrip(Long userId, TripStatus tripStatus, Pageable pageable) {
+        // TODO: 기존 프론트엔드 API 호환성을 위한 null 값 처리 유지. 차후 프론트 API 호출 로직 변경 시 null값 처리 삭제 예정
+        if (tripStatus == TripStatus.ALL || tripStatus == null) {
+            return tripMemberService.readAllTripSummaryByUserId(userId, pageable);
         } else {
             TravelStatus travelStatus = TravelStatus.valueOf(tripStatus.name());
-            return tripMemberService.readAllTripSummaryByUserId(userId, travelStatus);
+            return tripMemberService.readAllTripSummaryByUserId(userId, travelStatus, pageable);
         }
     }
 

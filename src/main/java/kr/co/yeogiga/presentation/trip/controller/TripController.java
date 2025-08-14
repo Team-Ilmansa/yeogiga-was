@@ -11,6 +11,9 @@ import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.domain.trip.dto.TripDto;
 import kr.co.yeogiga.presentation.trip.api.TripApi;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -54,9 +57,10 @@ public class TripController implements TripApi {
     @GetMapping
     public ResponseEntity<?> getAllTrip(
             @RequestParam(name = "status", required = false) TripStatus status,
+            @PageableDefault(size = 5) Pageable pageable,
             @AuthenticationPrincipal CustomUserDetailsImpl userDetails
     ) {
-        List<TripDto.Summary> result = tripQueryService.getAllTrip(userDetails.getUserId(), status);
+        Page<TripDto.Summary> result = tripQueryService.getAllTrip(userDetails.getUserId(), status, pageable);
         return ResponseEntity.ok().body(SuccessResponse.from(result));
     }
 

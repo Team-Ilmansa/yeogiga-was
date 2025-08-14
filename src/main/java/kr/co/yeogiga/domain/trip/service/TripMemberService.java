@@ -7,6 +7,8 @@ import kr.co.yeogiga.domain.trip.repository.TripMemberRepository;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,12 +31,12 @@ public class TripMemberService {
         return tripMemberRepository.findTripSummaryByTripId(tripId);
     }
     
-    public List<TripDto.Summary> readAllTripSummaryByUserId(Long userId) {
-        return tripMemberRepository.findAllTripSummaryByUserId(userId, null);
+    public Page<TripDto.Summary> readAllTripSummaryByUserId(Long userId, Pageable pageable) {
+        return tripMemberRepository.findAllTripSummaryByUserId(userId, null, pageable);
     }
     
-    public List<TripDto.Summary> readAllTripSummaryByUserId(Long userId, TravelStatus status) {
-        return tripMemberRepository.findAllTripSummaryByUserId(userId, status);
+    public Page<TripDto.Summary> readAllTripSummaryByUserId(Long userId, TravelStatus status, Pageable pageable) {
+        return tripMemberRepository.findAllTripSummaryByUserId(userId, status, pageable);
     }
 
     public List<Trip> readAllSettingTripByUserId(Long userId) {

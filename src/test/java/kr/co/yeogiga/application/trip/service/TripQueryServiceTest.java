@@ -22,19 +22,23 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -229,6 +233,8 @@ public class TripQueryServiceTest {
                     .build();
         }
         
+        private Pageable pageable = PageRequest.of(0, 5);
+        
         @Test
         @DisplayName("성공 - status가 ALL인 경우 전체 조회")
         void successGetAllTripWhenStatusIsALL() {
@@ -238,14 +244,14 @@ public class TripQueryServiceTest {
             TripDto.Summary trip3 = generateTripSummary(TravelStatus.IN_PROGRESS);
             TripDto.Summary trip4 = generateTripSummary(TravelStatus.COMPLETED);
             
-            when(tripMemberService.readAllTripSummaryByUserId(userId))
-                    .thenReturn(List.of(trip1, trip2, trip3, trip4));
+            when(tripMemberService.readAllTripSummaryByUserId(userId, pageable))
+                    .thenReturn(new PageImpl<>(List.of(trip1, trip2, trip3, trip4)));
             
             // when
-            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.ALL);
+            Page<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.ALL, pageable);
             
             // then
-            assertThat(result).hasSize(4);
+            assertThat(result.getContent()).hasSize(4);
         }
         
         @Test
@@ -254,14 +260,14 @@ public class TripQueryServiceTest {
             // given
             TripDto.Summary trip1 = generateTripSummary(TravelStatus.SETTING);
             
-            when(tripMemberService.readAllTripSummaryByUserId(userId, TravelStatus.SETTING))
-                    .thenReturn(List.of(trip1));
+            when(tripMemberService.readAllTripSummaryByUserId(userId, TravelStatus.SETTING, pageable))
+                    .thenReturn(new PageImpl<>(List.of(trip1)));
             
             // when
-            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.SETTING);
+            Page<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.SETTING, pageable);
             
             // then
-            assertThat(result).hasSize(1);
+            assertThat(result.getContent()).hasSize(1);
         }
         
         @Test
@@ -270,11 +276,11 @@ public class TripQueryServiceTest {
             // give
             TripDto.Summary trip1 = generateTripSummary(TravelStatus.PLANNED);
             
-            when(tripMemberService.readAllTripSummaryByUserId(userId, TravelStatus.PLANNED))
-                    .thenReturn(List.of(trip1));
+            when(tripMemberService.readAllTripSummaryByUserId(userId, TravelStatus.PLANNED, pageable))
+                    .thenReturn(new PageImpl<>(List.of(trip1)));
             
             // when
-            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.PLANNED);
+            Page<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.PLANNED, pageable);
             
             // then
             assertThat(result).hasSize(1);
@@ -286,11 +292,11 @@ public class TripQueryServiceTest {
             // give
             TripDto.Summary trip1 = generateTripSummary(TravelStatus.IN_PROGRESS);
             
-            when(tripMemberService.readAllTripSummaryByUserId(userId, TravelStatus.IN_PROGRESS))
-                    .thenReturn(List.of(trip1));
+            when(tripMemberService.readAllTripSummaryByUserId(userId, TravelStatus.IN_PROGRESS, pageable))
+                    .thenReturn(new PageImpl<>(List.of(trip1)));
             
             // when
-            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.IN_PROGRESS);
+            Page<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.IN_PROGRESS, pageable);
             
             // then
             assertThat(result).hasSize(1);
@@ -302,11 +308,11 @@ public class TripQueryServiceTest {
             // give
             TripDto.Summary trip1 = generateTripSummary(TravelStatus.COMPLETED);
             
-            when(tripMemberService.readAllTripSummaryByUserId(userId, TravelStatus.COMPLETED))
-                    .thenReturn(List.of(trip1));
+            when(tripMemberService.readAllTripSummaryByUserId(userId, TravelStatus.COMPLETED, pageable))
+                    .thenReturn(new PageImpl<>(List.of(trip1)));
             
             // when
-            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.COMPLETED);
+            Page<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.COMPLETED, pageable);
             
             // then
             assertThat(result).hasSize(1);
@@ -316,13 +322,13 @@ public class TripQueryServiceTest {
         @DisplayName("성공 - 빈 배열 반환")
         void successEmptyList() {
             // given
-            when(tripMemberService.readAllTripSummaryByUserId(userId)).thenReturn(List.of());
+            when(tripMemberService.readAllTripSummaryByUserId(userId, pageable)).thenReturn(Page.empty());
 
             // when
-            List<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.ALL);
+            Page<TripDto.Summary> result = tripQueryService.getAllTrip(userId, TripStatus.ALL, pageable);
 
             // then
-            assertThat(result).hasSize(0);
+            assertThat(result.getContent()).hasSize(0);
         }
     }
 
