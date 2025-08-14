@@ -394,8 +394,8 @@ public class TripControllerTest {
             resultActions
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()))
-                    .andExpect(jsonPath("$.data").isArray())
-                    .andExpect(jsonPath("$.data[0].members").isArray());
+                    .andExpect(jsonPath("$.data.content").isArray())
+                    .andExpect(jsonPath("$.data.content[0].members").isArray());
         }
         
         @Test
