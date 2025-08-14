@@ -1,8 +1,13 @@
 package kr.co.yeogiga.domain.trip.repository;
 
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.yeogiga.domain.trip.dto.TripDto;
 import kr.co.yeogiga.domain.trip.entity.QTrip;
@@ -11,8 +16,10 @@ import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.user.entity.QUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -57,7 +64,7 @@ public class CustomTripMemberRepositoryImpl implements CustomTripMemberRepositor
     }
     
     @Override
-    public List<TripDto.Summary> findAllTripSummaryByUserId(Long userId, TravelStatus status) {
+    public Page<TripDto.Summary> findAllTripSummaryByUserId(Long userId, TravelStatus status, Pageable pageable) {
         List<Trip> tripList = jpaQueryFactory
                 .select(trip)
                 .from(tripMember)
@@ -66,10 +73,13 @@ public class CustomTripMemberRepositoryImpl implements CustomTripMemberRepositor
                         tripMember.user.id.eq(userId),
                         eqTravelStatus(status)
                 )
+                .orderBy(getOrderSpecifiers(status))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
         
         if (tripList.isEmpty()) {
-            return Collections.emptyList();
+            return Page.empty();
         }
         
         List<Long> tripIds = tripList.stream()
@@ -102,11 +112,22 @@ public class CustomTripMemberRepositoryImpl implements CustomTripMemberRepositor
                         )
                 ));
         
-        return tripList.stream()
+        List<TripDto.Summary> tripSummaries = tripList.stream()
                 .map(trip -> TripDto.Summary.from(
                         trip,
                         memberInfoMap.getOrDefault(trip.getId(), List.of()))
                 ).toList();
+        
+        JPAQuery<Long> count = jpaQueryFactory
+                .select(trip.count())
+                .from(tripMember)
+                .join(tripMember.trip, trip)
+                .where(
+                        tripMember.user.id.eq(userId),
+                        eqTravelStatus(status)
+                );
+        
+        return PageableExecutionUtils.getPage(tripSummaries, pageable, count::fetchOne);
     }
     
     /**
@@ -117,5 +138,29 @@ public class CustomTripMemberRepositoryImpl implements CustomTripMemberRepositor
      */
     private BooleanExpression eqTravelStatus(TravelStatus travelStatus) {
         return travelStatus == null ? null : trip.travelStatus.eq(travelStatus);
+    }
+    
+    /**
+     * 여행 상태를 바탕으로 정렬 기준을 제공하는 메서드
+     * - 전체: 시작 일자 내림차순, null 값 우선 배치
+     * - SETTING, PLANNED, IN_PROGRESS: 시작 일자 오름차순, null 값 후순위 배치
+     * - COMPLETED: 종료 일자 내림차순, null 값 후순위 배치
+     *
+     * @param travelStatus  여행 상태
+     * @return              상태별 정렬 기준을 담은 OrderSpecifier 객체
+     */
+    private OrderSpecifier getOrderSpecifiers(TravelStatus travelStatus) {
+        Path<Object> target = Expressions.path(Object.class, trip.startedAt.getMetadata().getName());
+        
+        if (travelStatus == null) {
+            return new OrderSpecifier(Order.DESC, target, OrderSpecifier.NullHandling.NullsFirst);
+        } else if (travelStatus == TravelStatus.SETTING || travelStatus == TravelStatus.PLANNED || travelStatus== TravelStatus.IN_PROGRESS) {
+            return new OrderSpecifier(Order.ASC, target, OrderSpecifier.NullHandling.NullsLast);
+        } else if (travelStatus == TravelStatus.COMPLETED) {
+            target = Expressions.path(Object.class, trip, trip.endedAt.getMetadata().getName());
+            return new OrderSpecifier(Order.DESC, target, OrderSpecifier.NullHandling.NullsLast);
+        } else {
+            return null;
+        }
     }
 }
