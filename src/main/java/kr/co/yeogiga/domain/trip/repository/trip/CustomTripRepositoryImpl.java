@@ -1,4 +1,4 @@
-package kr.co.yeogiga.domain.trip.repository;
+package kr.co.yeogiga.domain.trip.repository.trip;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
