@@ -30,7 +30,8 @@ public class Place {
 
     private Double longitude;
 
-    private Double order;
+    @Column(name = "sort_order")
+    private int sortOrder;
 
     @Column(name = "is_visited")
     private boolean isVisited;
@@ -45,11 +46,11 @@ public class Place {
 
     @Builder
     public Place(String name, Double latitude, Double longitude,
-                 PlaceCategory placeType, Double order, TripDay tripDay) {
+                 PlaceCategory placeType, int sortOrder, TripDay tripDay) {
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.order = order;
+        this.sortOrder = sortOrder;
         this.isVisited = false;
         this.placeType = placeType;
         this.tripDay = tripDay;
