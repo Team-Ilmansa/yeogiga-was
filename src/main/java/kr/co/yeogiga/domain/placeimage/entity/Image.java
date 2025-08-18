@@ -1,4 +1,4 @@
-package kr.co.yeogiga.domain.tripplace.entity;
+package kr.co.yeogiga.domain.placeimage.entity;
 
 import lombok.Builder;
 import lombok.Getter;
