@@ -1,7 +1,7 @@
 package kr.co.yeogiga.application.place.application;
 
 import kr.co.yeogiga.common.exception.CustomException;
-import kr.co.yeogiga.domain.place.exception.PlaceErrorType;
+import kr.co.yeogiga.domain.trip.exception.PlaceErrorType;
 import kr.co.yeogiga.infrastructure.place.PlaceSearchClient;
 import kr.co.yeogiga.infrastructure.place.dto.PlaceInfoDto;
 import lombok.RequiredArgsConstructor;
