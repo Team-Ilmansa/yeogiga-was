@@ -1,6 +1,7 @@
 package kr.co.yeogiga.domain.tripplace.entity;
 
-import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
+import kr.co.yeogiga.domain.placeimage.entity.Image;
+import kr.co.yeogiga.domain.trip.type.PlaceCategory;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.mongodb.core.mapping.Field;

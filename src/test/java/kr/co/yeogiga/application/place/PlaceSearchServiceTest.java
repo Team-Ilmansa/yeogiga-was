@@ -2,7 +2,7 @@ package kr.co.yeogiga.application.place;
 
 import kr.co.yeogiga.application.place.application.PlaceSearchService;
 import kr.co.yeogiga.common.exception.CustomException;
-import kr.co.yeogiga.domain.place.exception.PlaceErrorType;
+import kr.co.yeogiga.domain.trip.exception.PlaceErrorType;
 import kr.co.yeogiga.infrastructure.place.PlaceSearchClient;
 import kr.co.yeogiga.infrastructure.place.dto.NaverPlaceInfoDto;
 import kr.co.yeogiga.infrastructure.place.dto.PlaceInfoDto;

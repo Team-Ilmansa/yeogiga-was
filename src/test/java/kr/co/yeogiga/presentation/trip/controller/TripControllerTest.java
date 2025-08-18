@@ -18,7 +18,7 @@ import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
-import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
+import kr.co.yeogiga.domain.trip.type.PlaceCategory;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.type.Role;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
@@ -45,7 +45,6 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;

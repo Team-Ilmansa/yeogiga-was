@@ -4,7 +4,7 @@ import kr.co.yeogiga.application.tripplace.image.dto.FavoriteImageRes;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageRes;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
-import kr.co.yeogiga.domain.tripplace.entity.Image;
+import kr.co.yeogiga.domain.placeimage.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import lombok.RequiredArgsConstructor;

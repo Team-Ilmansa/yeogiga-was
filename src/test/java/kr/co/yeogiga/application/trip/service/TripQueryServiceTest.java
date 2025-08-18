@@ -11,7 +11,7 @@ import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
-import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
+import kr.co.yeogiga.domain.trip.type.PlaceCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -32,7 +32,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 

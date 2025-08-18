@@ -2,7 +2,7 @@ package kr.co.yeogiga.application.image;
 
 import kr.co.yeogiga.application.image.dto.TempImageDto;
 import kr.co.yeogiga.application.image.service.TempPlaceImagesQueryService;
-import kr.co.yeogiga.domain.tripplace.entity.Image;
+import kr.co.yeogiga.domain.placeimage.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.TempPlaceImages;
 import kr.co.yeogiga.domain.tripplace.service.TempPlaceImagesService;
 import org.junit.jupiter.api.DisplayName;

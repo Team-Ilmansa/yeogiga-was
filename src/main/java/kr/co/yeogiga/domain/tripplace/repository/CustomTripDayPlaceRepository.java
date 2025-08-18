@@ -1,6 +1,6 @@
 package kr.co.yeogiga.domain.tripplace.repository;
 
-import kr.co.yeogiga.domain.tripplace.entity.Image;
+import kr.co.yeogiga.domain.placeimage.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 

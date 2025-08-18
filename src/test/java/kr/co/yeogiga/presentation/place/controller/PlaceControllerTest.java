@@ -5,7 +5,7 @@ import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
-import kr.co.yeogiga.domain.place.exception.PlaceErrorType;
+import kr.co.yeogiga.domain.trip.exception.PlaceErrorType;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.type.Role;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;

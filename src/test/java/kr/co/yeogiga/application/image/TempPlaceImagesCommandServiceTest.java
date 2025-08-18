@@ -3,7 +3,7 @@ package kr.co.yeogiga.application.image;
 import kr.co.yeogiga.application.image.dto.ImageDeleteDto;
 import kr.co.yeogiga.application.image.service.ImageDeleteProcessor;
 import kr.co.yeogiga.application.image.service.TempPlaceImagesCommandService;
-import kr.co.yeogiga.domain.tripplace.entity.Image;
+import kr.co.yeogiga.domain.placeimage.entity.Image;
 import kr.co.yeogiga.domain.tripplace.service.TempPlaceImagesService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

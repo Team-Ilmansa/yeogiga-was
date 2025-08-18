@@ -1,7 +1,7 @@
 package kr.co.yeogiga.application.tripplace.service;
 
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
-import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
+import kr.co.yeogiga.domain.trip.type.PlaceCategory;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;
 import kr.co.yeogiga.infrastructure.redis.constant.PlaceConstant;
 import org.junit.jupiter.api.DisplayName;

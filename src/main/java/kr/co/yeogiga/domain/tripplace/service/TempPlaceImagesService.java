@@ -1,6 +1,6 @@
 package kr.co.yeogiga.domain.tripplace.service;
 
-import kr.co.yeogiga.domain.tripplace.entity.Image;
+import kr.co.yeogiga.domain.placeimage.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.TempPlaceImages;
 import kr.co.yeogiga.domain.tripplace.repository.TempPlaceImagesRepository;
 import lombok.RequiredArgsConstructor;

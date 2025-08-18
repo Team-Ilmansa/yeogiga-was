@@ -1,6 +1,5 @@
-package kr.co.yeogiga.domain.tripplace.entity;
+package kr.co.yeogiga.domain.placeimage.entity;
 
-import kr.co.yeogiga.domain.placeimage.entity.Image;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,16 +12,17 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Document(collection = "temp_place_images")
-public class TempPlaceImages {
+@Document(collection = "place_image")
+public class PlaceImage {
     @Id
     private String id;
-    private String tripDayPlaceId;
+    private Long placeId;
     private List<Image> images;
 
     @Builder
-    public TempPlaceImages(String tripDayPlaceId) {
-        this.tripDayPlaceId = tripDayPlaceId;
+    public PlaceImage(Long placeId) {
         this.images = new ArrayList<>();
+        this.placeId = placeId;
     }
+
 }

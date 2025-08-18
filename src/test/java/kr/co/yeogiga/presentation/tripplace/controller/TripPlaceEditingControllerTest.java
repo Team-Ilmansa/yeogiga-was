@@ -8,7 +8,7 @@ import kr.co.yeogiga.application.tripplace.service.TripPlaceSortService;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
-import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
+import kr.co.yeogiga.domain.trip.type.PlaceCategory;
 import kr.co.yeogiga.infrastructure.config.security.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

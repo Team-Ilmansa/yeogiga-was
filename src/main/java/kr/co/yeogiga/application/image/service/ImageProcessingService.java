@@ -2,7 +2,7 @@ package kr.co.yeogiga.application.image.service;
 
 import kr.co.yeogiga.application.image.dto.ImageMetadataDto;
 import kr.co.yeogiga.application.image.dto.ImageUploadRequest;
-import kr.co.yeogiga.domain.tripplace.entity.Image;
+import kr.co.yeogiga.domain.placeimage.entity.Image;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.service.UserService;
 import kr.co.yeogiga.infrastructure.s3.AwsS3Storage;

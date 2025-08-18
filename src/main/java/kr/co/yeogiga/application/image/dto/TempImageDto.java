@@ -1,6 +1,6 @@
 package kr.co.yeogiga.application.image.dto;
 
-import kr.co.yeogiga.domain.tripplace.entity.Image;
+import kr.co.yeogiga.domain.placeimage.entity.Image;
 
 public record TempImageDto(
         String id,

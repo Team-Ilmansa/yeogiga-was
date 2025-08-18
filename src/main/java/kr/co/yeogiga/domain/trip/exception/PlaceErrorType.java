@@ -1,4 +1,4 @@
-package kr.co.yeogiga.domain.place.exception;
+package kr.co.yeogiga.domain.trip.exception;
 
 import kr.co.yeogiga.common.response.error.type.BaseErrorType;
 import lombok.RequiredArgsConstructor;
