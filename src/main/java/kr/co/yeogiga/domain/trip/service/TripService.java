@@ -3,7 +3,7 @@ package kr.co.yeogiga.domain.trip.service;
 import kr.co.yeogiga.domain.trip.dto.TripFcmTokenInfoDto;
 import kr.co.yeogiga.domain.trip.dto.TripFcmTokenQueryDto;
 import kr.co.yeogiga.domain.trip.entity.Trip;
-import kr.co.yeogiga.domain.trip.repository.TripRepository;
+import kr.co.yeogiga.domain.trip.repository.trip.TripRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

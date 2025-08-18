@@ -1,4 +1,4 @@
-package kr.co.yeogiga.domain.trip.repository;
+package kr.co.yeogiga.domain.trip.repository.trip;
 
 import kr.co.yeogiga.domain.trip.dto.TripFcmTokenInfoDto;
 import kr.co.yeogiga.domain.trip.dto.TripFcmTokenQueryDto;

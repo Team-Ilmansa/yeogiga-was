@@ -1,4 +1,4 @@
-package kr.co.yeogiga.domain.trip.repository;
+package kr.co.yeogiga.domain.trip.repository.tripmember;
 
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
