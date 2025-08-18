@@ -1,7 +1,7 @@
 package kr.co.yeogiga.application.tripplace.image.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import kr.co.yeogiga.domain.tripplace.entity.Image;
+import kr.co.yeogiga.domain.placeimage.entity.Image;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import lombok.Builder;
 

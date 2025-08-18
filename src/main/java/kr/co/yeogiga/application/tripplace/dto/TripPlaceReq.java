@@ -2,7 +2,7 @@ package kr.co.yeogiga.application.tripplace.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
-import kr.co.yeogiga.domain.tripplace.type.PlaceCategory;
+import kr.co.yeogiga.domain.trip.type.PlaceCategory;
 import lombok.Builder;
 
 import java.util.List;

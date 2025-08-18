@@ -1,7 +1,7 @@
 package kr.co.yeogiga.application.image.service;
 
 import kr.co.yeogiga.application.image.dto.ImageDeleteDto;
-import kr.co.yeogiga.domain.tripplace.entity.Image;
+import kr.co.yeogiga.domain.placeimage.entity.Image;
 import kr.co.yeogiga.domain.tripplace.service.TempPlaceImagesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
