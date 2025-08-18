@@ -1,6 +1,6 @@
 package kr.co.yeogiga.application.tripplace.service;
 
-import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceReqLegacy;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
@@ -32,10 +32,10 @@ public class TripPlaceEditingService {
      *
      * @param tripId : 여행 ID
      * @param day    : 여행 일차
-     * @param place  : 추가할 TripPlaceReq.Request 객체
+     * @param place  : 추가할 TripPlaceReqLegacy.Request 객체
      * @throws CustomException - ALREADY_ADDED_PLACE : 이미 목적지를 추가한 경우
      */
-    public void assignPlaceToDay(Long tripId, int day, TripPlaceReq.Request place) {
+    public void assignPlaceToDay(Long tripId, int day, TripPlaceReqLegacy.Request place) {
         String listKey = PlaceConstant.dayPlacesKey(tripId, day);
         String setKey = PlaceConstant.dayPlaceSetKey(tripId, day);
 
@@ -57,8 +57,8 @@ public class TripPlaceEditingService {
      */
     public List<TripPlaceRes.TempPlaceInfo> getAssignedPlaces(Long tripId, int day) {
         String dayPlacesKey = PlaceConstant.dayPlacesKey(tripId, day);
-        List<TripPlaceReq.StoredFormat> places =
-                redisRepository.getList(dayPlacesKey, TripPlaceReq.StoredFormat.class);
+        List<TripPlaceReqLegacy.StoredFormat> places =
+                redisRepository.getList(dayPlacesKey, TripPlaceReqLegacy.StoredFormat.class);
 
         return places.stream().map(TripPlaceRes.TempPlaceInfo::from).toList();
     }
@@ -76,7 +76,7 @@ public class TripPlaceEditingService {
         String dayPlacesKey = PlaceConstant.dayPlacesKey(tripId, day);
         String dayPlaceSetKey = PlaceConstant.dayPlaceSetKey(tripId, day);
 
-        TripPlaceReq.StoredFormat target = findPlaceInList(dayPlacesKey, placeId);
+        TripPlaceReqLegacy.StoredFormat target = findPlaceInList(dayPlacesKey, placeId);
         if (target == null) {
             return;
         }
@@ -94,8 +94,8 @@ public class TripPlaceEditingService {
      * @param placeId : 조회할 장소의 ID
      * @return : 일치하는 장소가 존재하면 해당 객체, 없으면 null 반환
      */
-    private TripPlaceReq.StoredFormat findPlaceInList(String listKey, String placeId) {
-        List<TripPlaceReq.StoredFormat> places = redisRepository.getList(listKey, TripPlaceReq.StoredFormat.class);
+    private TripPlaceReqLegacy.StoredFormat findPlaceInList(String listKey, String placeId) {
+        List<TripPlaceReqLegacy.StoredFormat> places = redisRepository.getList(listKey, TripPlaceReqLegacy.StoredFormat.class);
 
         return places.stream()
                 .filter(p -> placeId.equals(p.id()))
@@ -112,29 +112,29 @@ public class TripPlaceEditingService {
      * @param day            여행 일차
      * @param reorderRequest 재정렬할 목적지 ID 리스트
      */
-    public void reorderPlaces(Long tripId, int day, TripPlaceReq.ReorderRequest reorderRequest) {
+    public void reorderPlaces(Long tripId, int day, TripPlaceReqLegacy.ReorderRequest reorderRequest) {
         String dayPlacesKey = PlaceConstant.dayPlacesKey(tripId, day);
         String dayPlaceSetKey = PlaceConstant.dayPlaceSetKey(tripId, day);
 
-        List<TripPlaceReq.StoredFormat> storedPlaces =
-                redisRepository.getList(dayPlacesKey, TripPlaceReq.StoredFormat.class);
+        List<TripPlaceReqLegacy.StoredFormat> storedPlaces =
+                redisRepository.getList(dayPlacesKey, TripPlaceReqLegacy.StoredFormat.class);
 
         if (storedPlaces == null || storedPlaces.isEmpty()) {
             return;
         }
 
-        Map<String, TripPlaceReq.StoredFormat> placeMap = storedPlaces.stream()
-                .collect(Collectors.toMap(TripPlaceReq.StoredFormat::id, Function.identity()));
+        Map<String, TripPlaceReqLegacy.StoredFormat> placeMap = storedPlaces.stream()
+                .collect(Collectors.toMap(TripPlaceReqLegacy.StoredFormat::id, Function.identity()));
 
         // 요청한 정렬 순서에 맞게 목적지 재정렬
-        List<TripPlaceReq.StoredFormat> reordered =
+        List<TripPlaceReqLegacy.StoredFormat> reordered =
                 buildReorderedPlaces(reorderRequest.orderedPlaceIds(), placeMap);
 
         redisRepository.del(dayPlacesKey);
         redisRepository.del(dayPlaceSetKey);
 
         redisRepository.setListAll(dayPlacesKey, reordered);
-        for (TripPlaceReq.StoredFormat place : reordered) {
+        for (TripPlaceReqLegacy.StoredFormat place : reordered) {
             String placeUniqueKey = makeUniqueKey(place.name(), place.latitude(), place.longitude());
             redisRepository.addToSet(dayPlaceSetKey, placeUniqueKey);
         }
@@ -147,14 +147,14 @@ public class TripPlaceEditingService {
      * @param placeMap   ID 기준 Place 매핑 정보
      * @return 재정렬된 Place 리스트
      */
-    private List<TripPlaceReq.StoredFormat> buildReorderedPlaces(
+    private List<TripPlaceReqLegacy.StoredFormat> buildReorderedPlaces(
             List<String> orderedIds,
-            Map<String, TripPlaceReq.StoredFormat> placeMap
+            Map<String, TripPlaceReqLegacy.StoredFormat> placeMap
     ) {
-        List<TripPlaceReq.StoredFormat> reordered = new ArrayList<>();
+        List<TripPlaceReqLegacy.StoredFormat> reordered = new ArrayList<>();
 
         for (String placeId : orderedIds) {
-            TripPlaceReq.StoredFormat place = placeMap.get(placeId);
+            TripPlaceReqLegacy.StoredFormat place = placeMap.get(placeId);
             reordered.add(place);
         }
 

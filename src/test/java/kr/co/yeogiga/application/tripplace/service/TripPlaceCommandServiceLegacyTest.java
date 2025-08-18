@@ -1,6 +1,6 @@
 package kr.co.yeogiga.application.tripplace.service;
 
-import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceReqLegacy;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
@@ -29,13 +29,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class TripPlaceCommandServiceTest {
+public class TripPlaceCommandServiceLegacyTest {
 
     @Mock
     private TripDayPlaceService tripDayPlaceService;
 
     @InjectMocks
-    private TripPlaceCommandService tripPlaceCommandService;
+    private TripPlaceCommandServiceLegacy tripPlaceCommandServiceLegacy;
 
     private final String tripDayPlaceId = "tripDayPlaceId";
 
@@ -51,7 +51,7 @@ public class TripPlaceCommandServiceTest {
         void addPlaceFirst() {
             // given
             given(tripDayPlaceService.readMaxOrderById(tripDayPlaceId)).willReturn(0.0);
-            TripPlaceReq.Request request = TripPlaceReq.Request.builder()
+            TripPlaceReqLegacy.Request request = TripPlaceReqLegacy.Request.builder()
                     .name("목적지1")
                     .latitude(0.0)
                     .longitude(0.0)
@@ -59,7 +59,7 @@ public class TripPlaceCommandServiceTest {
                     .build();
 
             // when
-            tripPlaceCommandService.addNewPlace(tripDayPlaceId, request);
+            tripPlaceCommandServiceLegacy.addNewPlace(tripDayPlaceId, request);
 
             // then
             verify(tripDayPlaceService).savePlace(eq(tripDayPlaceId), placeCaptor.capture());
@@ -73,7 +73,7 @@ public class TripPlaceCommandServiceTest {
         void addPlaceBack() {
             // given
             given(tripDayPlaceService.readMaxOrderById(tripDayPlaceId)).willReturn(20.0);
-            TripPlaceReq.Request request = TripPlaceReq.Request.builder()
+            TripPlaceReqLegacy.Request request = TripPlaceReqLegacy.Request.builder()
                     .name("목적지1")
                     .latitude(0.0)
                     .longitude(0.0)
@@ -81,7 +81,7 @@ public class TripPlaceCommandServiceTest {
                     .build();
 
             // when
-            tripPlaceCommandService.addNewPlace(tripDayPlaceId, request);
+            tripPlaceCommandServiceLegacy.addNewPlace(tripDayPlaceId, request);
 
             // then
             verify(tripDayPlaceService).savePlace(eq(tripDayPlaceId), placeCaptor.capture());
@@ -107,12 +107,12 @@ public class TripPlaceCommandServiceTest {
                     Place.builder().id("id3").name("목적지3").latitude(0.0).longitude(0.0).placeType(PlaceCategory.RESTAURANT).order(30.0).build()
             );
             TripDayPlace tripDayPlace = TripDayPlace.builder().day(1).places(places).build();
-            TripPlaceReq.ReorderRequest reorderRequest = new TripPlaceReq.ReorderRequest(List.of("id3", "id1", "id2"));
+            TripPlaceReqLegacy.ReorderRequest reorderRequest = new TripPlaceReqLegacy.ReorderRequest(List.of("id3", "id1", "id2"));
 
             given(tripDayPlaceService.readById(tripDayPlaceId)).willReturn(Optional.of(tripDayPlace));
 
             // when
-            tripPlaceCommandService.reorderPlaces(tripDayPlaceId, reorderRequest);
+            tripPlaceCommandServiceLegacy.reorderPlaces(tripDayPlaceId, reorderRequest);
 
             // then
             assertEquals(places.get(2).getOrder(), 10.0);
@@ -127,11 +127,11 @@ public class TripPlaceCommandServiceTest {
             // given
             given(tripDayPlaceService.readById(tripDayPlaceId)).willReturn(Optional.empty());
 
-            TripPlaceReq.ReorderRequest reorderRequest = new TripPlaceReq.ReorderRequest(List.of("a"));
+            TripPlaceReqLegacy.ReorderRequest reorderRequest = new TripPlaceReqLegacy.ReorderRequest(List.of("a"));
 
             // when
             CustomException e = assertThrows(CustomException.class, () ->
-                    tripPlaceCommandService.reorderPlaces(tripDayPlaceId, reorderRequest));
+                    tripPlaceCommandServiceLegacy.reorderPlaces(tripDayPlaceId, reorderRequest));
 
             // then
             assertEquals(TripErrorType.TRIP_PLACE_NOT_FOUND, e.getErrorType());
@@ -146,7 +146,7 @@ public class TripPlaceCommandServiceTest {
         boolean isVisited = true;
 
         // when
-        tripPlaceCommandService.markPlaceAsVisited(tripDayPlaceId, placeId, isVisited);
+        tripPlaceCommandServiceLegacy.markPlaceAsVisited(tripDayPlaceId, placeId, isVisited);
 
         // then
         verify(tripDayPlaceService, times(1)).updatePlaceVisited(tripDayPlaceId, placeId, isVisited);
@@ -158,7 +158,7 @@ public class TripPlaceCommandServiceTest {
         // given
 
         // when
-        tripPlaceCommandService.deletePlace(tripDayPlaceId, "placeId");
+        tripPlaceCommandServiceLegacy.deletePlace(tripDayPlaceId, "placeId");
 
         // then
         verify(tripDayPlaceService, times(1)).deletePlace(tripDayPlaceId, "placeId");

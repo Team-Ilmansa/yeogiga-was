@@ -58,7 +58,7 @@ public class TripPlaceRes {
             double longitude,
             String placeCategory
     ) {
-        public static TempPlaceInfo from(TripPlaceReq.StoredFormat place) {
+        public static TempPlaceInfo from(TripPlaceReqLegacy.StoredFormat place) {
             return new TempPlaceInfo(
                     place.id(), place.name(), place.latitude(),
                     place.longitude(), place.placeCategory().getLabel()

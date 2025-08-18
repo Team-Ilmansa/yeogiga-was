@@ -8,10 +8,10 @@ import lombok.Builder;
 import java.util.List;
 import java.util.UUID;
 
-public class TripPlaceReq {
+public class TripPlaceReqLegacy {
 
     @Builder
-    @Schema(name = "TripPlaceReq.Request", description = "여행 목적지 추가 DTO")
+    @Schema(name = "TripPlaceReqLegacy.Request", description = "여행 목적지 추가 DTO")
     public record Request(
             @Schema(description = "목적지 이름", example = "광화문")
             String name,
@@ -52,13 +52,13 @@ public class TripPlaceReq {
             PlaceCategory placeCategory
     ) { }
 
-    @Schema(name = "TripPlaceReq.CompleteRequest", description = "여행 목적지 선택 완료 요청 DTO")
+    @Schema(name = "TripPlaceReqLegacy.CompleteRequest", description = "여행 목적지 선택 완료 요청 DTO")
     public record CompleteRequest(
             @Schema(description = "편집 완료된 마지막 일차", example = "5")
             int lastDay
     ) { }
 
-    @Schema(name = "TripPlaceReq.ReorderRequest", description = "여행 목적지 순서 변경 요청 DTO")
+    @Schema(name = "TripPlaceReqLegacy.ReorderRequest", description = "여행 목적지 순서 변경 요청 DTO")
     public record ReorderRequest(
             @Schema(description = "정렬된 목적지 ID 리스트", example = "[\"place3-id\", \"place1-id\", \"place2-id\"]")
             List<String> orderedPlaceIds

@@ -1,6 +1,6 @@
 package kr.co.yeogiga.application.tripplace.service;
 
-import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceReqLegacy;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
@@ -20,7 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class TripPlaceSavingService {
+public class TripPlaceSavingServiceLegacy {
     private final TripDayPlaceService tripDayPlaceService;
     private final TripService tripService;
     private final RedisRepository redisRepository;
@@ -64,12 +64,12 @@ public class TripPlaceSavingService {
      */
     private TripDayPlace createTripDayPlace(Long tripId, int day) {
         String dayPlacesKey = PlaceConstant.dayPlacesKey(tripId, day);
-        List<TripPlaceReq.StoredFormat> storedPlaces
-                = redisRepository.getList(dayPlacesKey, TripPlaceReq.StoredFormat.class);
+        List<TripPlaceReqLegacy.StoredFormat> storedPlaces
+                = redisRepository.getList(dayPlacesKey, TripPlaceReqLegacy.StoredFormat.class);
 
         List<Place> places = new ArrayList<>();
         for (int i = 0; i < storedPlaces.size(); i++) {
-            TripPlaceReq.StoredFormat stored = storedPlaces.get(i);
+            TripPlaceReqLegacy.StoredFormat stored = storedPlaces.get(i);
             places.add(convertToPlace(stored, i));
         }
 
@@ -88,7 +88,7 @@ public class TripPlaceSavingService {
      * @param index  : 리스트 내 순서
      * @return : Place 변환 객체
      */
-    private Place convertToPlace(TripPlaceReq.StoredFormat stored, int index) {
+    private Place convertToPlace(TripPlaceReqLegacy.StoredFormat stored, int index) {
         return Place.builder()
                 .id(stored.id())
                 .name(stored.name())

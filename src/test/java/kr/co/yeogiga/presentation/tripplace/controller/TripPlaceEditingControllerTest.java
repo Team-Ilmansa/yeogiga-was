@@ -1,7 +1,7 @@
 package kr.co.yeogiga.presentation.tripplace.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceReqLegacy;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceEditingService;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceSortService;
@@ -76,7 +76,7 @@ public class TripPlaceEditingControllerTest {
     @DisplayName("목적지 추가 테스트")
     class AssignPlaceToDayTest {
 
-        private final TripPlaceReq.Request request = TripPlaceReq.Request.builder()
+        private final TripPlaceReqLegacy.Request request = TripPlaceReqLegacy.Request.builder()
                 .name("목적지1")
                 .latitude(0.0)
                 .longitude(0.0)
@@ -130,8 +130,8 @@ public class TripPlaceEditingControllerTest {
     @DisplayName("목적지 수정 성공")
     void reorderPlacesSuccess() throws Exception {
         // given
-        TripPlaceReq.ReorderRequest request =
-                new TripPlaceReq.ReorderRequest(List.of("place3-id", "place1-id", "place2-id"));
+        TripPlaceReqLegacy.ReorderRequest request =
+                new TripPlaceReqLegacy.ReorderRequest(List.of("place3-id", "place1-id", "place2-id"));
 
         doNothing().when(tripPlaceEditingService).reorderPlaces(anyLong(), anyInt(), any());
 

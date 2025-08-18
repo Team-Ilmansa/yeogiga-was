@@ -1,6 +1,6 @@
 package kr.co.yeogiga.application.tripplace.service;
 
-import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceReqLegacy;
 import kr.co.yeogiga.domain.trip.type.PlaceCategory;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;
 import kr.co.yeogiga.infrastructure.redis.constant.PlaceConstant;
@@ -44,7 +44,7 @@ class TripPlaceSortServiceTest {
         // given
         String listKey = PlaceConstant.dayPlacesKey(tripId, day);
 
-        given(redisRepository.getList(eq(listKey), eq(TripPlaceReq.StoredFormat.class)))
+        given(redisRepository.getList(eq(listKey), eq(TripPlaceReqLegacy.StoredFormat.class)))
                 .willReturn(Collections.emptyList());
 
         // when
@@ -60,25 +60,25 @@ class TripPlaceSortServiceTest {
         // given
         String listKey = PlaceConstant.dayPlacesKey(tripId, day);
 
-        List<TripPlaceReq.StoredFormat> input = List.of(
-                new TripPlaceReq.StoredFormat("1", "PlaceA", 35.1, 128.1, PlaceCategory.RESTAURANT),
-                new TripPlaceReq.StoredFormat("2", "PlaceB", 35.2, 128.2, PlaceCategory.TOURISM),
-                new TripPlaceReq.StoredFormat("3", "PlaceC", 35.3, 128.3, PlaceCategory.LODGING)
+        List<TripPlaceReqLegacy.StoredFormat> input = List.of(
+                new TripPlaceReqLegacy.StoredFormat("1", "PlaceA", 35.1, 128.1, PlaceCategory.RESTAURANT),
+                new TripPlaceReqLegacy.StoredFormat("2", "PlaceB", 35.2, 128.2, PlaceCategory.TOURISM),
+                new TripPlaceReqLegacy.StoredFormat("3", "PlaceC", 35.3, 128.3, PlaceCategory.LODGING)
         );
 
-        given(redisRepository.getList(eq(listKey), eq(TripPlaceReq.StoredFormat.class)))
+        given(redisRepository.getList(eq(listKey), eq(TripPlaceReqLegacy.StoredFormat.class)))
                 .willReturn(input);
 
         // when
         tripPlaceSortService.sortDayTripPlaces(tripId, day);
 
         // then
-        ArgumentCaptor<Collection<TripPlaceReq.StoredFormat>> captor =
+        ArgumentCaptor<Collection<TripPlaceReqLegacy.StoredFormat>> captor =
                 ArgumentCaptor.forClass(Collection.class);
 
         verify(redisRepository, times(1)).setListAll(eq(listKey), captor.capture());
 
-        List<TripPlaceReq.StoredFormat> saved = new ArrayList<>(captor.getValue());
+        List<TripPlaceReqLegacy.StoredFormat> saved = new ArrayList<>(captor.getValue());
         assertEquals(PlaceCategory.LODGING, saved.get(2).placeCategory());
     }
 
@@ -88,30 +88,30 @@ class TripPlaceSortServiceTest {
         // given
         String listKey = PlaceConstant.dayPlacesKey(tripId, day);
 
-        List<TripPlaceReq.StoredFormat> input = List.of(
-                new TripPlaceReq.StoredFormat("1", "A", 35.0, 128.0, PlaceCategory.RESTAURANT),
-                new TripPlaceReq.StoredFormat("2", "B", 35.1, 128.1, PlaceCategory.RESTAURANT),
-                new TripPlaceReq.StoredFormat("3", "C", 35.2, 128.2, PlaceCategory.RESTAURANT),
-                new TripPlaceReq.StoredFormat("4", "D", 35.3, 128.3, PlaceCategory.LODGING),
-                new TripPlaceReq.StoredFormat("5", "E", 35.4, 128.4, PlaceCategory.TOURISM)
+        List<TripPlaceReqLegacy.StoredFormat> input = List.of(
+                new TripPlaceReqLegacy.StoredFormat("1", "A", 35.0, 128.0, PlaceCategory.RESTAURANT),
+                new TripPlaceReqLegacy.StoredFormat("2", "B", 35.1, 128.1, PlaceCategory.RESTAURANT),
+                new TripPlaceReqLegacy.StoredFormat("3", "C", 35.2, 128.2, PlaceCategory.RESTAURANT),
+                new TripPlaceReqLegacy.StoredFormat("4", "D", 35.3, 128.3, PlaceCategory.LODGING),
+                new TripPlaceReqLegacy.StoredFormat("5", "E", 35.4, 128.4, PlaceCategory.TOURISM)
         );
 
-        given(redisRepository.getList(eq(listKey), eq(TripPlaceReq.StoredFormat.class)))
+        given(redisRepository.getList(eq(listKey), eq(TripPlaceReqLegacy.StoredFormat.class)))
                 .willReturn(input);
 
         // when
         tripPlaceSortService.sortDayTripPlaces(tripId, day);
 
         // then
-        ArgumentCaptor<Collection<TripPlaceReq.StoredFormat>> captor =
+        ArgumentCaptor<Collection<TripPlaceReqLegacy.StoredFormat>> captor =
                 ArgumentCaptor.forClass(Collection.class);
         verify(redisRepository, times(1)).setListAll(eq(listKey), captor.capture());
-        List<TripPlaceReq.StoredFormat> saved = new ArrayList<>(captor.getValue());
+        List<TripPlaceReqLegacy.StoredFormat> saved = new ArrayList<>(captor.getValue());
 
         // 식당 카테고리가 3번 이상 연속하지 않는지 확인
         int maxConsecutiveRestaurants = 0;
         int currentCount = 0;
-        for (TripPlaceReq.StoredFormat place : saved) {
+        for (TripPlaceReqLegacy.StoredFormat place : saved) {
             if (PlaceCategory.RESTAURANT == place.placeCategory()) {
                 currentCount++;
                 maxConsecutiveRestaurants = Math.max(maxConsecutiveRestaurants, currentCount);

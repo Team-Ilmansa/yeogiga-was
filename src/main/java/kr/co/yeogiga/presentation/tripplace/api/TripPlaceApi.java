@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceReqLegacy;
 import kr.co.yeogiga.application.tripplace.dto.VisitedMarkReq;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,7 +37,7 @@ public interface TripPlaceApi {
             @PathVariable Long tripId,
 
             @Parameter(description = "여행의 마지막 일차 (3일 여행이라면 3)")
-            @RequestBody TripPlaceReq.CompleteRequest request
+            @RequestBody TripPlaceReqLegacy.CompleteRequest request
     );
 
     @TrackApi(description = "여행 목적지 추가 - 하나씩 (여행 목적지 지정 확정 후)")
@@ -61,7 +61,7 @@ public interface TripPlaceApi {
             @PathVariable String tripDayPlaceId,
 
             @Parameter(description = "추가할 목적지 정보")
-            @RequestBody TripPlaceReq.Request request
+            @RequestBody TripPlaceReqLegacy.Request request
     );
 
     @TrackApi(description = "여행 일정 정보 불러오기 (여행 목적지 지정 확정 후)")
@@ -251,7 +251,7 @@ public interface TripPlaceApi {
             @PathVariable String tripDayPlaceId,
 
             @Parameter(description = "목적지 순서 변경을 위한 정보")
-            @RequestBody TripPlaceReq.ReorderRequest reorderRequest
+            @RequestBody TripPlaceReqLegacy.ReorderRequest reorderRequest
     );
 
     @TrackApi(description = "여행 목적지 방문 여부 체크 (여행 목적지 지정 확정 후)")

@@ -9,12 +9,10 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceReqLegacy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.List;
 
 @ApiGroup(value = "[여행 생성 단계에서의 목적지 API]")
 @Tag(name = "[여행 생성 단계에서의 목적지 API]", description = "여행 목적지 관련 API")
@@ -49,7 +47,7 @@ public interface TripPlaceEditingApi {
             @Parameter(description = "배정하고자 하는 여행 일차")
             @PathVariable int day,
 
-            @RequestBody TripPlaceReq.Request place
+            @RequestBody TripPlaceReqLegacy.Request place
     );
 
     @TrackApi(description = "일차에 지정한 목적지 조회")
@@ -112,7 +110,7 @@ public interface TripPlaceEditingApi {
             @PathVariable int day,
 
             @Parameter(description = "변경된 순서로의 목적지 ID 리스트")
-            @RequestBody TripPlaceReq.ReorderRequest request
+            @RequestBody TripPlaceReqLegacy.ReorderRequest request
     );
 
     @TrackApi(description = "일차별 목적지의 순서 추천 알고리즘")

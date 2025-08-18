@@ -1,6 +1,6 @@
 package kr.co.yeogiga.application.tripplace.service;
 
-import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceReqLegacy;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class TripPlaceCommandService {
+public class TripPlaceCommandServiceLegacy {
     private final TripDayPlaceService tripDayPlaceService;
 
     /**
@@ -27,7 +27,7 @@ public class TripPlaceCommandService {
      * @param tripDayPlaceId 여행 일차(TripDayPlace)의 ID
      * @param insertRequest  삽입할 장소 정보 및 위치 기준 정보
      */
-    public void addNewPlace(String tripDayPlaceId, TripPlaceReq.Request insertRequest) {
+    public void addNewPlace(String tripDayPlaceId, TripPlaceReqLegacy.Request insertRequest) {
         Double maxPlaceOrder = tripDayPlaceService.readMaxOrderById(tripDayPlaceId);
 
         // TODO : 중복여행 못담기게
@@ -47,7 +47,7 @@ public class TripPlaceCommandService {
      * @param maxPlaceOrder 현재 목적지 order 중 최대값 (nullable)
      * @return 생성된 Place 객체
      */
-    private Place createPlace(TripPlaceReq.Request request, Double maxPlaceOrder) {
+    private Place createPlace(TripPlaceReqLegacy.Request request, Double maxPlaceOrder) {
         return request.toEntity(maxPlaceOrder + 10.0);
     }
 
@@ -58,7 +58,7 @@ public class TripPlaceCommandService {
      * @param tripDayPlaceId 여행 일차(TripDayPlace)의 ID
      * @param reorderRequest 재정렬할 목적지 ID 리스트
      */
-    public void reorderPlaces(String tripDayPlaceId, TripPlaceReq.ReorderRequest reorderRequest) {
+    public void reorderPlaces(String tripDayPlaceId, TripPlaceReqLegacy.ReorderRequest reorderRequest) {
         TripDayPlace tripDayPlace = tripDayPlaceService.readById(tripDayPlaceId)
                 .orElseThrow(() -> new CustomException(TripErrorType.TRIP_PLACE_NOT_FOUND));
 

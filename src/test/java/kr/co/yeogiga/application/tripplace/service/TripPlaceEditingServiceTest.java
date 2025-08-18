@@ -1,6 +1,6 @@
 package kr.co.yeogiga.application.tripplace.service;
 
-import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceReqLegacy;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
@@ -46,7 +46,7 @@ public class TripPlaceEditingServiceTest {
     class AssignPlaceToDayTest {
 
         private final String placeId = "place-id";
-        private final TripPlaceReq.Request request = TripPlaceReq.Request.builder()
+        private final TripPlaceReqLegacy.Request request = TripPlaceReqLegacy.Request.builder()
                 .name("목적지1")
                 .latitude(0.0)
                 .longitude(0.0)
@@ -64,7 +64,7 @@ public class TripPlaceEditingServiceTest {
             tripPlaceEditingService.assignPlaceToDay(tripId, day, request);
 
             // then
-            verify(redisRepository, times(1)).setList(anyString(), any(TripPlaceReq.StoredFormat.class));
+            verify(redisRepository, times(1)).setList(anyString(), any(TripPlaceReqLegacy.StoredFormat.class));
             verify(redisRepository, times(1)).addToSet(eq(dayPlaceSetKey), anyString());
         }
 
@@ -95,11 +95,11 @@ public class TripPlaceEditingServiceTest {
         @DisplayName("목적지 삭제 성공")
         void deletePlaceInEditingSuccess() {
             // given
-            TripPlaceReq.StoredFormat place = new TripPlaceReq.StoredFormat(
+            TripPlaceReqLegacy.StoredFormat place = new TripPlaceReqLegacy.StoredFormat(
                     placeId, "목적지1", 33.123, 126.456, PlaceCategory.RESTAURANT
             );
 
-            given(redisRepository.getList(anyString(), eq(TripPlaceReq.StoredFormat.class)))
+            given(redisRepository.getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class)))
                     .willReturn(List.of(place));
 
             // when
@@ -114,7 +114,7 @@ public class TripPlaceEditingServiceTest {
         @DisplayName("목적지 삭제 실패 - 존재하지 않음")
         void deletePlaceInEditingNotFound() {
             // given
-            given(redisRepository.getList(anyString(), eq(TripPlaceReq.StoredFormat.class)))
+            given(redisRepository.getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class)))
                     .willReturn(List.of());
 
             // when
@@ -130,18 +130,18 @@ public class TripPlaceEditingServiceTest {
     @DisplayName("목적지 순서 수정 성공")
     void reorderPlacesInEditingSuccess() {
         // given
-        List<TripPlaceReq.StoredFormat> storedPlace = List.of(
-                new TripPlaceReq.StoredFormat("place1-id", "목적지1", 33.1, 126.1, PlaceCategory.RESTAURANT),
-                new TripPlaceReq.StoredFormat("place2-id", "목적지2", 33.2, 126.2, PlaceCategory.RESTAURANT),
-                new TripPlaceReq.StoredFormat("place3-id", "목적지3", 33.3, 126.3, PlaceCategory.RESTAURANT)
+        List<TripPlaceReqLegacy.StoredFormat> storedPlace = List.of(
+                new TripPlaceReqLegacy.StoredFormat("place1-id", "목적지1", 33.1, 126.1, PlaceCategory.RESTAURANT),
+                new TripPlaceReqLegacy.StoredFormat("place2-id", "목적지2", 33.2, 126.2, PlaceCategory.RESTAURANT),
+                new TripPlaceReqLegacy.StoredFormat("place3-id", "목적지3", 33.3, 126.3, PlaceCategory.RESTAURANT)
         );
 
-        TripPlaceReq.ReorderRequest request =
-                new TripPlaceReq.ReorderRequest(List.of("place3-id", "place1-id", "place2-id"));
+        TripPlaceReqLegacy.ReorderRequest request =
+                new TripPlaceReqLegacy.ReorderRequest(List.of("place3-id", "place1-id", "place2-id"));
 
         String listKey = "trip:1:day:1:places";
 
-        given(redisRepository.getList(listKey, TripPlaceReq.StoredFormat.class)).willReturn(storedPlace);
+        given(redisRepository.getList(listKey, TripPlaceReqLegacy.StoredFormat.class)).willReturn(storedPlace);
 
         // when
         tripPlaceEditingService.reorderPlaces(tripId, day, request);
@@ -156,11 +156,11 @@ public class TripPlaceEditingServiceTest {
     @DisplayName("편집 중인 여행 일정 조회 성공")
     void getPlacesInEditingSuccess() {
         // given
-        List<TripPlaceReq.StoredFormat> mockPlaces = List.of(
-                new TripPlaceReq.StoredFormat("place-id", "목적지1", 33.123, 126.456, PlaceCategory.RESTAURANT)
+        List<TripPlaceReqLegacy.StoredFormat> mockPlaces = List.of(
+                new TripPlaceReqLegacy.StoredFormat("place-id", "목적지1", 33.123, 126.456, PlaceCategory.RESTAURANT)
         );
 
-        given(redisRepository.getList(anyString(), eq(TripPlaceReq.StoredFormat.class))).willReturn(mockPlaces);
+        given(redisRepository.getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class))).willReturn(mockPlaces);
 
         // when
         List<TripPlaceRes.TempPlaceInfo> result = tripPlaceEditingService.getAssignedPlaces(tripId, day);
