@@ -1,4 +1,4 @@
-package kr.co.yeogiga.domain.tripplace.type;
+package kr.co.yeogiga.domain.trip.type;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
