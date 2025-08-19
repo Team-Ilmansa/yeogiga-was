@@ -17,9 +17,9 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-public class TripPlaceImageReassignmentService {
+public class TripPlaceImageReassignmentServiceLegacy {
     private final TripDayPlaceService tripDayPlaceService;
-    private final TripPlaceImageAssignmentService tripPlaceImageAssignmentService;
+    private final TripPlaceImageAssignmentServiceLegacy tripPlaceImageAssignmentServiceLegacy;
 
     /**
      * 주어진 TripDayPlace ID에 대해 이미지 재정렬을 수행하는 메서드
@@ -44,6 +44,6 @@ public class TripPlaceImageReassignmentService {
         images.addAll(tripDayPlace.getUnmatchedImages());
         tripDayPlace.clearUnmatchedImages();
 
-        tripPlaceImageAssignmentService.assignImageToTripDayPlace(tripDayPlace, images);
+        tripPlaceImageAssignmentServiceLegacy.assignImageToTripDayPlace(tripDayPlace, images);
     }
 }

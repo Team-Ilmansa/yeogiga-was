@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-public class TripPlaceImageQueryService {
+public class TripPlaceImageQueryServiceLegacy {
     private final TripDayPlaceService tripDayPlaceService;
 
     /**

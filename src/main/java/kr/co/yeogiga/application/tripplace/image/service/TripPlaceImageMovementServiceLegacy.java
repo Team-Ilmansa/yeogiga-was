@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
-public class TripPlaceImageMovementService {
+public class TripPlaceImageMovementServiceLegacy {
     private final TripDayPlaceService tripDayPlaceService;
 
     /**

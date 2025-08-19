@@ -25,7 +25,7 @@ import java.util.Map;
  */
 @Service
 @RequiredArgsConstructor
-public class TripPlaceImageAssignmentService {
+public class TripPlaceImageAssignmentServiceLegacy {
     private final TripDayPlaceService tripDayPlaceService;
     private final TripRouteService tripRouteService;
 
