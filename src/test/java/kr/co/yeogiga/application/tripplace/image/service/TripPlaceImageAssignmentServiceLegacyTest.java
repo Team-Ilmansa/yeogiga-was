@@ -23,7 +23,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class TripPlaceImageAssignmentServiceTest {
+class TripPlaceImageAssignmentServiceLegacyTest {
 
     @Mock
     private TripDayPlaceService tripDayPlaceService;
@@ -32,7 +32,7 @@ class TripPlaceImageAssignmentServiceTest {
     private TripRouteService tripRouteService;
 
     @InjectMocks
-    private TripPlaceImageAssignmentService tripPlaceImageAssignmentService;
+    private TripPlaceImageAssignmentServiceLegacy tripPlaceImageAssignmentServiceLegacy;
 
     private final String tripDayPlaceId = "tripDayPlaceId";
 
@@ -85,7 +85,7 @@ class TripPlaceImageAssignmentServiceTest {
         tempImages.add(imgWithoutGps);
 
         // when
-        tripPlaceImageAssignmentService.assignImageToTripDayPlace(tripDayPlace, tempImages);
+        tripPlaceImageAssignmentServiceLegacy.assignImageToTripDayPlace(tripDayPlace, tempImages);
 
         // then
         assertEquals(1, tripDayPlace.getPlaces().get(0).getImages().size());

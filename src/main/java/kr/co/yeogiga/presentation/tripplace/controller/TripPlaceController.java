@@ -3,7 +3,7 @@ package kr.co.yeogiga.presentation.tripplace.controller;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceReqLegacy;
 import kr.co.yeogiga.application.tripplace.dto.VisitedMarkReq;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceCommandServiceLegacy;
-import kr.co.yeogiga.application.tripplace.service.TripPlaceQueryService;
+import kr.co.yeogiga.application.tripplace.service.TripPlaceQueryServiceLegacy;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceSavingServiceLegacy;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.presentation.tripplace.api.TripPlaceApi;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TripPlaceController implements TripPlaceApi {
     private final TripPlaceSavingServiceLegacy tripPlaceSavingServiceLegacy;
     private final TripPlaceCommandServiceLegacy tripPlaceCommandServiceLegacy;
-    private final TripPlaceQueryService tripPlaceQueryService;
+    private final TripPlaceQueryServiceLegacy tripPlaceQueryServiceLegacy;
 
     @Override
     @PostMapping("/{tripId}/complete")
@@ -51,7 +51,7 @@ public class TripPlaceController implements TripPlaceApi {
     @GetMapping("/{tripId}/day-place/places")
     public ResponseEntity<?> getTripDayPlacesInfo(@PathVariable Long tripId) {
         return ResponseEntity.ok(
-                SuccessResponse.from(tripPlaceQueryService.getTripDayPlacesInfo(tripId))
+                SuccessResponse.from(tripPlaceQueryServiceLegacy.getTripDayPlacesInfo(tripId))
         );
     }
 
@@ -61,7 +61,7 @@ public class TripPlaceController implements TripPlaceApi {
                                                  @PathVariable String tripDayPlaceId) {
 
         return ResponseEntity.ok(
-                SuccessResponse.from(tripPlaceQueryService.getPlaceDetailsInfo(tripDayPlaceId))
+                SuccessResponse.from(tripPlaceQueryServiceLegacy.getPlaceDetailsInfo(tripDayPlaceId))
         );
     }
 
@@ -69,7 +69,7 @@ public class TripPlaceController implements TripPlaceApi {
     @GetMapping("/{tripId}/day-place")
     public ResponseEntity<?> getTripDaySummaries(@PathVariable Long tripId) {
         return ResponseEntity.ok(
-                SuccessResponse.from(tripPlaceQueryService.getTripDaySummaries(tripId))
+                SuccessResponse.from(tripPlaceQueryServiceLegacy.getTripDaySummaries(tripId))
         );
     }
 

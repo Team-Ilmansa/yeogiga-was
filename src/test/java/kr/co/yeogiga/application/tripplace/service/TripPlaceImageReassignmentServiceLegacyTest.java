@@ -1,7 +1,7 @@
 package kr.co.yeogiga.application.tripplace.service;
 
-import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageAssignmentService;
-import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageReassignmentService;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageAssignmentServiceLegacy;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageReassignmentServiceLegacy;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.placeimage.entity.Image;
@@ -27,16 +27,16 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class TripPlaceImageReassignmentServiceTest {
+public class TripPlaceImageReassignmentServiceLegacyTest {
 
     @Mock
     private TripDayPlaceService tripDayPlaceService;
 
     @Mock
-    private TripPlaceImageAssignmentService tripPlaceImageAssignmentService;
+    private TripPlaceImageAssignmentServiceLegacy tripPlaceImageAssignmentServiceLegacy;
 
     @InjectMocks
-    private TripPlaceImageReassignmentService tripPlaceImageReassignmentService;
+    private TripPlaceImageReassignmentServiceLegacy tripPlaceImageReassignmentServiceLegacy;
 
     private final String tripDayPlaceId = "day-id";
     @Test
@@ -65,14 +65,14 @@ public class TripPlaceImageReassignmentServiceTest {
         given(tripDayPlaceService.readById(tripDayPlaceId)).willReturn(Optional.of(tripDayPlace));
 
         // when
-        tripPlaceImageReassignmentService.reassignImagesToTripDayPlace(tripDayPlaceId);
+        tripPlaceImageReassignmentServiceLegacy.reassignImagesToTripDayPlace(tripDayPlaceId);
 
         // then
         assertThat(place1.getImages()).isEmpty();
         assertThat(place2.getImages()).isEmpty();
         assertThat(tripDayPlace.getUnmatchedImages()).isEmpty();
 
-        verify(tripPlaceImageAssignmentService).assignImageToTripDayPlace(eq(tripDayPlace), anyList());
+        verify(tripPlaceImageAssignmentServiceLegacy).assignImageToTripDayPlace(eq(tripDayPlace), anyList());
     }
 
     @Test
@@ -83,7 +83,7 @@ public class TripPlaceImageReassignmentServiceTest {
 
         // when
         CustomException exception = assertThrows(CustomException.class, () ->
-                tripPlaceImageReassignmentService.reassignImagesToTripDayPlace(tripDayPlaceId)
+                tripPlaceImageReassignmentServiceLegacy.reassignImagesToTripDayPlace(tripDayPlaceId)
         );
 
         // then

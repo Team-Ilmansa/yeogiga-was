@@ -28,13 +28,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class TripPlaceImageMovementServiceTest {
+public class TripPlaceImageMovementServiceLegacyTest {
 
     @Mock
     private TripDayPlaceService tripDayPlaceService;
 
     @InjectMocks
-    private TripPlaceImageMovementService imageMovementService;
+    private TripPlaceImageMovementServiceLegacy imageMovementService;
 
     private final String tripDayPlaceId1 = "day1";
     private final String tripDayPlaceId2 = "day2";

@@ -13,7 +13,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class TripPlaceQueryService {
+public class TripPlaceQueryServiceLegacy {
     private final TripDayPlaceService tripDayPlaceService;
 
     /**

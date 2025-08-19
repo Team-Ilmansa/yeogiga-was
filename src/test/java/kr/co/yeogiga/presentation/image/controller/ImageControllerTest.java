@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.image.dto.ImageDeleteDto;
 import kr.co.yeogiga.application.image.dto.TempImageDto;
 import kr.co.yeogiga.application.image.service.ImageUploadProcessor;
-import kr.co.yeogiga.application.image.service.TempImageAssignProcessor;
+import kr.co.yeogiga.application.image.service.TempImageAssignProcessorLegacy;
 import kr.co.yeogiga.application.image.service.TempPlaceImagesCommandService;
 import kr.co.yeogiga.application.image.service.TempPlaceImagesQueryService;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
@@ -52,7 +52,7 @@ public class ImageControllerTest {
     private ImageUploadProcessor imageUploadProcessor;
 
     @MockBean
-    private TempImageAssignProcessor tempImageAssignProcessor;
+    private TempImageAssignProcessorLegacy tempImageAssignProcessorLegacy;
 
     @MockBean
     private TempPlaceImagesCommandService tempPlaceImagesCommandService;

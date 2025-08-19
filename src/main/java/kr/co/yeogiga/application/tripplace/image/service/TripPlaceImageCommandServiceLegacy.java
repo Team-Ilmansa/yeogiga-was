@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-public class TripPlaceImageCommandService {
+public class TripPlaceImageCommandServiceLegacy {
     private final TripDayPlaceService tripDayPlaceService;
     private final ImageDeleteProcessor imageDeleteProcessor;
 

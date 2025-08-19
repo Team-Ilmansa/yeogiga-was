@@ -26,13 +26,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public class TripPlaceQueryServiceTest {
+public class TripPlaceQueryServiceLegacyTest {
 
     @Mock
     private TripDayPlaceService tripDayPlaceService;
 
     @InjectMocks
-    private TripPlaceQueryService tripPlaceQueryService;
+    private TripPlaceQueryServiceLegacy tripPlaceQueryServiceLegacy;
 
     private final Place place1 = Place.builder().id("id1").name("목적지1").latitude(0.0).longitude(1.1).placeType(PlaceCategory.RESTAURANT).order(10.0).build();
     private final Place place2 = Place.builder().id("id2").name("목적지2").latitude(2.2).longitude(3.3).placeType(PlaceCategory.RESTAURANT).order(20.0).build();
@@ -54,7 +54,7 @@ public class TripPlaceQueryServiceTest {
         given(tripDayPlaceService.readByTripIdSortedByOrder(tripId)).willReturn(List.of(tripDayPlace));
 
         // when
-        List<TripPlaceRes.TripDayPlaceInfo> result = tripPlaceQueryService.getTripDayPlacesInfo(tripId);
+        List<TripPlaceRes.TripDayPlaceInfo> result = tripPlaceQueryServiceLegacy.getTripDayPlacesInfo(tripId);
 
         // then
         assertEquals(2, result.get(0).places().size());
@@ -80,7 +80,7 @@ public class TripPlaceQueryServiceTest {
             given(tripDayPlaceService.readByIdSortedByOrder(tripDayPlaceId)).willReturn(Optional.of(tripDayPlace));
 
             // when
-            List<TripPlaceRes.PlaceDetails> result = tripPlaceQueryService.getPlaceDetailsInfo(tripDayPlaceId);
+            List<TripPlaceRes.PlaceDetails> result = tripPlaceQueryServiceLegacy.getPlaceDetailsInfo(tripDayPlaceId);
 
             // then
             assertEquals(2, result.size());
@@ -98,7 +98,7 @@ public class TripPlaceQueryServiceTest {
 
             // when
             CustomException e = assertThrows(CustomException.class, () ->
-                    tripPlaceQueryService.getPlaceDetailsInfo(tripDayPlaceId));
+                    tripPlaceQueryServiceLegacy.getPlaceDetailsInfo(tripDayPlaceId));
 
             assertEquals(TripErrorType.TRIP_PLACE_NOT_FOUND, e.getErrorType());
         }
@@ -133,7 +133,7 @@ public class TripPlaceQueryServiceTest {
                 .willReturn(List.of(tripDayPlace));
 
         // when
-        List<TripDaySummaryRes.DayDto> result = tripPlaceQueryService.getTripDaySummaries(tripId);
+        List<TripDaySummaryRes.DayDto> result = tripPlaceQueryServiceLegacy.getTripDaySummaries(tripId);
 
         // then
         assertThat(result).hasSize(1);

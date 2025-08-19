@@ -3,10 +3,10 @@ package kr.co.yeogiga.presentation.tripplace.image.controller;
 import kr.co.yeogiga.application.tripplace.image.dto.FavoriteImageReq;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
-import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageCommandService;
-import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageMovementService;
-import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageQueryService;
-import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageReassignmentService;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageCommandServiceLegacy;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageMovementServiceLegacy;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageQueryServiceLegacy;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageReassignmentServiceLegacy;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.presentation.tripplace.image.api.TripPlaceImageApi;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/trip")
 @RequiredArgsConstructor
 public class TripPlaceImageController implements TripPlaceImageApi {
-    private final TripPlaceImageMovementService tripPlaceImageMovementService;
-    private final TripPlaceImageCommandService tripPlaceImageCommandService;
-    private final TripPlaceImageQueryService tripPlaceImageQueryService;
-    private final TripPlaceImageReassignmentService tripPlaceImageReassignmentService;
+    private final TripPlaceImageMovementServiceLegacy tripPlaceImageMovementServiceLegacy;
+    private final TripPlaceImageCommandServiceLegacy tripPlaceImageCommandServiceLegacy;
+    private final TripPlaceImageQueryServiceLegacy tripPlaceImageQueryServiceLegacy;
+    private final TripPlaceImageReassignmentServiceLegacy tripPlaceImageReassignmentServiceLegacy;
 
     @Override
     @GetMapping("/{tripId}/day-place/{tripDayPlaceId}/places/{placeId}/images")
@@ -37,7 +37,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
     ) {
         return ResponseEntity.ok(
                 SuccessResponse.from(
-                        tripPlaceImageQueryService.getPlaceImageInfo(tripDayPlaceId, placeId)
+                        tripPlaceImageQueryServiceLegacy.getPlaceImageInfo(tripDayPlaceId, placeId)
                 )
         );
     }
@@ -50,7 +50,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
     ) {
         return ResponseEntity.ok(
                 SuccessResponse.from(
-                        tripPlaceImageQueryService.getUnmatchedImageInfo(tripDayPlaceId)
+                        tripPlaceImageQueryServiceLegacy.getUnmatchedImageInfo(tripDayPlaceId)
                 )
         );
     }
@@ -63,7 +63,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
     ) {
         return ResponseEntity.ok(
                 SuccessResponse.from(
-                        tripPlaceImageQueryService.getFavoriteImages(tripDayPlaceId)
+                        tripPlaceImageQueryServiceLegacy.getFavoriteImages(tripDayPlaceId)
                 )
         );
     }
@@ -75,7 +75,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
             @PathVariable String tripDayPlaceId,
             @RequestBody TripPlaceImageReq.ImageMove imageReq
     ) {
-        tripPlaceImageMovementService.moveImageToAnotherPlace(tripDayPlaceId, imageReq);
+        tripPlaceImageMovementServiceLegacy.moveImageToAnotherPlace(tripDayPlaceId, imageReq);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
@@ -85,7 +85,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
             @PathVariable Long tripId,
             @RequestBody TripPlaceImageReq.ImageCrossDayMove imageReq
     ) {
-        tripPlaceImageMovementService.moveImageBetweenDayPlaces(imageReq);
+        tripPlaceImageMovementServiceLegacy.moveImageBetweenDayPlaces(imageReq);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
@@ -96,7 +96,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
             @PathVariable String tripDayPlaceId,
             @RequestBody TripPlaceImageReq.ImageUnmatchedMove imageReq
     ) {
-        tripPlaceImageMovementService.moveImageToUnmatched(tripDayPlaceId, imageReq);
+        tripPlaceImageMovementServiceLegacy.moveImageToUnmatched(tripDayPlaceId, imageReq);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
@@ -107,7 +107,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
             @PathVariable String tripDayPlaceId,
             @RequestBody TripPlaceImageReq.ImageUnmatchedMove imageReq
     ) {
-        tripPlaceImageMovementService.moveImageFromUnmatchedToPlace(tripDayPlaceId, imageReq);
+        tripPlaceImageMovementServiceLegacy.moveImageFromUnmatchedToPlace(tripDayPlaceId, imageReq);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
@@ -117,7 +117,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
             @PathVariable Long tripId,
             @PathVariable String tripDayPlaceId
     ) {
-        tripPlaceImageReassignmentService.reassignImagesToTripDayPlace(tripDayPlaceId);
+        tripPlaceImageReassignmentServiceLegacy.reassignImagesToTripDayPlace(tripDayPlaceId);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
@@ -129,7 +129,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
             @PathVariable String imageId,
             @RequestBody FavoriteImageReq favoriteImageReq
     ) {
-        tripPlaceImageCommandService.updateImageFavoriteStatus(tripDayPlaceId, imageId, favoriteImageReq);
+        tripPlaceImageCommandServiceLegacy.updateImageFavoriteStatus(tripDayPlaceId, imageId, favoriteImageReq);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
@@ -141,7 +141,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
             @PathVariable String imageId,
             @RequestBody TripPlaceImageDeleteDto.SingleDeleteReq deleteReq
     ) {
-        tripPlaceImageCommandService.deleteSingleImage(tripDayPlaceId, imageId, deleteReq);
+        tripPlaceImageCommandServiceLegacy.deleteSingleImage(tripDayPlaceId, imageId, deleteReq);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
@@ -151,7 +151,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
             @PathVariable Long tripId,
             @RequestBody TripPlaceImageDeleteDto.MultiDeleteReq deleteReq
     ) {
-        tripPlaceImageCommandService.deleteMultipleImages(tripId, deleteReq);
+        tripPlaceImageCommandServiceLegacy.deleteMultipleImages(tripId, deleteReq);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 }
