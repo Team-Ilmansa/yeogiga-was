@@ -18,7 +18,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class TripPlaceImageCommandServiceTest {
+public class TripPlaceImageCommandServiceLegacyTest {
 
     @Mock
     private TripDayPlaceService tripDayPlaceService;
@@ -27,7 +27,7 @@ public class TripPlaceImageCommandServiceTest {
     private ImageDeleteProcessor imageDeleteProcessor;
 
     @InjectMocks
-    private TripPlaceImageCommandService tripPlaceImageCommandService;
+    private TripPlaceImageCommandServiceLegacy tripPlaceImageCommandServiceLegacy;
 
     private final String tripDayPlaceId = "day-1";
     private final String placeId = "place-1";
@@ -40,7 +40,7 @@ public class TripPlaceImageCommandServiceTest {
         FavoriteImageReq favoriteImageReq = new FavoriteImageReq(placeId, true);
 
         // when
-        tripPlaceImageCommandService.updateImageFavoriteStatus(tripDayPlaceId, imageId, favoriteImageReq);
+        tripPlaceImageCommandServiceLegacy.updateImageFavoriteStatus(tripDayPlaceId, imageId, favoriteImageReq);
 
         // then
         verify(tripDayPlaceService, times(1))
@@ -61,7 +61,7 @@ public class TripPlaceImageCommandServiceTest {
                     );
 
             // when
-            tripPlaceImageCommandService.deleteSingleImage(tripDayPlaceId, imageId, req);
+            tripPlaceImageCommandServiceLegacy.deleteSingleImage(tripDayPlaceId, imageId, req);
 
             // then
             verify(tripDayPlaceService, times(1)).deleteImage(tripDayPlaceId, placeId, imageId);
@@ -78,7 +78,7 @@ public class TripPlaceImageCommandServiceTest {
                     );
 
             // when
-            tripPlaceImageCommandService.deleteSingleImage(tripDayPlaceId, imageId, req);
+            tripPlaceImageCommandServiceLegacy.deleteSingleImage(tripDayPlaceId, imageId, req);
 
             // then
             verify(tripDayPlaceService, times(1)).deleteImageFromUnMatched(tripDayPlaceId, imageId);
@@ -97,7 +97,7 @@ public class TripPlaceImageCommandServiceTest {
                 new TripPlaceImageDeleteDto.MultiDeleteReq(imageIds, urls);
 
         // when
-        tripPlaceImageCommandService.deleteMultipleImages(tripId, req);
+        tripPlaceImageCommandServiceLegacy.deleteMultipleImages(tripId, req);
 
         // then
         verify(tripDayPlaceService, times(1)).deleteImagesByTripId(tripId, imageIds);

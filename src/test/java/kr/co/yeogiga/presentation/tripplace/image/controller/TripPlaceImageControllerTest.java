@@ -6,10 +6,10 @@ import kr.co.yeogiga.application.tripplace.image.dto.FavoriteImageRes;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageDeleteDto;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageReq;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageRes;
-import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageCommandService;
-import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageMovementService;
-import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageQueryService;
-import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageReassignmentService;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageCommandServiceLegacy;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageMovementServiceLegacy;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageQueryServiceLegacy;
+import kr.co.yeogiga.application.tripplace.image.service.TripPlaceImageReassignmentServiceLegacy;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
@@ -60,16 +60,16 @@ public class TripPlaceImageControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private TripPlaceImageMovementService tripPlaceImageMovementService;
+    private TripPlaceImageMovementServiceLegacy tripPlaceImageMovementServiceLegacy;
 
     @MockBean
-    private TripPlaceImageCommandService tripPlaceImageCommandService;
+    private TripPlaceImageCommandServiceLegacy tripPlaceImageCommandServiceLegacy;
 
     @MockBean
-    private TripPlaceImageQueryService tripPlaceImageQueryService;
+    private TripPlaceImageQueryServiceLegacy tripPlaceImageQueryServiceLegacy;
 
     @MockBean
-    private TripPlaceImageReassignmentService tripPlaceImageReassignmentService;
+    private TripPlaceImageReassignmentServiceLegacy tripPlaceImageReassignmentServiceLegacy;
 
     private final Long tripId = 1L;
     private final String tripDayPlaceId = "dayId";
@@ -101,7 +101,7 @@ public class TripPlaceImageControllerTest {
                     .images(List.of())
                     .build();
 
-            when(tripPlaceImageQueryService.getPlaceImageInfo(tripDayPlaceId, fromPlaceId))
+            when(tripPlaceImageQueryServiceLegacy.getPlaceImageInfo(tripDayPlaceId, fromPlaceId))
                     .thenReturn(placeImageInfo);
 
             // when
@@ -135,7 +135,7 @@ public class TripPlaceImageControllerTest {
                     ))
                     .build();
 
-            when(tripPlaceImageQueryService.getUnmatchedImageInfo(tripDayPlaceId))
+            when(tripPlaceImageQueryServiceLegacy.getUnmatchedImageInfo(tripDayPlaceId))
                     .thenReturn(unmatchedImageInfo);
 
             // when
@@ -166,7 +166,7 @@ public class TripPlaceImageControllerTest {
                     LocalDateTime.now(), true
             );
 
-            given(tripPlaceImageQueryService.getFavoriteImages(tripDayPlaceId))
+            given(tripPlaceImageQueryServiceLegacy.getFavoriteImages(tripDayPlaceId))
                     .willReturn(List.of(image1, image2));
 
             // when
@@ -196,7 +196,7 @@ public class TripPlaceImageControllerTest {
         @DisplayName("성공")
         void success() throws Exception {
             // given
-            doNothing().when(tripPlaceImageMovementService).moveImageToAnotherPlace(tripDayPlaceId, req);
+            doNothing().when(tripPlaceImageMovementServiceLegacy).moveImageToAnotherPlace(tripDayPlaceId, req);
 
             // when
             ResultActions resultActions = mockMvc.perform(
@@ -217,7 +217,7 @@ public class TripPlaceImageControllerTest {
         void FailNotFoundTripDayPlace() throws Exception {
             // given
             doThrow(new CustomException(TripErrorType.TRIP_PLACE_NOT_FOUND))
-                    .when(tripPlaceImageMovementService).moveImageToAnotherPlace(tripDayPlaceId, req);
+                    .when(tripPlaceImageMovementServiceLegacy).moveImageToAnotherPlace(tripDayPlaceId, req);
 
             // when
             ResultActions resultActions = mockMvc.perform(
@@ -239,7 +239,7 @@ public class TripPlaceImageControllerTest {
         void failNotFoundPlace() throws Exception {
             // given
             doThrow(new CustomException(TripErrorType.PLACE_NOT_FOUND))
-                    .when(tripPlaceImageMovementService).moveImageToAnotherPlace(tripDayPlaceId, req);
+                    .when(tripPlaceImageMovementServiceLegacy).moveImageToAnotherPlace(tripDayPlaceId, req);
 
             // when
             ResultActions resultActions = mockMvc.perform(
@@ -261,7 +261,7 @@ public class TripPlaceImageControllerTest {
         void failNotFoundImage() throws Exception {
             // given
             doThrow(new CustomException(ImageErrorType.NOT_FOUND))
-                    .when(tripPlaceImageMovementService).moveImageToAnotherPlace(tripDayPlaceId, req);
+                    .when(tripPlaceImageMovementServiceLegacy).moveImageToAnotherPlace(tripDayPlaceId, req);
 
             // when
             ResultActions resultActions = mockMvc.perform(
@@ -285,7 +285,7 @@ public class TripPlaceImageControllerTest {
         // given
         TripPlaceImageReq.ImageCrossDayMove req =
                 new TripPlaceImageReq.ImageCrossDayMove("day1", fromPlaceId, "day2", toPlaceId, imageId);
-        doNothing().when(tripPlaceImageMovementService).moveImageBetweenDayPlaces(req);
+        doNothing().when(tripPlaceImageMovementServiceLegacy).moveImageBetweenDayPlaces(req);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -306,7 +306,7 @@ public class TripPlaceImageControllerTest {
     void moveImageToUnmatchedSuccess() throws Exception {
         // given
         TripPlaceImageReq.ImageUnmatchedMove req = new TripPlaceImageReq.ImageUnmatchedMove(fromPlaceId, imageId);
-        doNothing().when(tripPlaceImageMovementService).moveImageToUnmatched(tripDayPlaceId, req);
+        doNothing().when(tripPlaceImageMovementServiceLegacy).moveImageToUnmatched(tripDayPlaceId, req);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -327,7 +327,7 @@ public class TripPlaceImageControllerTest {
     void moveImageFromUnmatchedToPlaceSuccess() throws Exception {
         // given
         TripPlaceImageReq.ImageUnmatchedMove req = new TripPlaceImageReq.ImageUnmatchedMove(toPlaceId, imageId);
-        doNothing().when(tripPlaceImageMovementService).moveImageFromUnmatchedToPlace(tripDayPlaceId, req);
+        doNothing().when(tripPlaceImageMovementServiceLegacy).moveImageFromUnmatchedToPlace(tripDayPlaceId, req);
 
         // when
         ResultActions resultActions = mockMvc.perform(

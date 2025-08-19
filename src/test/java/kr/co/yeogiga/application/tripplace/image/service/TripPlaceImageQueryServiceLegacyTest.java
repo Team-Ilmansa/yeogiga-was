@@ -27,13 +27,13 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class TripPlaceImageQueryServiceTest {
+public class TripPlaceImageQueryServiceLegacyTest {
 
     @Mock
     private TripDayPlaceService tripDayPlaceService;
 
     @InjectMocks
-    private TripPlaceImageQueryService tripPlaceImageQueryService;
+    private TripPlaceImageQueryServiceLegacy tripPlaceImageQueryServiceLegacy;
 
     private final String tripDayPlaceId = "tripDayPlace-id";
     private final String placeId = "place-id";
@@ -68,7 +68,7 @@ public class TripPlaceImageQueryServiceTest {
                     .thenReturn(Optional.of(place));
 
             // when
-            TripPlaceImageRes.PlaceImageInfo result = tripPlaceImageQueryService.getPlaceImageInfo(tripDayPlaceId, placeId);
+            TripPlaceImageRes.PlaceImageInfo result = tripPlaceImageQueryServiceLegacy.getPlaceImageInfo(tripDayPlaceId, placeId);
 
             // then
             assertEquals(placeId, result.id());
@@ -84,7 +84,7 @@ public class TripPlaceImageQueryServiceTest {
 
             // when
             CustomException exception = assertThrows(CustomException.class,
-                    () -> tripPlaceImageQueryService.getPlaceImageInfo(tripDayPlaceId, placeId));
+                    () -> tripPlaceImageQueryServiceLegacy.getPlaceImageInfo(tripDayPlaceId, placeId));
 
             // then
             assertEquals(TripErrorType.PLACE_NOT_FOUND, exception.getErrorType());
@@ -99,7 +99,7 @@ public class TripPlaceImageQueryServiceTest {
                 .thenReturn(List.of(image));
 
         // when
-        TripPlaceImageRes.UnmatchedImageInfo result = tripPlaceImageQueryService.getUnmatchedImageInfo(tripDayPlaceId);
+        TripPlaceImageRes.UnmatchedImageInfo result = tripPlaceImageQueryServiceLegacy.getUnmatchedImageInfo(tripDayPlaceId);
 
         // then
         assertEquals(image.getUrl(), result.images().get(0).url());
@@ -114,7 +114,7 @@ public class TripPlaceImageQueryServiceTest {
                 .willReturn(List.of(image));
 
         // when
-        List<FavoriteImageRes> result = tripPlaceImageQueryService.getFavoriteImages(tripDayPlaceId);
+        List<FavoriteImageRes> result = tripPlaceImageQueryServiceLegacy.getFavoriteImages(tripDayPlaceId);
 
         // then
         assertEquals(1, result.size());

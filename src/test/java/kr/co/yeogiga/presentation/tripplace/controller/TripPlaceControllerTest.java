@@ -6,7 +6,7 @@ import kr.co.yeogiga.application.tripplace.dto.TripPlaceReqLegacy;
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceRes;
 import kr.co.yeogiga.application.tripplace.dto.VisitedMarkReq;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceCommandServiceLegacy;
-import kr.co.yeogiga.application.tripplace.service.TripPlaceQueryService;
+import kr.co.yeogiga.application.tripplace.service.TripPlaceQueryServiceLegacy;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceSavingServiceLegacy;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
@@ -63,7 +63,7 @@ public class TripPlaceControllerTest {
     private TripPlaceCommandServiceLegacy tripPlaceCommandServiceLegacy;
 
     @MockBean
-    private TripPlaceQueryService tripPlaceQueryService;
+    private TripPlaceQueryServiceLegacy tripPlaceQueryServiceLegacy;
 
     private final Long tripId = 1L;
     private final String tripDayPlaceId = "dayId";
@@ -128,7 +128,7 @@ public class TripPlaceControllerTest {
     void getTripDayPlacesInfoSuccess() throws Exception {
         // given
         TripPlaceRes.TripDayPlaceInfo info = new TripPlaceRes.TripDayPlaceInfo("day1", 1, List.of());
-        given(tripPlaceQueryService.getTripDayPlacesInfo(tripId)).willReturn(List.of(info));
+        given(tripPlaceQueryServiceLegacy.getTripDayPlacesInfo(tripId)).willReturn(List.of(info));
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -148,7 +148,7 @@ public class TripPlaceControllerTest {
         // given
         TripPlaceRes.PlaceDetails details =
                 new TripPlaceRes.PlaceDetails("place1", "목적지1", 0.0, 0.0, "카페", true);
-        given(tripPlaceQueryService.getPlaceDetailsInfo(tripDayPlaceId)).willReturn(List.of(details));
+        given(tripPlaceQueryServiceLegacy.getPlaceDetailsInfo(tripDayPlaceId)).willReturn(List.of(details));
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -174,7 +174,7 @@ public class TripPlaceControllerTest {
                 new TripDaySummaryRes.ImageDto("image-id", "url", 1.0, 2.0, LocalDateTime.now())
         );
 
-        given(tripPlaceQueryService.getTripDaySummaries(tripId)).willReturn(List.of(responseDto));
+        given(tripPlaceQueryServiceLegacy.getTripDaySummaries(tripId)).willReturn(List.of(responseDto));
 
         // when
         ResultActions resultActions = mockMvc.perform(
