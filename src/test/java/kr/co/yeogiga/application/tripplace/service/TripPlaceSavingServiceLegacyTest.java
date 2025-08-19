@@ -1,12 +1,11 @@
 package kr.co.yeogiga.application.tripplace.service;
 
-import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceReqLegacy;
 import kr.co.yeogiga.domain.trip.entity.Trip;
-import kr.co.yeogiga.domain.trip.service.PlaceService;
-import kr.co.yeogiga.domain.trip.service.TripDayService;
 import kr.co.yeogiga.domain.trip.service.TripService;
-import kr.co.yeogiga.domain.trip.type.PlaceCategory;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
+import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
+import kr.co.yeogiga.domain.trip.type.PlaceCategory;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;
 import kr.co.yeogiga.infrastructure.redis.constant.PlaceConstant;
 import org.junit.jupiter.api.DisplayName;
@@ -35,22 +34,19 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class TripPlaceSavingServiceTest {
+public class TripPlaceSavingServiceLegacyTest {
 
     @Mock
-    private TripService tripService;
-
-    @Mock
-    private TripDayService tripDayService;
-
-    @Mock
-    private PlaceService placeService;
+    private TripDayPlaceService tripDayPlaceService;
 
     @Mock
     private RedisRepository redisRepository;
 
+    @Mock
+    private TripService tripService;
+
     @InjectMocks
-    private TripPlaceSavingService tripPlaceSavingService;
+    private TripPlaceSavingServiceLegacy tripPlaceSavingServiceLegacy;
 
     private final Long tripId = 1L;
     private final int lastDay = 2;
@@ -65,16 +61,17 @@ public class TripPlaceSavingServiceTest {
     @DisplayName("여행 생성 완료 성공 - 여행 전")
     void completeTripSuccessPlanned() {
         // given
-        TripPlaceReq.StoredFormat place1 = new TripPlaceReq.StoredFormat(
+        TripPlaceReqLegacy.StoredFormat place1 = new TripPlaceReqLegacy.StoredFormat(
                 "id1", "장소1", 33.123, 126.456, PlaceCategory.TOURISM
         );
-        TripPlaceReq.StoredFormat place2 = new TripPlaceReq.StoredFormat(
+        TripPlaceReqLegacy.StoredFormat place2 = new TripPlaceReqLegacy.StoredFormat(
                 "id2", "장소2", 33.789, 126.987, PlaceCategory.RESTAURANT
         );
 
-        when(redisRepository.getList(anyString(), eq(TripPlaceReq.StoredFormat.class)))
+        when(redisRepository.getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class)))
                 .thenReturn(List.of(place1))
                 .thenReturn(List.of(place2));
+
 
         ReflectionTestUtils.setField(trip, "startedAt", LocalDateTime.of(2025, 5, 25, 12, 0));
         ReflectionTestUtils.setField(trip, "endedAt", LocalDateTime.of(2025, 5, 26, 12, 0));
@@ -88,12 +85,11 @@ public class TripPlaceSavingServiceTest {
             mockedLocalDateTime.when(LocalDateTime::now).thenReturn(mockNow);
 
             // when
-            tripPlaceSavingService.completeTrip(tripId, lastDay);
+            tripPlaceSavingServiceLegacy.completeTrip(tripId, lastDay);
 
             // then
-            verify(redisRepository, times(2)).getList(anyString(), eq(TripPlaceReq.StoredFormat.class));
-            verify(tripDayService, times(2)).save(any());
-            verify(placeService, times(1)).saveAll(any());
+            verify(redisRepository, times(2)).getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class));
+            verify(tripDayPlaceService, times(1)).saveAll(any());
             verify(redisRepository, times(1)).del(PlaceConstant.dayPlacesKey(tripId, 1));
             verify(redisRepository, times(1)).del(PlaceConstant.dayPlaceSetKey(tripId, 1));
             verify(redisRepository, times(1)).del(PlaceConstant.dayPlacesKey(tripId, 2));
@@ -107,14 +103,14 @@ public class TripPlaceSavingServiceTest {
     @DisplayName("여행 생성 완료 성공 - 여행 중")
     void completeTripSuccessInProgress() {
         // given
-        TripPlaceReq.StoredFormat place1 = new TripPlaceReq.StoredFormat(
+        TripPlaceReqLegacy.StoredFormat place1 = new TripPlaceReqLegacy.StoredFormat(
                 "id1", "장소1", 33.123, 126.456, PlaceCategory.TOURISM
         );
-        TripPlaceReq.StoredFormat place2 = new TripPlaceReq.StoredFormat(
+        TripPlaceReqLegacy.StoredFormat place2 = new TripPlaceReqLegacy.StoredFormat(
                 "id2", "장소2", 33.789, 126.987, PlaceCategory.RESTAURANT
         );
 
-        when(redisRepository.getList(anyString(), eq(TripPlaceReq.StoredFormat.class)))
+        when(redisRepository.getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class)))
                 .thenReturn(List.of(place1))
                 .thenReturn(List.of(place2));
 
@@ -131,12 +127,11 @@ public class TripPlaceSavingServiceTest {
             mockedLocalDateTime.when(LocalDateTime::now).thenReturn(mockNow);
 
             // when
-            tripPlaceSavingService.completeTrip(tripId, lastDay);
+            tripPlaceSavingServiceLegacy.completeTrip(tripId, lastDay);
 
             // then
-            verify(redisRepository, times(2)).getList(anyString(), eq(TripPlaceReq.StoredFormat.class));
-            verify(tripDayService, times(2)).save(any());
-            verify(placeService, times(1)).saveAll(any());
+            verify(redisRepository, times(2)).getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class));
+            verify(tripDayPlaceService, times(1)).saveAll(any());
             verify(redisRepository, times(1)).del(PlaceConstant.dayPlacesKey(tripId, 1));
             verify(redisRepository, times(1)).del(PlaceConstant.dayPlaceSetKey(tripId, 1));
             verify(redisRepository, times(1)).del(PlaceConstant.dayPlacesKey(tripId, 2));
@@ -150,14 +145,14 @@ public class TripPlaceSavingServiceTest {
     @DisplayName("여행 생성 완료 성공 - 여행 후")
     void completeTripSuccessCompleted() {
         // given
-        TripPlaceReq.StoredFormat place1 = new TripPlaceReq.StoredFormat(
+        TripPlaceReqLegacy.StoredFormat place1 = new TripPlaceReqLegacy.StoredFormat(
                 "id1", "장소1", 33.123, 126.456, PlaceCategory.TOURISM
         );
-        TripPlaceReq.StoredFormat place2 = new TripPlaceReq.StoredFormat(
+        TripPlaceReqLegacy.StoredFormat place2 = new TripPlaceReqLegacy.StoredFormat(
                 "id2", "장소2", 33.789, 126.987, PlaceCategory.RESTAURANT
         );
 
-        when(redisRepository.getList(anyString(), eq(TripPlaceReq.StoredFormat.class)))
+        when(redisRepository.getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class)))
                 .thenReturn(List.of(place1))
                 .thenReturn(List.of(place2));
 
@@ -174,12 +169,11 @@ public class TripPlaceSavingServiceTest {
             mockedLocalDateTime.when(LocalDateTime::now).thenReturn(mockNow);
 
             // when
-            tripPlaceSavingService.completeTrip(tripId, lastDay);
+            tripPlaceSavingServiceLegacy.completeTrip(tripId, lastDay);
 
             // then
-            verify(redisRepository, times(2)).getList(anyString(), eq(TripPlaceReq.StoredFormat.class));
-            verify(tripDayService, times(2)).save(any());
-            verify(placeService, times(1)).saveAll(any());
+            verify(redisRepository, times(2)).getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class));
+            verify(tripDayPlaceService, times(1)).saveAll(any());
             verify(redisRepository, times(1)).del(PlaceConstant.dayPlacesKey(tripId, 1));
             verify(redisRepository, times(1)).del(PlaceConstant.dayPlaceSetKey(tripId, 1));
             verify(redisRepository, times(1)).del(PlaceConstant.dayPlacesKey(tripId, 2));

@@ -1,116 +1,51 @@
 package kr.co.yeogiga.application.tripplace.service;
 
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceReqLegacy;
 import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.domain.trip.entity.Place;
+import kr.co.yeogiga.domain.trip.entity.TripDay;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
-import kr.co.yeogiga.domain.tripplace.entity.Place;
-import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
-import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
+import kr.co.yeogiga.domain.trip.service.PlaceService;
+import kr.co.yeogiga.domain.trip.service.TripDayService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class TripPlaceCommandService {
-    private final TripDayPlaceService tripDayPlaceService;
+    private final TripDayService tripDayService;
+    private final PlaceService placeService;
 
     /**
      * 여행 일차에 새로운 목적지를 삽입 메서드
      * 삽입 위치는 현재 목적지 order 중 최대값을 기준으로 order를 계산하여 결정
      *
-     * @param tripDayPlaceId 여행 일차(TripDayPlace)의 ID
-     * @param insertRequest  삽입할 장소 정보 및 위치 기준 정보
+     * @param tripId        여행 ID
+     * @param day           여행 일차
+     * @param insertRequest 삽입할 장소 정보 및 위치 기준 정보
      */
-    public void addNewPlace(String tripDayPlaceId, TripPlaceReq.Request insertRequest) {
-        Double maxPlaceOrder = tripDayPlaceService.readMaxOrderById(tripDayPlaceId);
+    public void addNewPlace(Long tripId, int day, TripPlaceReq.Request insertRequest) {
+        TripDay tripDay = tripDayService.readByTripIdAndDay(tripId, day)
+                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_DAY_NOT_FOUND));
 
-        // TODO : 중복여행 못담기게
-        tripDayPlaceService.savePlace(
-                tripDayPlaceId,
-                createPlace(insertRequest, maxPlaceOrder)
-        );
+        int placeCount = placeService.countByTripDayId(tripDay.getId());
+
+        placeService.save(createPlace(tripDay, insertRequest, placeCount));
     }
 
     /**
      * 목적지 객체를 만드는 메서드
      * 현재 목적지 order 최대값 기반으로 새로운 order를 계산하여 새로운 Place 객체를 생성
-     * 1. maxPlaceOrder : 0.0 => 존재하는 목적지가 없는 상황
-     * 2. maxPlaceOrder : 0.0 x => 마지막 목적지 뒤에 추가하는 상화
+     * 1. maxPlaceOrder : 0 => 존재하는 목적지가 없는 상황
+     * 2. maxPlaceOrder : 0 x => 마지막 목적지 뒤에 추가하는 상화
      *
+     * @param tripDay       여행 일차 객체
      * @param request       사용자 요청 정보
      * @param maxPlaceOrder 현재 목적지 order 중 최대값 (nullable)
      * @return 생성된 Place 객체
      */
-    private Place createPlace(TripPlaceReq.Request request, Double maxPlaceOrder) {
-        return request.toEntity(maxPlaceOrder + 10.0);
-    }
-
-    /**
-     * 목적지를 정렬하는 메서드
-     * 여행 일차에 등록된 모든 장소(Place)의 순서를 클라이언트가 전달한 순서대로 재정렬
-     *
-     * @param tripDayPlaceId 여행 일차(TripDayPlace)의 ID
-     * @param reorderRequest 재정렬할 목적지 ID 리스트
-     */
-    public void reorderPlaces(String tripDayPlaceId, TripPlaceReq.ReorderRequest reorderRequest) {
-        TripDayPlace tripDayPlace = tripDayPlaceService.readById(tripDayPlaceId)
-                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_PLACE_NOT_FOUND));
-
-        Map<String, Place> placeMap = tripDayPlace.getPlaces().stream()
-                .collect(Collectors.toMap(Place::getId, Function.identity()));
-
-        List<Place> reordered = buildReorderedPlaces(reorderRequest.orderedPlaceIds(), placeMap);
-
-        tripDayPlace.updatePlaces(reordered);
-        tripDayPlaceService.save(tripDayPlace);
-    }
-
-    /**
-     * 목적지를 정렬하여 반환하는 메서드
-     * 정렬된 placeId 리스트를 기준으로 order 값을 10 단위로 재부여하여 Place 리스트를 생성
-     *
-     * @param orderedIds 정렬된 Place ID 목록
-     * @param placeMap   ID 기준 Place 매핑 정보
-     * @return 재정렬된 Place 리스트
-     */
-    private List<Place> buildReorderedPlaces(List<String> orderedIds, Map<String, Place> placeMap) {
-        List<Place> reordered = new ArrayList<>();
-
-        for (int i = 0; i < orderedIds.size(); i++) {
-            String placeId = orderedIds.get(i);
-            Place place = placeMap.get(placeId);
-
-            place.updateOrder((i + 1) * 10.0);
-            reordered.add(place);
-        }
-
-        return reordered;
-    }
-
-    /**
-     * 특정 목적지의 방문 여부를 업데이트하는 메서드
-     *
-     * @param tripDayPlaceId 여행 일차 ID
-     * @param placeId        목적지 ID
-     * @param isVisited      변경할 상태
-     */
-    public void markPlaceAsVisited(String tripDayPlaceId, String placeId, boolean isVisited) {
-        tripDayPlaceService.updatePlaceVisited(tripDayPlaceId, placeId, isVisited);
-    }
-
-    /**
-     * 여행 일차(TripDayPlace)에서 특정 목적지를 삭제하는 메서드
-     *
-     * @param tripDayPlaceId 여행 일차 ID
-     * @param placeId        삭제할 목적지 ID
-     */
-    public void deletePlace(String tripDayPlaceId, String placeId) {
-        tripDayPlaceService.deletePlace(tripDayPlaceId, placeId);
+    private Place createPlace(TripDay tripDay, TripPlaceReq.Request request, int maxPlaceOrder) {
+        return request.toEntity(tripDay, maxPlaceOrder + 1);
     }
 }

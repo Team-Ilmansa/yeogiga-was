@@ -1,10 +1,10 @@
 package kr.co.yeogiga.presentation.tripplace.controller;
 
-import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceReqLegacy;
 import kr.co.yeogiga.application.tripplace.dto.VisitedMarkReq;
-import kr.co.yeogiga.application.tripplace.service.TripPlaceCommandService;
+import kr.co.yeogiga.application.tripplace.service.TripPlaceCommandServiceLegacy;
 import kr.co.yeogiga.application.tripplace.service.TripPlaceQueryService;
-import kr.co.yeogiga.application.tripplace.service.TripPlaceSavingService;
+import kr.co.yeogiga.application.tripplace.service.TripPlaceSavingServiceLegacy;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.presentation.tripplace.api.TripPlaceApi;
 import lombok.RequiredArgsConstructor;
@@ -24,16 +24,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/trip")
 @RequiredArgsConstructor
 public class TripPlaceController implements TripPlaceApi {
-    private final TripPlaceSavingService tripPlaceSavingService;
-    private final TripPlaceCommandService tripPlaceCommandService;
+    private final TripPlaceSavingServiceLegacy tripPlaceSavingServiceLegacy;
+    private final TripPlaceCommandServiceLegacy tripPlaceCommandServiceLegacy;
     private final TripPlaceQueryService tripPlaceQueryService;
 
     @Override
     @PostMapping("/{tripId}/complete")
     public ResponseEntity<?> completeTrip(@PathVariable Long tripId,
-                                          @RequestBody TripPlaceReq.CompleteRequest request) {
+                                          @RequestBody TripPlaceReqLegacy.CompleteRequest request) {
 
-        tripPlaceSavingService.completeTrip(tripId, request.lastDay());
+        tripPlaceSavingServiceLegacy.completeTrip(tripId, request.lastDay());
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
@@ -41,9 +41,9 @@ public class TripPlaceController implements TripPlaceApi {
     @PostMapping("/{tripId}/day-place/{tripDayPlaceId}/places")
     public ResponseEntity<?> addNewPlace(@PathVariable Long tripId,
                                          @PathVariable String tripDayPlaceId,
-                                         @RequestBody TripPlaceReq.Request request) {
+                                         @RequestBody TripPlaceReqLegacy.Request request) {
 
-        tripPlaceCommandService.addNewPlace(tripDayPlaceId, request);
+        tripPlaceCommandServiceLegacy.addNewPlace(tripDayPlaceId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created());
     }
 
@@ -77,8 +77,8 @@ public class TripPlaceController implements TripPlaceApi {
     @PutMapping("/{tripId}/day-place/{tripDayPlaceId}/places/order")
     public ResponseEntity<?> reorderPlaces(@PathVariable Long tripId,
                                            @PathVariable String tripDayPlaceId,
-                                           @RequestBody TripPlaceReq.ReorderRequest reorderRequest) {
-        tripPlaceCommandService.reorderPlaces(tripDayPlaceId, reorderRequest);
+                                           @RequestBody TripPlaceReqLegacy.ReorderRequest reorderRequest) {
+        tripPlaceCommandServiceLegacy.reorderPlaces(tripDayPlaceId, reorderRequest);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
@@ -88,7 +88,7 @@ public class TripPlaceController implements TripPlaceApi {
                                                 @PathVariable String tripDayPlaceId,
                                                 @PathVariable String placeId,
                                                 @RequestBody VisitedMarkReq visitedMarkReq) {
-        tripPlaceCommandService.markPlaceAsVisited(tripDayPlaceId, placeId, visitedMarkReq.isVisited());
+        tripPlaceCommandServiceLegacy.markPlaceAsVisited(tripDayPlaceId, placeId, visitedMarkReq.isVisited());
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 
@@ -98,7 +98,7 @@ public class TripPlaceController implements TripPlaceApi {
                                          @PathVariable String tripDayPlaceId,
                                          @PathVariable String placeId) {
 
-        tripPlaceCommandService.deletePlace(tripDayPlaceId, placeId);
+        tripPlaceCommandServiceLegacy.deletePlace(tripDayPlaceId, placeId);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
 }

@@ -2,11 +2,14 @@ package kr.co.yeogiga.application.tripplace.service;
 
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
 import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.domain.trip.entity.Place;
+import kr.co.yeogiga.domain.trip.entity.Trip;
+import kr.co.yeogiga.domain.trip.entity.TripDay;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
-import kr.co.yeogiga.domain.tripplace.entity.Place;
-import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
-import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
+import kr.co.yeogiga.domain.trip.service.PlaceService;
+import kr.co.yeogiga.domain.trip.service.TripDayService;
 import kr.co.yeogiga.domain.trip.type.PlaceCategory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,15 +19,16 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -32,135 +36,94 @@ import static org.mockito.Mockito.verify;
 public class TripPlaceCommandServiceTest {
 
     @Mock
-    private TripDayPlaceService tripDayPlaceService;
+    private TripDayService tripDayService;
+
+    @Mock
+    private PlaceService placeService;
 
     @InjectMocks
     private TripPlaceCommandService tripPlaceCommandService;
 
-    private final String tripDayPlaceId = "tripDayPlaceId";
+    private final Long tripId = 1L;
+    private final Long tripDayId = 10L;
+
 
     @Nested
     @DisplayName("새로운 목적지 추가 테스트")
     class AddNewsPlaceTest {
 
+        private final int day = 1;
+        private TripDay tripDay;
+        private TripPlaceReq.Request request;
+
         @Captor
         private ArgumentCaptor<Place> placeCaptor;
 
-        @Test
-        @DisplayName("가장 처음 추가되는 경우 - 기존에 목적지 없는 상태")
-        void addPlaceFirst() {
-            // given
-            given(tripDayPlaceService.readMaxOrderById(tripDayPlaceId)).willReturn(0.0);
-            TripPlaceReq.Request request = TripPlaceReq.Request.builder()
+        @BeforeEach
+        void setUp() {
+            tripDay = TripDay.builder()
+                    .trip(mock(Trip.class))
+                    .day(day)
+                    .build();
+
+            ReflectionTestUtils.setField(tripDay, "id", tripDayId);
+
+            request = TripPlaceReq.Request.builder()
                     .name("목적지1")
                     .latitude(0.0)
                     .longitude(0.0)
                     .placeType(PlaceCategory.RESTAURANT)
                     .build();
+        }
+
+        @Test
+        @DisplayName("실패 - 여행 일정이 없는 경우")
+        void failWhenTripDayNotFound() {
+            // given
+            given(tripDayService.readByTripIdAndDay(tripId, day)).willReturn(Optional.empty());
 
             // when
-            tripPlaceCommandService.addNewPlace(tripDayPlaceId, request);
+            CustomException exception = assertThrows(CustomException.class,
+                    () -> tripPlaceCommandService.addNewPlace(tripId, day, request));
 
             // then
-            verify(tripDayPlaceService).savePlace(eq(tripDayPlaceId), placeCaptor.capture());
+            assertEquals(TripErrorType.TRIP_DAY_NOT_FOUND, exception.getErrorType());
+            verify(placeService, never()).save(any(Place.class));
+        }
+
+        @Test
+        @DisplayName("가장 처음 추가되는 경우 - 기존에 목적지 없는 상태")
+        void addPlaceFirst() {
+            // given
+            given(tripDayService.readByTripIdAndDay(tripId, day)).willReturn(Optional.ofNullable(tripDay));
+            given(placeService.countByTripDayId(tripDayId)).willReturn(0);
+
+            // when
+            tripPlaceCommandService.addNewPlace(tripId, day, request);
+
+            // then
+            verify(placeService, times(1)).save(placeCaptor.capture());
 
             Place captured = placeCaptor.getValue();
-            assertEquals(10.0, captured.getOrder());
+            assertEquals(1, captured.getSortOrder());
         }
 
         @Test
         @DisplayName("가장 뒤에 추가되는 경우")
         void addPlaceBack() {
             // given
-            given(tripDayPlaceService.readMaxOrderById(tripDayPlaceId)).willReturn(20.0);
-            TripPlaceReq.Request request = TripPlaceReq.Request.builder()
-                    .name("목적지1")
-                    .latitude(0.0)
-                    .longitude(0.0)
-                    .placeType(PlaceCategory.RESTAURANT)
-                    .build();
+            given(tripDayService.readByTripIdAndDay(tripId, day)).willReturn(Optional.ofNullable(tripDay));
+            given(placeService.countByTripDayId(tripDayId)).willReturn(3);
 
             // when
-            tripPlaceCommandService.addNewPlace(tripDayPlaceId, request);
+            tripPlaceCommandService.addNewPlace(tripId, day, request);
 
             // then
-            verify(tripDayPlaceService).savePlace(eq(tripDayPlaceId), placeCaptor.capture());
+            verify(placeService, times(1)).save(placeCaptor.capture());
 
             Place captured = placeCaptor.getValue();
-            assertEquals(30.0, captured.getOrder());
+            assertEquals(4, captured.getSortOrder());
         }
 
-    }
-
-
-    @Nested
-    @DisplayName("목적지 정렬 테스트")
-    class ReorderPlacesTest {
-
-        @Test
-        @DisplayName("정렬 성공")
-        void reorderSuccess() {
-            // given
-            List<Place> places = List.of(
-                    Place.builder().id("id1").name("목적지1").latitude(0.0).longitude(0.0).placeType(PlaceCategory.RESTAURANT).order(10.0).build(),
-                    Place.builder().id("id2").name("목적지2").latitude(0.0).longitude(0.0).placeType(PlaceCategory.RESTAURANT).order(20.0).build(),
-                    Place.builder().id("id3").name("목적지3").latitude(0.0).longitude(0.0).placeType(PlaceCategory.RESTAURANT).order(30.0).build()
-            );
-            TripDayPlace tripDayPlace = TripDayPlace.builder().day(1).places(places).build();
-            TripPlaceReq.ReorderRequest reorderRequest = new TripPlaceReq.ReorderRequest(List.of("id3", "id1", "id2"));
-
-            given(tripDayPlaceService.readById(tripDayPlaceId)).willReturn(Optional.of(tripDayPlace));
-
-            // when
-            tripPlaceCommandService.reorderPlaces(tripDayPlaceId, reorderRequest);
-
-            // then
-            assertEquals(places.get(2).getOrder(), 10.0);
-            assertEquals(places.get(0).getOrder(), 20.0);
-            assertEquals(places.get(1).getOrder(), 30.0);
-            verify(tripDayPlaceService, times(1)).save(any());
-        }
-
-        @Test
-        @DisplayName("실패 - 일차 없음")
-        void reorderFailDayPlaceNotFound() {
-            // given
-            given(tripDayPlaceService.readById(tripDayPlaceId)).willReturn(Optional.empty());
-
-            TripPlaceReq.ReorderRequest reorderRequest = new TripPlaceReq.ReorderRequest(List.of("a"));
-
-            // when
-            CustomException e = assertThrows(CustomException.class, () ->
-                    tripPlaceCommandService.reorderPlaces(tripDayPlaceId, reorderRequest));
-
-            // then
-            assertEquals(TripErrorType.TRIP_PLACE_NOT_FOUND, e.getErrorType());
-        }
-    }
-
-    @Test
-    @DisplayName("목적지 방문 여부 변경 성공")
-    void markPlaceAsVisitedSuccess() {
-        // given
-        String placeId = "place-id";
-        boolean isVisited = true;
-
-        // when
-        tripPlaceCommandService.markPlaceAsVisited(tripDayPlaceId, placeId, isVisited);
-
-        // then
-        verify(tripDayPlaceService, times(1)).updatePlaceVisited(tripDayPlaceId, placeId, isVisited);
-    }
-
-    @Test
-    @DisplayName("삭제 성공")
-    void deletePlaceSuccess() {
-        // given
-
-        // when
-        tripPlaceCommandService.deletePlace(tripDayPlaceId, "placeId");
-
-        // then
-        verify(tripDayPlaceService, times(1)).deletePlace(tripDayPlaceId, "placeId");
     }
 }

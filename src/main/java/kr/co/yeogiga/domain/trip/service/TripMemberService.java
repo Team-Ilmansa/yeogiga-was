@@ -3,7 +3,7 @@ package kr.co.yeogiga.domain.trip.service;
 import kr.co.yeogiga.domain.trip.dto.TripDto;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.entity.TripMember;
-import kr.co.yeogiga.domain.trip.repository.TripMemberRepository;
+import kr.co.yeogiga.domain.trip.repository.tripmember.TripMemberRepository;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import kr.co.yeogiga.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;

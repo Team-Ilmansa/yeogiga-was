@@ -1,6 +1,6 @@
 package kr.co.yeogiga.application.tripplace.service;
 
-import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceReqLegacy;
 import kr.co.yeogiga.common.util.DistanceUtils;
 import kr.co.yeogiga.domain.trip.type.PlaceCategory;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;
@@ -31,23 +31,23 @@ public class TripPlaceSortService {
      */
     public void sortDayTripPlaces(Long tripId, int day) {
         String listKey = PlaceConstant.dayPlacesKey(tripId, day);
-        List<TripPlaceReq.StoredFormat> places =
-                redisRepository.getList(listKey, TripPlaceReq.StoredFormat.class);
+        List<TripPlaceReqLegacy.StoredFormat> places =
+                redisRepository.getList(listKey, TripPlaceReqLegacy.StoredFormat.class);
 
         if (places == null || places.isEmpty()) {
             return;
         }
 
         // 숙소 카테고리 & 나머지 카테고리 분리
-        List<TripPlaceReq.StoredFormat> lodgings = new ArrayList<>();
-        List<TripPlaceReq.StoredFormat> otherPlaces = new ArrayList<>();
+        List<TripPlaceReqLegacy.StoredFormat> lodgings = new ArrayList<>();
+        List<TripPlaceReqLegacy.StoredFormat> otherPlaces = new ArrayList<>();
         partitionPlaces(places, otherPlaces, lodgings);
 
         // 위도/경도 기준 목적지 정렬
         sortByDistance(otherPlaces);
 
         // 연속된 식당 카테고리 방지 (3번 이상 방지)
-        List<TripPlaceReq.StoredFormat> sorted = preventConsecutiveRestaurants(otherPlaces);
+        List<TripPlaceReqLegacy.StoredFormat> sorted = preventConsecutiveRestaurants(otherPlaces);
 
         // 마지막에 숙소 삽입
         sorted.addAll(lodgings);
@@ -64,11 +64,11 @@ public class TripPlaceSortService {
      * @param lodgings    숙소만 저장할 리스트
      */
     private void partitionPlaces(
-            List<TripPlaceReq.StoredFormat> places,
-            List<TripPlaceReq.StoredFormat> otherPlaces,
-            List<TripPlaceReq.StoredFormat> lodgings
+            List<TripPlaceReqLegacy.StoredFormat> places,
+            List<TripPlaceReqLegacy.StoredFormat> otherPlaces,
+            List<TripPlaceReqLegacy.StoredFormat> lodgings
     ) {
-        for (TripPlaceReq.StoredFormat place : places) {
+        for (TripPlaceReqLegacy.StoredFormat place : places) {
             if (PlaceCategory.LODGING == place.placeCategory()) {
                 lodgings.add(place);
             } else {
@@ -83,10 +83,10 @@ public class TripPlaceSortService {
      *
      * @param places 정렬할 장소 목록
      */
-    private void sortByDistance(List<TripPlaceReq.StoredFormat> places) {
+    private void sortByDistance(List<TripPlaceReqLegacy.StoredFormat> places) {
         if (places.isEmpty()) return;
 
-        TripPlaceReq.StoredFormat basePlace = places.get(0);
+        TripPlaceReqLegacy.StoredFormat basePlace = places.get(0);
         places.sort(Comparator.comparingDouble(p ->
                         DistanceUtils.calculateDistance(
                                 basePlace.latitude(), basePlace.longitude(), p.latitude(), p.longitude()
@@ -101,11 +101,11 @@ public class TripPlaceSortService {
      * @param input 정렬된 장소 목록
      * @return 재배치된 장소 목록
      */
-    private List<TripPlaceReq.StoredFormat> preventConsecutiveRestaurants(List<TripPlaceReq.StoredFormat> input) {
-        List<TripPlaceReq.StoredFormat> result = new ArrayList<>();
-        Queue<TripPlaceReq.StoredFormat> restaurants = new LinkedList<>();
+    private List<TripPlaceReqLegacy.StoredFormat> preventConsecutiveRestaurants(List<TripPlaceReqLegacy.StoredFormat> input) {
+        List<TripPlaceReqLegacy.StoredFormat> result = new ArrayList<>();
+        Queue<TripPlaceReqLegacy.StoredFormat> restaurants = new LinkedList<>();
 
-        for (TripPlaceReq.StoredFormat place : input) {
+        for (TripPlaceReqLegacy.StoredFormat place : input) {
             if (result.contains(place)) continue;
 
             if (isRestaurant(place)) {  // 식당 카테고리인 경우
@@ -116,7 +116,7 @@ public class TripPlaceSortService {
                 }
 
                 // 식당 3개 연속 방지 로직
-                TripPlaceReq.StoredFormat nonRestaurant = findNextNonRestaurant(input, result, restaurants);
+                TripPlaceReqLegacy.StoredFormat nonRestaurant = findNextNonRestaurant(input, result, restaurants);
                 if (nonRestaurant != null) {
                     result.add(restaurants.poll());    // 식당 1
                     result.add(nonRestaurant);         // 식당 이외의 카테고리
@@ -149,10 +149,10 @@ public class TripPlaceSortService {
      * @param restaurants 현재 연속된 식당 리스트
      * @return 조건에 맞는 식당 이외 장소, 없으면 null
      */
-    private TripPlaceReq.StoredFormat findNextNonRestaurant(
-            List<TripPlaceReq.StoredFormat> input,
-            List<TripPlaceReq.StoredFormat> result,
-            Queue<TripPlaceReq.StoredFormat> restaurants
+    private TripPlaceReqLegacy.StoredFormat findNextNonRestaurant(
+            List<TripPlaceReqLegacy.StoredFormat> input,
+            List<TripPlaceReqLegacy.StoredFormat> result,
+            Queue<TripPlaceReqLegacy.StoredFormat> restaurants
     ) {
         return input.stream()
                 .filter(p -> !isRestaurant(p) && !result.contains(p) && !restaurants.contains(p))
@@ -166,7 +166,7 @@ public class TripPlaceSortService {
      * @param place 장소 객체
      * @return true = 식당, false = 식당 아님
      */
-    private boolean isRestaurant(TripPlaceReq.StoredFormat place) {
+    private boolean isRestaurant(TripPlaceReqLegacy.StoredFormat place) {
         return PlaceCategory.RESTAURANT == place.placeCategory();
     }
 }

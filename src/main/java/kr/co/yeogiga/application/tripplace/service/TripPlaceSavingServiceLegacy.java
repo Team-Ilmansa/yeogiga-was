@@ -1,15 +1,14 @@
 package kr.co.yeogiga.application.tripplace.service;
 
-import kr.co.yeogiga.application.tripplace.dto.TripPlaceReq;
+import kr.co.yeogiga.application.tripplace.dto.TripPlaceReqLegacy;
 import kr.co.yeogiga.common.exception.CustomException;
-import kr.co.yeogiga.domain.trip.entity.Place;
 import kr.co.yeogiga.domain.trip.entity.Trip;
-import kr.co.yeogiga.domain.trip.entity.TripDay;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
-import kr.co.yeogiga.domain.trip.service.PlaceService;
-import kr.co.yeogiga.domain.trip.service.TripDayService;
 import kr.co.yeogiga.domain.trip.service.TripService;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
+import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
+import kr.co.yeogiga.domain.tripplace.entity.Place;
+import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;
 import kr.co.yeogiga.infrastructure.redis.constant.PlaceConstant;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +20,9 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class TripPlaceSavingService {
+public class TripPlaceSavingServiceLegacy {
+    private final TripDayPlaceService tripDayPlaceService;
     private final TripService tripService;
-    private final TripDayService tripDayService;
-    private final PlaceService placeService;
     private final RedisRepository redisRepository;
 
     /**
@@ -39,64 +37,65 @@ public class TripPlaceSavingService {
      */
     @Transactional
     public void completeTrip(Long tripId, int lastDay) {
-        Trip trip = tripService.readById(tripId)
-                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
+        List<TripDayPlace> tripDayPlaces = new ArrayList<>();
 
-        List<Place> places = new ArrayList<>();
         for (int day = 1; day <= lastDay; day++) {
-            places.addAll(createTripDayPlace(trip, day));
+            tripDayPlaces.add(createTripDayPlace(tripId, day));
 
             // Redis에 임시 저장된 데이터 삭제
             redisRepository.del(PlaceConstant.dayPlacesKey(tripId, day));
             redisRepository.del(PlaceConstant.dayPlaceSetKey(tripId, day));
         }
 
+        Trip trip = tripService.readById(tripId)
+                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
+
         trip.updateStatus(TravelStatus.resolveStatus(trip.getStartedAt(), trip.getEndedAt()));
 
-        placeService.saveAll(places);
+        tripDayPlaceService.saveAll(tripDayPlaces);
     }
 
     /**
-     * 특정 일자(day)에 해당하는 여행 일차(TripDay) 객체 생성 및 목적지(place) 리스트 반환
+     * 특정 일자(day)에 해당하는 TripDayPlace 객체 생성
      *
-     * @param trip : 여행 객체
-     * @param day  : 일차 (1일차, 2일차 ...)
+     * @param tripId : 여행 ID
+     * @param day    : 일차 (1일차, 2일차 ...)
+     * @return : 생성된 TripDayPlace
      */
-    private List<Place> createTripDayPlace(Trip trip, int day) {
-        String dayPlacesKey = PlaceConstant.dayPlacesKey(trip.getId(), day);
-        List<TripPlaceReq.StoredFormat> storedPlaces
-                = redisRepository.getList(dayPlacesKey, TripPlaceReq.StoredFormat.class);
-
-        TripDay tripDay = tripDayService.save(TripDay.builder()
-                .day(day)
-                .trip(trip)
-                .build());
+    private TripDayPlace createTripDayPlace(Long tripId, int day) {
+        String dayPlacesKey = PlaceConstant.dayPlacesKey(tripId, day);
+        List<TripPlaceReqLegacy.StoredFormat> storedPlaces
+                = redisRepository.getList(dayPlacesKey, TripPlaceReqLegacy.StoredFormat.class);
 
         List<Place> places = new ArrayList<>();
-        for (int index = 0; index < storedPlaces.size(); index++) {
-            TripPlaceReq.StoredFormat stored = storedPlaces.get(index);
-            places.add(convertToPlace(stored, tripDay, index));
+        for (int i = 0; i < storedPlaces.size(); i++) {
+            TripPlaceReqLegacy.StoredFormat stored = storedPlaces.get(i);
+            places.add(convertToPlace(stored, i));
         }
 
-        return places;
+        return TripDayPlace.builder()
+                .tripId(tripId)
+                .day(day)
+                .places(places)
+                .build();
     }
 
     /**
      * StoredFormat -> Place 변환 (순서(order) 반영)
+     * - 순서(order)는 10씩 증가. (효율적인 목적지 순서 번경을 위함)
      *
-     * @param stored  : 저장된 StoredFormat
-     * @param tripDay : 여행 일차 객체
-     * @param index   : 리스트 내 순서
+     * @param stored : 저장된 StoredFormat
+     * @param index  : 리스트 내 순서
      * @return : Place 변환 객체
      */
-    private Place convertToPlace(TripPlaceReq.StoredFormat stored, TripDay tripDay, int index) {
+    private Place convertToPlace(TripPlaceReqLegacy.StoredFormat stored, int index) {
         return Place.builder()
+                .id(stored.id())
                 .name(stored.name())
                 .latitude(stored.latitude())
                 .longitude(stored.longitude())
                 .placeType(stored.placeCategory())
-                .sortOrder(index + 1)
-                .tripDay(tripDay)
+                .order((index + 1) * 10.0)
                 .build();
     }
 }

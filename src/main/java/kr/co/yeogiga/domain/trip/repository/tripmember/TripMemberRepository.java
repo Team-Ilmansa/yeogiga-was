@@ -1,4 +1,4 @@
-package kr.co.yeogiga.domain.trip.repository;
+package kr.co.yeogiga.domain.trip.repository.tripmember;
 
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.entity.TripMember;
