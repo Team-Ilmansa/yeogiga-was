@@ -33,7 +33,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -480,7 +479,13 @@ public class AuthControllerTest {
             
             doThrow(new CustomException(
                     UserErrorType.ALREADY_WITHDRAW,
-                    SignInDto.WithdrawnUserInfo.of(1L, LocalDateTime.now()))
+                    SignInDto.WithdrawnUserInfo.builder()
+                            .userId(1L)
+                            .nickname("nickname")
+                            .imageUrl("https://image.com")
+                            .deletionExpiration(LocalDate.now().plusDays(7))
+                            .build()
+                    )
             ).when(authService).signIn(request);
             
             // when
@@ -497,6 +502,8 @@ public class AuthControllerTest {
                     .andExpect(jsonPath("$.code").value(UserErrorType.ALREADY_WITHDRAW.getCode()))
                     .andExpect(jsonPath("$.message").value(UserErrorType.ALREADY_WITHDRAW.getMessage()))
                     .andExpect(jsonPath("$.data.userId").value(1L))
+                    .andExpect(jsonPath("$.data.nickname").value("nickname"))
+                    .andExpect(jsonPath("$.data.imageUrl").value("https://image.com"))
                     .andExpect(jsonPath("$.data.deletionExpiration").value(LocalDate.now().plusDays(7).toString()));
         }
     }

@@ -49,8 +49,6 @@ public class OAuthControllerTest {
     @MockBean
     private OAuthManagementService oAuthManagementService;
     
-    
-
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext) {
         this.mockMvc = MockMvcBuilders

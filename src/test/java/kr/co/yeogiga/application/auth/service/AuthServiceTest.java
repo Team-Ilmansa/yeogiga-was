@@ -291,6 +291,8 @@ public class AuthServiceTest {
             assertEquals(UserErrorType.ALREADY_WITHDRAW, exception.getErrorType());
             SignInDto.WithdrawnUserInfo withdrawnUserInfo = (SignInDto.WithdrawnUserInfo) exception.getData();
             assertEquals(1L, withdrawnUserInfo.userId());
+            assertEquals("testnick", withdrawnUserInfo.nickname());
+            assertThat(withdrawnUserInfo.imageUrl()).isNull();
             assertEquals(LocalDate.now().plusDays(7), withdrawnUserInfo.deletionExpiration());
         }
     }
