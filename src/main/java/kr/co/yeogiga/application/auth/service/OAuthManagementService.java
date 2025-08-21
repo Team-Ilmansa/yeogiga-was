@@ -104,7 +104,7 @@ public class OAuthManagementService {
                     if (user.isDeleted()) {
                         throw new CustomException(
                                 UserErrorType.ALREADY_WITHDRAW,
-                                SignInDto.WithdrawnUserInfo.of(user.getId(), user.getDeletedAt())
+                                SignInDto.WithdrawnUserInfo.fromEntity(user)
                         );
                     }
 
