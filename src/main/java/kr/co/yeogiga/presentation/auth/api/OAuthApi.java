@@ -73,13 +73,15 @@ public interface OAuthApi {
                                     """),
                             @ExampleObject(name = "이미 탈퇴한 사용자", description = "탈퇴(Soft Delete)된 사용자에 대한 응답", value = """
                                         {
-                                              "code": "U003",
-                                              "message": "이미 회원탈퇴한 사용자입니다.",
-                                              "data": {
-                                                  "userId": 1,
-                                                  "deletionExpiration": "2025-08-13"
-                                              }
-                                          }
+                                               "code": "U003",
+                                               "message": "이미 회원탈퇴한 사용자입니다.",
+                                               "data": {
+                                                   "userId": 16,
+                                                   "nickname": "nick16",
+                                                   "imageUrl": null,
+                                                   "deletionExpiration": "2025-08-29"
+                                               }
+                                           }
                                     """)
                     }))
     })
