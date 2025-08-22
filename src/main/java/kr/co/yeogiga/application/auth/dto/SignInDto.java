@@ -63,7 +63,7 @@ public class SignInDto {
             String imageUrl,
             LocalDate deletionExpiration
     ) {
-        public static WithdrawnUserInfo fromEntity(User user) {
+        public static WithdrawnUserInfo from(User user) {
             return WithdrawnUserInfo.builder()
                     .userId(user.getId())
                     .nickname(user.getNickname())

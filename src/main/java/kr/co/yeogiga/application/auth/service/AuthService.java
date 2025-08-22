@@ -67,7 +67,7 @@ public class AuthService {
         if (user.isDeleted()) {
             throw new CustomException(
                     UserErrorType.ALREADY_WITHDRAW,
-                    SignInDto.WithdrawnUserInfo.fromEntity(user)
+                    SignInDto.WithdrawnUserInfo.from(user)
             );
         }
 
