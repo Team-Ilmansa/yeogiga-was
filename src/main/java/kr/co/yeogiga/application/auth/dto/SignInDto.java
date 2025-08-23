@@ -2,10 +2,10 @@ package kr.co.yeogiga.application.auth.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import kr.co.yeogiga.domain.user.entity.User;
 import lombok.Builder;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class SignInDto {
 
@@ -59,12 +59,16 @@ public class SignInDto {
     @Builder
     public record WithdrawnUserInfo(
             Long userId,
+            String nickname,
+            String imageUrl,
             LocalDate deletionExpiration
     ) {
-        public static WithdrawnUserInfo of(Long userId, LocalDateTime deletedAt) {
+        public static WithdrawnUserInfo from(User user) {
             return WithdrawnUserInfo.builder()
-                    .userId(userId)
-                    .deletionExpiration(deletedAt.toLocalDate().plusDays(7))
+                    .userId(user.getId())
+                    .nickname(user.getNickname())
+                    .imageUrl(user.getImageUrl())
+                    .deletionExpiration(user.getDeletedAt().toLocalDate().plusDays(7))
                     .build();
         }
     }
