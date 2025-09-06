@@ -149,11 +149,10 @@ public class ImageControllerTest {
         List<String> urls = List.of("https://image1.com", "https://image2.com");
 
         ImageDeleteDto deleteDto = new ImageDeleteDto(imageIds, urls);
-        String tempPlaceImageId = "tempPlaceImage-Id";
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                delete("/api/v1/trip/{tripId}/day-place/temp-images/{tempPlaceImageId}}", tripId, tempPlaceImageId)
+                delete("/api/v1/trip/{tripId}/day-place/temp-images/{tripDayPlaceId}}", tripId, tripDayPlaceId)
                         .content(objectMapper.writeValueAsBytes(deleteDto))
                         .contentType(MediaType.APPLICATION_JSON)
         );
