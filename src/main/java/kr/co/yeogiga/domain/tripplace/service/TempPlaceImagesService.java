@@ -26,7 +26,7 @@ public class TempPlaceImagesService {
         tempPlaceImagesRepository.deleteById(id);
     }
 
-    public void deleteImages(String id, List<String> imageIds) {
-        tempPlaceImagesRepository.deleteImages(id, imageIds);
+    public void deleteImages(String tripDayPlaceId, List<String> imageIds) {
+        tempPlaceImagesRepository.deleteImages(tripDayPlaceId, imageIds);
     }
 }

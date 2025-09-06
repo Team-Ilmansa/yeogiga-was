@@ -27,11 +27,11 @@ public class TempPlaceImagesCommandService {
      * - MongoDB 문서에서 이미지 삭제 - imageIds
      * - AWS S3에서 이미지 삭제 - urls
      *
-     * @param tempPlaceImageId 임시 저장소 ID
-     * @param deleteDto        이미지 삭제 정보 객체
+     * @param tripDayPlaceId 여행일차 ID
+     * @param deleteDto      이미지 삭제 정보 객체
      */
-    public void removeTempImages(String tempPlaceImageId, ImageDeleteDto deleteDto) {
-        tempPlaceImagesService.deleteImages(tempPlaceImageId, deleteDto.imageIds());
+    public void removeTempImages(String tripDayPlaceId, ImageDeleteDto deleteDto) {
+        tempPlaceImagesService.deleteImages(tripDayPlaceId, deleteDto.imageIds());
         imageDeleteProcessor.process(deleteDto.urls());
     }
 }

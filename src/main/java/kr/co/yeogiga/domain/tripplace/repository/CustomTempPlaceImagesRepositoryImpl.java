@@ -31,8 +31,8 @@ public class CustomTempPlaceImagesRepositoryImpl implements CustomTempPlaceImage
     }
 
     @Override
-    public void deleteImages(String id, List<String> imageIds) {
-        Query query = new Query(Criteria.where("_id").is(id));
+    public void deleteImages(String tripDayPlaceId, List<String> imageIds) {
+        Query query = new Query(Criteria.where("tripDayPlaceId").is(tripDayPlaceId));
         Update update = new Update().pull("images", Query.query(Criteria.where("id").in(imageIds)));
         mongoTemplate.updateFirst(query, update, TempPlaceImages.class);
     }
