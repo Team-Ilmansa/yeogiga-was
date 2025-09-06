@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface CustomTempPlaceImagesRepository {
     void saveImage(String tripDayPlaceId, Image image);
-    void deleteImages(String id, List<String> imageIds);
+    void deleteImages(String tripDayPlaceId, List<String> imageIds);
 }
