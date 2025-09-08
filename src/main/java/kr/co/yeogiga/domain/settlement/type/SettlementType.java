@@ -1,7 +1,10 @@
 package kr.co.yeogiga.domain.settlement.type;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor
@@ -13,4 +16,12 @@ public enum SettlementType {
     ETC("기타");
     
     private final String value;
+    
+    @JsonCreator
+    public static SettlementType parse(String input) {
+        return Arrays.stream(values())
+                .filter(type -> type.toString().equals(input))
+                .findFirst()
+                .orElse(null);
+    }
 }
