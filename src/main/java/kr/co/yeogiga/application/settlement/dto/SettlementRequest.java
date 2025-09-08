@@ -11,12 +11,10 @@ import kr.co.yeogiga.domain.settlement.entity.PayInfo;
 import kr.co.yeogiga.domain.settlement.entity.Settlement;
 import kr.co.yeogiga.domain.settlement.type.SettlementType;
 import lombok.Builder;
-import lombok.Getter;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@Getter
 public class SettlementRequest {
     
     @Schema(name = "SettlementRequest.SettlementDto", description = "정산 내역 생성 요청 DTO")
