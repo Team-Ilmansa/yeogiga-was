@@ -5,6 +5,7 @@ import kr.co.yeogiga.application.settlement.dto.SettlementRequest;
 import kr.co.yeogiga.application.settlement.service.SettlementCommandService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
+import kr.co.yeogiga.presentation.settlement.api.SettlementApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/settlement")
 @RequiredArgsConstructor
-public class SettlementController {
+public class SettlementController implements SettlementApi {
     private final SettlementCommandService settlementCommandService;
     
+    @Override
     @PostMapping("/{tripId}")
     public ResponseEntity<?> createSettlement(
             @PathVariable(name = "tripId") Long tripId,
