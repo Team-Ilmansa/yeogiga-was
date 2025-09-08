@@ -1,0 +1,32 @@
+package kr.co.yeogiga.domain.settlement.exception;
+
+import kr.co.yeogiga.common.response.error.type.BaseErrorType;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+
+/**
+ * Settlement ErrorCode: S0XX
+ */
+@RequiredArgsConstructor
+public enum SettlementErrorType implements BaseErrorType {
+    NOT_VALID_PRICE(HttpStatus.BAD_REQUEST, "S000", "정산 내역 금액 총합이 일치하지 않습니다.");
+    
+    private final HttpStatus status;
+    private final String code;
+    private final String message;
+    
+    @Override
+    public HttpStatus getHttpStatus() {
+        return status;
+    }
+    
+    @Override
+    public String getCode() {
+        return code;
+    }
+    
+    @Override
+    public String getMessage() {
+        return message;
+    }
+}
