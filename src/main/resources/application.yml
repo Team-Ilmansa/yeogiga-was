@@ -75,3 +75,12 @@ map:
     uri: ${NAVER_API_URI}
     client-id: ${NAVER_CLIENT_ID}
     client-secret: ${NAVER_CLIENT_SECRET}
+
+--- # Sentry
+sentry:
+  dsn: ${SENTRY_DSN}
+  exception-resolver-order: -2147483647
+  max-request-body-size: always
+  send-default-pii: true
+  logging:
+    enabled: false
