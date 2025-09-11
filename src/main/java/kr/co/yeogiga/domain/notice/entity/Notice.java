@@ -41,18 +41,21 @@ public class Notice extends BaseTimeEntity {
     @Column(name = "author_id", insertable = false, updatable = false)
     private Long authorId;
     
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(length = 200, nullable = false)
     private String description;
     
     @Column(name = "trip_id", nullable = false)
     private Long tripId;
+
+    private boolean completed;
     
     @Builder
-    public Notice(String title, User author, String description, Long tripId) {
+    public Notice(String title, User author, String description, Long tripId, boolean completed) {
         this.title = title;
         this.author = author;
         this.description = description;
         this.tripId = tripId;
+        this.completed = completed;
     }
     
     public void update(String title, String description) {
@@ -62,5 +65,9 @@ public class Notice extends BaseTimeEntity {
     
     public boolean isAuthor(Long userId) {
         return this.author != null && this.authorId.equals(userId);
+    }
+
+    public void changeCompleted(boolean completed) {
+        this.completed = completed;
     }
 }
