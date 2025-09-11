@@ -50,6 +50,24 @@ public interface NoticeApi {
                                                      }
                                              }
                                     """)
+                    })),
+            @ApiResponse(responseCode = "403", description = "공지사항 생성 실패 - 여행 방장이 아닌 경우",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "공지사항 작성자가 아닌 경우", value = """
+                                             {
+                                                    "code": "T007",
+                                                    "message": "여행 방장이 아닙니다."
+                                                }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "공지사항 생성 실패 - 여행이 존재하지 않는 경우",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "여행이 존재하지 않는 경우", value = """
+                                             {
+                                                     "code": "T006",
+                                                     "message": "해당 여행이 존재하지 않습니다."
+                                                 }
+                                    """)
                     }))
     })
     ResponseEntity<?> createNotice(
@@ -73,6 +91,7 @@ public interface NoticeApi {
                                                               "id": 24,
                                                               "title": "준비물 챙기세요.",
                                                               "description": "수건, 양말...",
+                                                              "completed" : "true",
                                                               "createdAt": "2025-07-27T11:56:34.546218",
                                                               "authorId": 13,
                                                               "nickname": "nick13",
@@ -82,6 +101,7 @@ public interface NoticeApi {
                                                               "id": 23,
                                                               "title": "여행 전 주의사항",
                                                               "description": "여행 전 해당 내용 인지하시길 바랍니다.",
+                                                              "completed" : "false",
                                                               "createdAt": "2025-07-27T11:56:29.82594",
                                                               "authorId": 13,
                                                               "nickname": "nick13",
@@ -91,6 +111,7 @@ public interface NoticeApi {
                                                               "id": 22,
                                                               "title": "여행 경비 안내",
                                                               "description": "여행 경비는 인당...",
+                                                              "completed" : "false",
                                                               "createdAt": "2025-07-27T11:56:27.579067",
                                                               "authorId": 13,
                                                               "nickname": "nick13",
@@ -130,6 +151,7 @@ public interface NoticeApi {
                                                        "id": 22,
                                                        "title": "중요 공지입니다.",
                                                        "description": "설명입니다.",
+                                                       "completed" : "true",
                                                        "createdAt": "2025-07-27T11:56:27.579067",
                                                        "authorId": 13,
                                                        "nickname": "nick",
@@ -200,6 +222,43 @@ public interface NoticeApi {
             @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @PathVariable(name = "noticeId") Long noticeId,
             @Valid @RequestBody NoticeReq.Creation request
+    );
+
+    @TrackApi(description = "공지사항 상태 변경 (완료/미완료)")
+    @Operation(summary = "공지사항 상태 변경 (완료/미완료)", description = "공지사항 상태 변경 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "공지사항 상태 변경 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                             {
+                                                  "code": 200,
+                                                  "message": "요청이 성공하였습니다."
+                                              }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "403", description = "공지사항 상태 변경 실패 - 공지사항의 작성자가 아닌 경우",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "공지사항 작성자가 아닌 경우", value = """
+                                             {
+                                                    "code": "N001",
+                                                    "message": "공지사항의 작성자가 아닙니다."
+                                                }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "공지사항 상태 변경 실패 - 존재하지 않는 공지사항",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "공지사항이 존재하지 않는 경우", value = """
+                                             {
+                                                     "code": "N000",
+                                                     "message": "존재하지 않는 공지사항입니다."
+                                                 }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> updateCompleted(
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
+            @PathVariable(name = "noticeId") Long noticeId,
+            @RequestBody NoticeReq.UpdateCompleted request
     );
     
     @TrackApi(description = "공지사항 삭제")
