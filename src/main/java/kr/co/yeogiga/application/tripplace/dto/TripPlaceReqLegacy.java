@@ -19,7 +19,7 @@ public class TripPlaceReqLegacy {
             double latitude,
             @Schema(description = "목적지 경도", example = "123.123")
             double longitude,
-            @Schema(description = "목적지 타입(카테고리)", example = "RESTAURANT, TOURISM, LODGING, ETC")
+            @Schema(description = "목적지 타입(카테고리)", example = "RESTAURANT, TOURISM, LODGING, TRANSPORT, ETC")
             PlaceCategory placeType
     ) {
         public Place toEntity(Double order) {
