@@ -14,20 +14,30 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class NoticeCommandService {
     private final NoticeService noticeService;
-    
+    private final TripService tripService;
+
     /**
      * 여행 공지사항을 생성하는 메서드
      *
-     * @param userId    작성자 ID
-     * @param tripId    여행 ID
-     * @param dto       공지사항 요청 DTO
+     * @param userId 작성자 ID
+     * @param tripId 여행 ID
+     * @param dto    공지사항 요청 DTO
      */
+    @Transactional
     public void createNotice(Long userId, Long tripId, NoticeReq.Creation dto) {
+        Trip trip = tripService.readById(tripId)
+                .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
+
+        if (!trip.isLeader(userId)) {
+            throw new CustomException(TripErrorType.PERMISSION_DENIED_NOT_LEADER);
+        }
+
         Notice notice = Notice.builder()
                 .title(dto.title())
                 .description(dto.description())
                 .author(User.builder().id(userId).build())
                 .tripId(tripId)
+                .completed(false)
                 .build();
         
         noticeService.save(notice);
