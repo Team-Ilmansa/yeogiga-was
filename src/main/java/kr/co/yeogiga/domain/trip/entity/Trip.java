@@ -69,4 +69,8 @@ public class Trip {
     public void updateInfo(String title) {
         this.title = title;
     }
+
+    public boolean isLeader(Long userId) {
+        return this.leaderId != null && this.leaderId.equals(userId);
+    }
 }

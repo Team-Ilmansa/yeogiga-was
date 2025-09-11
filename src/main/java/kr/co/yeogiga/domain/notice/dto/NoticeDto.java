@@ -12,6 +12,7 @@ public class NoticeDto {
             Long id,
             String title,
             String description,
+            boolean completed,
             LocalDateTime createdAt,
             Long authorId,
             String nickname,
@@ -22,6 +23,7 @@ public class NoticeDto {
                     .id(notice.getId())
                     .title(notice.getTitle())
                     .description(notice.getDescription())
+                    .completed(notice.isCompleted())
                     .createdAt(notice.getCreatedAt())
                     .authorId(notice.getAuthorId())
                     .nickname(notice.getAuthor().getNickname())

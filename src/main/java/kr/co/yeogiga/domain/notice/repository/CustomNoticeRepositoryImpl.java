@@ -57,6 +57,7 @@ public class CustomNoticeRepositoryImpl implements CustomNoticeRepository {
                                 notice.id,
                                 notice.title,
                                 notice.description,
+                                notice.completed,
                                 notice.createdAt,
                                 user.id,
                                 user.nickname,

@@ -2,6 +2,7 @@ package kr.co.yeogiga.application.notice.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 public class NoticeReq {
@@ -15,7 +16,16 @@ public class NoticeReq {
             
             @Schema(description = "내용", example = "준비물 다시 확인하시고 꼭 챙기십시오.")
             @NotBlank(message = "내용은 필수 입력값입니다.")
+            @Size(max = 200, message = "내용은 최대 200자까지 입력 가능합니다.")
             String description
+    ) {
+    }
+
+    @Builder
+    @Schema(name = "NoticeReq.UpdateCompleted", description = "공지 완료 여부 수정 요청 DTO")
+    public record UpdateCompleted(
+            @Schema(description = "공지 완료 여부", example = "true")
+            boolean completed
     ) {
     }
 }
