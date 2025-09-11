@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -70,7 +71,18 @@ public class NoticeController implements NoticeApi {
         noticeCommandService.updateNotice(noticeId, userDetails.getUserId(), request);
         return ResponseEntity.ok(SuccessResponse.ok());
     }
-    
+
+    @Override
+    @PatchMapping("/{tripId}/notices/{noticeId}/completed")
+    public ResponseEntity<?> updateCompleted(
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
+            @PathVariable(name = "noticeId") Long noticeId,
+            @RequestBody NoticeReq.UpdateCompleted request
+    ) {
+        noticeCommandService.updateCompleted(noticeId, userDetails.getUserId(), request);
+        return ResponseEntity.ok(SuccessResponse.ok());
+    }
+
     @Override
     @DeleteMapping("/{tripId}/notices/{noticeId}")
     public ResponseEntity<?> deleteNotice(
