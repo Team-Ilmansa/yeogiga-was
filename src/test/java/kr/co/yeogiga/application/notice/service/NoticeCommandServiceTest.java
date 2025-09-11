@@ -5,6 +5,9 @@ import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.notice.entity.Notice;
 import kr.co.yeogiga.domain.notice.exception.NoticeErrorType;
 import kr.co.yeogiga.domain.notice.service.NoticeService;
+import kr.co.yeogiga.domain.trip.entity.Trip;
+import kr.co.yeogiga.domain.trip.exception.TripErrorType;
+import kr.co.yeogiga.domain.trip.service.TripService;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.type.Role;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,26 +38,33 @@ public class NoticeCommandServiceTest {
     
     @Mock
     private NoticeService noticeService;
-    
+
+    @Mock
+    private TripService tripService;
+
     @InjectMocks
     private NoticeCommandService noticeCommandService;
     
     @Nested
     @DisplayName("공지사항 생성")
     class CreateNotice {
+        private final Long userId = 1L;
+        private final Long tripId = 2L;
+
+        private Trip trip = Trip.builder()
+                .leaderId(userId)
+                .build();
         
         @Test
         @DisplayName("성공")
         void success() {
             // given
-            Long userId = 1L;
-            Long tripId = 2L;
-            
             NoticeReq.Creation dto = NoticeReq.Creation.builder()
                     .title("title")
                     .description("description")
                     .build();
-            
+
+            when(tripService.readById(anyLong())).thenReturn(Optional.ofNullable(trip));
             doNothing().when(noticeService).save(any(Notice.class));
             
             // when
@@ -65,6 +75,47 @@ public class NoticeCommandServiceTest {
                 assertEquals(userId, notice.getAuthor().getId());
                 assertEquals(tripId, notice.getTripId());
             }));
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 여행")
+        void failIfTripNotFound() {
+            // given
+            NoticeReq.Creation dto = NoticeReq.Creation.builder()
+                    .title("title")
+                    .description("description")
+                    .build();
+
+            when(tripService.readById(anyLong())).thenReturn(Optional.empty());
+
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> noticeCommandService.createNotice(userId, tripId, dto));
+
+            // then
+            assertEquals(TripErrorType.TRIP_NOT_FOUND, exception.getErrorType());
+        }
+
+        @Test
+        @DisplayName("실패 - 여행 방장 아님")
+        void failUnauthorizedLeader() {
+            // given
+            Long notLeaderId = 2L;
+            Long tripId = 2L;
+
+            NoticeReq.Creation dto = NoticeReq.Creation.builder()
+                    .title("title")
+                    .description("description")
+                    .build();
+
+            when(tripService.readById(anyLong())).thenReturn(Optional.ofNullable(trip));
+
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> noticeCommandService.createNotice(notLeaderId, tripId, dto));
+
+            // then
+            assertEquals(TripErrorType.PERMISSION_DENIED_NOT_LEADER, exception.getErrorType());
         }
     }
     
@@ -129,6 +180,70 @@ public class NoticeCommandServiceTest {
             CustomException exception = assertThrows(CustomException.class, ()
                     -> noticeCommandService.updateNotice(2L, 3L, dto));
             
+            // then
+            assertEquals(NoticeErrorType.UNAUTHORIZED_AUTHOR, exception.getErrorType());
+        }
+    }
+
+    @Nested
+    @DisplayName("공지사항 상태 변경")
+    class UpdateCompleted {
+        User user = User.builder()
+                .id(1L)
+                .nickname("nickname")
+                .role(Role.USER)
+                .build();
+
+        Notice notice = Notice.builder()
+                .tripId(2L)
+                .title("title")
+                .description("description")
+                .author(user)
+                .build();
+
+        NoticeReq.UpdateCompleted dto = NoticeReq.UpdateCompleted.builder()
+                .completed(true)
+                .build();
+
+        @Test
+        @DisplayName("성공")
+        void success() {
+            // given
+            ReflectionTestUtils.setField(notice, "authorId", 1L);
+            when(noticeService.readById(2L)).thenReturn(Optional.of(notice));
+
+            // when
+            noticeCommandService.updateCompleted(2L, 1L, dto);
+
+            // when
+            assertEquals(dto.completed(), notice.isCompleted());
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 공지사항")
+        void failIfNoticeNotFound() {
+            // given
+            when(noticeService.readById(anyLong())).thenReturn(Optional.empty());
+
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> noticeCommandService.updateCompleted(2L, 1L, dto));
+
+            // then
+            assertEquals(NoticeErrorType.NOT_FOUND, exception.getErrorType());
+        }
+
+        @Test
+        @DisplayName("실패 - 작성자가 아닌 경우")
+        void failUnauthorizedAuthor() {
+            // given
+            ReflectionTestUtils.setField(notice, "authorId", 1L);
+            when(noticeService.readById(anyLong())).thenReturn(Optional.of(notice));
+
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> noticeCommandService.updateCompleted(2L, 3L, dto));
+
             // then
             assertEquals(NoticeErrorType.UNAUTHORIZED_AUTHOR, exception.getErrorType());
         }
