@@ -37,6 +37,7 @@ public class SettlementController implements SettlementApi {
                 .body(SuccessResponse.created());
     }
     
+    @Override
     @GetMapping("/{tripId}/settlements/{settlementId}")
     public ResponseEntity<?> getSettlement(
             @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
