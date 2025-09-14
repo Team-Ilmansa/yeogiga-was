@@ -44,6 +44,6 @@ public class SettlementController implements SettlementApi {
             @PathVariable(name = "settlementId") Long settlementId
     ) {
         return ResponseEntity
-                .ok(settlementQueryService.getSettlement(tripId, userDetails.getUserId(), settlementId));
+                .ok(SuccessResponse.from(settlementQueryService.getSettlement(tripId, userDetails.getUserId(), settlementId)));
     }
 }
