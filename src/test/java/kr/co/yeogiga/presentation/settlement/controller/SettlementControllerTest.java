@@ -185,7 +185,7 @@ public class SettlementControllerTest {
             
             // when
             ResultActions resultActions = mockMvc.perform(
-                    post("/api/v1/settlement/{tripId}", tripId)
+                    post("/api/v1/trip/{tripId}/settlements", tripId)
                             .with(user(userDetails))
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsBytes(settlementDto))
@@ -207,7 +207,7 @@ public class SettlementControllerTest {
             
             // when
             ResultActions resultActions = mockMvc.perform(
-                    post("/api/v1/settlement/{tripId}", tripId)
+                    post("/api/v1/trip/{tripId}/settlements", tripId)
                             .with(user(userDetails))
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsBytes(settlementDto))
@@ -248,7 +248,7 @@ public class SettlementControllerTest {
             
             // when
             ResultActions resultActions = mockMvc.perform(
-                    post("/api/v1/settlement/{tripId}", tripId)
+                    post("/api/v1/trip/{tripId}/settlements", tripId)
                             .with(user(userDetails))
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsBytes(settlementDto))
