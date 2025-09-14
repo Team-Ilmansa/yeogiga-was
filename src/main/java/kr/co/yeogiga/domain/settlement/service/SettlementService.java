@@ -1,9 +1,12 @@
 package kr.co.yeogiga.domain.settlement.service;
 
+import kr.co.yeogiga.domain.settlement.dto.SettlementDto;
 import kr.co.yeogiga.domain.settlement.entity.Settlement;
 import kr.co.yeogiga.domain.settlement.repository.SettlementRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -12,5 +15,9 @@ public class SettlementService {
     
     public Long save(Settlement settlement) {
         return settlementRepository.save(settlement).getId();
+    }
+    
+    public Optional<SettlementDto> findSettlementDtoById(Long id) {
+        return settlementRepository.findSettlementDtoById(id);
     }
 }
