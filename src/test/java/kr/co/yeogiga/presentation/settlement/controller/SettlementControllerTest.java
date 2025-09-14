@@ -3,11 +3,14 @@ package kr.co.yeogiga.presentation.settlement.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.yeogiga.application.settlement.dto.SettlementRequest;
 import kr.co.yeogiga.application.settlement.service.SettlementCommandService;
+import kr.co.yeogiga.application.settlement.service.SettlementQueryService;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.common.security.filter.JwtAuthenticationFilter;
+import kr.co.yeogiga.domain.settlement.dto.PayInfoDto;
+import kr.co.yeogiga.domain.settlement.dto.SettlementDto;
 import kr.co.yeogiga.domain.settlement.exception.SettlementErrorType;
 import kr.co.yeogiga.domain.settlement.type.SettlementType;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
@@ -36,9 +39,11 @@ import java.util.List;
 
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -61,6 +66,9 @@ public class SettlementControllerTest {
     
     @MockBean
     private SettlementCommandService settlementCommandService;
+    
+    @MockBean
+    private SettlementQueryService settlementQueryService;
     
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext) {
@@ -116,7 +124,7 @@ public class SettlementControllerTest {
             
             // when
             ResultActions resultActions = mockMvc.perform(
-                    post("/api/v1/settlement/{tripId}", tripId)
+                    post("/api/v1/trip/{tripId}/settlements", tripId)
                             .with(user(userDetails))
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsBytes(settlementDto))
@@ -153,7 +161,7 @@ public class SettlementControllerTest {
             
             // when
             ResultActions resultActions = mockMvc.perform(
-                    post("/api/v1/settlement/{tripId}", tripId)
+                    post("/api/v1/trip/{tripId}/settlements", tripId)
                             .with(user(userDetails))
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsBytes(settlementDto))
@@ -251,6 +259,89 @@ public class SettlementControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code").value(SettlementErrorType.NOT_VALID_PRICE.getCode()))
                     .andExpect(jsonPath("$.message").value(SettlementErrorType.NOT_VALID_PRICE.getMessage()));
+        }
+    }
+    
+    @Nested
+    @DisplayName("정산 내역 조회")
+    class GetSettlement {
+        private final Long tripId = 1L;
+        private final Long settlementId = 1L;
+        
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            PayInfoDto payInfoDto1 = new PayInfoDto(10L, userDetails.getUserId(), "nick1", "http://image.com/1", 10000L, true);
+            PayInfoDto payInfoDto2 = new PayInfoDto(11L, 2L, "nick2", "http://image.com/2", 10000L, false);
+            
+            SettlementDto settlementDto = new SettlementDto(
+                    settlementId,
+                    "점심",
+                    20000L,
+                    LocalDate.now(),
+                    SettlementType.MEAL,
+                    userDetails.getUserId(),
+                    false,
+                    List.of(payInfoDto1, payInfoDto2)
+            );
+            
+            when(settlementQueryService.getSettlement(tripId, userDetails.getUserId(), settlementId))
+                    .thenReturn(settlementDto);
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/{tripId}/settlements/{settlementId}", tripId, settlementId)
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.id").value(settlementId))
+                    .andExpect(jsonPath("$.data.name").value("점심"))
+                    .andExpect(jsonPath("$.data.payers[0].userId").value(1L))
+                    .andExpect(jsonPath("$.data.payers[1].userId").value(2L));
+        }
+        
+        @Test
+        @DisplayName("실패 - 여행 멤버가 아닌 경우")
+        void failIfNotMember() throws Exception {
+            // given
+            doThrow(new CustomException(TripMemberErrorType.IS_NOT_MEMBER)).when(settlementQueryService)
+                    .getSettlement(tripId, userDetails.getUserId(), settlementId);
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/{tripId}/settlements/{settlementId}", tripId, settlementId)
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(TripMemberErrorType.IS_NOT_MEMBER.getCode()))
+                    .andExpect(jsonPath("$.message").value(TripMemberErrorType.IS_NOT_MEMBER.getMessage()));
+        }
+        
+        @Test
+        @DisplayName("실패 - 정산 내역 미존재")
+        void failIfSettlementNotFound() throws Exception {
+            // given
+            doThrow(new CustomException(SettlementErrorType.NOT_FOUND)).when(settlementQueryService)
+                    .getSettlement(tripId, userDetails.getUserId(), settlementId);
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/{tripId}/settlements/{settlementId}", tripId, settlementId)
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value(SettlementErrorType.NOT_FOUND.getCode()))
+                    .andExpect(jsonPath("$.message").value(SettlementErrorType.NOT_FOUND.getMessage()));
         }
     }
 }
