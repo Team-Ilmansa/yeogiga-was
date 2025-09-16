@@ -1,5 +1,6 @@
 package kr.co.yeogiga.infrastructure.config;
 
+import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.sql.MySQLTemplates;
 import com.querydsl.sql.SQLTemplates;
@@ -12,7 +13,7 @@ public class QueryDslConfig {
 
     @Bean
     public JPAQueryFactory jpaQueryFactory(EntityManager entityManager) {
-        return new JPAQueryFactory(entityManager);
+        return new JPAQueryFactory(JPQLTemplates.DEFAULT, entityManager);
     }
     
     @Bean

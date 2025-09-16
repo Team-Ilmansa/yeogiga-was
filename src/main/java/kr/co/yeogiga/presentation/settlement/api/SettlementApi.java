@@ -33,7 +33,7 @@ public interface SettlementApi {
                                              }
                                     """)
                     })),
-            @ApiResponse(responseCode = "400", description = "공지사항 생성 실패",
+            @ApiResponse(responseCode = "400", description = "정산 내역 생성 실패",
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(name = "유효성 검사 실패", value = """
                                              {
@@ -58,7 +58,7 @@ public interface SettlementApi {
                                              }
                                     """)
                     })),
-            @ApiResponse(responseCode = "404", description = "공지사항 생성 실패",
+            @ApiResponse(responseCode = "404", description = "정샌 내역 생성 실패",
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(name = "존재하지 않는 여행",value = """
                                              {
@@ -72,5 +72,69 @@ public interface SettlementApi {
             @Parameter(description = "여행 ID") @PathVariable(name = "tripId") Long tripId,
             @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @Valid @RequestBody SettlementRequest.SettlementDto settlement
+    );
+    
+    @TrackApi(description = "정산 내역 조회")
+    @Operation(summary = "정산 내역 조회", description = "정산 내역 조회 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "정산 내역 조회 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                             {
+                                                  "id": 1,
+                                                  "name": "주유소",
+                                                  "totalPrice": 50000,
+                                                  "date": "2025-09-07",
+                                                  "type": "TRANSPORTATION",
+                                                  "payerId": 16,
+                                                  "isCompleted": false,
+                                                  "payers": [
+                                                      {
+                                                          "id": 1,
+                                                          "userId": 15,
+                                                          "nickname": "nick15",
+                                                          "imageUrl": "https://image.com/1",
+                                                          "price": 10000,
+                                                          "isCompleted": false
+                                                      },
+                                                      {
+                                                          "id": 2,
+                                                          "userId": 16,
+                                                          "nickname": "nick16",
+                                                          "imageUrl": null,
+                                                          "price": 20000,
+                                                          "isCompleted": true
+                                                      }
+                                                  ]
+                                              }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "400", description = "정산 내역 조회 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "여행 멤버가 아닌 경우", value = """
+                                             {
+                                                   "code": "T102",
+                                                   "message": "해당 여행의 멤버가 아닙니다."
+                                               }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "정산 내역 조회 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "정산 내역 미존재",value = """
+                                             {
+                                                  "code": "S001",
+                                                  "message": "존재하지 않는 정산 내역 입니다."
+                                              }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> getSettlement(
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
+            
+            @Parameter(description = "여행 ID")
+            @PathVariable(name ="tripId") Long tripId,
+            
+            @Parameter(description = "정산 내역 ID")
+            @PathVariable(name = "settlementId") Long settlementId
     );
 }
