@@ -35,7 +35,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -342,6 +344,85 @@ public class SettlementControllerTest {
                     .andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.code").value(SettlementErrorType.NOT_FOUND.getCode()))
                     .andExpect(jsonPath("$.message").value(SettlementErrorType.NOT_FOUND.getMessage()));
+        }
+    }
+    
+    @Nested
+    @DisplayName("정산 내역 전체 조회")
+    class GetAllSettlement {
+        private final Long settlementId = 1L;
+        private final Long tripId = 1L;
+        
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            PayInfoDto payInfoDto1 = new PayInfoDto(10L, userDetails.getUserId(), "nick1", "http://image.com/1", 10000L, true);
+            PayInfoDto payInfoDto2 = new PayInfoDto(11L, 2L, "nick2", "http://image.com/2", 10000L, false);
+            PayInfoDto payInfoDto3 = new PayInfoDto(20L, userDetails.getUserId(), "nick1", "http://image.com/1", 10000L, true);
+            PayInfoDto payInfoDto4 = new PayInfoDto(21L, 2L, "nick2", "http://image.com/2", 40000L, true);
+            
+            SettlementDto settlementDto1 = new SettlementDto(
+                    settlementId,
+                    "마트 장보기",
+                    20000L,
+                    LocalDate.now(),
+                    SettlementType.ETC,
+                    userDetails.getUserId(),
+                    false,
+                    List.of(payInfoDto1, payInfoDto2)
+            );
+            
+            SettlementDto settlementDto2 = new SettlementDto(
+                    settlementId,
+                    "주류",
+                    50000L,
+                    LocalDate.now().minusDays(1),
+                    SettlementType.ETC,
+                    userDetails.getUserId(),
+                    true,
+                    List.of(payInfoDto3, payInfoDto4)
+            );
+            
+            Map<LocalDate, List<SettlementDto>> map = new HashMap<>();
+            
+            map.put(LocalDate.now(), List.of(settlementDto1));
+            map.put(LocalDate.now().minusDays(1), List.of(settlementDto2));
+            
+            when(settlementQueryService.getAllSettlement(tripId, userDetails.getUserId())).thenReturn(map);
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/{tripId}/settlements", tripId)
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data." + LocalDate.now()).isArray())
+                    .andExpect(jsonPath("$.data." + LocalDate.now().minusDays(1)).isArray());
+            
+        }
+        
+        @Test
+        @DisplayName("실패 - 여행 멤버가 아닌 경우")
+        void failIfNotMember() throws Exception {
+            // given
+            doThrow(new CustomException(TripMemberErrorType.IS_NOT_MEMBER)).when(settlementQueryService)
+                    .getAllSettlement(tripId, userDetails.getUserId());
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/v1/trip/{tripId}/settlements", tripId)
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(TripMemberErrorType.IS_NOT_MEMBER.getCode()))
+                    .andExpect(jsonPath("$.message").value(TripMemberErrorType.IS_NOT_MEMBER.getMessage()));
         }
     }
 }
