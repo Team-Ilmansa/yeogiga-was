@@ -6,6 +6,7 @@ import kr.co.yeogiga.domain.settlement.repository.SettlementRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,5 +20,9 @@ public class SettlementService {
     
     public Optional<SettlementDto> findSettlementDtoById(Long id) {
         return settlementRepository.findSettlementDtoById(id);
+    }
+    
+    public List<SettlementDto> readAllSettlementDtoByTripId(Long tripId) {
+        return settlementRepository.findAllSettlementDtoByTripId(tripId);
     }
 }
