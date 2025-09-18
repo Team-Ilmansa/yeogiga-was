@@ -9,10 +9,10 @@ import java.util.Arrays;
 @Getter
 @RequiredArgsConstructor
 public enum SettlementType {
-    ATTRACTION("관광지"),
+    RESTAURANT("식당"),
+    TOURISM("관광지"),
     LODGING("숙소"),
-    MEAL("식사"),
-    TRANSPORTATION("이동수단"),
+    TRANSPORT("교통수단"),
     ETC("기타");
     
     private final String value;
