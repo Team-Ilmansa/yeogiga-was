@@ -137,4 +137,174 @@ public interface SettlementApi {
             @Parameter(description = "정산 내역 ID")
             @PathVariable(name = "settlementId") Long settlementId
     );
+    
+    @TrackApi(description = "정산 내역 전체 조회")
+    @Operation(summary = "정산 내역 전체 조회", description = "정산 내역 전체 조회 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "정산 내역 전체 조회 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                             {
+                                                 "code": 200,
+                                                 "message": "요청이 성공하였습니다.",
+                                                 "data": {
+                                                     "2025-09-08": [
+                                                         {
+                                                             "id": 4,
+                                                             "name": "숙소",
+                                                             "totalPrice": 30000,
+                                                             "date": "2025-09-08",
+                                                             "type": "LODGING",
+                                                             "payerId": 16,
+                                                             "isCompleted": true,
+                                                             "payers": [
+                                                                 {
+                                                                     "id": 7,
+                                                                     "userId": 15,
+                                                                     "nickname": "nick15",
+                                                                     "imageUrl": "https://image.com/15",
+                                                                     "price": 10000,
+                                                                     "isCompleted": true
+                                                                 },
+                                                                 {
+                                                                     "id": 8,
+                                                                     "userId": 16,
+                                                                     "nickname": "nick16",
+                                                                     "imageUrl": null,
+                                                                     "price": 20000,
+                                                                     "isCompleted": true
+                                                                 }
+                                                             ]
+                                                         },
+                                                         {
+                                                             "id": 5,
+                                                             "name": "2팀 저녁 숙소",
+                                                             "totalPrice": 50000,
+                                                             "date": "2025-09-08",
+                                                             "type": "LODGING",
+                                                             "payerId": 16,
+                                                             "isCompleted": false,
+                                                             "payers": [
+                                                                 {
+                                                                     "id": 9,
+                                                                     "userId": 15,
+                                                                     "nickname": "nick15",
+                                                                     "imageUrl": "https://image.com/15",
+                                                                     "price": 10000,
+                                                                     "isCompleted": false
+                                                                 },
+                                                                 {
+                                                                     "id": 10,
+                                                                     "userId": 16,
+                                                                     "nickname": "nick16",
+                                                                     "imageUrl": null,
+                                                                     "price": 20000,
+                                                                     "isCompleted": true
+                                                                 }
+                                                             ]
+                                                         }
+                                                     ],
+                                                     "2025-09-07": [
+                                                         {
+                                                             "id": 1,
+                                                             "name": "주유소",
+                                                             "totalPrice": 50000,
+                                                             "date": "2025-09-07",
+                                                             "type": "TRANSPORT",
+                                                             "payerId": 16,
+                                                             "isCompleted": false,
+                                                             "payers": [
+                                                                 {
+                                                                     "id": 1,
+                                                                     "userId": 15,
+                                                                     "nickname": "nick15",
+                                                                     "imageUrl": "https://image.com/15",
+                                                                     "price": 10000,
+                                                                     "isCompleted": false
+                                                                 },
+                                                                 {
+                                                                     "id": 2,
+                                                                     "userId": 16,
+                                                                     "nickname": "nick16",
+                                                                     "imageUrl": null,
+                                                                     "price": 20000,
+                                                                     "isCompleted": true
+                                                                 }
+                                                             ]
+                                                         },
+                                                         {
+                                                             "id": 2,
+                                                             "name": "점심",
+                                                             "totalPrice": 30000,
+                                                             "date": "2025-09-07",
+                                                             "type": "RESTAURANT",
+                                                             "payerId": 16,
+                                                             "isCompleted": true,
+                                                             "payers": [
+                                                                 {
+                                                                     "id": 3,
+                                                                     "userId": 15,
+                                                                     "nickname": "nick15",
+                                                                     "imageUrl": "https://image.com/15",
+                                                                     "price": 10000,
+                                                                     "isCompleted": true
+                                                                 },
+                                                                 {
+                                                                     "id": 4,
+                                                                     "userId": 16,
+                                                                     "nickname": "nick16",
+                                                                     "imageUrl": null,
+                                                                     "price": 20000,
+                                                                     "isCompleted": true
+                                                                 }
+                                                             ]
+                                                         },
+                                                         {
+                                                             "id": 3,
+                                                             "name": "저녁",
+                                                             "totalPrice": 30000,
+                                                             "date": "2025-09-07",
+                                                             "type": "RESTAURANT",
+                                                             "payerId": 16,
+                                                             "isCompleted": true,
+                                                             "payers": [
+                                                                 {
+                                                                     "id": 5,
+                                                                     "userId": 15,
+                                                                     "nickname": "nick15",
+                                                                     "imageUrl": "https://image.com/15",
+                                                                     "price": 10000,
+                                                                     "isCompleted": true
+                                                                 },
+                                                                 {
+                                                                     "id": 6,
+                                                                     "userId": 16,
+                                                                     "nickname": "nick16",
+                                                                     "imageUrl": null,
+                                                                     "price": 20000,
+                                                                     "isCompleted": true
+                                                                 }
+                                                             ]
+                                                         }
+                                                     ]
+                                                 }
+                                             }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "400", description = "정산 내역 전체 조회 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "여행 멤버가 아닌 경우", value = """
+                                             {
+                                                   "code": "T102",
+                                                   "message": "해당 여행의 멤버가 아닙니다."
+                                               }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> getAllSettlement(
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
+            
+            @Parameter(description = "여행 ID")
+            @PathVariable(name ="tripId") Long tripId
+    );
 }
