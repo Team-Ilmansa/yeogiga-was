@@ -101,7 +101,7 @@ public class SettlementControllerTest {
                 .name("점심 식사")
                 .totalPrice(50000L)
                 .date(LocalDate.now())
-                .type(SettlementType.MEAL)
+                .type(SettlementType.RESTAURANT)
                 .payers(List.of(
                         SettlementRequest.PayInfoDto.builder()
                                 .userId(1L)
@@ -144,7 +144,7 @@ public class SettlementControllerTest {
                     .name("  ")
                     .totalPrice(-1L)
                     .date(LocalDate.now())
-                    .type(SettlementType.MEAL)
+                    .type(SettlementType.RESTAURANT)
                     .payers(List.of(
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(1L)
@@ -228,7 +228,7 @@ public class SettlementControllerTest {
                     .name("점심 식사")
                     .totalPrice(50000L)
                     .date(LocalDate.now())
-                    .type(SettlementType.MEAL)
+                    .type(SettlementType.RESTAURANT)
                     .payers(List.of(
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(1L)
@@ -280,7 +280,7 @@ public class SettlementControllerTest {
                     "점심",
                     20000L,
                     LocalDate.now(),
-                    SettlementType.MEAL,
+                    SettlementType.RESTAURANT,
                     userDetails.getUserId(),
                     false,
                     List.of(payInfoDto1, payInfoDto2)
