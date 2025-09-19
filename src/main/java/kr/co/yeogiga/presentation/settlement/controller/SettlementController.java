@@ -47,4 +47,14 @@ public class SettlementController implements SettlementApi {
         return ResponseEntity
                 .ok(SuccessResponse.from(settlementQueryService.getSettlement(tripId, userDetails.getUserId(), settlementId)));
     }
+    
+    @Override
+    @GetMapping("/{tripId}/settlements")
+    public ResponseEntity<?> getAllSettlement(
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
+            @PathVariable(name ="tripId") Long tripId
+    ) {
+        return ResponseEntity
+                .ok(SuccessResponse.from(settlementQueryService.getAllSettlement(tripId, userDetails.getUserId())));
+    }
 }

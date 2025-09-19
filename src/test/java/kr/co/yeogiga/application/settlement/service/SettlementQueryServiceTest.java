@@ -18,8 +18,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -104,6 +106,73 @@ public class SettlementQueryServiceTest {
             
             // then
             assertEquals(SettlementErrorType.NOT_FOUND, exception.getErrorType());
+        }
+    }
+    
+    @Nested
+    @DisplayName("정산 내역 전체 조회")
+    class GetAllSettlement {
+        private final Long tripId = 1L;
+        private final Long userId = 1L;
+        private final Long settlementId = 1L;
+        
+        @Test
+        @DisplayName("성공")
+        void success() {
+            // given
+            PayInfoDto payInfoDto1 = new PayInfoDto(10L, userId, "nick1", "http://image.com/1", 10000L, true);
+            PayInfoDto payInfoDto2 = new PayInfoDto(11L, 2L, "nick2", "http://image.com/2", 10000L, false);
+            PayInfoDto payInfoDto3 = new PayInfoDto(20L, userId, "nick1", "http://image.com/1", 10000L, true);
+            PayInfoDto payInfoDto4 = new PayInfoDto(21L, 2L, "nick2", "http://image.com/2", 40000L, true);
+            
+            SettlementDto settlementDto1 = new SettlementDto(
+                    settlementId,
+                    "마트 장보기",
+                    20000L,
+                    LocalDate.now(),
+                    SettlementType.ETC,
+                    userId,
+                    false,
+                    List.of(payInfoDto1, payInfoDto2)
+            );
+            
+            SettlementDto settlementDto2 = new SettlementDto(
+                    settlementId,
+                    "주류",
+                    50000L,
+                    LocalDate.now().minusDays(1),
+                    SettlementType.ETC,
+                    userId,
+                    true,
+                    List.of(payInfoDto3, payInfoDto4)
+            );
+            
+            
+            when(tripMemberService.existsByTripIdAndUserId(tripId, userId)).thenReturn(true);
+            when(settlementService.readAllSettlementDtoByTripId(tripId)).thenReturn(List.of(settlementDto1, settlementDto2));
+            
+            // when
+            Map<LocalDate, List<SettlementDto>> result = settlementQueryService.getAllSettlement(tripId, userId);
+            
+            // then
+            assertThat(result.get(LocalDate.now())).hasSize(1);
+            assertThat(result.get(LocalDate.now().minusDays(1))).hasSize(1);
+            assertEquals("마트 장보기", result.get(LocalDate.now()).get(0).name());
+            assertEquals("주류", result.get(LocalDate.now().minusDays(1)).get(0).name());
+        }
+        
+        @Test
+        @DisplayName("실패 - 여행 멤버가 아닌 경우")
+        void failIfNotMember() {
+            // given
+            when(tripMemberService.existsByTripIdAndUserId(tripId, userId)).thenReturn(false);
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> settlementQueryService.getAllSettlement(tripId, userId));
+            
+            // then
+            assertEquals(TripMemberErrorType.IS_NOT_MEMBER, exception.getErrorType());
         }
     }
 }
