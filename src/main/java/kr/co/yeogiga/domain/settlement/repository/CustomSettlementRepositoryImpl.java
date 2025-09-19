@@ -30,6 +30,7 @@ public class CustomSettlementRepositoryImpl implements CustomSettlementRepositor
                         .from(settlement)
                         .join(payInfo).on(settlement.id.eq(payInfo.settlementId))
                         .join(user).on(payInfo.userId.eq(user.id))
+                        .where(settlement.id.eq(id))
                         .transform(
                                 GroupBy.groupBy(settlement.id).as(
                                         Projections.constructor(

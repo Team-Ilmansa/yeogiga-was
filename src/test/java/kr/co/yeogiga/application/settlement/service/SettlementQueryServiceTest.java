@@ -64,7 +64,7 @@ public class SettlementQueryServiceTest {
             );
             
             when(tripMemberService.existsByTripIdAndUserId(tripId, userId)).thenReturn(true);
-            when(settlementService.findSettlementDtoById(settlementId))
+            when(settlementService.readSettlementDtoById(settlementId))
                     .thenReturn(Optional.of(settlementDto));
             
             // when
@@ -98,7 +98,7 @@ public class SettlementQueryServiceTest {
         void failIfSettlementNotFound() {
             // given
             when(tripMemberService.existsByTripIdAndUserId(tripId, userId)).thenReturn(true);
-            when(settlementService.findSettlementDtoById(settlementId)).thenReturn(Optional.empty());
+            when(settlementService.readSettlementDtoById(settlementId)).thenReturn(Optional.empty());
             
             // when
             CustomException exception = assertThrows(CustomException.class, ()

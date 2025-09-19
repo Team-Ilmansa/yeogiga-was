@@ -18,7 +18,7 @@ public class SettlementService {
         return settlementRepository.save(settlement).getId();
     }
     
-    public Optional<SettlementDto> findSettlementDtoById(Long id) {
+    public Optional<SettlementDto> readSettlementDtoById(Long id) {
         return settlementRepository.findSettlementDtoById(id);
     }
     

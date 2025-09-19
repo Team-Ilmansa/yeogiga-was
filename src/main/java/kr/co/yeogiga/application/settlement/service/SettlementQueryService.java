@@ -36,7 +36,7 @@ public class SettlementQueryService {
             throw new CustomException(TripMemberErrorType.IS_NOT_MEMBER);
         }
         
-        return settlementService.findSettlementDtoById(settlementId)
+        return settlementService.readSettlementDtoById(settlementId)
                 .orElseThrow(() -> new CustomException(SettlementErrorType.NOT_FOUND));
     }
     
