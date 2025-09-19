@@ -85,7 +85,7 @@ public interface SettlementApi {
                                                   "name": "주유소",
                                                   "totalPrice": 50000,
                                                   "date": "2025-09-07",
-                                                  "type": "TRANSPORTATION",
+                                                  "type": "TRANSPORT",
                                                   "payerId": 16,
                                                   "isCompleted": false,
                                                   "payers": [

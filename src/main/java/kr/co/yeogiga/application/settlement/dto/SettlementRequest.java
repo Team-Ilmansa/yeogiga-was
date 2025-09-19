@@ -33,7 +33,7 @@ public class SettlementRequest {
             @NotNull(message = "날짜는 필수 입력값입니다.")
             LocalDate date,
             
-            @Schema(description = "정산 내역 타입", examples = {"ATTRACTION(관광지)", "LODGING(숙소)", "MEAL(식사)", "TRANSPORTATION(이동수단)", "ETC(기타)"})
+            @Schema(description = "정산 내역 타입", examples = {"TOURISM(관광지)", "LODGING(숙소)", "RESTAURANT(식사)", "TRANSPORT(교통수단)", "ETC(기타)"})
             @EnumValidation(target = SettlementType.class, message = "지원하지 않는 정산 내역 타입입니다.")
             @NotNull(message = "타입은 필수 입력값입니다.")
             SettlementType type,

@@ -55,7 +55,7 @@ public class SettlementQueryServiceTest {
                     "점심",
                     20000L,
                     LocalDate.now(),
-                    SettlementType.MEAL,
+                    SettlementType.RESTAURANT,
                     userId,
                     false,
                     List.of(payInfoDto1, payInfoDto2)
