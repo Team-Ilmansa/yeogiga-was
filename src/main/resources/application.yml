@@ -75,3 +75,13 @@ map:
     uri: ${NAVER_API_URI}
     client-id: ${NAVER_CLIENT_ID}
     client-secret: ${NAVER_CLIENT_SECRET}
+
+--- # weather
+weather:
+  base-url: ${WEATHER_BASE_URL}
+  path: ${WEATHER_PATH}
+  service-key:  ${WEATHER_SERVICE_KEY}
+  page-no: ${WEATHER_PAGE_NO}
+  num-of-rows: ${WEATHER_NUM}
+  data-type: ${WEATHER_DATA_TYPE}
+
