@@ -18,11 +18,23 @@ public class SettlementService {
         return settlementRepository.save(settlement).getId();
     }
     
+    public Optional<Settlement> readById(Long id) {
+        return settlementRepository.findById(id);
+    }
+    
+    public Optional<Long> readPayerIdById(Long id) {
+        return settlementRepository.findPayerIdById(id);
+    }
+    
     public Optional<SettlementDto> readSettlementDtoById(Long id) {
         return settlementRepository.findSettlementDtoById(id);
     }
     
     public List<SettlementDto> readAllSettlementDtoByTripId(Long tripId) {
         return settlementRepository.findAllSettlementDtoByTripId(tripId);
+    }
+    
+    public void deleteById(Long id) {
+        settlementRepository.deleteById(id);
     }
 }
