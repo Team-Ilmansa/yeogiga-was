@@ -59,6 +59,7 @@ public class SettlementController implements SettlementApi {
                 .ok(SuccessResponse.from(settlementQueryService.getAllSettlement(tripId, userDetails.getUserId())));
     }
     
+    @Override
     @DeleteMapping("/{tripId}/settlements/{settlementId}")
     public ResponseEntity<?> deleteSettlement(
             @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
