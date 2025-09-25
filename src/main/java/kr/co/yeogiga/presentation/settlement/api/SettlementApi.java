@@ -307,4 +307,54 @@ public interface SettlementApi {
             @Parameter(description = "여행 ID")
             @PathVariable(name ="tripId") Long tripId
     );
+    
+    @TrackApi(description = "정산 내역 삭제")
+    @Operation(summary = "정산 내역 삭제", description = "정산 내역 삭제 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "정산 내역 삭제 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                            {
+                                                "code": 200,
+                                                "message": "요청이 성공하였습니다."
+                                            }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "400", description = "정산 내역 삭제 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "여행 멤버가 아닌 경우", value = """
+                                             {
+                                                   "code": "T102",
+                                                   "message": "해당 여행의 멤버가 아닙니다."
+                                               }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "403", description = "정산 내역 삭제 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "요청자가 정산 생성자가 아닌 경우", value = """
+                                             {
+                                                 "code": "S002",
+                                                 "message": "정산자가 아닙니다."
+                                             }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "정산 내역 삭제 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "정산 내역 미존재",value = """
+                                             {
+                                                  "code": "S001",
+                                                  "message": "존재하지 않는 정산 내역 입니다."
+                                              }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> deleteSettlement(
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
+            
+            @Parameter(description = "여행 ID")
+            @PathVariable(name = "tripId") Long tripId,
+            
+            @Parameter(description = "정산 내역 ID")
+            @PathVariable(name = "settlementId") Long settlementId
+    );
 }

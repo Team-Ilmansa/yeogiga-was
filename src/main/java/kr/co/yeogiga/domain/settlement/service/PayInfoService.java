@@ -15,4 +15,8 @@ public class PayInfoService {
     public void saveAllInBatch(List<PayInfo> payInfos) {
         payInfoRepository.saveAllInBatch(payInfos);
     }
+    
+    public void deleteBySettlementId(Long settlementId) {
+        payInfoRepository.deleteBySettlementId(settlementId);
+    }
 }

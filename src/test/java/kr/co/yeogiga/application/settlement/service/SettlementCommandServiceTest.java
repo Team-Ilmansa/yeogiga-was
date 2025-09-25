@@ -25,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -219,6 +220,75 @@ public class SettlementCommandServiceTest {
             
             // then
             assertEquals(SettlementErrorType.NOT_VALID_PRICE, exception.getErrorType());
+        }
+    }
+    
+    @Nested
+    @DisplayName("정산 내역 삭제")
+    class DeleteSettlement {
+        private final Long tripId = 1L;
+        private final Long userId = 1L;
+        private final Long settlementId = 1L;
+        
+        @Test
+        @DisplayName("성공")
+        void success() {
+            // given
+            when(tripMemberService.existsByTripIdAndUserId(tripId, userId)).thenReturn(true);
+            when(settlementService.readPayerIdById(settlementId)).thenReturn(Optional.of(userId));
+            doNothing().when(payInfoService).deleteBySettlementId(settlementId);
+            doNothing().when(settlementService).deleteById(settlementId);
+            
+            // when
+            settlementCommandService.deleteSettlement(tripId, userId, settlementId);
+            
+            // then
+            verify(payInfoService, times(1)).deleteBySettlementId(settlementId);
+            verify(settlementService, times(1)).deleteById(settlementId);
+        }
+        
+        @Test
+        @DisplayName("실패 - 요청자가 여행 멤버가 아닐 경우")
+        void failIfNotMember() {
+            // given
+            when(tripMemberService.existsByTripIdAndUserId(tripId, userId)).thenReturn(false);
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> settlementCommandService.deleteSettlement(tripId, userId, settlementId));
+            
+            // then
+            assertEquals(TripMemberErrorType.IS_NOT_MEMBER, exception.getErrorType());
+        }
+        
+        @Test
+        @DisplayName("실패 - 정산 내역이 존재하지 않을 경우")
+        void failIfSettlementNotFound() {
+            // given
+            when(tripMemberService.existsByTripIdAndUserId(tripId, userId)).thenReturn(true);
+            when(settlementService.readPayerIdById(settlementId)).thenReturn(Optional.empty());
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> settlementCommandService.deleteSettlement(tripId, userId, settlementId));
+            
+            // then
+            assertEquals(SettlementErrorType.NOT_FOUND, exception.getErrorType());
+        }
+        
+        @Test
+        @DisplayName("실패 - 요청자가 정산 생성자가 아닌 경우")
+        void failIfIsNotPayer() {
+            // given
+            when(tripMemberService.existsByTripIdAndUserId(tripId, userId)).thenReturn(true);
+            when(settlementService.readPayerIdById(settlementId)).thenReturn(Optional.of(2L));
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> settlementCommandService.deleteSettlement(tripId, userId, settlementId));
+            
+            // then
+            assertEquals(SettlementErrorType.IS_NOT_PAYER, exception.getErrorType());
         }
     }
 }

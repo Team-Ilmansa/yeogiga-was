@@ -109,4 +109,32 @@ public class SettlementCommandService {
         return payers.stream()
                 .allMatch(SettlementRequest.PayInfoDto::isCompleted);
     }
+    
+    /**
+     * 정산 내역을 삭제하는 메서드
+     *
+     * @param tripId        여행 ID
+     * @param userId        사용자 ID
+     * @param settlementId  정산 내역 ID
+     *
+     * @throws CustomException TripMemberErrorType.IS_NOT_MEMBER - 요청자가 여행 멤버가 아닐 경우
+     * @throws CustomException SettlementErrorType.NOT_FOUND - 정산 내역이 존재하지 않을 경우
+     * @throws CustomException SettlementErrorType.IS_NOT_PAYER - 요청자가 정산 생성자가 아닐 경우
+     */
+    @Transactional
+    public void deleteSettlement(Long tripId, Long userId, Long settlementId) {
+        if (!tripMemberService.existsByTripIdAndUserId(tripId, userId)) {
+            throw new CustomException(TripMemberErrorType.IS_NOT_MEMBER);
+        }
+        
+        Long payerId = settlementService.readPayerIdById(settlementId)
+                .orElseThrow(() -> new CustomException(SettlementErrorType.NOT_FOUND));
+        
+        if (!payerId.equals(userId)) {
+            throw new CustomException(SettlementErrorType.IS_NOT_PAYER);
+        }
+        
+        payInfoService.deleteBySettlementId(settlementId);
+        settlementService.deleteById(settlementId);
+    }
 }

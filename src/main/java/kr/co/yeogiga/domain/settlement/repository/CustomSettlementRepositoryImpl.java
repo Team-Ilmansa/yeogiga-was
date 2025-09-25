@@ -24,6 +24,17 @@ public class CustomSettlementRepositoryImpl implements CustomSettlementRepositor
     private final QUser user = QUser.user;
     
     @Override
+    public Optional<Long> findPayerIdById(Long id) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(settlement.payerId)
+                        .from(settlement)
+                        .where(settlement.id.eq(id))
+                        .fetchFirst()
+        );
+    }
+    
+    @Override
     public Optional<SettlementDto> findSettlementDtoById(Long id) {
         return Optional.ofNullable(
                 jpaQueryFactory

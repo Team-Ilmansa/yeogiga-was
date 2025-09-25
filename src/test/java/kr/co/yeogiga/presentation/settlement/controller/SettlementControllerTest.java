@@ -45,6 +45,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -423,6 +424,52 @@ public class SettlementControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code").value(TripMemberErrorType.IS_NOT_MEMBER.getCode()))
                     .andExpect(jsonPath("$.message").value(TripMemberErrorType.IS_NOT_MEMBER.getMessage()));
+        }
+    }
+    
+    @Nested
+    @DisplayName("정산 내역 삭제")
+    class DeleteSettlement {
+        private final Long tripId = 1L;
+        private final Long settlementId = 1L;
+        
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            doNothing().when(settlementCommandService).deleteSettlement(tripId, userDetails.getUserId(), settlementId);
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    delete("/api/v1/trip/{tripId}/settlements/{settlementsId}", tripId, settlementId)
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").value(SuccessResponse.ok().code()))
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+        }
+        
+        @Test
+        @DisplayName("요청자가 정산 생성자가 아닌 경우")
+        void failIfIsNotPayer() throws Exception {
+            // given
+            doThrow(new CustomException(SettlementErrorType.IS_NOT_PAYER))
+                    .when(settlementCommandService).deleteSettlement(tripId, userDetails.getUserId(), settlementId);
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    delete("/api/v1/trip/{tripId}/settlements/{settlementsId}", tripId, settlementId)
+                            .with(user(userDetails))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.code").value(SettlementErrorType.IS_NOT_PAYER.getCode()))
+                    .andExpect(jsonPath("$.message").value(SettlementErrorType.IS_NOT_PAYER.getMessage()));
         }
     }
 }
