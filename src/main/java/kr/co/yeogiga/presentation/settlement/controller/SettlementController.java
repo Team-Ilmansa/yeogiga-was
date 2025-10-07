@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,10 +54,22 @@ public class SettlementController implements SettlementApi {
     @GetMapping("/{tripId}/settlements")
     public ResponseEntity<?> getAllSettlement(
             @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
-            @PathVariable(name ="tripId") Long tripId
+            @PathVariable(name = "tripId") Long tripId
     ) {
         return ResponseEntity
                 .ok(SuccessResponse.from(settlementQueryService.getAllSettlement(tripId, userDetails.getUserId())));
+    }
+    
+    @PutMapping("/{tripId}/settlements/{settlementId}")
+    public ResponseEntity<?> updateSettlement(
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
+            @PathVariable(name = "tripId") Long tripId,
+            @PathVariable(name = "settlementId") Long settlementId,
+            @RequestBody SettlementRequest.SettlementDto settlement
+    ) {
+        settlementCommandService.updateSettlement(tripId, userDetails.getUserId(), settlementId, settlement);
+        
+        return ResponseEntity.ok(SuccessResponse.ok());
     }
     
     @Override
