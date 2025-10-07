@@ -37,4 +37,9 @@ public class PayInfo {
         this.isCompleted = isCompleted;
         this.settlementId = settlementId;
     }
+    
+    public void update(Long price, boolean isCompleted) {
+        this.price = price;
+        this.isCompleted = isCompleted;
+    }
 }

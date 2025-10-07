@@ -6,8 +6,16 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface PayInfoRepository extends JpaRepository<PayInfo, Long>, CustomPayInfoRepository {
+    List<PayInfo> findAllBySettlementId(Long settlementId);
+    
     @Modifying
     @Query(value = "DELETE FROM pay_info WHERE settlement_id = :settlementId", nativeQuery = true)
     void deleteBySettlementId(@Param(value = "settlementId") Long settlementId);
+    
+    @Modifying
+    @Query(value = "DELETE FROM pay_info WHERE id in :ids")
+    void deleteByIds(@Param(value = "ids") List<Long> ids);
 }

@@ -62,4 +62,16 @@ public class Settlement {
         this.payerId = payerId;
         this.isCompleted = isCompleted;
     }
+    
+    public void update(String name, Long totalPrice, LocalDate date, SettlementType type, boolean isCompleted) {
+        this.name = name;
+        this.totalPrice = totalPrice;
+        this.date = date;
+        this.type = type;
+        this.isCompleted = isCompleted;
+    }
+    
+    public boolean isPayer(Long id) {
+        return payerId.equals(id);
+    }
 }
