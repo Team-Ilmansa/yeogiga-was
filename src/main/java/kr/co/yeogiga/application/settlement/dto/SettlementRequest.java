@@ -55,6 +55,12 @@ public class SettlementRequest {
                     .isCompleted(isCompleted)
                     .build();
         }
+        
+        public boolean isValidPrice() {
+            return this.totalPrice == payers.stream()
+                    .mapToLong(PayInfoDto::price)
+                    .sum();
+        }
     }
    
     @Schema(name = "SettlementRequest.PayInfoDto", description = "인원 별 정산 금액 및 여부")
