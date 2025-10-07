@@ -65,7 +65,7 @@ public class SettlementController implements SettlementApi {
             @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @PathVariable(name = "tripId") Long tripId,
             @PathVariable(name = "settlementId") Long settlementId,
-            @RequestBody SettlementRequest.SettlementDto settlement
+            @Valid @RequestBody SettlementRequest.SettlementDto settlement
     ) {
         settlementCommandService.updateSettlement(tripId, userDetails.getUserId(), settlementId, settlement);
         
