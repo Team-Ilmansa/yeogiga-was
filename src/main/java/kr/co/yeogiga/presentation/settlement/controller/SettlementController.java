@@ -60,6 +60,7 @@ public class SettlementController implements SettlementApi {
                 .ok(SuccessResponse.from(settlementQueryService.getAllSettlement(tripId, userDetails.getUserId())));
     }
     
+    @Override
     @PutMapping("/{tripId}/settlements/{settlementId}")
     public ResponseEntity<?> updateSettlement(
             @AuthenticationPrincipal CustomUserDetailsImpl userDetails,

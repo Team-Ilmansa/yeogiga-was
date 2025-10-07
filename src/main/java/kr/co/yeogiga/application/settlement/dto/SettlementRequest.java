@@ -56,6 +56,7 @@ public class SettlementRequest {
                     .build();
         }
         
+        @Schema(hidden = true)
         public boolean isValidPrice() {
             return this.totalPrice == payers.stream()
                     .mapToLong(PayInfoDto::price)
