@@ -74,12 +74,10 @@ public class SettlementCommandServiceTest {
                         SettlementRequest.PayInfoDto.builder()
                                 .userId(1L)
                                 .price(10000L)
-                                .isCompleted(true)
                                 .build(),
                         SettlementRequest.PayInfoDto.builder()
                                 .userId(2L)
                                 .price(40000L)
-                                .isCompleted(false)
                                 .build()
                 ))
                 .build();
@@ -122,12 +120,10 @@ public class SettlementCommandServiceTest {
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(1L)
                                     .price(10000L)
-                                    .isCompleted(true)
                                     .build(),
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(2L)
                                     .price(40000L)
-                                    .isCompleted(true)
                                     .build()
                     ))
                     .build();
@@ -142,8 +138,6 @@ public class SettlementCommandServiceTest {
             // then
             verify(settlementService, times(1)).save(settlementCaptor.capture());
             verify(payInfoService, times(1)).saveAllInBatch(anyList());
-            
-            assertEquals(true, settlementCaptor.getValue().isCompleted());
         }
         
         @Test
@@ -173,12 +167,10 @@ public class SettlementCommandServiceTest {
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(1L)
                                     .price(10000L)
-                                    .isCompleted(true)
                                     .build(),
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(3L)
                                     .price(40000L)
-                                    .isCompleted(false)
                                     .build()
                     ))
                     .build();
@@ -206,12 +198,10 @@ public class SettlementCommandServiceTest {
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(1L)
                                     .price(10000L)
-                                    .isCompleted(true)
                                     .build(),
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(2L)
                                     .price(20000L)
-                                    .isCompleted(false)
                                     .build()
                     ))
                     .build();
@@ -378,12 +368,10 @@ public class SettlementCommandServiceTest {
                     SettlementRequest.PayInfoDto.builder()
                             .userId(1L)
                             .price(10000L)
-                            .isCompleted(true)
                             .build(),
                     SettlementRequest.PayInfoDto.builder()
                             .userId(3L)
                             .price(50000L)
-                            .isCompleted(true)
                             .build()
             );
             
@@ -401,7 +389,6 @@ public class SettlementCommandServiceTest {
             // then
             assertEquals(settlementDto.name(), settlement.getName());
             assertEquals(settlementDto.totalPrice(), settlement.getTotalPrice());
-            assertTrue(settlement.isCompleted());
             
             assertEquals(10000L, payInfo1.getPrice());
             
@@ -412,7 +399,6 @@ public class SettlementCommandServiceTest {
             PayInfo payInfo = addedPayInfos.getValue().get(0);
             assertEquals(3L, payInfo.getUserId());
             assertEquals(50000L, payInfo.getPrice());
-            assertTrue(payInfo.isCompleted());
         }
         
         @Test
@@ -427,12 +413,10 @@ public class SettlementCommandServiceTest {
                     SettlementRequest.PayInfoDto.builder()
                             .userId(userId)
                             .price(20000L)
-                            .isCompleted(true)
                             .build(),
                     SettlementRequest.PayInfoDto.builder()
                             .userId(2L)
                             .price(30000L)
-                            .isCompleted(false)
                             .build()
             );
             
@@ -464,12 +448,10 @@ public class SettlementCommandServiceTest {
                     SettlementRequest.PayInfoDto.builder()
                             .userId(userId)
                             .price(20000L)
-                            .isCompleted(true)
                             .build(),
                     SettlementRequest.PayInfoDto.builder()
                             .userId(2L)
                             .price(30000L)
-                            .isCompleted(false)
                             .build()
             );
             
@@ -500,12 +482,10 @@ public class SettlementCommandServiceTest {
                     SettlementRequest.PayInfoDto.builder()
                             .userId(userId)
                             .price(20000L)
-                            .isCompleted(true)
                             .build(),
                     SettlementRequest.PayInfoDto.builder()
                             .userId(2L)
                             .price(30000L)
-                            .isCompleted(false)
                             .build()
             );
             
@@ -536,12 +516,10 @@ public class SettlementCommandServiceTest {
                     SettlementRequest.PayInfoDto.builder()
                             .userId(userId)
                             .price(20000L)
-                            .isCompleted(true)
                             .build(),
                     SettlementRequest.PayInfoDto.builder()
                             .userId(4L)
                             .price(30000L)
-                            .isCompleted(false)
                             .build()
             );
             
@@ -572,12 +550,10 @@ public class SettlementCommandServiceTest {
                     SettlementRequest.PayInfoDto.builder()
                             .userId(userId)
                             .price(20000L)
-                            .isCompleted(true)
                             .build(),
                     SettlementRequest.PayInfoDto.builder()
                             .userId(2L)
                             .price(40000L)
-                            .isCompleted(false)
                             .build()
             );
             

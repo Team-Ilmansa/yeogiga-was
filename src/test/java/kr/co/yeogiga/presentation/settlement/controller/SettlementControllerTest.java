@@ -111,12 +111,10 @@ public class SettlementControllerTest {
                         SettlementRequest.PayInfoDto.builder()
                                 .userId(1L)
                                 .price(10000L)
-                                .isCompleted(true)
                                 .build(),
                         SettlementRequest.PayInfoDto.builder()
                                 .userId(2L)
                                 .price(40000L)
-                                .isCompleted(false)
                                 .build()
                 ))
                 .build();
@@ -154,12 +152,10 @@ public class SettlementControllerTest {
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(1L)
                                     .price(-2L)
-                                    .isCompleted(true)
                                     .build(),
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(2L)
                                     .price(40000L)
-                                    .isCompleted(false)
                                     .build()
                     ))
                     .build();
@@ -238,12 +234,10 @@ public class SettlementControllerTest {
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(1L)
                                     .price(10000L)
-                                    .isCompleted(true)
                                     .build(),
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(2L)
                                     .price(20000L)
-                                    .isCompleted(false)
                                     .build()
                     ))
                     .build();
@@ -489,12 +483,10 @@ public class SettlementControllerTest {
                     SettlementRequest.PayInfoDto.builder()
                             .userId(userDetails.getUserId())
                             .price(20000L)
-                            .isCompleted(true)
                             .build(),
                     SettlementRequest.PayInfoDto.builder()
                             .userId(2L)
                             .price(30000L)
-                            .isCompleted(false)
                             .build()
             );
             
