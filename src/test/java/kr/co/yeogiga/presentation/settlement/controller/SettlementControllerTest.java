@@ -35,6 +35,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -109,12 +111,10 @@ public class SettlementControllerTest {
                         SettlementRequest.PayInfoDto.builder()
                                 .userId(1L)
                                 .price(10000L)
-                                .isCompleted(true)
                                 .build(),
                         SettlementRequest.PayInfoDto.builder()
                                 .userId(2L)
                                 .price(40000L)
-                                .isCompleted(false)
                                 .build()
                 ))
                 .build();
@@ -152,12 +152,10 @@ public class SettlementControllerTest {
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(1L)
                                     .price(-2L)
-                                    .isCompleted(true)
                                     .build(),
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(2L)
                                     .price(40000L)
-                                    .isCompleted(false)
                                     .build()
                     ))
                     .build();
@@ -236,12 +234,10 @@ public class SettlementControllerTest {
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(1L)
                                     .price(10000L)
-                                    .isCompleted(true)
                                     .build(),
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(2L)
                                     .price(20000L)
-                                    .isCompleted(false)
                                     .build()
                     ))
                     .build();
@@ -470,6 +466,88 @@ public class SettlementControllerTest {
                     .andExpect(status().isForbidden())
                     .andExpect(jsonPath("$.code").value(SettlementErrorType.IS_NOT_PAYER.getCode()))
                     .andExpect(jsonPath("$.message").value(SettlementErrorType.IS_NOT_PAYER.getMessage()));
+        }
+    }
+    
+    @Nested
+    @DisplayName("정산 내역 수정")
+    class UpdateSettlement {
+        private final Long tripId = 1L;
+        private final Long settlementId = 1L;
+        
+        private SettlementRequest.SettlementDto settlementDto;
+        
+        @BeforeEach
+        void setUp() {
+            List<SettlementRequest.PayInfoDto> payInfoDtos = List.of(
+                    SettlementRequest.PayInfoDto.builder()
+                            .userId(userDetails.getUserId())
+                            .price(20000L)
+                            .build(),
+                    SettlementRequest.PayInfoDto.builder()
+                            .userId(2L)
+                            .price(30000L)
+                            .build()
+            );
+            
+            settlementDto = SettlementRequest.SettlementDto.builder()
+                    .name("점심 식사 - new")
+                    .date(LocalDate.of(2025, 10, 6))
+                    .totalPrice(50000L)
+                    .type(SettlementType.RESTAURANT)
+                    .payers(payInfoDtos)
+                    .build();
+        }
+        
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            doNothing().when(settlementCommandService)
+                    .updateSettlement(tripId, userDetails.getUserId(), settlementId, settlementDto);
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    put("/api/v1/trip/{tripId}/settlements/{settlementId}", tripId, settlementId)
+                            .with(user(userDetails))
+                            .content(objectMapper.writeValueAsBytes(settlementDto))
+                            .contentType(MediaType.APPLICATION_JSON)
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+        }
+        
+        @Test
+        @DisplayName("실패 - 유효성 검증 실패")
+        void failValidation() throws Exception {
+            // given
+            doNothing().when(settlementCommandService)
+                    .updateSettlement(tripId, userDetails.getUserId(), settlementId, settlementDto);
+            
+            SettlementRequest.SettlementDto settlementDto = SettlementRequest.SettlementDto.builder()
+                    .name("  ")
+                    .totalPrice(-1L)
+                    .date(LocalDate.of(2025, 10, 7))
+                    .type(SettlementType.RESTAURANT)
+                    .payers(Collections.emptyList())
+                    .build();
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    put("/api/v1/trip/{tripId}/settlements/{settlementId}", tripId, settlementId)
+                            .with(user(userDetails))
+                            .content(objectMapper.writeValueAsBytes(settlementDto))
+                            .contentType(MediaType.APPLICATION_JSON)
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors.name").exists())
+                    .andExpect(jsonPath("$.errors.totalPrice").exists());
         }
     }
 }

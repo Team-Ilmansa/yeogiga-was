@@ -12,6 +12,7 @@ import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.exception.TripMemberErrorType;
 import kr.co.yeogiga.domain.trip.service.TripMemberService;
 import kr.co.yeogiga.domain.user.entity.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -29,9 +31,11 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -70,12 +74,10 @@ public class SettlementCommandServiceTest {
                         SettlementRequest.PayInfoDto.builder()
                                 .userId(1L)
                                 .price(10000L)
-                                .isCompleted(true)
                                 .build(),
                         SettlementRequest.PayInfoDto.builder()
                                 .userId(2L)
                                 .price(40000L)
-                                .isCompleted(false)
                                 .build()
                 ))
                 .build();
@@ -118,12 +120,10 @@ public class SettlementCommandServiceTest {
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(1L)
                                     .price(10000L)
-                                    .isCompleted(true)
                                     .build(),
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(2L)
                                     .price(40000L)
-                                    .isCompleted(true)
                                     .build()
                     ))
                     .build();
@@ -138,8 +138,6 @@ public class SettlementCommandServiceTest {
             // then
             verify(settlementService, times(1)).save(settlementCaptor.capture());
             verify(payInfoService, times(1)).saveAllInBatch(anyList());
-            
-            assertEquals(true, settlementCaptor.getValue().isCompleted());
         }
         
         @Test
@@ -169,12 +167,10 @@ public class SettlementCommandServiceTest {
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(1L)
                                     .price(10000L)
-                                    .isCompleted(true)
                                     .build(),
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(3L)
                                     .price(40000L)
-                                    .isCompleted(false)
                                     .build()
                     ))
                     .build();
@@ -202,12 +198,10 @@ public class SettlementCommandServiceTest {
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(1L)
                                     .price(10000L)
-                                    .isCompleted(true)
                                     .build(),
                             SettlementRequest.PayInfoDto.builder()
                                     .userId(2L)
                                     .price(20000L)
-                                    .isCompleted(false)
                                     .build()
                     ))
                     .build();
@@ -289,6 +283,294 @@ public class SettlementCommandServiceTest {
             
             // then
             assertEquals(SettlementErrorType.IS_NOT_PAYER, exception.getErrorType());
+        }
+    }
+    
+    @Nested
+    @DisplayName("정산 내역 갱신")
+    class UpdateSettlement {
+        private final Long tripId = 1L;
+        private final Long userId = 1L;
+        private final Long settlementId = 1L;
+        
+        private Settlement settlement;
+        private PayInfo payInfo1;
+        private PayInfo payInfo2;
+        
+        private User member1;
+        private User member2;
+        private User member3;
+        
+        private SettlementRequest.SettlementDto settlementDto;
+        
+        @Captor
+        ArgumentCaptor<List<Long>> deletedPayInfoIds;
+        
+        @Captor
+        ArgumentCaptor<List<PayInfo>> addedPayInfos;
+        
+        @BeforeEach
+        void setUp() {
+            settlement = Settlement.builder()
+                    .tripId(tripId)
+                    .name("점심 식사")
+                    .totalPrice(50000L)
+                    .date(LocalDate.of(2025, 10, 6))
+                    .type(SettlementType.RESTAURANT)
+                    .payerId(userId)
+                    .isCompleted(false)
+                    .build();
+            
+            ReflectionTestUtils.setField(settlement, "id", settlementId);
+            
+            payInfo1 = PayInfo.builder()
+                    .userId(userId)
+                    .price(20000L)
+                    .isCompleted(true)
+                    .settlementId(settlement.getId())
+                    .build();
+            
+            payInfo2 = PayInfo.builder()
+                    .userId(2L)
+                    .price(30000L)
+                    .isCompleted(false)
+                    .settlementId(settlement.getId())
+                    .build();
+            
+            ReflectionTestUtils.setField(payInfo1, "id", 1L);
+            ReflectionTestUtils.setField(payInfo2, "id", 2L);
+            
+            member1 = User.builder()
+                    .id(userId)
+                    .nickname("nick1")
+                    .build();
+            
+            member2 = User.builder()
+                    .id(2L)
+                    .nickname("nick2")
+                    .build();
+            
+            member3 = User.builder()
+                    .id(3L)
+                    .nickname("nick3")
+                    .build();
+        }
+        
+        @Test
+        @DisplayName("성공 - 새로운 분담자 추가 및 기존 분담자 삭제")
+        void success() {
+            // given
+            when(tripMemberService.readAllUserByTripId(tripId)).thenReturn(List.of(member1, member2, member3));
+            when(settlementService.readById(settlementId)).thenReturn(Optional.of(settlement));
+            when(payInfoService.readAllBySettlementId(settlementId)).thenReturn(List.of(payInfo1, payInfo2));
+            
+            List<SettlementRequest.PayInfoDto> payInfoDtos = List.of(
+                    SettlementRequest.PayInfoDto.builder()
+                            .userId(1L)
+                            .price(10000L)
+                            .build(),
+                    SettlementRequest.PayInfoDto.builder()
+                            .userId(3L)
+                            .price(50000L)
+                            .build()
+            );
+            
+            settlementDto = SettlementRequest.SettlementDto.builder()
+                    .name("점심 식사 - 2")
+                    .date(LocalDate.of(2025, 10, 6))
+                    .totalPrice(60000L)
+                    .type(SettlementType.RESTAURANT)
+                    .payers(payInfoDtos)
+                    .build();
+            
+            // when
+            settlementCommandService.updateSettlement(tripId, userId, settlementId, settlementDto);
+            
+            // then
+            assertEquals(settlementDto.name(), settlement.getName());
+            assertEquals(settlementDto.totalPrice(), settlement.getTotalPrice());
+            
+            assertEquals(10000L, payInfo1.getPrice());
+            
+            verify(payInfoService, times(1)).deleteByIds(deletedPayInfoIds.capture());
+            verify(payInfoService, times(1)).saveAllInBatch(addedPayInfos.capture());
+            
+            assertEquals(payInfo2.getId(), deletedPayInfoIds.getValue().get(0));
+            PayInfo payInfo = addedPayInfos.getValue().get(0);
+            assertEquals(3L, payInfo.getUserId());
+            assertEquals(50000L, payInfo.getPrice());
+        }
+        
+        @Test
+        @DisplayName("성공 - 정산 내역만 수정된 경우")
+        void successIfOnlySettlementChanged() {
+            // given
+            when(tripMemberService.readAllUserByTripId(tripId)).thenReturn(List.of(member1, member2, member3));
+            when(settlementService.readById(settlementId)).thenReturn(Optional.of(settlement));
+            when(payInfoService.readAllBySettlementId(settlementId)).thenReturn(List.of(payInfo1, payInfo2));
+            
+            List<SettlementRequest.PayInfoDto> payInfoDtos = List.of(
+                    SettlementRequest.PayInfoDto.builder()
+                            .userId(userId)
+                            .price(20000L)
+                            .build(),
+                    SettlementRequest.PayInfoDto.builder()
+                            .userId(2L)
+                            .price(30000L)
+                            .build()
+            );
+            
+            settlementDto = SettlementRequest.SettlementDto.builder()
+                    .name("점심 식사 - new")
+                    .date(LocalDate.of(2025, 10, 6))
+                    .totalPrice(50000L)
+                    .type(SettlementType.RESTAURANT)
+                    .payers(payInfoDtos)
+                    .build();
+            
+            // when
+            settlementCommandService.updateSettlement(tripId, userId, settlementId, settlementDto);
+            
+            // then
+            assertEquals(settlementDto.name(), settlement.getName());
+            
+            verify(payInfoService, never()).deleteByIds(anyList());
+            verify(payInfoService, never()).saveAllInBatch(anyList());
+        }
+        
+        @Test
+        @DisplayName("실패 - 여행이 존재하지 않는 경우")
+        void failIfTripNotFound() {
+            // given
+            when(tripMemberService.readAllUserByTripId(tripId)).thenReturn(Collections.emptyList());
+            
+            List<SettlementRequest.PayInfoDto> payInfoDtos = List.of(
+                    SettlementRequest.PayInfoDto.builder()
+                            .userId(userId)
+                            .price(20000L)
+                            .build(),
+                    SettlementRequest.PayInfoDto.builder()
+                            .userId(2L)
+                            .price(30000L)
+                            .build()
+            );
+            
+            settlementDto = SettlementRequest.SettlementDto.builder()
+                    .name("점심 식사 - new")
+                    .date(LocalDate.of(2025, 10, 6))
+                    .totalPrice(50000L)
+                    .type(SettlementType.RESTAURANT)
+                    .payers(payInfoDtos)
+                    .build();
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> settlementCommandService.updateSettlement(tripId, userId, settlementId, settlementDto));
+        
+            // then
+            assertEquals(TripErrorType.TRIP_NOT_FOUND, exception.getErrorType());
+        }
+        
+        @Test
+        @DisplayName("실패 - 해당 정산 내역의 작성자가 아닌 경우")
+        void failIfNotPayer() {
+            // given
+            when(tripMemberService.readAllUserByTripId(tripId)).thenReturn(List.of(member1, member2, member3));
+            when(settlementService.readById(settlementId)).thenReturn(Optional.of(settlement));
+            
+            List<SettlementRequest.PayInfoDto> payInfoDtos = List.of(
+                    SettlementRequest.PayInfoDto.builder()
+                            .userId(userId)
+                            .price(20000L)
+                            .build(),
+                    SettlementRequest.PayInfoDto.builder()
+                            .userId(2L)
+                            .price(30000L)
+                            .build()
+            );
+            
+            settlementDto = SettlementRequest.SettlementDto.builder()
+                    .name("점심 식사 - new")
+                    .date(LocalDate.of(2025, 10, 6))
+                    .totalPrice(50000L)
+                    .type(SettlementType.RESTAURANT)
+                    .payers(payInfoDtos)
+                    .build();
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> settlementCommandService.updateSettlement(tripId, 2L, settlementId, settlementDto));
+            
+            // then
+            assertEquals(SettlementErrorType.IS_NOT_PAYER, exception.getErrorType());
+        }
+        
+        @Test
+        @DisplayName("실패 - 여행 멤버가 아닌 분담자가 존재하는 경우")
+        void failIfExistsNotMember() {
+            // given
+            when(tripMemberService.readAllUserByTripId(tripId)).thenReturn(List.of(member1, member2, member3));
+            when(settlementService.readById(settlementId)).thenReturn(Optional.of(settlement));
+            
+            List<SettlementRequest.PayInfoDto> payInfoDtos = List.of(
+                    SettlementRequest.PayInfoDto.builder()
+                            .userId(userId)
+                            .price(20000L)
+                            .build(),
+                    SettlementRequest.PayInfoDto.builder()
+                            .userId(4L)
+                            .price(30000L)
+                            .build()
+            );
+            
+            settlementDto = SettlementRequest.SettlementDto.builder()
+                    .name("점심 식사 - new")
+                    .date(LocalDate.of(2025, 10, 6))
+                    .totalPrice(50000L)
+                    .type(SettlementType.RESTAURANT)
+                    .payers(payInfoDtos)
+                    .build();
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> settlementCommandService.updateSettlement(tripId, userId, settlementId, settlementDto));
+            
+            // then
+            assertEquals(TripMemberErrorType.EXISTS_NOT_MEMBER, exception.getErrorType());
+        }
+        
+        @Test
+        @DisplayName("실패 - 정산 내역 금액의 총합이 일치하지 않는 경우")
+        void failIfNotValidPrice() {
+            // given
+            when(tripMemberService.readAllUserByTripId(tripId)).thenReturn(List.of(member1, member2, member3));
+            when(settlementService.readById(settlementId)).thenReturn(Optional.of(settlement));
+            
+            List<SettlementRequest.PayInfoDto> payInfoDtos = List.of(
+                    SettlementRequest.PayInfoDto.builder()
+                            .userId(userId)
+                            .price(20000L)
+                            .build(),
+                    SettlementRequest.PayInfoDto.builder()
+                            .userId(2L)
+                            .price(40000L)
+                            .build()
+            );
+            
+            settlementDto = SettlementRequest.SettlementDto.builder()
+                    .name("점심 식사 - new")
+                    .date(LocalDate.of(2025, 10, 6))
+                    .totalPrice(50000L)
+                    .type(SettlementType.RESTAURANT)
+                    .payers(payInfoDtos)
+                    .build();
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> settlementCommandService.updateSettlement(tripId, userId, settlementId, settlementDto));
+            
+            // then
+            assertEquals(SettlementErrorType.NOT_VALID_PRICE, exception.getErrorType());
         }
     }
 }

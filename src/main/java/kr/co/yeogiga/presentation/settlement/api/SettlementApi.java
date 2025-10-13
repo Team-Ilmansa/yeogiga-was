@@ -308,6 +308,80 @@ public interface SettlementApi {
             @PathVariable(name ="tripId") Long tripId
     );
     
+    @TrackApi(description = "정산 내역 수정")
+    @Operation(summary = "정산 내역 수정", description = "정산 내역 수정 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "정산 내역 수정 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                             {
+                                                     "code": 200,
+                                                     "message": "요청이 성공하였습니다."
+                                             }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "400", description = "정산 내역 수정 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "유효성 검사 실패", value = """
+                                             {
+                                                  "code": "G002",
+                                                  "errors": {
+                                                      "payers[1].price": "최소 금액은 0원입니다.",
+                                                      "totalPrice": "최소 금액은 0원입니다.",
+                                                      "name": "이름은 필수 입력값입니다."
+                                                  }
+                                              }
+                                    """),
+                            @ExampleObject(name = "정산 내역 총합 금액 불일치", value = """
+                                             {
+                                                   "code": "S000",
+                                                   "message": "정산 내역 금액 총합이 일치하지 않습니다."
+                                             }
+                                    """),
+                            @ExampleObject(name = "여행 멤버가 아닌 정산자가 존재하는 경우", value = """
+                                             {
+                                                  "code": "T105",
+                                                  "message": "여행 멤버가 아닌 사용자가 존재합니다."
+                                             }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "403", description = "정샌 내역 수정 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "요청자가 정산자가 아닌 경우",value = """
+                                             {
+                                                  "code": "S002",
+                                                  "message": "정산자가 아닙니다."
+                                              }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "정샌 내역 수정 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "존재하지 않는 여행",value = """
+                                             {
+                                                 "code": "T006",
+                                                 "message": "해당 여행이 존재하지 않습니다."
+                                             }
+                                    """),
+                            @ExampleObject(name = "존재하지 않는 정산 내역",value = """
+                                             {
+                                                  "code": "S001",
+                                                  "message": "존재하지 않는 정산 내역 입니다."
+                                              }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> updateSettlement(
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
+            
+            @Parameter(description = "여행 ID")
+            @PathVariable(name = "tripId") Long tripId,
+            
+            @Parameter(description = "정산 내역 ID")
+            @PathVariable(name = "settlementId") Long settlementId,
+            
+            @Valid @RequestBody SettlementRequest.SettlementDto settlement
+    );
+    
     @TrackApi(description = "정산 내역 삭제")
     @Operation(summary = "정산 내역 삭제", description = "정산 내역 삭제 API")
     @ApiResponses({

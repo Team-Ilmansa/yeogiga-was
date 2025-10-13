@@ -16,7 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,12 +54,12 @@ public class SettlementCommandService {
             throw new CustomException(TripMemberErrorType.EXISTS_NOT_MEMBER);
         }
         
-        if (!isValidPrice(payers, dto.totalPrice())) {
+        if (!dto.isValidPrice()) {
             throw new CustomException(SettlementErrorType.NOT_VALID_PRICE);
         }
         
         
-        Settlement settlement = dto.toEntity(tripId, userId, isAllCompleted(payers));
+        Settlement settlement = dto.toEntity(tripId, userId);
         
         Long settlementId = settlementService.save(settlement);
         
@@ -85,29 +87,126 @@ public class SettlementCommandService {
     }
     
     /**
-     * 인원 별 정산 금액의 총합이 정산 내역의 총합과 일치하는지 여부를 반환하는 메서드
+     * 정산 내역을 갱신하는 메서드
      *
-     * @param payers        인원 당 정산 내역 목록
-     * @param totalPrice    정산 내역 총합
-     * @return              인원 별 정산 금액의 총합과 정산 내역의 총합이 일치하는지 여부
+     * @param tripId        여행 ID
+     * @param userId        사용자 ID
+     * @param settlementId  정산 내역 ID
+     * @param dto           정산 내역 갱신 요청 DTO
+     *
+     * @throws CustomException TripErrorType.TRIP_NOT_FOUND - 여행이 존재하지 않는 경우
+     * @throws CustomException SettlementErrorType.IS_NOT_PAYER - 해당 정산 내역의 작성자가 아닌 경우
+     * @throws CustomException TripMemberErrorType.EXISTS_NOT_MEMBER - 여행 멤버가 아닌 분담자가 존재하는 경우
+     * @throws CustomException SettlementErrorType.NOT_VALID_PRICE - 정산 내역 금액의 총합이 일치하지 않는 경우
      */
-    private boolean isValidPrice(List<SettlementRequest.PayInfoDto> payers, Long totalPrice) {
-        Long sum = payers.stream()
-                .mapToLong(SettlementRequest.PayInfoDto::price)
-                .sum();
+    @Transactional
+    public void updateSettlement(Long tripId, Long userId, Long settlementId, SettlementRequest.SettlementDto dto) {
+        List<User> members = tripMemberService.readAllUserByTripId(tripId);
         
-        return sum.equals(totalPrice);
+        if (members.isEmpty()) {
+            throw new CustomException(TripErrorType.TRIP_NOT_FOUND);
+        }
+        
+        Settlement settlement = settlementService.readById(settlementId)
+                .orElseThrow(() -> new CustomException(SettlementErrorType.NOT_FOUND));
+        
+        if (!settlement.isPayer(userId)) {
+            throw new CustomException(SettlementErrorType.IS_NOT_PAYER);
+        }
+        
+        List<SettlementRequest.PayInfoDto> payers = dto.payers();
+        
+        if (!isAllTripMember(payers, members)) {
+            throw new CustomException(TripMemberErrorType.EXISTS_NOT_MEMBER);
+        }
+        
+        if (!dto.isValidPrice()) {
+            throw new CustomException(SettlementErrorType.NOT_VALID_PRICE);
+        }
+     
+        // TODO: Settlement - PayInfo 연관관계 설정 후 수정 예정
+        List<PayInfo> payInfos = payInfoService.readAllBySettlementId(settlementId);
+        
+        settlement.update(dto.name(), dto.totalPrice(), dto.date(), dto.type());
+        synchronizePayInfo(payInfos, payers, settlementId);
     }
     
     /**
-     * 인원 당 정산 내역 정보가 모두 정산이 완료되었는지 여부를 반환하는 메서드
+     * 정산 내역 수정 시 인당 분담 내역({@code PayInfo}) 추가, 수정, 삭제를 처리하는 메서드
      *
-     * @param payers    인원 당 정산 내역 정보 리스트
-     * @return          리스트 내 모든 정산 내역이 정산이 완료되었는지 여부
+     * @param oldPayInfos   기존의 인당 분담 내역 목록
+     * @param newPayInfos   수정할 인당 분담 내역 목록
+     * @param settlementId  정산 내역 ID
      */
-    private boolean isAllCompleted(List<SettlementRequest.PayInfoDto> payers) {
-        return payers.stream()
-                .allMatch(SettlementRequest.PayInfoDto::isCompleted);
+    private void synchronizePayInfo(
+            List<PayInfo> oldPayInfos,
+            List<SettlementRequest.PayInfoDto> newPayInfos,
+            Long settlementId
+    ) {
+        Map<Long, SettlementRequest.PayInfoDto> newPayInfoMap = newPayInfos.stream()
+                .collect(Collectors.toMap(
+                        payInfoDto -> payInfoDto.userId(),
+                        Function.identity()
+                ));
+        
+        addPayInfo(oldPayInfos, newPayInfos, settlementId);
+        updatePayInfo(oldPayInfos, newPayInfoMap);
+        deletePayInfo(oldPayInfos, newPayInfoMap);
+    }
+    
+    /**
+     * 분담 내역 수정 후, 삭제할 분담 내역을 처리하는 메서드
+     *
+     * @param oldPayInfos   기존의 인당 분담 내역 목록
+     * @param newPayInfoMap 분담자 ID를 Key로 가지는 인당 분담 내역 Map
+     */
+    private void deletePayInfo(List<PayInfo> oldPayInfos, Map<Long, SettlementRequest.PayInfoDto> newPayInfoMap) {
+        List<Long> deletedPayInfoIds = oldPayInfos.stream()
+                .filter(payInfo -> !newPayInfoMap.containsKey(payInfo.getUserId()))
+                .map(PayInfo::getId)
+                .toList();
+        
+        if (!deletedPayInfoIds.isEmpty()) {
+            payInfoService.deleteByIds(deletedPayInfoIds);
+        }
+    }
+    
+    /**
+     * 분담 내역 수정 후, 갱신할 분담 내역을 처리하는 메서드
+     *
+     * @param oldPayInfos   기존의 인당 분담 내역 목록
+     * @param newPayInfoMap 분담자 ID를 Key로 가지는 인당 분담 내역 Map
+     */
+    private void updatePayInfo(List<PayInfo> oldPayInfos, Map<Long, SettlementRequest.PayInfoDto> newPayInfoMap) {
+        oldPayInfos.forEach(payInfo -> {
+            SettlementRequest.PayInfoDto payInfoDto = newPayInfoMap.get(payInfo.getUserId());
+            
+            if (payInfoDto != null) {
+                payInfo.update(payInfoDto.price());
+            }
+        });
+    }
+    
+    /**
+     * 분담 내역 수정 후, 추가할 분담 내역을 처리하는 메서드
+     *
+     * @param oldPayInfos   기존의 인당 분담 내역 목록
+     * @param newPayInfos   새로운 인당 분담 내역 목록
+     * @param settlementId  정산 내역 ID
+     */
+    private void addPayInfo(List<PayInfo> oldPayInfos, List<SettlementRequest.PayInfoDto> newPayInfos, Long settlementId) {
+        List<Long> oldPayers = oldPayInfos.stream()
+                .map(payInfo -> payInfo.getUserId())
+                .toList();
+        
+        List<PayInfo> addedPayInfos = newPayInfos.stream()
+                .filter(payInfoDto -> !oldPayers.contains(payInfoDto.userId()))
+                .map(payInfoDto -> payInfoDto.toEntity(settlementId))
+                .toList();
+        
+        if (!addedPayInfos.isEmpty()) {
+            payInfoService.saveAllInBatch(addedPayInfos);
+        }
     }
     
     /**
