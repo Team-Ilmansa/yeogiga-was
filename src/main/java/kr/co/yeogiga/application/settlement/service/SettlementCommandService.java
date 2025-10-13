@@ -59,7 +59,7 @@ public class SettlementCommandService {
         }
         
         
-        Settlement settlement = dto.toEntity(tripId, userId, isAllCompleted(payers));
+        Settlement settlement = dto.toEntity(tripId, userId);
         
         Long settlementId = settlementService.save(settlement);
         
@@ -84,17 +84,6 @@ public class SettlementCommandService {
         
         return payers.stream()
                 .allMatch(payer -> memberIds.contains(payer.userId()));
-    }
-    
-    /**
-     * 인원 당 정산 내역 정보가 모두 정산이 완료되었는지 여부를 반환하는 메서드
-     *
-     * @param payers    인원 당 정산 내역 정보 리스트
-     * @return          리스트 내 모든 정산 내역이 정산이 완료되었는지 여부
-     */
-    private boolean isAllCompleted(List<SettlementRequest.PayInfoDto> payers) {
-        return payers.stream()
-                .allMatch(SettlementRequest.PayInfoDto::isCompleted);
     }
     
     /**
@@ -138,7 +127,7 @@ public class SettlementCommandService {
         // TODO: Settlement - PayInfo 연관관계 설정 후 수정 예정
         List<PayInfo> payInfos = payInfoService.readAllBySettlementId(settlementId);
         
-        settlement.update(dto.name(), dto.totalPrice(), dto.date(), dto.type(), isAllCompleted(payers));
+        settlement.update(dto.name(), dto.totalPrice(), dto.date(), dto.type());
         synchronizePayInfo(payInfos, payers, settlementId);
     }
     
@@ -193,7 +182,7 @@ public class SettlementCommandService {
             SettlementRequest.PayInfoDto payInfoDto = newPayInfoMap.get(payInfo.getUserId());
             
             if (payInfoDto != null) {
-                payInfo.update(payInfoDto.price(), payInfoDto.isCompleted());
+                payInfo.update(payInfoDto.price());
             }
         });
     }

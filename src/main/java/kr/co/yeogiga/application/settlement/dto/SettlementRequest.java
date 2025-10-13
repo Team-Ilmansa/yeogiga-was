@@ -44,7 +44,7 @@ public class SettlementRequest {
             @NotEmpty(message = "정산 인원은 최소 1명 이상이어야합니다.")
             List<PayInfoDto> payers
     ) {
-        public Settlement toEntity(Long tripId, Long payerId, boolean isCompleted) {
+        public Settlement toEntity(Long tripId, Long payerId) {
             return Settlement.builder()
                     .tripId(tripId)
                     .name(name)
@@ -52,7 +52,6 @@ public class SettlementRequest {
                     .date(date)
                     .type(type)
                     .payerId(payerId)
-                    .isCompleted(isCompleted)
                     .build();
         }
         
@@ -74,16 +73,12 @@ public class SettlementRequest {
             @Schema(description = "해당 인원의 정산 금액", example = "10000")
             @NotNull(message = "인원 별 정산 금액은 필수 입력값입니다.")
             @Min(value = 0, message = "최소 금액은 0원입니다.")
-            Long price,
-            
-            @Schema(description = "해당 인원의 정산 완료 여부", examples = {"true", "false"})
-            boolean isCompleted
+            Long price
     ) {
         public PayInfo toEntity(Long settlementId) {
             return PayInfo.builder()
                     .userId(userId)
                     .price(price)
-                    .isCompleted(isCompleted)
                     .settlementId(settlementId)
                     .build();
         }
