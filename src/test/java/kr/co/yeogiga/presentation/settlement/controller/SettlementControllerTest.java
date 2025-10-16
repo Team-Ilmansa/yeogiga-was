@@ -48,6 +48,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -548,6 +549,69 @@ public class SettlementControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errors.name").exists())
                     .andExpect(jsonPath("$.errors.totalPrice").exists());
+        }
+    }
+    
+    @Nested
+    @DisplayName("정산 완료")
+    class CompleteSettlement {
+        private final Long settlementId = 1L;
+        private final Long tripId = 1L;
+        
+        private SettlementRequest.PayInfoCompletionListDto dto;
+        
+        @BeforeEach
+        void setUp() {
+            SettlementRequest.PayInfoCompletionDto payInfoCompletion1
+                    = new SettlementRequest.PayInfoCompletionDto(userDetails.getUserId(), true);
+            SettlementRequest.PayInfoCompletionDto payInfoCompletion2
+                    = new SettlementRequest.PayInfoCompletionDto(2L, false);
+            
+            dto = new SettlementRequest.PayInfoCompletionListDto(List.of(payInfoCompletion1, payInfoCompletion2));
+        }
+        
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            doNothing().when(settlementCommandService).completeSettlement(
+                    settlementId,
+                    userDetails.getUserId(),
+                    dto.payInfos()
+            );
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    patch("/api/v1/trip/{tripId}/settlements/{settlementId}", tripId, settlementId)
+                            .with(user(userDetails))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsBytes(dto))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+        }
+        
+        @Test
+        @DisplayName("실패 - 분담 내역 리스트의 크기가 1보다 작은 경우 유효성 검증 실패")
+        void failValidation() throws Exception {
+            // given
+            dto = new SettlementRequest.PayInfoCompletionListDto(Collections.emptyList());
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    patch("/api/v1/trip/{tripId}/settlements/{settlementId}", tripId, settlementId)
+                            .with(user(userDetails))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsBytes(dto))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors.payInfos").exists());
         }
     }
 }
