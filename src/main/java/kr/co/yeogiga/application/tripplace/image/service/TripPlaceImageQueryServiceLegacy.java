@@ -21,6 +21,20 @@ public class TripPlaceImageQueryServiceLegacy {
     private final TripDayPlaceService tripDayPlaceService;
 
     /**
+     * ## 임시 처리 로직
+     * <p>
+     * 특정 TripDayPlace 내에서 일차(day)별 이미지 조회 메섣,
+     *
+     * @param tripId 여행 ID
+     * @param day    일차
+     * @return 여행 일차에 대한 이미지 반환
+     */
+    public List<TripPlaceImageRes.ImageDto> getTripDayImageInfo(Long tripId, int day) {
+        return tripDayPlaceService.readAllImagesByTripIdAndDay(tripId, day)
+                .stream().map(TripPlaceImageRes.ImageDto::from).toList();
+    }
+
+    /**
      * 특정 TripDayPlace 내에서 지정된 Place의 정보와 해당 장소에 속한 이미지 목록을 조회 메서드
      *
      * @param tripDayPlaceId TripDayPlace(여행 일차) ID
