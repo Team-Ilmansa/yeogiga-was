@@ -14,6 +14,7 @@ public interface CustomTripDayPlaceRepository {
     Double findMaxOrderById(String id);
     Optional<TripDayPlace> findByIdSorted(String id);
     List<TripDayPlace> findByTripIdSorted(Long tripId);
+    List<Image> findAllImagesByTripIdAndDay(Long tripId, int day);
     Optional<Place> findPlaceByIdAndPlaceId(String id, String placeId);
     List<Image> findUnmatchedImagesById(String id);
     List<TripDayPlace> findTripDayPlaceSummariesByTripId(Long tripId);

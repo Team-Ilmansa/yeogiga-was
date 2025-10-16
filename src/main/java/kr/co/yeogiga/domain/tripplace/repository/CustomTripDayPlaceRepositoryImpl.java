@@ -14,6 +14,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -120,6 +122,33 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
                 mongoTemplate.aggregate(aggregation, "trip_day_place", TripDayPlace.class);
 
         return results.getMappedResults();
+    }
+
+    @Override
+    public List<Image> findAllImagesByTripIdAndDay(Long tripId, int day) {
+        Criteria criteria = Criteria.where("tripId").is(tripId)
+                .and("day").is(day);
+
+        Query query = new Query(criteria);
+        query.fields().include("unmatchedImages").include("places.images");
+
+        TripDayPlace doc = mongoTemplate.findOne(query, TripDayPlace.class);
+        if (doc == null) return Collections.emptyList();
+
+        List<Image> images = new ArrayList<>();
+
+        if (doc.getUnmatchedImages() != null) {
+            images.addAll(doc.getUnmatchedImages());
+        }
+
+        if (doc.getPlaces() != null) {
+            for (Place p : doc.getPlaces()) {
+                if (p.getImages() != null) {
+                    images.addAll(p.getImages());
+                }
+            }
+        }
+        return images;
     }
 
     @Override
