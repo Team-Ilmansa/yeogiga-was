@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import kr.co.yeogiga.domain.common.entity.BaseTimeEntity;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -22,7 +23,7 @@ import java.time.LocalDateTime;
 @Entity(name = "trip")
 @SQLRestriction("deleted_at IS NULL")
 @SQLDelete(sql = "UPDATE trip SET deleted_at = NOW() WHERE id = ?")
-public class Trip {
+public class Trip extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
