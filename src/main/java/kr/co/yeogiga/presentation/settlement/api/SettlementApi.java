@@ -382,6 +382,62 @@ public interface SettlementApi {
             @Valid @RequestBody SettlementRequest.SettlementDto settlement
     );
     
+    @TrackApi(description = "정산 완료 여부 갱신")
+    @Operation(summary = "정산 완료 여부 갱신", description = "정산 완료 여부 갱신 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "정산 완료 여부 갱신 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                             {
+                                                     "code": 200,
+                                                     "message": "요청이 성공하였습니다."
+                                             }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "400", description = "정산 완료 여부 갱신 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "유효성 검사 실패", value = """
+                                             {
+                                                 "code": "G002",
+                                                 "errors": {
+                                                     "payInfos": "정산 완료 목록은 최소 1개 이상이어야 합니다."
+                                                 }
+                                             }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "403", description = "정산 완료 여부 갱신 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "요청자가 정산자가 아닌 경우",value = """
+                                             {
+                                                  "code": "S002",
+                                                  "message": "정산자가 아닙니다."
+                                              }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "404", description = "정산 완료 여부 갱신 실패",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "존재하지 않는 정산 내역",value = """
+                                             {
+                                                  "code": "S001",
+                                                  "message": "존재하지 않는 정산 내역 입니다."
+                                              }
+                                    """),
+                            @ExampleObject(name = "존재하지 않는 분담 내역",value = """
+                                             {
+                                                 "code": "S003",
+                                                 "message": "존재하지 않는 분담 내역입니다."
+                                             }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> completeSettlement(
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
+            
+            @Parameter(description = "정산 내역 ID")
+            @PathVariable(name = "settlementId") Long settlementId,
+            @Valid @RequestBody SettlementRequest.PayInfoCompletionListDto request
+    );
+    
     @TrackApi(description = "정산 내역 삭제")
     @Operation(summary = "정산 내역 삭제", description = "정산 내역 삭제 API")
     @ApiResponses({

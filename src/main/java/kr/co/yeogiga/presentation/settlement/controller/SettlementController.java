@@ -74,6 +74,7 @@ public class SettlementController implements SettlementApi {
         return ResponseEntity.ok(SuccessResponse.ok());
     }
     
+    @Override
     @PatchMapping("/{tripId}/settlements/{settlementId}")
     public ResponseEntity<?> completeSettlement(
             @AuthenticationPrincipal CustomUserDetailsImpl userDetails,

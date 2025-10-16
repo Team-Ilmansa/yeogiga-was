@@ -64,7 +64,7 @@ public class SettlementRequest {
         }
     }
     
-    @Schema(name = "SettlementRequest.PayInfoDto", description = "인원 별 정산 금액 및 여부")
+    @Schema(name = "SettlementRequest.PayInfoDto", description = "인원 별 정산 금액 및 여부 DTO")
     @Builder
     public record PayInfoDto(
             @Schema(description = "사용자 ID", example = "1")
@@ -85,14 +85,23 @@ public class SettlementRequest {
         }
     }
     
+    @Schema(name = "SettlementRequest.PayInfoCompletionListDto", description = "분담 내역 완료 여부 리스트 DTO")
     public record PayInfoCompletionListDto(
+        @Schema(
+                description = "분담 내역 완료 여부 리스트",
+                example = "[{\"payInfoId\": 1, \"isCompleted\": true}, {\"payInfoId\": 2, \"isCompleted\": false}]"
+        )
         @Size(min = 1, message = "정산 완료 목록은 최소 1개 이상이어야 합니다.")
         List<PayInfoCompletionDto> payInfos
     ) { }
     
+    @Schema(name = "SettlementRequest.PayInfoCompletionDto", description = "분담 내역 완료 여부 DTO")
     public record PayInfoCompletionDto(
+            @Schema(description = "분담 내역 ID", examples = "1")
             @NotNull(message = "분담자 id는 필수 입력값입니다.")
             Long payInfoId,
+            
+            @Schema(description = "정산 완료 여부", examples = "true")
             boolean isCompleted
     ) { }
 }
