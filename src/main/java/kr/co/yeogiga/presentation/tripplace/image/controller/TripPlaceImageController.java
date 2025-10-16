@@ -28,6 +28,7 @@ public class TripPlaceImageController implements TripPlaceImageApi {
     private final TripPlaceImageQueryServiceLegacy tripPlaceImageQueryServiceLegacy;
     private final TripPlaceImageReassignmentServiceLegacy tripPlaceImageReassignmentServiceLegacy;
 
+    @Override
     @GetMapping("/{tripId}/day-place/images/day/{day}")
     public ResponseEntity<?> getTripDayImageInfo(
             @PathVariable Long tripId,
