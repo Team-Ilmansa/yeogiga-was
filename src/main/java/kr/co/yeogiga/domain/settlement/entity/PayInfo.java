@@ -41,4 +41,12 @@ public class PayInfo {
     public void update(Long price) {
         this.price = price;
     }
+    
+    public void complete() {
+        this.isCompleted = true;
+    }
+    
+    public void uncomplete() {
+        this.isCompleted = false;
+    }
 }

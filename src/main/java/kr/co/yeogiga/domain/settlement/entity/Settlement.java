@@ -73,4 +73,12 @@ public class Settlement {
     public boolean isPayer(Long id) {
         return payerId.equals(id);
     }
+    
+    public void complete() {
+        this.isCompleted = true;
+    }
+    
+    public void uncomplete() {
+        this.isCompleted = false;
+    }
 }
