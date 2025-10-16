@@ -17,7 +17,7 @@ public interface TripMemberRepository extends JpaRepository<TripMember, Long>, C
 
     @Query("SELECT tm.trip FROM trip_member tm " +
             "WHERE tm.user.id = :userId AND tm.trip.travelStatus = 'SETTING' " +
-            "ORDER BY tm.trip.createdAt DESC")
+            "ORDER BY tm.trip.startedAt ASC NULLS LAST, tm.trip.createdAt DESC")
     List<Trip> findAllSettingTripByUserId(Long userId);
 
     @Query("SELECT tm.user FROM trip_member tm WHERE tm.trip.id = :tripId")
