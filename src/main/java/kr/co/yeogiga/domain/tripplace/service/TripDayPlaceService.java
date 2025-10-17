@@ -51,6 +51,10 @@ public class TripDayPlaceService {
         return tripDayPlaceRepository.findMaxOrderById(id);
     }
 
+    public List<Image> readAllImagesByTripIdAndDay(Long tripId, int day) {
+        return tripDayPlaceRepository.findAllImagesByTripIdAndDay(tripId, day);
+    }
+
     public Optional<Place> readPlaceByIdAndPlaceId(String id, String placeId) {
         return tripDayPlaceRepository.findPlaceByIdAndPlaceId(id, placeId);
     }

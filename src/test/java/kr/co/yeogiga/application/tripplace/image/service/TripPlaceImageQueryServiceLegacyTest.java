@@ -3,11 +3,11 @@ package kr.co.yeogiga.application.tripplace.image.service;
 import kr.co.yeogiga.application.tripplace.image.dto.FavoriteImageRes;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageRes;
 import kr.co.yeogiga.common.exception.CustomException;
-import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.placeimage.entity.Image;
+import kr.co.yeogiga.domain.trip.exception.TripErrorType;
+import kr.co.yeogiga.domain.trip.type.PlaceCategory;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
-import kr.co.yeogiga.domain.trip.type.PlaceCategory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -53,6 +53,25 @@ public class TripPlaceImageQueryServiceLegacyTest {
             .placeType(PlaceCategory.RESTAURANT)
             .order(10.0)
             .build();
+
+    @Test
+    @DisplayName("여행 일차에 대한 이미지 조회 테스트")
+    void getTripDayImageInfoTest() {
+        // given
+        List<Image> images = List.of(image);
+        Long tripId = 1L;
+        int day = 1;
+
+        when(tripDayPlaceService.readAllImagesByTripIdAndDay(tripId, day))
+                .thenReturn(images);
+
+        // when
+        List<TripPlaceImageRes.ImageDto> result =
+                tripPlaceImageQueryServiceLegacy.getTripDayImageInfo(tripId, day);
+
+        // then
+        assertThat(result).hasSize(1);
+    }
 
     @Nested
     @DisplayName("특정 여행 일차 및 목적지의 이미지 목록 조회 테스트")

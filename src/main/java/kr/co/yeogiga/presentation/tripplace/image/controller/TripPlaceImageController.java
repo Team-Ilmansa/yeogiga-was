@@ -29,6 +29,19 @@ public class TripPlaceImageController implements TripPlaceImageApi {
     private final TripPlaceImageReassignmentServiceLegacy tripPlaceImageReassignmentServiceLegacy;
 
     @Override
+    @GetMapping("/{tripId}/day-place/images/day/{day}")
+    public ResponseEntity<?> getTripDayImageInfo(
+            @PathVariable Long tripId,
+            @PathVariable int day
+    ) {
+        return ResponseEntity.ok(
+                SuccessResponse.from(
+                        tripPlaceImageQueryServiceLegacy.getTripDayImageInfo(tripId, day)
+                )
+        );
+    }
+
+    @Override
     @GetMapping("/{tripId}/day-place/{tripDayPlaceId}/places/{placeId}/images")
     public ResponseEntity<?> getPlaceInfo(
             @PathVariable Long tripId,

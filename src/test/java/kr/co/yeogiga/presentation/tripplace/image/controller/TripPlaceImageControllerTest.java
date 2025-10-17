@@ -84,6 +84,38 @@ public class TripPlaceImageControllerTest {
                 .build();
     }
 
+    @Test
+    @DisplayName("여행 일차 이미지 조회 테스트")
+    void getTripDayImageInfoTest() throws Exception {
+        // given
+        TripPlaceImageRes.ImageDto image1 = TripPlaceImageRes.ImageDto.builder()
+                .url("https://image1.com")
+                .build();
+
+        TripPlaceImageRes.ImageDto image2 = TripPlaceImageRes.ImageDto.builder()
+                .url("https://image2.com")
+                .build();
+
+        List<TripPlaceImageRes.ImageDto> imageDtos = List.of(image1, image2);
+        int day = 1;
+
+        when(tripPlaceImageQueryServiceLegacy.getTripDayImageInfo(tripId, day))
+                .thenReturn(imageDtos);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/trip/{tripId}/day-place/images/day/{day}", tripId, day)
+                        .accept(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."))
+                .andExpect(jsonPath("$.data", hasSize(2)));
+    }
+
     @Nested
     @DisplayName("이미지 조회 테스트")
     class GetImageInfoTest {
