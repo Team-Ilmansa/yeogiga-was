@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import kr.co.yeogiga.common.validation.EnumValidation;
 import kr.co.yeogiga.domain.settlement.entity.PayInfo;
 import kr.co.yeogiga.domain.settlement.entity.Settlement;
@@ -19,7 +20,7 @@ public class SettlementRequest {
     
     @Schema(name = "SettlementRequest.SettlementDto", description = "정산 내역 생성 요청 DTO")
     @Builder
-    public record SettlementDto (
+    public record SettlementDto(
             @Schema(description = "정산 내역 이름", example = "점심 식사")
             @NotBlank(message = "이름은 필수 입력값입니다.")
             String name,
@@ -62,10 +63,10 @@ public class SettlementRequest {
                     .sum();
         }
     }
-   
-    @Schema(name = "SettlementRequest.PayInfoDto", description = "인원 별 정산 금액 및 여부")
+    
+    @Schema(name = "SettlementRequest.PayInfoDto", description = "인원 별 정산 금액 및 여부 DTO")
     @Builder
-    public record PayInfoDto (
+    public record PayInfoDto(
             @Schema(description = "사용자 ID", example = "1")
             @NotNull(message = "사용자 id는 필수 입력값입니다.")
             Long userId,
@@ -83,4 +84,24 @@ public class SettlementRequest {
                     .build();
         }
     }
+    
+    @Schema(name = "SettlementRequest.PayInfoCompletionListDto", description = "분담 내역 완료 여부 리스트 DTO")
+    public record PayInfoCompletionListDto(
+        @Schema(
+                description = "분담 내역 완료 여부 리스트",
+                example = "[{\"payInfoId\": 1, \"isCompleted\": true}, {\"payInfoId\": 2, \"isCompleted\": false}]"
+        )
+        @Size(min = 1, message = "정산 완료 목록은 최소 1개 이상이어야 합니다.")
+        List<PayInfoCompletionDto> payInfos
+    ) { }
+    
+    @Schema(name = "SettlementRequest.PayInfoCompletionDto", description = "분담 내역 완료 여부 DTO")
+    public record PayInfoCompletionDto(
+            @Schema(description = "분담 내역 ID", examples = "1")
+            @NotNull(message = "분담자 id는 필수 입력값입니다.")
+            Long payInfoId,
+            
+            @Schema(description = "정산 완료 여부", examples = "true")
+            boolean isCompleted
+    ) { }
 }

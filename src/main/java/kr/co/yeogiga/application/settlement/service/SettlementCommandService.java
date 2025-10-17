@@ -210,6 +210,60 @@ public class SettlementCommandService {
     }
     
     /**
+     * 정산 여부를 갱신하는 메서드
+     *
+     * <p> 모든 분담 내역이 정산 완료된 경우, 해당 분담 내역을 포함하는 정산 내역도 정산 완료 처리
+     *
+     * @param settlementId  정산 내역 ID
+     * @param userId        사용자 ID
+     * @param dtos          정산 여부 갱신 DTO 리스트
+     *
+     * @throws CustomException SettlementErrorType.NOT_FOUND - 정산 내역이 존재하지 않는 경우
+     * @throws CustomException SettlementErrorType.IS_NOT_PAYER - 요청자가 정산 내역의 생성자가 아닌 경우
+     * @throws CustomException SettlementErrorTYpe.PAY_INFO_NOT_FOUND - 분담 내역이 존재하지 않는 경우
+     */
+    @Transactional
+    public void completeSettlement(Long settlementId, Long userId, List<SettlementRequest.PayInfoCompletionDto> dtos) {
+        Settlement settlement = settlementService.readById(settlementId)
+                .orElseThrow(() -> new CustomException(SettlementErrorType.NOT_FOUND));
+        
+        if (!settlement.isPayer(userId)) {
+            throw new CustomException(SettlementErrorType.IS_NOT_PAYER);
+        }
+        
+        List<PayInfo> payInfos = payInfoService.readAllBySettlementId(settlementId);
+        Map<Long, PayInfo> payInfoMap = payInfos.stream()
+                .collect(Collectors.toMap(
+                        payInfo -> payInfo.getId(),
+                        Function.identity()
+                ));
+        
+        boolean isAllCompleted = true;
+        
+        for (SettlementRequest.PayInfoCompletionDto dto : dtos) {
+            PayInfo payInfo = payInfoMap.get(dto.payInfoId());
+            
+            if (payInfo == null) {
+                throw new CustomException(SettlementErrorType.PAY_INFO_NOT_FOUND);
+            }
+            
+            if (dto.isCompleted()) {
+                payInfo.complete();
+            } else {
+                payInfo.uncomplete();
+            }
+            
+            isAllCompleted = isAllCompleted && dto.isCompleted();
+        }
+        
+        if (isAllCompleted) {
+            settlement.complete();
+        } else {
+            settlement.uncomplete();
+        }
+    }
+    
+    /**
      * 정산 내역을 삭제하는 메서드
      *
      * @param tripId        여행 ID

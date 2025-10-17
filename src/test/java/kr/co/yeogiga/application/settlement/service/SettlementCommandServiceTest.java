@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -571,6 +572,154 @@ public class SettlementCommandServiceTest {
             
             // then
             assertEquals(SettlementErrorType.NOT_VALID_PRICE, exception.getErrorType());
+        }
+    }
+    
+    @Nested
+    @DisplayName("정산 완료 여부 갱신")
+    class CompleteSettlement {
+        private final Long settlementId = 1L;
+        private final Long userId = 1L;
+        
+        private Settlement settlement;
+        private PayInfo payInfo1;
+        private PayInfo payInfo2;
+        
+        @BeforeEach
+        void setUp() {
+            settlement = Settlement.builder()
+                    .tripId(1L)
+                    .name("점심 식사")
+                    .totalPrice(10000L)
+                    .date(LocalDate.of(2025, 10, 16))
+                    .type(SettlementType.RESTAURANT)
+                    .payerId(userId)
+                    .isCompleted(false)
+                    .build();
+            
+            payInfo1 = PayInfo.builder()
+                    .userId(userId)
+                    .price(5000L)
+                    .isCompleted(true)
+                    .settlementId(settlementId)
+                    .build();
+            
+            payInfo2 = PayInfo.builder()
+                    .userId(2L)
+                    .price(5000L)
+                    .isCompleted(false)
+                    .settlementId(settlementId)
+                    .build();
+            
+            ReflectionTestUtils.setField(payInfo1, "id", 1L);
+            ReflectionTestUtils.setField(payInfo2, "id", 2L);
+        }
+        
+        @Test
+        @DisplayName("성공 - 모든 정산자가 정산을 완료한 경우")
+        void success() {
+            // given
+            when(settlementService.readById(settlementId)).thenReturn(Optional.of(settlement));
+            when(payInfoService.readAllBySettlementId(settlementId)).thenReturn(List.of(payInfo1, payInfo2));
+            
+            List<SettlementRequest.PayInfoCompletionDto> dtos = List.of(
+                    new SettlementRequest.PayInfoCompletionDto(1L, true),
+                    new SettlementRequest.PayInfoCompletionDto(2L, true)
+            );
+            
+            // when
+            settlementCommandService.completeSettlement(settlementId, userId, dtos);
+            
+            // then
+            // 1. 분담 내역의 완료 여부가 DTO의 완료 여부와 동일하다.
+            assertEquals(dtos.get(0).isCompleted(), payInfo1.isCompleted());
+            assertEquals(dtos.get(1).isCompleted(), payInfo2.isCompleted());
+            
+            // 2. 분담 내역이 모두 정산 완료 된 경우, 해당 정산 내역도 정산 완료 처리 된다.
+            assertTrue(settlement.isCompleted());
+        }
+        
+        
+        @Test
+        @DisplayName("성공 - 정산을 완료하지 않은 분담자가 존재하는 경우")
+        void successIfNotSettledUserExists() {
+            // given
+            List<SettlementRequest.PayInfoCompletionDto> dtos = List.of(
+                    new SettlementRequest.PayInfoCompletionDto(1L, true),
+                    new SettlementRequest.PayInfoCompletionDto(2L, false)
+            );
+            
+            when(settlementService.readById(settlementId)).thenReturn(Optional.of(settlement));
+            when(payInfoService.readAllBySettlementId(settlementId)).thenReturn(List.of(payInfo1, payInfo2));
+            
+            // when
+            settlementCommandService.completeSettlement(settlementId, userId, dtos);
+            
+            // then
+            // 1. 분담 내역의 완료 여부가 DTO의 완료 여부와 동일하다.
+            assertEquals(dtos.get(0).isCompleted(), payInfo1.isCompleted());
+            assertEquals(dtos.get(1).isCompleted(), payInfo2.isCompleted());
+            
+            // 2. 정산 완료 되지 않은 분담 내역이 존재하는 경우, 해당 정산 내역도 정산 미완료 처리가 된다.
+            assertFalse(settlement.isCompleted());
+        }
+        
+        @Test
+        @DisplayName("실패 - 정산 내역이 존재하지 않는 경우")
+        void failIfSettlementNotFound() {
+            // given
+            List<SettlementRequest.PayInfoCompletionDto> dtos = List.of(
+                    new SettlementRequest.PayInfoCompletionDto(1L, true),
+                    new SettlementRequest.PayInfoCompletionDto(2L, false)
+            );
+            
+            when(settlementService.readById(settlementId)).thenReturn(Optional.empty());
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> settlementCommandService.completeSettlement(settlementId, userId, dtos));
+            
+            // then
+            assertEquals(SettlementErrorType.NOT_FOUND, exception.getErrorType());
+        }
+        
+        @Test
+        @DisplayName("실패 - 요청자가 정산 내역 생성자가 아닌 경우")
+        void failIfUserisNotPayer() {
+            // given
+            List<SettlementRequest.PayInfoCompletionDto> dtos = List.of(
+                    new SettlementRequest.PayInfoCompletionDto(1L, true),
+                    new SettlementRequest.PayInfoCompletionDto(2L, false)
+            );
+            
+            when(settlementService.readById(settlementId)).thenReturn(Optional.of(settlement));
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> settlementCommandService.completeSettlement(settlementId, 2L, dtos));
+            
+            // then
+            assertEquals(SettlementErrorType.IS_NOT_PAYER, exception.getErrorType());
+        }
+        
+        @Test
+        @DisplayName("실패 - 존재하지 않는 분담 내역이 존재하는 경우")
+        void failIfPayInfoNotFound() {
+            // given
+            List<SettlementRequest.PayInfoCompletionDto> dtos = List.of(
+                    new SettlementRequest.PayInfoCompletionDto(1L, true),
+                    new SettlementRequest.PayInfoCompletionDto(5L, false)
+            );
+            
+            when(settlementService.readById(settlementId)).thenReturn(Optional.of(settlement));
+            when(payInfoService.readAllBySettlementId(settlementId)).thenReturn(List.of(payInfo1, payInfo2));
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> settlementCommandService.completeSettlement(settlementId, userId, dtos));
+            
+            // then
+            assertEquals(SettlementErrorType.PAY_INFO_NOT_FOUND, exception.getErrorType());
         }
     }
 }
