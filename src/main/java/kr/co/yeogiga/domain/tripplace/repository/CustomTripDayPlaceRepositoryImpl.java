@@ -137,17 +137,12 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
 
         List<Image> images = new ArrayList<>();
 
-        if (doc.getUnmatchedImages() != null) {
-            images.addAll(doc.getUnmatchedImages());
+        images.addAll(doc.getUnmatchedImages());
+
+        for (Place p : doc.getPlaces()) {
+            images.addAll(p.getImages());
         }
 
-        if (doc.getPlaces() != null) {
-            for (Place p : doc.getPlaces()) {
-                if (p.getImages() != null) {
-                    images.addAll(p.getImages());
-                }
-            }
-        }
         return images;
     }
 
