@@ -26,7 +26,7 @@ public class CustomPayInfoRepositoryImpl implements CustomPayInfoRepository {
                         ps.setLong(1, payInfo.getUserId());
                         ps.setLong(2, payInfo.getPrice());
                         ps.setBoolean(3, payInfo.isCompleted());
-                        ps.setLong(4, payInfo.getSettlementId());
+                        ps.setLong(4, payInfo.getSettlement().getId());
                     }
                     
                     @Override

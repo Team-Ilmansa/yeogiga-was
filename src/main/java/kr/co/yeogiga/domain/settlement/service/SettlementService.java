@@ -14,12 +14,16 @@ import java.util.Optional;
 public class SettlementService {
     private final SettlementRepository settlementRepository;
     
-    public Long save(Settlement settlement) {
-        return settlementRepository.save(settlement).getId();
+    public Settlement save(Settlement settlement) {
+        return settlementRepository.save(settlement);
     }
     
     public Optional<Settlement> readById(Long id) {
         return settlementRepository.findById(id);
+    }
+    
+    public Optional<Settlement> readByIdJoinFetch(Long id) {
+        return settlementRepository.findByIdJoinFetch(id);
     }
     
     public Optional<Long> readPayerIdById(Long id) {
