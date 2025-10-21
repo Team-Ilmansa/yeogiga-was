@@ -4,9 +4,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import kr.co.yeogiga.domain.settlement.type.SettlementType;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -14,6 +16,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -44,8 +48,12 @@ public class Settlement {
     @Column(name = "is_completed")
     private boolean isCompleted;
     
+    @OneToMany(mappedBy = "settlement", fetch = FetchType.LAZY)
+    private List<PayInfo> payInfos = new ArrayList<>();
+    
     @Builder
     public Settlement(
+            Long id,
             Long tripId,
             String name,
             Long totalPrice,
@@ -54,6 +62,7 @@ public class Settlement {
             Long payerId,
             boolean isCompleted
     ) {
+        this.id = id;
         this.tripId = tripId;
         this.name = name;
         this.totalPrice = totalPrice;
@@ -80,5 +89,9 @@ public class Settlement {
     
     public void uncomplete() {
         this.isCompleted = false;
+    }
+    
+    public void addPayInfo(PayInfo payInfo) {
+        this.payInfos.add(payInfo);
     }
 }
