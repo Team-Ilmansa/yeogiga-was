@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -74,7 +75,7 @@ public class SettlementCommandServiceTest {
                 .type(SettlementType.RESTAURANT)
                 .payers(List.of(
                         SettlementRequest.PayInfoDto.builder()
-                                .userId(1L)
+                                .userId(userId)
                                 .price(10000L)
                                 .build(),
                         SettlementRequest.PayInfoDto.builder()
@@ -94,8 +95,11 @@ public class SettlementCommandServiceTest {
         @DisplayName("성공")
         void success() {
             // given
+            Settlement settlement = mock(Settlement.class);
+            when(settlement.getId()).thenReturn(settlementId);
+            when(settlement.isPayer(userId)).thenReturn(true);
             when(tripMemberService.readAllUserByTripId(tripId)).thenReturn(members);
-            when(settlementService.save(any(Settlement.class))).thenReturn(Settlement.builder().id(settlementId).build());
+            when(settlementService.save(any(Settlement.class))).thenReturn(settlement);
             doNothing().when(payInfoService).saveAllInBatch(anyList());
             
             // when
@@ -107,6 +111,16 @@ public class SettlementCommandServiceTest {
             
             assertFalse(settlementCaptor.getValue().isCompleted());
             payInfosCaptor.getValue().forEach(payInfo -> assertEquals(settlementId, payInfo.getSettlement().getId()));
+            List<PayInfo> payInfos = payInfosCaptor.getValue();
+            
+            for (PayInfo payInfo : payInfos) {
+                assertEquals(settlementId, payInfo.getSettlement().getId());
+                if (payInfo.getUserId().equals(userId)) {
+                    assertTrue(payInfo.isCompleted());
+                } else {
+                    assertFalse(payInfo.isCompleted());
+                }
+            }
         }
         
         @Test
@@ -131,7 +145,7 @@ public class SettlementCommandServiceTest {
                     .build();
             
             when(tripMemberService.readAllUserByTripId(tripId)).thenReturn(members);
-            when(settlementService.save(any(Settlement.class))).thenReturn(Settlement.builder().build());
+            when(settlementService.save(any(Settlement.class))).thenReturn(Settlement.builder().payerId(userId).build());
             doNothing().when(payInfoService).saveAllInBatch(anyList());
             
             // when
