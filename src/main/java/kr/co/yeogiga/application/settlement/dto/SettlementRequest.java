@@ -76,11 +76,11 @@ public class SettlementRequest {
             @Min(value = 0, message = "최소 금액은 0원입니다.")
             Long price
     ) {
-        public PayInfo toEntity(Long settlementId) {
+        public PayInfo toEntity(Settlement settlement) {
             return PayInfo.builder()
                     .userId(userId)
                     .price(price)
-                    .settlementId(settlementId)
+                    .settlement(settlement)
                     .build();
         }
     }
