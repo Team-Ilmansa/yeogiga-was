@@ -2,9 +2,12 @@ package kr.co.yeogiga.domain.settlement.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,15 +30,17 @@ public class PayInfo {
     @Column(name = "is_completed")
     private boolean isCompleted;
     
-    @Column(name = "settlement_id", nullable = false)
-    private Long settlementId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "settlement_id", nullable = false)
+    private Settlement settlement;
     
     @Builder
-    public PayInfo(Long userId, Long price, boolean isCompleted, Long settlementId) {
+    public PayInfo(Long userId, Long price, boolean isCompleted, Settlement settlement) {
         this.userId = userId;
         this.price = price;
         this.isCompleted = isCompleted;
-        this.settlementId = settlementId;
+        this.settlement = settlement;
+        settlement.addPayInfo(this);
     }
     
     public void update(Long price) {

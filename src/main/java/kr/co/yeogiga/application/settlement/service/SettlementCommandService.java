@@ -59,12 +59,10 @@ public class SettlementCommandService {
         }
         
         
-        Settlement settlement = dto.toEntity(tripId, userId);
-        
-        Long settlementId = settlementService.save(settlement);
+        Settlement settlement = settlementService.save(dto.toEntity(tripId, userId));
         
         List<PayInfo> payInfoList = payers.stream()
-                .map(payInfo -> payInfo.toEntity(settlementId))
+                .map(payInfo -> payInfo.toEntity(settlement))
                 .toList();
         
         payInfoService.saveAllInBatch(payInfoList);
@@ -107,7 +105,7 @@ public class SettlementCommandService {
             throw new CustomException(TripErrorType.TRIP_NOT_FOUND);
         }
         
-        Settlement settlement = settlementService.readById(settlementId)
+        Settlement settlement = settlementService.readByIdJoinFetch(settlementId)
                 .orElseThrow(() -> new CustomException(SettlementErrorType.NOT_FOUND));
         
         if (!settlement.isPayer(userId)) {
@@ -124,11 +122,10 @@ public class SettlementCommandService {
             throw new CustomException(SettlementErrorType.NOT_VALID_PRICE);
         }
      
-        // TODO: Settlement - PayInfo 연관관계 설정 후 수정 예정
-        List<PayInfo> payInfos = payInfoService.readAllBySettlementId(settlementId);
+        List<PayInfo> payInfos = settlement.getPayInfos();
         
         settlement.update(dto.name(), dto.totalPrice(), dto.date(), dto.type());
-        synchronizePayInfo(payInfos, payers, settlementId);
+        synchronizePayInfo(payInfos, payers, settlement);
     }
     
     /**
@@ -136,12 +133,12 @@ public class SettlementCommandService {
      *
      * @param oldPayInfos   기존의 인당 분담 내역 목록
      * @param newPayInfos   수정할 인당 분담 내역 목록
-     * @param settlementId  정산 내역 ID
+     * @param settlement    정산 내역
      */
     private void synchronizePayInfo(
             List<PayInfo> oldPayInfos,
             List<SettlementRequest.PayInfoDto> newPayInfos,
-            Long settlementId
+            Settlement settlement
     ) {
         Map<Long, SettlementRequest.PayInfoDto> newPayInfoMap = newPayInfos.stream()
                 .collect(Collectors.toMap(
@@ -149,7 +146,7 @@ public class SettlementCommandService {
                         Function.identity()
                 ));
         
-        addPayInfo(oldPayInfos, newPayInfos, settlementId);
+        addPayInfo(oldPayInfos, newPayInfos, settlement);
         updatePayInfo(oldPayInfos, newPayInfoMap);
         deletePayInfo(oldPayInfos, newPayInfoMap);
     }
@@ -192,16 +189,16 @@ public class SettlementCommandService {
      *
      * @param oldPayInfos   기존의 인당 분담 내역 목록
      * @param newPayInfos   새로운 인당 분담 내역 목록
-     * @param settlementId  정산 내역 ID
+     * @param settlement    정산 내역
      */
-    private void addPayInfo(List<PayInfo> oldPayInfos, List<SettlementRequest.PayInfoDto> newPayInfos, Long settlementId) {
+    private void addPayInfo(List<PayInfo> oldPayInfos, List<SettlementRequest.PayInfoDto> newPayInfos, Settlement settlement) {
         List<Long> oldPayers = oldPayInfos.stream()
                 .map(payInfo -> payInfo.getUserId())
                 .toList();
         
         List<PayInfo> addedPayInfos = newPayInfos.stream()
                 .filter(payInfoDto -> !oldPayers.contains(payInfoDto.userId()))
-                .map(payInfoDto -> payInfoDto.toEntity(settlementId))
+                .map(payInfoDto -> payInfoDto.toEntity(settlement))
                 .toList();
         
         if (!addedPayInfos.isEmpty()) {
@@ -224,15 +221,14 @@ public class SettlementCommandService {
      */
     @Transactional
     public void completeSettlement(Long settlementId, Long userId, List<SettlementRequest.PayInfoCompletionDto> dtos) {
-        Settlement settlement = settlementService.readById(settlementId)
+        Settlement settlement = settlementService.readByIdJoinFetch(settlementId)
                 .orElseThrow(() -> new CustomException(SettlementErrorType.NOT_FOUND));
         
         if (!settlement.isPayer(userId)) {
             throw new CustomException(SettlementErrorType.IS_NOT_PAYER);
         }
         
-        List<PayInfo> payInfos = payInfoService.readAllBySettlementId(settlementId);
-        Map<Long, PayInfo> payInfoMap = payInfos.stream()
+        Map<Long, PayInfo> payInfoMap = settlement.getPayInfos().stream()
                 .collect(Collectors.toMap(
                         payInfo -> payInfo.getId(),
                         Function.identity()

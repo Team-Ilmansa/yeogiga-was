@@ -7,6 +7,7 @@ import kr.co.yeogiga.domain.settlement.dto.PayInfoDto;
 import kr.co.yeogiga.domain.settlement.dto.SettlementDto;
 import kr.co.yeogiga.domain.settlement.entity.QPayInfo;
 import kr.co.yeogiga.domain.settlement.entity.QSettlement;
+import kr.co.yeogiga.domain.settlement.entity.Settlement;
 import kr.co.yeogiga.domain.user.entity.QUser;
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +25,19 @@ public class CustomSettlementRepositoryImpl implements CustomSettlementRepositor
     private final QUser user = QUser.user;
     
     @Override
+    public Optional<Settlement> findByIdJoinFetch(Long id) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(settlement)
+                        .join(settlement.payInfos, payInfo)
+                        .fetchJoin()
+                        .where(settlement.id.eq(id))
+                        .distinct()
+                        .fetchOne()
+        );
+    }
+    
+    @Override
     public Optional<Long> findPayerIdById(Long id) {
         return Optional.ofNullable(
                 jpaQueryFactory
@@ -39,7 +53,7 @@ public class CustomSettlementRepositoryImpl implements CustomSettlementRepositor
         return Optional.ofNullable(
                 jpaQueryFactory
                         .from(settlement)
-                        .join(payInfo).on(settlement.id.eq(payInfo.settlementId))
+                        .join(payInfo).on(settlement.id.eq(payInfo.settlement.id))
                         .join(user).on(payInfo.userId.eq(user.id))
                         .where(settlement.id.eq(id))
                         .transform(
@@ -75,7 +89,7 @@ public class CustomSettlementRepositoryImpl implements CustomSettlementRepositor
         Collection<SettlementDto> result = jpaQueryFactory
                 .from(settlement)
                 .where(settlement.tripId.eq(tripId))
-                .join(payInfo).on(settlement.id.eq(payInfo.settlementId))
+                .join(payInfo).on(settlement.id.eq(payInfo.settlement.id))
                 .join(user).on(payInfo.userId.eq(user.id))
                 .transform(
                         GroupBy.groupBy(settlement.id).as(
