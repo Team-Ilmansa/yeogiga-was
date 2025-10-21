@@ -60,6 +60,7 @@ public class SettlementCommandServiceTest {
     class CreateSettlement {
         private final Long tripId = 10L;
         private final Long userId = 1L;
+        private final Long settlementId = 100L;
         
         private List<User> members = List.of(
                 User.builder().id(1L).build(),
@@ -94,7 +95,7 @@ public class SettlementCommandServiceTest {
         void success() {
             // given
             when(tripMemberService.readAllUserByTripId(tripId)).thenReturn(members);
-            when(settlementService.save(any(Settlement.class))).thenReturn(100L);
+            when(settlementService.save(any(Settlement.class))).thenReturn(Settlement.builder().id(settlementId).build());
             doNothing().when(payInfoService).saveAllInBatch(anyList());
             
             // when
@@ -104,8 +105,8 @@ public class SettlementCommandServiceTest {
             verify(settlementService, times(1)).save(settlementCaptor.capture());
             verify(payInfoService, times(1)).saveAllInBatch(payInfosCaptor.capture());
             
-            assertEquals(false, settlementCaptor.getValue().isCompleted());
-            payInfosCaptor.getValue().forEach(payInfo -> assertEquals(100L, payInfo.getSettlementId()));
+            assertFalse(settlementCaptor.getValue().isCompleted());
+            payInfosCaptor.getValue().forEach(payInfo -> assertEquals(settlementId, payInfo.getSettlement().getId()));
         }
         
         @Test
@@ -130,7 +131,7 @@ public class SettlementCommandServiceTest {
                     .build();
             
             when(tripMemberService.readAllUserByTripId(tripId)).thenReturn(members);
-            when(settlementService.save(any(Settlement.class))).thenReturn(100L);
+            when(settlementService.save(any(Settlement.class))).thenReturn(Settlement.builder().build());
             doNothing().when(payInfoService).saveAllInBatch(anyList());
             
             // when
@@ -328,14 +329,14 @@ public class SettlementCommandServiceTest {
                     .userId(userId)
                     .price(20000L)
                     .isCompleted(true)
-                    .settlementId(settlement.getId())
+                    .settlement(settlement)
                     .build();
             
             payInfo2 = PayInfo.builder()
                     .userId(2L)
                     .price(30000L)
                     .isCompleted(false)
-                    .settlementId(settlement.getId())
+                    .settlement(settlement)
                     .build();
             
             ReflectionTestUtils.setField(payInfo1, "id", 1L);
@@ -362,8 +363,7 @@ public class SettlementCommandServiceTest {
         void success() {
             // given
             when(tripMemberService.readAllUserByTripId(tripId)).thenReturn(List.of(member1, member2, member3));
-            when(settlementService.readById(settlementId)).thenReturn(Optional.of(settlement));
-            when(payInfoService.readAllBySettlementId(settlementId)).thenReturn(List.of(payInfo1, payInfo2));
+            when(settlementService.readByIdJoinFetch(settlementId)).thenReturn(Optional.of(settlement));
             
             List<SettlementRequest.PayInfoDto> payInfoDtos = List.of(
                     SettlementRequest.PayInfoDto.builder()
@@ -407,8 +407,7 @@ public class SettlementCommandServiceTest {
         void successIfOnlySettlementChanged() {
             // given
             when(tripMemberService.readAllUserByTripId(tripId)).thenReturn(List.of(member1, member2, member3));
-            when(settlementService.readById(settlementId)).thenReturn(Optional.of(settlement));
-            when(payInfoService.readAllBySettlementId(settlementId)).thenReturn(List.of(payInfo1, payInfo2));
+            when(settlementService.readByIdJoinFetch(settlementId)).thenReturn(Optional.of(settlement));
             
             List<SettlementRequest.PayInfoDto> payInfoDtos = List.of(
                     SettlementRequest.PayInfoDto.builder()
@@ -477,7 +476,7 @@ public class SettlementCommandServiceTest {
         void failIfNotPayer() {
             // given
             when(tripMemberService.readAllUserByTripId(tripId)).thenReturn(List.of(member1, member2, member3));
-            when(settlementService.readById(settlementId)).thenReturn(Optional.of(settlement));
+            when(settlementService.readByIdJoinFetch(settlementId)).thenReturn(Optional.of(settlement));
             
             List<SettlementRequest.PayInfoDto> payInfoDtos = List.of(
                     SettlementRequest.PayInfoDto.builder()
@@ -511,7 +510,7 @@ public class SettlementCommandServiceTest {
         void failIfExistsNotMember() {
             // given
             when(tripMemberService.readAllUserByTripId(tripId)).thenReturn(List.of(member1, member2, member3));
-            when(settlementService.readById(settlementId)).thenReturn(Optional.of(settlement));
+            when(settlementService.readByIdJoinFetch(settlementId)).thenReturn(Optional.of(settlement));
             
             List<SettlementRequest.PayInfoDto> payInfoDtos = List.of(
                     SettlementRequest.PayInfoDto.builder()
@@ -545,7 +544,7 @@ public class SettlementCommandServiceTest {
         void failIfNotValidPrice() {
             // given
             when(tripMemberService.readAllUserByTripId(tripId)).thenReturn(List.of(member1, member2, member3));
-            when(settlementService.readById(settlementId)).thenReturn(Optional.of(settlement));
+            when(settlementService.readByIdJoinFetch(settlementId)).thenReturn(Optional.of(settlement));
             
             List<SettlementRequest.PayInfoDto> payInfoDtos = List.of(
                     SettlementRequest.PayInfoDto.builder()
@@ -601,14 +600,14 @@ public class SettlementCommandServiceTest {
                     .userId(userId)
                     .price(5000L)
                     .isCompleted(true)
-                    .settlementId(settlementId)
+                    .settlement(settlement)
                     .build();
             
             payInfo2 = PayInfo.builder()
                     .userId(2L)
                     .price(5000L)
                     .isCompleted(false)
-                    .settlementId(settlementId)
+                    .settlement(settlement)
                     .build();
             
             ReflectionTestUtils.setField(payInfo1, "id", 1L);
@@ -619,8 +618,7 @@ public class SettlementCommandServiceTest {
         @DisplayName("성공 - 모든 정산자가 정산을 완료한 경우")
         void success() {
             // given
-            when(settlementService.readById(settlementId)).thenReturn(Optional.of(settlement));
-            when(payInfoService.readAllBySettlementId(settlementId)).thenReturn(List.of(payInfo1, payInfo2));
+            when(settlementService.readByIdJoinFetch(settlementId)).thenReturn(Optional.of(settlement));
             
             List<SettlementRequest.PayInfoCompletionDto> dtos = List.of(
                     new SettlementRequest.PayInfoCompletionDto(1L, true),
@@ -649,8 +647,7 @@ public class SettlementCommandServiceTest {
                     new SettlementRequest.PayInfoCompletionDto(2L, false)
             );
             
-            when(settlementService.readById(settlementId)).thenReturn(Optional.of(settlement));
-            when(payInfoService.readAllBySettlementId(settlementId)).thenReturn(List.of(payInfo1, payInfo2));
+            when(settlementService.readByIdJoinFetch(settlementId)).thenReturn(Optional.of(settlement));
             
             // when
             settlementCommandService.completeSettlement(settlementId, userId, dtos);
@@ -673,7 +670,7 @@ public class SettlementCommandServiceTest {
                     new SettlementRequest.PayInfoCompletionDto(2L, false)
             );
             
-            when(settlementService.readById(settlementId)).thenReturn(Optional.empty());
+            when(settlementService.readByIdJoinFetch(settlementId)).thenReturn(Optional.empty());
             
             // when
             CustomException exception = assertThrows(CustomException.class, ()
@@ -692,7 +689,7 @@ public class SettlementCommandServiceTest {
                     new SettlementRequest.PayInfoCompletionDto(2L, false)
             );
             
-            when(settlementService.readById(settlementId)).thenReturn(Optional.of(settlement));
+            when(settlementService.readByIdJoinFetch(settlementId)).thenReturn(Optional.of(settlement));
             
             // when
             CustomException exception = assertThrows(CustomException.class, ()
@@ -711,8 +708,7 @@ public class SettlementCommandServiceTest {
                     new SettlementRequest.PayInfoCompletionDto(5L, false)
             );
             
-            when(settlementService.readById(settlementId)).thenReturn(Optional.of(settlement));
-            when(payInfoService.readAllBySettlementId(settlementId)).thenReturn(List.of(payInfo1, payInfo2));
+            when(settlementService.readByIdJoinFetch(settlementId)).thenReturn(Optional.of(settlement));
             
             // when
             CustomException exception = assertThrows(CustomException.class, ()
