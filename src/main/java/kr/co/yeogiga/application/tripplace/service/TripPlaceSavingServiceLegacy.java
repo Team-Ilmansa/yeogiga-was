@@ -2,13 +2,14 @@ package kr.co.yeogiga.application.tripplace.service;
 
 import kr.co.yeogiga.application.tripplace.dto.TripPlaceReqLegacy;
 import kr.co.yeogiga.common.exception.CustomException;
+import kr.co.yeogiga.common.util.RegionUtil;
 import kr.co.yeogiga.domain.trip.entity.Trip;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.service.TripService;
 import kr.co.yeogiga.domain.trip.type.TravelStatus;
-import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
+import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import kr.co.yeogiga.infrastructure.redis.RedisRepository;
 import kr.co.yeogiga.infrastructure.redis.constant.PlaceConstant;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,10 +41,13 @@ public class TripPlaceSavingServiceLegacy {
     @Transactional
     public void completeTrip(Long tripId, int lastDay) {
         List<TripDayPlace> tripDayPlaces = new ArrayList<>();
+        List<String> addresses = new ArrayList<>();
 
         for (int day = 1; day <= lastDay; day++) {
             tripDayPlaces.add(createTripDayPlace(tripId, day));
-
+            List<TripPlaceReqLegacy.StoredFormat> places = redisRepository.getList(PlaceConstant.dayPlacesKey(tripId, day), TripPlaceReqLegacy.StoredFormat.class);
+            addresses.addAll(places.stream().map(tripPlace -> tripPlace.address()).toList());
+            
             // Redis에 임시 저장된 데이터 삭제
             redisRepository.del(PlaceConstant.dayPlacesKey(tripId, day));
             redisRepository.del(PlaceConstant.dayPlaceSetKey(tripId, day));
@@ -49,10 +55,25 @@ public class TripPlaceSavingServiceLegacy {
 
         Trip trip = tripService.readById(tripId)
                 .orElseThrow(() -> new CustomException(TripErrorType.TRIP_NOT_FOUND));
-
+        
+        updateTripCity(trip, addresses);
         trip.updateStatus(TravelStatus.resolveStatus(trip.getStartedAt(), trip.getEndedAt()));
 
         tripDayPlaceService.saveAll(tripDayPlaces);
+    }
+    
+    /**
+     * 여행 주 목적지(city) 값을 설정하는 메서드
+     *
+     * @param trip      여행 엔티티
+     * @param addresses 목적지들의 주소 목록
+     */
+    public void updateTripCity(Trip trip, List<String> addresses) {
+        Set<String> regionSet = addresses.stream()
+                .map(address -> RegionUtil.extractRegion(address))
+                .collect(Collectors.toSet());
+        
+        trip.updateCity(regionSet.stream().toList());
     }
 
     /**
