@@ -551,7 +551,6 @@ public class TripControllerTest {
 
         private Trip trip = Trip.builder()
                 .title("title")
-                .city("city")
                 .leaderId(1L)
                 .travelStatus(TravelStatus.IN_PROGRESS)
                 .build();

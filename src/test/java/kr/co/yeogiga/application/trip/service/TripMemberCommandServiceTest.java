@@ -55,7 +55,6 @@ public class TripMemberCommandServiceTest {
 
         private final Trip trip = Trip.builder()
                 .title("title")
-                .city("대구광역시")
                 .leaderId(userId)
                 .travelStatus(TravelStatus.IN_PROGRESS)
                 .build();
