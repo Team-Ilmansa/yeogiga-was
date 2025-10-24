@@ -112,7 +112,7 @@ public interface TripApi {
     @Operation(summary = "특정 여행 조회", description = "특정 여행 조회 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "특정 여행 조회 성공",
-                    content = @Content(mediaType = "application/json", examples = {
+                    content = @Content(examples = {
                             @ExampleObject(value = """
                                              {
                                                      "code": 200,
@@ -120,7 +120,7 @@ public interface TripApi {
                                                      "data": {
                                                          "tripId": 1,
                                                          "title": "새로운 여행1",
-                                                         "city": "경주시",
+                                                         "city": ["경주시", "포항시"],
                                                          "leaderId": 2,
                                                          "startedAt": "2025-05-01T12:00:00",
                                                          "endedAt": "2025-05-02T12:01:00",
@@ -150,7 +150,7 @@ public interface TripApi {
                                                      }
                                                  }
                                     """)
-                    })),
+                    }, mediaType = "application/json")),
             @ApiResponse(responseCode = "404", description = "특정 여행 조회 실패",
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(name = "여행 미존재",value = """
@@ -179,7 +179,7 @@ public interface TripApi {
                                                             {
                                                                 "tripId": 1,
                                                                 "title": "여행1",
-                                                                "city": null,
+                                                                "city": ["제주특별자치도"],
                                                                 "leaderId": 15,
                                                                 "startedAt": null,
                                                                 "endedAt": null,
@@ -200,7 +200,7 @@ public interface TripApi {
                                                             {
                                                                 "tripId": 3,
                                                                 "title": "여행3",
-                                                                "city": null,
+                                                                "city": [],
                                                                 "leaderId": 15,
                                                                 "startedAt": null,
                                                                 "endedAt": null,
@@ -216,7 +216,7 @@ public interface TripApi {
                                                             {
                                                                 "tripId": 7,
                                                                 "title": "여행6",
-                                                                "city": null,
+                                                                "city": [],
                                                                 "leaderId": 15,
                                                                 "startedAt": "2025-09-14T12:51:36",
                                                                 "endedAt": "2025-09-18T12:51:40",
@@ -232,7 +232,7 @@ public interface TripApi {
                                                             {
                                                                 "tripId": 2,
                                                                 "title": "여행2",
-                                                                "city": null,
+                                                                "city": [],
                                                                 "leaderId": 15,
                                                                 "startedAt": "2025-08-17T12:52:26",
                                                                 "endedAt": "2025-08-23T12:52:40",
@@ -248,7 +248,7 @@ public interface TripApi {
                                                             {
                                                                 "tripId": 6,
                                                                 "title": "여행6",
-                                                                "city": null,
+                                                                "city": ["대구광역시", "포항시"],
                                                                 "leaderId": 15,
                                                                 "startedAt": "2025-08-16T12:51:14",
                                                                 "endedAt": "2025-08-20T12:51:21",
@@ -280,7 +280,7 @@ public interface TripApi {
                                                              {
                                                                  "tripId": 2,
                                                                  "title": "여행2",
-                                                                 "city": null,
+                                                                 "city": [],
                                                                  "leaderId": 15,
                                                                  "startedAt": "2025-08-17T12:52:26",
                                                                  "endedAt": "2025-08-23T12:52:40",
@@ -296,7 +296,7 @@ public interface TripApi {
                                                              {
                                                                  "tripId": 1,
                                                                  "title": "여행1",
-                                                                 "city": null,
+                                                                 "city": [],
                                                                  "leaderId": 15,
                                                                  "startedAt": null,
                                                                  "endedAt": null,
@@ -333,7 +333,7 @@ public interface TripApi {
                                                               {
                                                                   "tripId": 6,
                                                                   "title": "여행6",
-                                                                  "city": null,
+                                                                  "city": [],
                                                                   "leaderId": 15,
                                                                   "startedAt": "2025-08-16T12:51:14",
                                                                   "endedAt": "2025-08-20T12:51:21",
@@ -349,7 +349,7 @@ public interface TripApi {
                                                               {
                                                                   "tripId": 7,
                                                                   "title": "여행6",
-                                                                  "city": null,
+                                                                  "city": ["제주특별자치도"],
                                                                   "leaderId": 15,
                                                                   "startedAt": "2025-09-14T12:51:36",
                                                                   "endedAt": "2025-09-18T12:51:40",
@@ -381,7 +381,7 @@ public interface TripApi {
                                                                {
                                                                    "tripId": 4,
                                                                    "title": "여행4",
-                                                                   "city": null,
+                                                                   "city": ["부산광역시"],
                                                                    "leaderId": 15,
                                                                    "startedAt": "2025-08-13T12:30:54",
                                                                    "endedAt": "2025-08-20T12:31:08",
@@ -413,7 +413,7 @@ public interface TripApi {
                                                                 {
                                                                     "tripId": 5,
                                                                     "title": "여행5",
-                                                                    "city": null,
+                                                                    "city": ["대전광역시"],
                                                                     "leaderId": 15,
                                                                     "startedAt": "2025-08-10T12:32:27",
                                                                     "endedAt": "2025-08-12T12:32:13",
@@ -429,7 +429,7 @@ public interface TripApi {
                                                                 {
                                                                     "tripId": 3,
                                                                     "title": "여행3",
-                                                                    "city": null,
+                                                                    "city": [],
                                                                     "leaderId": 15,
                                                                     "startedAt": null,
                                                                     "endedAt": null,
