@@ -15,6 +15,8 @@ public class TripPlaceReqLegacy {
     public record Request(
             @Schema(description = "목적지 이름", example = "광화문")
             String name,
+            @Schema(description = "주소", example = "서울특별시 종로구 세종대로 172")
+            String address,
             @Schema(description = "목적지 위도", example = "33.33")
             double latitude,
             @Schema(description = "목적지 경도", example = "123.123")
@@ -37,6 +39,7 @@ public class TripPlaceReqLegacy {
             return new StoredFormat(
                     UUID.randomUUID().toString(),
                     name,
+                    address,
                     latitude,
                     longitude,
                     placeType
@@ -47,6 +50,7 @@ public class TripPlaceReqLegacy {
     public record StoredFormat(
             String id,
             String name,
+            String address,
             double latitude,
             double longitude,
             PlaceCategory placeCategory
