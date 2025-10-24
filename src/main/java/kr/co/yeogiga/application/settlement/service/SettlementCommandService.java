@@ -58,11 +58,10 @@ public class SettlementCommandService {
             throw new CustomException(SettlementErrorType.NOT_VALID_PRICE);
         }
         
-        
         Settlement settlement = settlementService.save(dto.toEntity(tripId, userId));
         
         List<PayInfo> payInfoList = payers.stream()
-                .map(payInfo -> payInfo.toEntity(settlement))
+                .map(payInfo -> payInfo.toEntity(settlement, settlement.isPayer(payInfo.userId())))
                 .toList();
         
         payInfoService.saveAllInBatch(payInfoList);

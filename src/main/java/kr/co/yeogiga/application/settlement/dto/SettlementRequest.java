@@ -83,6 +83,15 @@ public class SettlementRequest {
                     .settlement(settlement)
                     .build();
         }
+        
+        public PayInfo toEntity(Settlement settlement, boolean isCompleted) {
+            return PayInfo.builder()
+                    .userId(userId)
+                    .price(price)
+                    .settlement(settlement)
+                    .isCompleted(isCompleted)
+                    .build();
+        }
     }
     
     @Schema(name = "SettlementRequest.PayInfoCompletionListDto", description = "분담 내역 완료 여부 리스트 DTO")
