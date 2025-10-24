@@ -62,10 +62,10 @@ public class TripPlaceSavingServiceLegacyTest {
     void completeTripSuccessPlanned() {
         // given
         TripPlaceReqLegacy.StoredFormat place1 = new TripPlaceReqLegacy.StoredFormat(
-                "id1", "장소1", 33.123, 126.456, PlaceCategory.TOURISM
+                "id1", "장소1", "주소1", 33.123, 126.456, PlaceCategory.TOURISM
         );
         TripPlaceReqLegacy.StoredFormat place2 = new TripPlaceReqLegacy.StoredFormat(
-                "id2", "장소2", 33.789, 126.987, PlaceCategory.RESTAURANT
+                "id2", "장소2", "주소2", 33.789, 126.987, PlaceCategory.RESTAURANT
         );
 
         when(redisRepository.getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class)))
@@ -88,7 +88,7 @@ public class TripPlaceSavingServiceLegacyTest {
             tripPlaceSavingServiceLegacy.completeTrip(tripId, lastDay);
 
             // then
-            verify(redisRepository, times(2)).getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class));
+            verify(redisRepository, times(4)).getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class));
             verify(tripDayPlaceService, times(1)).saveAll(any());
             verify(redisRepository, times(1)).del(PlaceConstant.dayPlacesKey(tripId, 1));
             verify(redisRepository, times(1)).del(PlaceConstant.dayPlaceSetKey(tripId, 1));
@@ -104,10 +104,10 @@ public class TripPlaceSavingServiceLegacyTest {
     void completeTripSuccessInProgress() {
         // given
         TripPlaceReqLegacy.StoredFormat place1 = new TripPlaceReqLegacy.StoredFormat(
-                "id1", "장소1", 33.123, 126.456, PlaceCategory.TOURISM
+                "id1", "장소1", "주소1", 33.123, 126.456, PlaceCategory.TOURISM
         );
         TripPlaceReqLegacy.StoredFormat place2 = new TripPlaceReqLegacy.StoredFormat(
-                "id2", "장소2", 33.789, 126.987, PlaceCategory.RESTAURANT
+                "id2", "장소2", "주소2", 33.789, 126.987, PlaceCategory.RESTAURANT
         );
 
         when(redisRepository.getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class)))
@@ -130,7 +130,7 @@ public class TripPlaceSavingServiceLegacyTest {
             tripPlaceSavingServiceLegacy.completeTrip(tripId, lastDay);
 
             // then
-            verify(redisRepository, times(2)).getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class));
+            verify(redisRepository, times(4)).getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class));
             verify(tripDayPlaceService, times(1)).saveAll(any());
             verify(redisRepository, times(1)).del(PlaceConstant.dayPlacesKey(tripId, 1));
             verify(redisRepository, times(1)).del(PlaceConstant.dayPlaceSetKey(tripId, 1));
@@ -146,10 +146,10 @@ public class TripPlaceSavingServiceLegacyTest {
     void completeTripSuccessCompleted() {
         // given
         TripPlaceReqLegacy.StoredFormat place1 = new TripPlaceReqLegacy.StoredFormat(
-                "id1", "장소1", 33.123, 126.456, PlaceCategory.TOURISM
+                "id1", "장소1", "주소1", 33.123, 126.456, PlaceCategory.TOURISM
         );
         TripPlaceReqLegacy.StoredFormat place2 = new TripPlaceReqLegacy.StoredFormat(
-                "id2", "장소2", 33.789, 126.987, PlaceCategory.RESTAURANT
+                "id2", "장소2", "주소2", 33.789, 126.987, PlaceCategory.RESTAURANT
         );
 
         when(redisRepository.getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class)))
@@ -172,7 +172,7 @@ public class TripPlaceSavingServiceLegacyTest {
             tripPlaceSavingServiceLegacy.completeTrip(tripId, lastDay);
 
             // then
-            verify(redisRepository, times(2)).getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class));
+            verify(redisRepository, times(4)).getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class));
             verify(tripDayPlaceService, times(1)).saveAll(any());
             verify(redisRepository, times(1)).del(PlaceConstant.dayPlacesKey(tripId, 1));
             verify(redisRepository, times(1)).del(PlaceConstant.dayPlaceSetKey(tripId, 1));

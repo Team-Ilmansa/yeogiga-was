@@ -96,7 +96,7 @@ public class TripPlaceEditingServiceTest {
         void deletePlaceInEditingSuccess() {
             // given
             TripPlaceReqLegacy.StoredFormat place = new TripPlaceReqLegacy.StoredFormat(
-                    placeId, "목적지1", 33.123, 126.456, PlaceCategory.RESTAURANT
+                    placeId, "목적지1", "주소1", 33.123, 126.456, PlaceCategory.RESTAURANT
             );
 
             given(redisRepository.getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class)))
@@ -131,9 +131,9 @@ public class TripPlaceEditingServiceTest {
     void reorderPlacesInEditingSuccess() {
         // given
         List<TripPlaceReqLegacy.StoredFormat> storedPlace = List.of(
-                new TripPlaceReqLegacy.StoredFormat("place1-id", "목적지1", 33.1, 126.1, PlaceCategory.RESTAURANT),
-                new TripPlaceReqLegacy.StoredFormat("place2-id", "목적지2", 33.2, 126.2, PlaceCategory.RESTAURANT),
-                new TripPlaceReqLegacy.StoredFormat("place3-id", "목적지3", 33.3, 126.3, PlaceCategory.RESTAURANT)
+                new TripPlaceReqLegacy.StoredFormat("place1-id", "목적지1", "주소1", 33.1, 126.1, PlaceCategory.RESTAURANT),
+                new TripPlaceReqLegacy.StoredFormat("place2-id", "목적지2", "주소2", 33.2, 126.2, PlaceCategory.RESTAURANT),
+                new TripPlaceReqLegacy.StoredFormat("place3-id", "목적지3", "주소3", 33.3, 126.3, PlaceCategory.RESTAURANT)
         );
 
         TripPlaceReqLegacy.ReorderRequest request =
@@ -157,7 +157,7 @@ public class TripPlaceEditingServiceTest {
     void getPlacesInEditingSuccess() {
         // given
         List<TripPlaceReqLegacy.StoredFormat> mockPlaces = List.of(
-                new TripPlaceReqLegacy.StoredFormat("place-id", "목적지1", 33.123, 126.456, PlaceCategory.RESTAURANT)
+                new TripPlaceReqLegacy.StoredFormat("place-id", "목적지1", "주소3", 33.123, 126.456, PlaceCategory.RESTAURANT)
         );
 
         given(redisRepository.getList(anyString(), eq(TripPlaceReqLegacy.StoredFormat.class))).willReturn(mockPlaces);

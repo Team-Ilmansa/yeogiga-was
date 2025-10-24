@@ -61,9 +61,9 @@ class TripPlaceSortServiceTest {
         String listKey = PlaceConstant.dayPlacesKey(tripId, day);
 
         List<TripPlaceReqLegacy.StoredFormat> input = List.of(
-                new TripPlaceReqLegacy.StoredFormat("1", "PlaceA", 35.1, 128.1, PlaceCategory.RESTAURANT),
-                new TripPlaceReqLegacy.StoredFormat("2", "PlaceB", 35.2, 128.2, PlaceCategory.TOURISM),
-                new TripPlaceReqLegacy.StoredFormat("3", "PlaceC", 35.3, 128.3, PlaceCategory.LODGING)
+                new TripPlaceReqLegacy.StoredFormat("1", "PlaceA", "AddressA", 35.1, 128.1, PlaceCategory.RESTAURANT),
+                new TripPlaceReqLegacy.StoredFormat("2", "PlaceB", "AddressB", 35.2, 128.2, PlaceCategory.TOURISM),
+                new TripPlaceReqLegacy.StoredFormat("3", "PlaceC", "AddressC", 35.3, 128.3, PlaceCategory.LODGING)
         );
 
         given(redisRepository.getList(eq(listKey), eq(TripPlaceReqLegacy.StoredFormat.class)))
@@ -89,11 +89,11 @@ class TripPlaceSortServiceTest {
         String listKey = PlaceConstant.dayPlacesKey(tripId, day);
 
         List<TripPlaceReqLegacy.StoredFormat> input = List.of(
-                new TripPlaceReqLegacy.StoredFormat("1", "A", 35.0, 128.0, PlaceCategory.RESTAURANT),
-                new TripPlaceReqLegacy.StoredFormat("2", "B", 35.1, 128.1, PlaceCategory.RESTAURANT),
-                new TripPlaceReqLegacy.StoredFormat("3", "C", 35.2, 128.2, PlaceCategory.RESTAURANT),
-                new TripPlaceReqLegacy.StoredFormat("4", "D", 35.3, 128.3, PlaceCategory.LODGING),
-                new TripPlaceReqLegacy.StoredFormat("5", "E", 35.4, 128.4, PlaceCategory.TOURISM)
+                new TripPlaceReqLegacy.StoredFormat("1", "A", "AddrA", 35.0, 128.0, PlaceCategory.RESTAURANT),
+                new TripPlaceReqLegacy.StoredFormat("2", "B", "AddrB", 35.1, 128.1, PlaceCategory.RESTAURANT),
+                new TripPlaceReqLegacy.StoredFormat("3", "C", "AddrC", 35.2, 128.2, PlaceCategory.RESTAURANT),
+                new TripPlaceReqLegacy.StoredFormat("4", "D", "AddrD", 35.3, 128.3, PlaceCategory.LODGING),
+                new TripPlaceReqLegacy.StoredFormat("5", "E", "AddrE", 35.4, 128.4, PlaceCategory.TOURISM)
         );
 
         given(redisRepository.getList(eq(listKey), eq(TripPlaceReqLegacy.StoredFormat.class)))
