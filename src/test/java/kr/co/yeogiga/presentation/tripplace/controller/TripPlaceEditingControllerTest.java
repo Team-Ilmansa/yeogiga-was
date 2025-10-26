@@ -80,6 +80,7 @@ public class TripPlaceEditingControllerTest {
                 .name("목적지1")
                 .latitude(0.0)
                 .longitude(0.0)
+                .address("주소1")
                 .placeType(PlaceCategory.RESTAURANT)
                 .build();
 

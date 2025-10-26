@@ -13,7 +13,7 @@ public class TripDto {
     public record Summary(
             Long tripId,
             String title,
-            String city,
+            List<String> city,
             Long leaderId,
             LocalDateTime startedAt,
             LocalDateTime endedAt,

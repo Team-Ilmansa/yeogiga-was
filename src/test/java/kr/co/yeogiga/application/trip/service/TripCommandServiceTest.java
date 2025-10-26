@@ -134,7 +134,6 @@ public class TripCommandServiceTest {
 
         private Trip trip = Trip.builder()
                 .title("test")
-                .city("대구광역시")
                 .leaderId(userId)
                 .travelStatus(TravelStatus.PLANNED)
                 .build();
