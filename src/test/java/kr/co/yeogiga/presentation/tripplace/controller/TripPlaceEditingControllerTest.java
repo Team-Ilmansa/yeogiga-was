@@ -187,7 +187,7 @@ public class TripPlaceEditingControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].name").value("목적지1"))
-                .andExpect(jsonPath("$.data[0].placeCategory").value(PlaceCategory.RESTAURANT.getLabel()));
+                .andExpect(jsonPath("$.data[0].placeType").value(PlaceCategory.RESTAURANT.getLabel()));
     }
 
     @Test
