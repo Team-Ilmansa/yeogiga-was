@@ -65,14 +65,14 @@ public interface TripPlaceEditingApi {
                                                     "name": "목적지1",
                                                     "latitude": 32.33,
                                                     "longitude": 87.123,
-                                                    "placeCategory": "관광지"
+                                                    "placeType": "관광지"
                                                 },
                                                 {
                                                     "id": "place-id2",
                                                     "name": "목적지2",
                                                     "latitude": 132.33,
                                                     "longitude": 287.123,
-                                                    "placeCategory": "식당"
+                                                    "placeType": "식당"
                                                 }
                                             ]
                                         }

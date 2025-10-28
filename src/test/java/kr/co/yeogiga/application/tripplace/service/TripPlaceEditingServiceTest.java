@@ -168,6 +168,6 @@ public class TripPlaceEditingServiceTest {
         // then
         assertEquals(1, result.size());
         assertEquals("목적지1", result.get(0).name());
-        assertEquals(PlaceCategory.RESTAURANT.getLabel(), result.get(0).placeCategory());
+        assertEquals(PlaceCategory.RESTAURANT.getLabel(), result.get(0).placeType());
     }
 }

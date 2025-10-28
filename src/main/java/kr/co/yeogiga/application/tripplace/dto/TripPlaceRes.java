@@ -56,7 +56,7 @@ public class TripPlaceRes {
             String name,
             double latitude,
             double longitude,
-            String placeCategory
+            String placeType
     ) {
         public static TempPlaceInfo from(TripPlaceReqLegacy.StoredFormat place) {
             return new TempPlaceInfo(
