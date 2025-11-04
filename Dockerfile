@@ -1,4 +1,4 @@
-FROM openjdk:17 AS builder
+FROM eclipse-temurin:17-jdk AS builder
 COPY gradlew .
 COPY gradle gradle
 COPY build.gradle .
