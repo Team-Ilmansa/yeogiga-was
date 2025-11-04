@@ -1,16 +1,16 @@
 FROM eclipse-temurin:17-jdk AS builder
+WORKDIR /app
 COPY gradlew .
 COPY gradle gradle
 COPY build.gradle .
 COPY settings.gradle .
 COPY src src
 RUN chmod +x ./gradlew
-RUN microdnf install findutils
-RUN ./gradlew build -x test
-
+RUN apt-get update && apt-get install -y findutils
+RUN ./gradlew clean build -x test --no-daemon
 
 FROM eclipse-temurin:17-jre
-RUN mkdir /opt/app
-COPY --from=builder build/libs/*.jar /opt/app/spring-boot-application.jar
+WORKDIR /opt/app
+COPY --from=builder /app/build/libs/*.jar /opt/app/spring-boot-application.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/opt/app/spring-boot-application.jar"]
