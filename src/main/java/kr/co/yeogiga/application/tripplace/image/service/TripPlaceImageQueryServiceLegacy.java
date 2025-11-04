@@ -3,8 +3,8 @@ package kr.co.yeogiga.application.tripplace.image.service;
 import kr.co.yeogiga.application.tripplace.image.dto.FavoriteImageRes;
 import kr.co.yeogiga.application.tripplace.image.dto.TripPlaceImageRes;
 import kr.co.yeogiga.common.exception.CustomException;
-import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.placeimage.entity.Image;
+import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class TripPlaceImageQueryServiceLegacy {
     /**
      * ## 임시 처리 로직
      * <p>
-     * 특정 TripDayPlace 내에서 일차(day)별 이미지 조회 메섣,
+     * 특정 여행 내에서 일차(day)별 이미지 조회 메서드
      *
      * @param tripId 여행 ID
      * @param day    일차
@@ -32,6 +32,21 @@ public class TripPlaceImageQueryServiceLegacy {
     public List<TripPlaceImageRes.ImageDto> getTripDayImageInfo(Long tripId, int day) {
         return tripDayPlaceService.readAllImagesByTripIdAndDay(tripId, day)
                 .stream().map(TripPlaceImageRes.ImageDto::from).toList();
+    }
+
+    /**
+     * ## 임시 처리 로직 v2 (placeId별 그룹화)
+     * <p>
+     * 특정 여행 내에서 일차(day)별 이미지 조회 메서드
+     *
+     * @param tripId 여행 ID
+     * @param day    일차
+     * @return 여행 일차에 대한 이미지 반환
+     */
+    public TripPlaceImageRes.GroupedResponse getTripDayImageInfoWithPlaceId(Long tripId, int day) {
+        return TripPlaceImageRes.GroupedResponse.from(
+                tripDayPlaceService.readImagesGroupedByPlace(tripId, day)
+        );
     }
 
     /**
