@@ -9,7 +9,7 @@ RUN microdnf install findutils
 RUN ./gradlew build -x test
 
 
-FROM openjdk:17
+FROM eclipse-temurin:17-jre
 RUN mkdir /opt/app
 COPY --from=builder build/libs/*.jar /opt/app/spring-boot-application.jar
 EXPOSE 8080
