@@ -1,6 +1,7 @@
 package kr.co.yeogiga.domain.tripplace.repository;
 
 import kr.co.yeogiga.domain.placeimage.entity.Image;
+import kr.co.yeogiga.domain.tripplace.dto.ImagesPlaceDto;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 import lombok.RequiredArgsConstructor;
@@ -144,6 +145,40 @@ public class CustomTripDayPlaceRepositoryImpl implements CustomTripDayPlaceRepos
         }
 
         return images;
+    }
+
+    @Override
+    public ImagesPlaceDto.Response findImagesGroupedByPlace(Long tripId, int day) {
+        Criteria criteria = Criteria.where("tripId").is(tripId)
+                .and("day").is(day);
+
+        Query query = new Query(criteria);
+        query.fields()
+                .include("unmatchedImages")
+                .include("places.images")
+                .include("places.id");
+
+        TripDayPlace doc = mongoTemplate.findOne(query, TripDayPlace.class);
+        if (doc == null) {
+            return new ImagesPlaceDto.Response(List.of(), List.of());
+        }
+
+        List<Image> unmatched = Optional.ofNullable(doc.getUnmatchedImages())
+                .map(List::copyOf)
+                .orElseGet(List::of);
+
+        List<ImagesPlaceDto.PlaceImages> byPlace = new ArrayList<>();
+        List<Place> places = Optional.ofNullable(doc.getPlaces()).orElseGet(List::of);
+
+        for (Place p : places) {
+            if (p.getId() == null) continue;
+            List<Image> imgs = Optional.ofNullable(p.getImages())
+                    .map(List::copyOf)
+                    .orElseGet(List::of);
+            byPlace.add(new ImagesPlaceDto.PlaceImages(p.getId(), imgs));
+        }
+
+        return new ImagesPlaceDto.Response(byPlace, unmatched);
     }
 
     @Override
