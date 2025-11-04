@@ -48,7 +48,7 @@ jobs:
       - name: Create Json
         uses: jsdaniell/create-json@v1.2.2
         with:
-          name: "./src/main/resources/yeogiga-808f2-firebase-adminsdk-fbsvc-b180bb10a5.json"
+          name: "./src/main/resources/yeogiga-808f2-firebase-adminsdk-fbsvc-996c456f1e.json"
           json: ${{ secrets.FIREBASE_PRODUCTION_JSON }}
 
       # 4. Docker 이미지 build 및 push
