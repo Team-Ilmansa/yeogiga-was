@@ -2,6 +2,7 @@ package kr.co.yeogiga.application.tripplace.image.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import kr.co.yeogiga.domain.placeimage.entity.Image;
+import kr.co.yeogiga.domain.tripplace.dto.ImagesPlaceDto;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import lombok.Builder;
 
@@ -43,6 +44,37 @@ public class TripPlaceImageRes {
                     unmatchedImages.stream()
                             .map(ImageDto::from)
                             .collect(Collectors.toList())
+            );
+        }
+    }
+
+    @Builder
+    public record GroupedResponse(
+            List<PlaceImages> byPlace,
+            List<ImageDto> unmatched
+    ) {
+        public static GroupedResponse from(ImagesPlaceDto.Response response) {
+            List<PlaceImages> byPlace = response.byPlace().stream()
+                    .map(PlaceImages::from)
+                    .toList();
+
+            List<ImageDto> unmatched = response.unmatched().stream()
+                    .map(ImageDto::from)
+                    .toList();
+
+            return new GroupedResponse(byPlace, unmatched);
+        }
+    }
+
+    @Builder
+    public record PlaceImages(
+            String placeId,
+            List<ImageDto> images
+    ) {
+        public static PlaceImages from(ImagesPlaceDto.PlaceImages placeImages) {
+            return new PlaceImages(
+                    placeImages.placeId(),
+                    placeImages.images().stream().map(ImageDto::from).toList()
             );
         }
     }

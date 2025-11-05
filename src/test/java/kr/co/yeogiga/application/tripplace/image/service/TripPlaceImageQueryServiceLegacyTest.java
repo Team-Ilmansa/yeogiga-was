@@ -6,6 +6,7 @@ import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.placeimage.entity.Image;
 import kr.co.yeogiga.domain.trip.exception.TripErrorType;
 import kr.co.yeogiga.domain.trip.type.PlaceCategory;
+import kr.co.yeogiga.domain.tripplace.dto.ImagesPlaceDto;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.service.TripDayPlaceService;
 import org.junit.jupiter.api.DisplayName;
@@ -71,6 +72,61 @@ public class TripPlaceImageQueryServiceLegacyTest {
 
         // then
         assertThat(result).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("여행 일차에 대한 이미지 조회 테스트 (목적지 id로 그룹화)")
+    void getTripDayImageInfoWithPlaceIdTest() {
+        // given
+        Image image1 = Image.builder()
+                .url("https://image-1.com")
+                .latitude(37.0)
+                .longitude(127.0)
+                .date(LocalDateTime.of(2024, 5, 14, 12, 0))
+                .build();
+
+        Image image2 = Image.builder()
+                .url("https://image-2.com")
+                .latitude(37.1)
+                .longitude(127.1)
+                .date(LocalDateTime.of(2024, 5, 15, 8, 30))
+                .build();
+
+        Image unmatched = Image.builder()
+                .url("https://image-3.com")
+                .latitude(36.9)
+                .longitude(126.9)
+                .date(LocalDateTime.of(2024, 5, 16, 9, 0))
+                .build();
+
+        Long tripId = 1L;
+        int day = 1;
+
+        ImagesPlaceDto.PlaceImages placeGroup = new ImagesPlaceDto.PlaceImages(
+                "place-1",
+                List.of(image1, image2)
+        );
+
+        ImagesPlaceDto.Response response = new ImagesPlaceDto.Response(
+                List.of(placeGroup),
+                List.of(unmatched)
+        );
+
+        given(tripDayPlaceService.readImagesGroupedByPlace(tripId, day))
+                .willReturn(response);
+
+        // when
+        TripPlaceImageRes.GroupedResponse result =
+                tripPlaceImageQueryServiceLegacy.getTripDayImageInfoWithPlaceId(tripId, day);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.byPlace()).hasSize(1);
+        assertThat(result.unmatched()).hasSize(1);
+
+        TripPlaceImageRes.PlaceImages byPlace0 = result.byPlace().get(0);
+        assertThat(byPlace0.placeId()).isEqualTo("place-1");
+        assertThat(byPlace0.images()).hasSize(2);
     }
 
     @Nested

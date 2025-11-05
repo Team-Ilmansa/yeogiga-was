@@ -1,6 +1,7 @@
 package kr.co.yeogiga.domain.tripplace.repository;
 
 import kr.co.yeogiga.domain.placeimage.entity.Image;
+import kr.co.yeogiga.domain.tripplace.dto.ImagesPlaceDto;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 
@@ -15,6 +16,7 @@ public interface CustomTripDayPlaceRepository {
     Optional<TripDayPlace> findByIdSorted(String id);
     List<TripDayPlace> findByTripIdSorted(Long tripId);
     List<Image> findAllImagesByTripIdAndDay(Long tripId, int day);
+    ImagesPlaceDto.Response findImagesGroupedByPlace(Long tripId, int day);
     Optional<Place> findPlaceByIdAndPlaceId(String id, String placeId);
     List<Image> findUnmatchedImagesById(String id);
     List<TripDayPlace> findTripDayPlaceSummariesByTripId(Long tripId);

@@ -59,6 +59,85 @@ public interface TripPlaceImageApi {
             @PathVariable int day
     );
 
+    @TrackApi(description = "여행 일차별 이미지 조회 - 목적지 id로 그룹화 (임시 처리 REST API)")
+    @Operation(summary = "여행 일차별 이미지 조회 - 목적지 id로 그룹화 (임시 처리 REST API)", description = "여행 일차별 이미지 조회하는 API입니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "일차에 맞는 이미지 조회 성공",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = """
+                                        {
+                                            "code": 200,
+                                            "message": "요청이 성공하였습니다.",
+                                            "data": {
+                                                 "byPlace": [
+                                                     {
+                                                         "placeId": "place1-id",
+                                                         "images": [
+                                                            {
+                                                                 "id": "image1-id",
+                                                                 "url": "https://image1.com",
+                                                                 "latitude": 11.11,
+                                                                 "longitude": 22.22,
+                                                                 "date": "2025-04-13T21:53:57.445",
+                                                                 "favorite": true
+                                                             },
+                                                             {
+                                                                 "id": "image2-id",
+                                                                 "url": "https://image2.com",
+                                                                 "latitude": 33.33,
+                                                                 "longitude": 44.44,
+                                                                 "date": "2025-04-13T21:53:57.445",
+                                                                 "favorite": false
+                                                             }
+                                                         ]
+                                                     },
+                                                     {
+                                                         "placeId": "place2-id",
+                                                         "images": [
+                                                             {
+                                                                 "id": "image3-id",
+                                                                 "url": "https://image3.com",
+                                                                 "latitude": 55.55,
+                                                                 "longitude": 66.66,
+                                                                 "date": "2025-04-13T21:53:57.445",
+                                                                 "favorite": true
+                                                             },
+                                                             {
+                                                                 "id": "image4-id",
+                                                                 "url": "https://image4.com",
+                                                                 "latitude": 77.77,
+                                                                 "longitude": 88.88,
+                                                                 "date": "2025-04-13T21:53:57.445",
+                                                                 "favorite": false
+                                                             }
+                                                         ]
+                                                     }
+                                                 ],
+                                                 "unmatched": [
+                                                     {
+                                                         "id": "image5-id",
+                                                         "url": "https://image5.com",
+                                                         "favorite": false
+                                                     },
+                                                     {
+                                                         "id": "image6-id",
+                                                         "url": "https://image6.com",
+                                                         "favorite": false
+                                                     }
+                                                 ]
+                                             }
+                                        }
+                                    """)
+                    }))
+    })
+    ResponseEntity<?> getTripDayImageInfoWithPlaceId(
+            @Parameter(description = "여행 ID")
+            @PathVariable Long tripId,
+
+            @Parameter(description = "여행 일차")
+            @PathVariable int day
+    );
+
     @TrackApi(description = "일차별 목적지에 매칭되어 있는 이미지 조회")
     @Operation(summary = "일차별 목적지에 매칭되어 있는 이미지 조회", description = "일차별 목적지에 매칭되어 있는 이미지 조회하는 API입니다.")
     @ApiResponses({

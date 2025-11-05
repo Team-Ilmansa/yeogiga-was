@@ -1,6 +1,7 @@
 package kr.co.yeogiga.domain.tripplace.service;
 
 import kr.co.yeogiga.domain.placeimage.entity.Image;
+import kr.co.yeogiga.domain.tripplace.dto.ImagesPlaceDto;
 import kr.co.yeogiga.domain.tripplace.entity.Place;
 import kr.co.yeogiga.domain.tripplace.entity.TripDayPlace;
 import kr.co.yeogiga.domain.tripplace.repository.TripDayPlaceRepository;
@@ -53,6 +54,10 @@ public class TripDayPlaceService {
 
     public List<Image> readAllImagesByTripIdAndDay(Long tripId, int day) {
         return tripDayPlaceRepository.findAllImagesByTripIdAndDay(tripId, day);
+    }
+
+    public ImagesPlaceDto.Response readImagesGroupedByPlace(Long tripId, int day) {
+        return tripDayPlaceRepository.findImagesGroupedByPlace(tripId, day);
     }
 
     public Optional<Place> readPlaceByIdAndPlaceId(String id, String placeId) {

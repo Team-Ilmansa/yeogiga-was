@@ -116,6 +116,69 @@ public class TripPlaceImageControllerTest {
                 .andExpect(jsonPath("$.data", hasSize(2)));
     }
 
+    @Test
+    @DisplayName("여행 일차에 대한 이미지 조회 테스트 (목적지 id로 그룹화)")
+    void getTripDayImageInfoWithPlaceIdTest() throws Exception {
+        // given
+        long tripId = 1L;
+        int day = 1;
+
+        TripPlaceImageRes.ImageDto img1 = TripPlaceImageRes.ImageDto.builder()
+                .id("image1-id")
+                .url("https://image1.com")
+                .latitude(37.0).longitude(127.0)
+                .favorite(false)
+                .build();
+
+        TripPlaceImageRes.ImageDto img2 = TripPlaceImageRes.ImageDto.builder()
+                .id("image2-id")
+                .url("https://image2.com")
+                .latitude(37.1).longitude(127.1)
+                .favorite(true)
+                .build();
+
+        TripPlaceImageRes.ImageDto unmatched = TripPlaceImageRes.ImageDto.builder()
+                .id("image3-id")
+                .url("https://unmatched.com")
+                .latitude(36.9).longitude(126.9)
+                .favorite(false)
+                .build();
+
+        TripPlaceImageRes.PlaceImages byPlace0 = TripPlaceImageRes.PlaceImages.builder()
+                .placeId("place-1")
+                .images(List.of(img1, img2))
+                .build();
+
+        TripPlaceImageRes.GroupedResponse grouped =
+                TripPlaceImageRes.GroupedResponse.builder()
+                        .byPlace(List.of(byPlace0))
+                        .unmatched(List.of(unmatched))
+                        .build();
+
+        when(tripPlaceImageQueryServiceLegacy.getTripDayImageInfoWithPlaceId(tripId, day))
+                .thenReturn(grouped);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/trip/{tripId}/day-place/images/day/{day}/with-place", tripId, day)
+                        .accept(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("요청이 성공하였습니다."))
+                .andExpect(jsonPath("$.data.byPlace", hasSize(1)))
+                .andExpect(jsonPath("$.data.byPlace[0].placeId").value("place-1"))
+                .andExpect(jsonPath("$.data.byPlace[0].images", hasSize(2)))
+                .andExpect(jsonPath("$.data.byPlace[0].images[0].id").value("image1-id"))
+                .andExpect(jsonPath("$.data.byPlace[0].images[1].id").value("image2-id"))
+                .andExpect(jsonPath("$.data.unmatched", hasSize(1)))
+                .andExpect(jsonPath("$.data.unmatched[0].id").value("image3-id"));
+
+    }
+
     @Nested
     @DisplayName("이미지 조회 테스트")
     class GetImageInfoTest {
