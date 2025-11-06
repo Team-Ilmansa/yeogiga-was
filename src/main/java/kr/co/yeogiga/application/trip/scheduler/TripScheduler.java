@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class TripScheduler {
     private final TripCommandService tripCommandService;
 
-    @Scheduled(cron = "0 */30 * * * *")
+    @Scheduled(cron = "0 */5 * * * *")
     public void runUpdateTravelStatusJob() {
         tripCommandService.updateTravelStatus(LocalDateTime.now());
     }
