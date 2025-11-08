@@ -5,7 +5,7 @@ import kr.co.yeogiga.application.trip.dto.TripMemberLocationDto;
 import kr.co.yeogiga.application.trip.service.TripMemberLocationCommandService;
 import kr.co.yeogiga.application.trip.service.TripMemberLocationQueryService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
-import kr.co.yeogiga.common.security.auth.CustomUserDetails;
+import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
 import kr.co.yeogiga.presentation.trip.api.TripMemberLocationApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,7 +28,7 @@ public class TripMemberLocationController implements TripMemberLocationApi {
     @Override
     @PostMapping("/{tripId}/members/location")
     public ResponseEntity<?> saveLocation(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @PathVariable Long tripId,
             @Valid @RequestBody TripMemberLocationDto.Request request
     ) {
@@ -39,7 +39,7 @@ public class TripMemberLocationController implements TripMemberLocationApi {
     @Override
     @GetMapping("/{tripId}/members/location")
     public ResponseEntity<?> getLocations(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetailsImpl userDetails,
             @PathVariable Long tripId
     ) {
         return ResponseEntity.ok()
