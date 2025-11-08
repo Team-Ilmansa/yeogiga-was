@@ -18,7 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,17 +64,28 @@ public class TripPlaceSavingServiceLegacy {
     }
     
     /**
-     * 여행 주 목적지(city) 값을 설정하는 메서드
+     * 여행 주 목적 지역(city) 값을 설정하는 메서드
+     *
+     * <p> 여러 목직 지역이 존재하는 경우 가장 빈도 수가 높은 2곳을 선택해 저장
      *
      * @param trip      여행 엔티티
      * @param addresses 목적지들의 주소 목록
      */
     public void updateTripCity(Trip trip, List<String> addresses) {
-        Set<String> regionSet = addresses.stream()
-                .map(address -> RegionUtil.extractRegion(address))
-                .collect(Collectors.toSet());
+        Map<String, Long> regionCounts = addresses.stream()
+                .map(RegionUtil::extractRegion)
+                .collect(Collectors.groupingBy(
+                        Function.identity(),
+                        Collectors.counting()
+                ));
         
-        trip.updateCity(regionSet.stream().toList());
+        List<String> top2Regions = regionCounts.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .limit(2)
+                .map(Map.Entry::getKey)
+                .toList();
+        
+        trip.updateCity(top2Regions);
     }
 
     /**
