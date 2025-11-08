@@ -222,9 +222,46 @@ public class TripPlaceSavingServiceLegacyTest {
             // when
             tripPlaceSavingServiceLegacy.completeTrip(tripId, 2);
             
-            // then: 여행 목적지(지역)은 중복인 목적지로 인하여 총 3곳이며, "대구광역시", "포항시", "제주특별자치도"이다.
-            assertThat(trip.getCity()).hasSize(3);
-            assertThat(trip.getCity()).containsAll(List.of("대구광역시", "포항시", "제주특별자치도"));
+            // then: 여행 목적지(지역)은 여러 목적지 중 빈도 수가 높은 2곳이 할당되며, "포항시", "대구광역시" 이다. 삽입 순서에 따라 대구광역시가 우선 할당 된다.
+            assertThat(trip.getCity()).hasSize(2);
+            assertThat(trip.getCity()).containsAll(List.of("대구광역시", "포항시"));
+        }
+    }
+    
+    @Test
+    @DisplayName("여행 목적지 확정 성공 - 여행 주 목적지(지역)이 한 곳만 존재하는 경우")
+    void successAssignTripCityWhenCityIsOnlyOne() {
+        // given
+        TripPlaceReqLegacy.StoredFormat place1 = new TripPlaceReqLegacy.StoredFormat(
+                "id2", "포함시청", "경상북도 포항시 남구 대잠동 1001 포항시청", 33.789, 126.987, PlaceCategory.TOURISM
+        );
+        TripPlaceReqLegacy.StoredFormat place2 = new TripPlaceReqLegacy.StoredFormat(
+                "id3", "포항역 고속철", "경상북도 포항시 북구 흥해읍 이인리 137-1", 33.789, 126.987, PlaceCategory.TRANSPORT
+        );
+        when(redisRepository.getList(PlaceConstant.dayPlacesKey(tripId, 1), TripPlaceReqLegacy.StoredFormat.class))
+                .thenReturn(List.of(place1));
+        
+        
+        when(redisRepository.getList(PlaceConstant.dayPlacesKey(tripId, 2), TripPlaceReqLegacy.StoredFormat.class))
+                .thenReturn(List.of(place2));
+        
+        ReflectionTestUtils.setField(trip, "startedAt", LocalDateTime.of(2025, 5, 20, 12, 0));
+        ReflectionTestUtils.setField(trip, "endedAt", LocalDateTime.of(2025, 5, 21, 12, 0));
+        
+        when(tripService.readById(tripId)).thenReturn(Optional.of(trip));
+        
+        try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+            String date = "2025-05-24T12:00:00Z";
+            Clock clock = Clock.fixed(Instant.parse(date), ZoneId.of("UTC"));
+            LocalDateTime mockNow = LocalDateTime.now(clock);
+            mockedLocalDateTime.when(LocalDateTime::now).thenReturn(mockNow);
+            
+            // when
+            tripPlaceSavingServiceLegacy.completeTrip(tripId, 2);
+            
+            // then: 여행 주 목적 지역이 단 1곳일 경우는, 해당 지역만 할당된다.
+            assertThat(trip.getCity()).hasSize(1);
+            assertThat(trip.getCity()).containsAll(List.of("포항시"));
         }
     }
 }
