@@ -350,7 +350,7 @@ public interface SettlementApi {
                             @ExampleObject(name = "요청자가 정산자가 아닌 경우",value = """
                                              {
                                                   "code": "S002",
-                                                  "message": "정산자가 아닙니다."
+                                                  "message": "정산자 생성자가 아닙니다."
                                               }
                                     """)
                     })),
@@ -410,7 +410,7 @@ public interface SettlementApi {
                             @ExampleObject(name = "요청자가 정산자가 아닌 경우",value = """
                                              {
                                                   "code": "S002",
-                                                  "message": "정산자가 아닙니다."
+                                                  "message": "정산 생성자가 아닙니다."
                                               }
                                     """)
                     })),
@@ -464,7 +464,7 @@ public interface SettlementApi {
                             @ExampleObject(name = "요청자가 정산 생성자가 아닌 경우", value = """
                                              {
                                                  "code": "S002",
-                                                 "message": "정산자가 아닙니다."
+                                                 "message": "정산 생성자가 아닙니다."
                                              }
                                     """)
                     })),
