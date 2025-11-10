@@ -1,5 +1,6 @@
 package kr.co.yeogiga.application.auth.service;
 
+import kr.co.yeogiga.application.auth.dto.IdInquiryDto;
 import kr.co.yeogiga.application.auth.dto.SignInDto;
 import kr.co.yeogiga.application.auth.dto.SignUpDto;
 import kr.co.yeogiga.application.auth.dto.TokenDto;
@@ -148,5 +149,18 @@ public class AuthService {
         }
         
         user.revertWithdrawal();
+    }
+    
+    /**
+     * 사용자 로그인 아이디 찾기 메서드
+     *
+     * @param email     이메일
+     * @return          사용자 로그인 아이디
+     */
+    public IdInquiryDto.Response inquireUsername(String email) {
+        User user = userService.readByEmail(email)
+                .orElseThrow(() -> new CustomException(UserErrorType.EMAIL_NOT_FOUND));
+        
+        return new IdInquiryDto.Response(user.getUsername());
     }
 }

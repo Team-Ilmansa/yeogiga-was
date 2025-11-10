@@ -1,6 +1,7 @@
 package kr.co.yeogiga.presentation.auth.controller;
 
 import jakarta.validation.Valid;
+import kr.co.yeogiga.application.auth.dto.IdInquiryDto;
 import kr.co.yeogiga.application.auth.dto.RestoreDto;
 import kr.co.yeogiga.application.auth.dto.SignInDto;
 import kr.co.yeogiga.application.auth.dto.SignUpDto;
@@ -113,5 +114,12 @@ public class AuthController implements AuthApi {
     public ResponseEntity<?> restoreUser(@Valid @RequestBody RestoreDto.Request request) {
         authService.restoreUser(request.userId());
         return ResponseEntity.ok(SuccessResponse.ok());
+    }
+    
+    @Override
+    @PostMapping("/id-inquiry")
+    public ResponseEntity<?> inquireUsername(@Valid @RequestBody IdInquiryDto.Request request) {
+        return ResponseEntity
+                .ok(SuccessResponse.from(authService.inquireUsername(request.email())));
     }
 }

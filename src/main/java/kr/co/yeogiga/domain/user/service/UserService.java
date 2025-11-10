@@ -51,6 +51,9 @@ public class UserService {
         return userRepository.findByFcmToken(fcmToken);
     }
 
+    public Optional<User> readByEmail(String email) {
+        return userRepository.findUserIncludeDeletedByEmail(email);
+    }
     public boolean existsIncludeDeletedByUsername(String username) {
         return userRepository.existsIncludeDeletedByUsername(username);
     }

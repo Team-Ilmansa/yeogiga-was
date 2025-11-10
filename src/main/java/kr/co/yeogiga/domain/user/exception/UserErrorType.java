@@ -14,8 +14,8 @@ public enum UserErrorType implements BaseErrorType {
     PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "U002", "비밀번호가 불일치합니다."),
     ALREADY_WITHDRAW(HttpStatus.BAD_REQUEST, "U003", "이미 회원탈퇴한 사용자입니다."),
     ALREADY_USED_NICKNAME(HttpStatus.CONFLICT, "U004", "이미 사용 중인 닉네임입니다."),
-    SAME_NICKNAME(HttpStatus.CONFLICT, "U005", "기존과 동일한 닉네임 입니다.");
-
+    SAME_NICKNAME(HttpStatus.CONFLICT, "U005", "기존과 동일한 닉네임 입니다."),
+    EMAIL_NOT_FOUND(HttpStatus.NOT_FOUND, "U006", "존재하지 않는 이메일입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
