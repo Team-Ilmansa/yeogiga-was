@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CustomUserRepository {
+    Optional<User> findUserIncludeDeletedByEmail(String email);
     Optional<User> findUserIncludeDeletedByPlatformAndPlatformId(String platform, String platformId);
     Optional<User> findUserIncludeDeletedById(Long id);
     Optional<User> findUserIncludeDeletedByNickname(String nickname);

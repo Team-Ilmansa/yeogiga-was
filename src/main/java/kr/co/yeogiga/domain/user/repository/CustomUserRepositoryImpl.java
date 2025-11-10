@@ -50,6 +50,19 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
     }
     
     @Override
+    public Optional<User> findUserIncludeDeletedByEmail(String email) {
+        JPASQLQuery<Tuple> jpaSqlQuery = new JPASQLQuery<>(entityManager, sqlTemplates);
+        
+        return Optional.ofNullable(
+                jpaSqlQuery
+                        .select(USER_ENTITY_PATH)
+                        .from(USER_ENTITY_PATH)
+                        .where(Expressions.stringPath(USER_ENTITY_PATH, USER_COLUMN.EMAIL).eq(email))
+                        .fetchFirst()
+        );
+    }
+    
+    @Override
     public Optional<User> findUserIncludeDeletedByPlatformAndPlatformId(String platform, String platformId) {
         JPASQLQuery<Tuple> jpaSqlQuery = new JPASQLQuery<>(entityManager, sqlTemplates);
         
