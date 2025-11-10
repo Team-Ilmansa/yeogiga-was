@@ -116,6 +116,7 @@ public class AuthController implements AuthApi {
         return ResponseEntity.ok(SuccessResponse.ok());
     }
     
+    @Override
     @PostMapping("/id-inquiry")
     public ResponseEntity<?> inquireUsername(@Valid @RequestBody IdInquiryDto.Request request) {
         return ResponseEntity
