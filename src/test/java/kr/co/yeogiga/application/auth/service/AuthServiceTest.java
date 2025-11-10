@@ -1,5 +1,6 @@
 package kr.co.yeogiga.application.auth.service;
 
+import kr.co.yeogiga.application.auth.dto.IdInquiryDto;
 import kr.co.yeogiga.application.auth.dto.SignInDto;
 import kr.co.yeogiga.application.auth.dto.SignUpDto;
 import kr.co.yeogiga.application.auth.dto.TokenDto;
@@ -406,6 +407,45 @@ public class AuthServiceTest {
             
             // then
             assertEquals(AuthErrorType.NOT_WITHDRAWN, exception.getErrorType());
+        }
+    }
+    
+    @Nested
+    @DisplayName("아이디 찾기")
+    class InquireUsername {
+        private final String email = "test@test.com";
+        private final String username = "test";
+        private final User user = User.builder()
+                .username(username)
+                .email(email)
+                .password("password")
+                .build();
+        
+        @Test
+        @DisplayName("성공")
+        void success() {
+            // given
+            when(userService.readByEmail(email)).thenReturn(Optional.of(user));
+            
+            // when
+            IdInquiryDto.Response result = authService.inquireUsername(email);
+            
+            // then
+            assertEquals(username, result.username());
+        }
+        
+        @Test
+        @DisplayName("실패 - 해당 이메일을 사용하는 사용자가 존재하지 않는 경우")
+        void failIfEmailNotFound() {
+            // given
+            when(userService.readByEmail(email)).thenReturn(Optional.empty());
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> authService.inquireUsername(email));
+            
+            // then
+            assertEquals(UserErrorType.EMAIL_NOT_FOUND, exception.getErrorType());
         }
     }
 }
