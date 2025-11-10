@@ -3,6 +3,7 @@ package kr.co.yeogiga.presentation.auth.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import kr.co.yeogiga.application.auth.constant.AuthConstants;
+import kr.co.yeogiga.application.auth.dto.IdInquiryDto;
 import kr.co.yeogiga.application.auth.dto.RestoreDto;
 import kr.co.yeogiga.application.auth.dto.SignInDto;
 import kr.co.yeogiga.application.auth.dto.SignUpDto;
@@ -37,6 +38,7 @@ import java.time.LocalDate;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -662,6 +664,53 @@ public class AuthControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errors.userId").exists());
         }
+    }
+    
+    @Nested
+    @DisplayName("아이디 찾기")
+    class InquireUsername {
+        private final String email = "test@test.com";
+        private final String username = "test";
+        private final IdInquiryDto.Request request = new IdInquiryDto.Request(email);
+        private final IdInquiryDto.Response response = new IdInquiryDto.Response(username);
         
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            when(authService.inquireUsername(email)).thenReturn(response);
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    post("/api/v1/auth/id-inquiry")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsBytes(request))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.username").value(username));
+        }
+        
+        @Test
+        @DisplayName("실패 - 유효성 검증 실패")
+        void failValidation() throws Exception {
+            // given
+            IdInquiryDto.Request request = new IdInquiryDto.Request("notvalidemail");
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    post("/api/v1/auth/id-inquiry")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsBytes(request))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors.email").exists());
+            
+        }
     }
 }
