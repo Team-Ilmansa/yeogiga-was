@@ -12,6 +12,7 @@ import kr.co.yeogiga.infrastructure.fcm.response.FcmSendResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -66,9 +67,11 @@ public class FcmNotificationSender {
      * @return FCM 전송 메시지
      */
     private Message buildSilentMessage(String token, Map<String, String> data) {
+        Map<String, String> payload = new HashMap<>(data);
+        payload.put("content_available", "1");
         return Message.builder()
                 .setToken(token)
-                .putAllData(data)
+                .putAllData(payload)
                 .setApnsConfig(ApnsConfig.builder()
                         .putHeader("apns-priority", "5")
                         .putHeader("apns-push-type", "background")
