@@ -12,6 +12,7 @@ public interface CustomUserRepository {
     Optional<User> findUserIncludeDeletedById(Long id);
     Optional<User> findUserIncludeDeletedByNickname(String nickname);
     Optional<User> findUserIncludeDeletedByUsername(String username);
+    Optional<User> findUserIncludeDeletedByEmailAndUsername(String email, String username);
     List<Long> findDeletedUserIdBefore(LocalDate date);
     boolean existsIncludeDeletedByUsername(String username);
     boolean existsIncludeDeletedByNickname(String nickname);
