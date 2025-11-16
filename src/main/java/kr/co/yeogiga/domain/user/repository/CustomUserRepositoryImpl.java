@@ -197,6 +197,22 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
     }
     
     @Override
+    public boolean existsIncludeDeletedByEmailAndUsername(String email, String username) {
+        JPASQLQuery<Tuple> jpaSqlQuery = new JPASQLQuery<>(entityManager, sqlTemplates);
+        
+        Integer fetchOne = jpaSqlQuery
+                .select(Expressions.ONE)
+                .from(USER_ENTITY_PATH)
+                .where(
+                        Expressions.stringPath(USER_ENTITY_PATH, USER_COLUMN.EMAIL).eq(email),
+                        Expressions.stringPath(USER_ENTITY_PATH, USER_COLUMN.USERNAME).eq(username)
+                )
+                .fetchFirst();
+        
+        return fetchOne != null;
+    }
+    
+    @Override
     public void deleteHardAllByIdIn(List<Long> ids) {
         jpaQueryFactory
                 .delete(user)
