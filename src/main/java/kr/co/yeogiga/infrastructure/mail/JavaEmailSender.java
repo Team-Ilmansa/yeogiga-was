@@ -1,14 +1,14 @@
 package kr.co.yeogiga.infrastructure.mail;
 
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-
-import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Component
@@ -18,21 +18,24 @@ public class JavaEmailSender extends EmailSender {
     
     @Async
     @Override
-    public void send(String to, String subject, String content) {
+    public void send(String to, String subject, String html, Content... contents) {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        
         try {
-            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-            MimeMessageHelper messageHelper
-                    = new MimeMessageHelper(mimeMessage, false, StandardCharsets.UTF_8.name());
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             
-            messageHelper.setSubject(subject);
-            messageHelper.setTo(to);
-            messageHelper.setFrom(username);
-            messageHelper.setText(content, true);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setFrom(username);
+            helper.setText(html, true);
+            
+            for (Content content : contents) {
+                helper.addInline(content.contentId(), new ClassPathResource(content.contentLocation()));
+            }
             
             javaMailSender.send(mimeMessage);
-        } catch (Exception e) {
+        } catch (MessagingException e) {
             log.error("[ERROR] Failed to send mail - to: {} | subject: {} | message: {}", to, subject, e.getMessage());
         }
-        
     }
 }

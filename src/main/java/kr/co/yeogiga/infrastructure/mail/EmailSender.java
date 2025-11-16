@@ -7,5 +7,5 @@ public abstract class EmailSender {
     @Value("${spring.mail.username}")
     protected String username;
     
-    public abstract void send(String to, String subject, String content);
+    public abstract void send(String to, String subject, String html, Content... contents);
 }
