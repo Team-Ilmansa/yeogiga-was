@@ -19,6 +19,6 @@ public class UprisingPlaceQueryService {
      */
     public List<UprisingPlaceDto.Response> getAllUprisingPlaces() {
         return uprisingPlaceService.readAll().stream()
-                .map(UprisingPlaceDto.Response::fromEntity).toList();
+                .map(UprisingPlaceDto.Response::from).toList();
     }
 }
