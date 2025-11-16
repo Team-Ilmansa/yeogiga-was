@@ -14,7 +14,7 @@ public class UprisingPlaceDto {
             PlaceCategory placeCategory,
             String url
     ) {
-        public static Response fromEntity(UprisingPlace uprisingPlace) {
+        public static Response from(UprisingPlace uprisingPlace) {
             return Response.builder()
                     .id(uprisingPlace.getId())
                     .name(uprisingPlace.getName())
