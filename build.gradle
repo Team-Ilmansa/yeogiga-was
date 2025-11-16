@@ -70,6 +70,9 @@ dependencies {
     /* Java Mail */
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+    /* Thymeleaf Template Engine */
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
     /* JAXB */
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
     implementation 'com.sun.xml.bind:jaxb-impl:2.3.1'
