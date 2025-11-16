@@ -39,6 +39,12 @@ public interface PasswordApi {
                                                 "username": "아이디는 필수 입력값입니다."
                                             }
                                         }
+                                    """),
+                            @ExampleObject(name = "시간 내 비밀번호 초기화 요청 횟수 초과", value = """
+                                        {
+                                            "code": "A021",
+                                            "message": "비밀번호 초기화 요청 후 3분 이내 재요청은 불가능합니다."
+                                        }
                                     """)
                     }))
     })
