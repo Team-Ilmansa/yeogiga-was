@@ -15,4 +15,11 @@ public class PasswordResetDto {
             @NotBlank(message = "아이디는 필수 입력값입니다.")
             String username
     ) { }
+    
+    public record Reset(
+            String email,
+            String username,
+            String code,
+            String password
+    ) { }
 }
