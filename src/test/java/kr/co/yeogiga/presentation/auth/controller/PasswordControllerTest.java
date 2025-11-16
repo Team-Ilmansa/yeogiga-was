@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.mockito.Mockito.doNothing;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -96,6 +97,59 @@ public class PasswordControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errors.email").exists())
                     .andExpect(jsonPath("$.errors.username").doesNotExist());
+        }
+    }
+    
+    @Nested
+    @DisplayName("비밀번호 초기화")
+    class ResetPassword {
+        @Test
+        @DisplayName("성공")
+        void success() throws Exception {
+            // given
+            String email = "test@test.com";
+            String username = "test";
+            String code = "code";
+            String password = "password";
+            PasswordResetDto.Reset request = new PasswordResetDto.Reset(email, username, code, password);
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    patch("/api/v1/auth/password/reset")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsBytes(request))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value(SuccessResponse.ok().message()));
+        }
+        
+        @Test
+        @DisplayName("실패 - 유효성 검증 실패")
+        void failValidation() throws Exception {
+            // given
+            String email = "test@testcom";
+            String username = "";
+            String code = "code";
+            String password = "password";
+            PasswordResetDto.Reset request = new PasswordResetDto.Reset(email, username, code, password);
+            
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    patch("/api/v1/auth/password/reset")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsBytes(request))
+            );
+            
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errors.email").exists())
+                    .andExpect(jsonPath("$.errors.username").exists())
+                    .andExpect(jsonPath("$.errors.code").doesNotExist())
+                    .andExpect(jsonPath("$.errors.password").doesNotExist());
         }
     }
 }
