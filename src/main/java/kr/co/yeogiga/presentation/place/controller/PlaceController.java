@@ -1,6 +1,6 @@
 package kr.co.yeogiga.presentation.place.controller;
 
-import kr.co.yeogiga.application.place.application.PlaceSearchService;
+import kr.co.yeogiga.application.place.PlaceSearchService;
 import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.presentation.place.api.PlaceApi;
 import lombok.RequiredArgsConstructor;

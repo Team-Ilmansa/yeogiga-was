@@ -1,6 +1,6 @@
 package kr.co.yeogiga.presentation.place.controller;
 
-import kr.co.yeogiga.application.place.application.PlaceSearchService;
+import kr.co.yeogiga.application.place.PlaceSearchService;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.security.auth.CustomUserDetails;
 import kr.co.yeogiga.common.security.auth.CustomUserDetailsImpl;
