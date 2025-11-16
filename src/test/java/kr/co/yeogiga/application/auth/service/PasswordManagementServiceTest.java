@@ -45,7 +45,7 @@ public class PasswordManagementServiceTest {
     private PasswordManagementService passwordManagementService;
     
     @Nested
-    @DisplayName("패스워드 초기화 요청")
+    @DisplayName("비밀번호 초기화 요청")
     class RequestPasswordReset {
         private final String email = "test@test.com";
         private final String username = "test";
@@ -55,6 +55,7 @@ public class PasswordManagementServiceTest {
         void success() {
             // given
             when(userService.existsIncludeDeletedByEmailAndUsername(email, username)).thenReturn(true);
+            when(passwordCodeService.existsCode(email)).thenReturn(false);
             doNothing().when(passwordCodeService).save(eq(email), anyString());
             doNothing().when(passwordResetEmailSender).send(eq(email), anyString());
             
@@ -64,6 +65,21 @@ public class PasswordManagementServiceTest {
             // then
             verify(passwordCodeService, times(1)).save(eq(email), anyString());
             verify(passwordResetEmailSender, times(1)).send(eq(email), anyString());
+        }
+        
+        @Test
+        @DisplayName("실패 - 최초 요청 후 시간 내 재요청한 경우")
+        void failBecausePasswordResetTimeLimit() {
+            // given
+            when(userService.existsIncludeDeletedByEmailAndUsername(email, username)).thenReturn(true);
+            when(passwordCodeService.existsCode(email)).thenReturn(true);
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> passwordManagementService.requestPasswordReset(email, username));
+            
+            // then
+            assertEquals(AuthErrorType.PASSWORD_RESET_TIME_LIMIT, exception.getErrorType());
         }
         
         @Test
