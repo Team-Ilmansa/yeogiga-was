@@ -27,6 +27,7 @@ public class PasswordController implements PasswordApi {
         return ResponseEntity.ok(SuccessResponse.ok());
     }
     
+    @Override
     @PatchMapping("/password/reset")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody PasswordResetDto.Reset request) {
         passwordManagementService.resetPassword(request.email(), request.username(), request.code(), request.password());
