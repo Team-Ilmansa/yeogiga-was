@@ -17,9 +17,17 @@ public class PasswordResetDto {
     ) { }
     
     public record Reset(
+            @NotBlank(message = "이메일은 필수 입력값입니다.")
+            @Pattern(regexp = "^[\\w!#$%&'*+/=?`{|}~^.-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$", message = "잘못된 이메일 형식입니다.")
             String email,
+            
+            @NotBlank(message = "아이디는 필수 입력값입니다.")
             String username,
+            
+            @NotBlank(message = "비밀번호 초기화 확인용 코드는 필수 입력값입니다.")
             String code,
+            
+            @NotBlank(message = "새 비밀번호는 필수 입력값입니다.")
             String password
     ) { }
 }

@@ -7,6 +7,7 @@ import kr.co.yeogiga.common.response.success.SuccessResponse;
 import kr.co.yeogiga.presentation.auth.api.PasswordApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,13 @@ public class PasswordController implements PasswordApi {
     @PostMapping("/password/reset")
     public ResponseEntity<?> requestPasswordReset(@Valid @RequestBody PasswordResetDto.Request request) {
         passwordManagementService.requestPasswordReset(request.email(), request.username());
+        
+        return ResponseEntity.ok(SuccessResponse.ok());
+    }
+    
+    @PatchMapping("/password/reset")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody PasswordResetDto.Reset request) {
+        passwordManagementService.resetPassword(request.email(), request.username(), request.code(), request.password());
         
         return ResponseEntity.ok(SuccessResponse.ok());
     }
