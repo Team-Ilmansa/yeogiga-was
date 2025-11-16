@@ -36,6 +36,10 @@ public class PasswordManagementService {
             throw new CustomException(AuthErrorType.MISMATCHED_EMAIL_OR_USERNAME);
         }
         
+        if (passwordCodeService.existsCode(email)) {
+            throw new CustomException(AuthErrorType.PASSWORD_RESET_TIME_LIMIT);
+        }
+        
         String code = PasswordCodeGenerator.generate();
         
         passwordCodeService.save(email, code);

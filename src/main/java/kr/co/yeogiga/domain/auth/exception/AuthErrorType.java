@@ -34,7 +34,8 @@ public enum AuthErrorType implements BaseErrorType {
     
     MISMATCHED_EMAIL_OR_USERNAME(HttpStatus.BAD_REQUEST, "A018", "이메일 또는 아이디가 일치하지 않습니다."),
     PASSWORD_RESET_TIMEOUT(HttpStatus.BAD_REQUEST, "A019", "비밀번호 초기화 요청 시간이 초과하였습니다. 다시 시도해주세요."),
-    PASSWORD_CODE_MISMATCH(HttpStatus.BAD_REQUEST, "A020", "비밀번호 초기화 인증 코드가 일치하지 않습니다.");
+    PASSWORD_CODE_MISMATCH(HttpStatus.BAD_REQUEST, "A020", "비밀번호 초기화 인증 코드가 일치하지 않습니다."),
+    PASSWORD_RESET_TIME_LIMIT(HttpStatus.BAD_REQUEST, "A021", "비밀번호 초기화 요청 후 3분 이내 재요청은 불가능합니다.");
 
 
     private final HttpStatus httpStatus;
