@@ -16,4 +16,8 @@ public class PasswordCodeService {
     public String getCode(String email) {
         return passwordCodeRepository.getCode(email);
     }
+    
+    public void del(String email) {
+        passwordCodeRepository.del(email);
+    }
 }

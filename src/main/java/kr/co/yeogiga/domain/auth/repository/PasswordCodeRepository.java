@@ -4,4 +4,6 @@ public interface PasswordCodeRepository {
     void save(String email, String code);
     
     String getCode(String email);
+    
+    void del(String email);
 }

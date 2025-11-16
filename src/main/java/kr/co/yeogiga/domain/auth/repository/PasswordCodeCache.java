@@ -23,6 +23,11 @@ public class PasswordCodeCache implements PasswordCodeRepository {
         return (String) redisRepository.get(getPasswordCodeKey(email));
     }
     
+    @Override
+    public void del(String email) {
+        redisRepository.del(getPasswordCodeKey(email));
+    }
+    
     private String getPasswordCodeKey(String email) {
         return PASSWORD_CODE_KEY_FORMAT.formatted(email);
     }
