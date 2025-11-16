@@ -24,6 +24,11 @@ public class PasswordCodeCache implements PasswordCodeRepository {
     }
     
     @Override
+    public boolean existsCode(String email) {
+        return redisRepository.existed(getPasswordCodeKey(email));
+    }
+    
+    @Override
     public void del(String email) {
         redisRepository.del(getPasswordCodeKey(email));
     }

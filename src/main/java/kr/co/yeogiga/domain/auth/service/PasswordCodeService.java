@@ -17,6 +17,10 @@ public class PasswordCodeService {
         return passwordCodeRepository.getCode(email);
     }
     
+    public boolean existsCode(String email) {
+        return passwordCodeRepository.existsCode(email);
+    }
+    
     public void del(String email) {
         passwordCodeRepository.del(email);
     }
