@@ -1,4 +1,4 @@
-package kr.co.yeogiga.application.place.application;
+package kr.co.yeogiga.application.place;
 
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.trip.exception.PlaceErrorType;
