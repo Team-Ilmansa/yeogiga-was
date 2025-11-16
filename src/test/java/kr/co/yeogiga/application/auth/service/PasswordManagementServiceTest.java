@@ -3,6 +3,7 @@ package kr.co.yeogiga.application.auth.service;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
 import kr.co.yeogiga.domain.auth.service.PasswordCodeService;
+import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.service.UserService;
 import kr.co.yeogiga.infrastructure.mail.PasswordResetEmailSender;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -32,6 +37,9 @@ public class PasswordManagementServiceTest {
     
     @Mock
     private PasswordResetEmailSender passwordResetEmailSender;
+    
+    @Mock
+    private PasswordEncoder passwordEncoder;
     
     @InjectMocks
     private PasswordManagementService passwordManagementService;
@@ -70,6 +78,79 @@ public class PasswordManagementServiceTest {
             
             // then
             assertEquals(AuthErrorType.MISMATCHED_EMAIL_OR_USERNAME, exception.getErrorType());
+        }
+    }
+    
+    @Nested
+    @DisplayName("비밀번호 초기화")
+    class ResetPassword {
+        private final String email = "test@test.com";
+        private final String username = "username";
+        private final String code = UUID.randomUUID().toString();
+        private final String newPassword = "newPassword";
+        
+        @Test
+        @DisplayName("성공")
+        void success() {
+            // given
+            User user = User.builder().build();
+            String encryptedPassword = "encrypted-newPassword";
+            when(userService.readIncludeDeletedUserByEmailAndUsername(email, username)).thenReturn(Optional.of(user));
+            when(passwordCodeService.getCode(email)).thenReturn(code);
+            when(passwordEncoder.encode(newPassword)).thenReturn(encryptedPassword);
+            doNothing().when(passwordCodeService).del(email);
+            
+            // then
+            passwordManagementService.resetPassword(email, username, code, newPassword);
+            
+            // then
+            assertEquals(encryptedPassword, user.getPassword());
+        }
+        
+        @Test
+        @DisplayName("실패 - 이메일 또는 아이디 불일치")
+        void failIfEmailAndUsernameMismatch() {
+            // given
+            when(userService.readIncludeDeletedUserByEmailAndUsername(email, username)).thenReturn(Optional.empty());
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> passwordManagementService.resetPassword(email, username, code, newPassword));
+            
+            // then
+            assertEquals(AuthErrorType.MISMATCHED_EMAIL_OR_USERNAME, exception.getErrorType());
+        }
+        
+        @Test
+        @DisplayName("실패 - 비밀번호 초기화 인증 시간 초과")
+        void failIfPasswordResetTimeout() {
+            // given
+            User user = User.builder().build();
+            when(userService.readIncludeDeletedUserByEmailAndUsername(email, username)).thenReturn(Optional.of(user));
+            when(passwordCodeService.getCode(email)).thenReturn(null);
+            
+            // when
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> passwordManagementService.resetPassword(email, username, code, newPassword));
+            
+            // then
+            assertEquals(AuthErrorType.PASSWORD_RESET_TIMEOUT, exception.getErrorType());
+        }
+        
+        @Test
+        @DisplayName("실패 - 비밀번호 초기화 확인용 코드 불일치")
+        void failIfPasswordCodeMismatch() {
+            // given
+            User user = User.builder().build();
+            when(userService.readIncludeDeletedUserByEmailAndUsername(email, username)).thenReturn(Optional.of(user));
+            when(passwordCodeService.getCode(email)).thenReturn("mismatch-password");
+            
+            // then
+            CustomException exception = assertThrows(CustomException.class, ()
+                    -> passwordManagementService.resetPassword(email, username, code, newPassword));
+            
+            // then
+            assertEquals(AuthErrorType.PASSWORD_CODE_MISMATCH, exception.getErrorType());
         }
     }
 }
