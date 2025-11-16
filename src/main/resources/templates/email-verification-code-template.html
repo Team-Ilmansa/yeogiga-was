@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>인증 코드</title>
+</head>
+<body style="margin: 0; padding: 0; display: flex; justify-content: center; align-content: center;">
+    <div style="display: flex; justify-content: center">
+        <div style="border-radius: 6px; border: 1px solid #F0F0F0; padding: 40px 30px; max-width: 420px;">
+            <div style="margin-bottom: 30px;">
+                <img src="cid:logo" alt="yeogiga-logo">
+            </div>
+
+            <div style="font-weight: bold; font-size: 32px; margin-bottom: 30px;">
+                이메일 인증코드를<br/>
+                확인해주세요
+            </div>
+
+            <div style="margin-bottom: 50px; line-height: 1.5em;">
+                아래 인증코드 6자리를 진행 중인 화면에 입력하여 이메일 인증을 완료해주세요.
+            </div>
+
+            <div
+                 th:text="${code}"
+                 style="
+                    border-radius: 6px;
+                    border: none;
+                    background-color: #F0F0F0;
+                    color: #535353;
+                    padding: 17px 0;
+                    margin-bottom: 50px;
+                    text-align: center;
+                    font-size: 25px;
+                 "
+            >
+                917557
+            </div>
+
+            <div style="line-height: 1.5em; color: #888888">
+                • 인증코드는 3분 동안 유효합니다.<br/>
+                • 본 메일은 발신 전용입니다.
+            </div>
+
+            <div style="text-align: right; color: #444444">
+                일로만난사이
+            </div>
+        </div>
+    </div>
+</body>
+</html>
