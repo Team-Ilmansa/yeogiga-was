@@ -42,6 +42,10 @@ public class UserService {
     public Optional<User> readIncludeDeletedUserByPlatformAndPlatformId(OAuthPlatform platform, String platformId) {
         return userRepository.findUserIncludeDeletedByPlatformAndPlatformId(platform.name(), platformId);
     }
+    
+    public Optional<User> readIncludeDeletedUserByEmailAndUsername(String email, String username) {
+        return userRepository.findUserIncludeDeletedByEmailAndUsername(email, username);
+    }
 
     public List<Long> readDeletedUserIdBefore(LocalDate date) {
         return userRepository.findDeletedUserIdBefore(date);
@@ -64,6 +68,10 @@ public class UserService {
 
     public boolean existsIncludeDeletedByEmail(String email) {
         return userRepository.existsIdIncludeDeletedByEmail(email);
+    }
+    
+    public boolean existsIncludeDeletedByEmailAndUsername(String email, String username) {
+        return userRepository.existsIncludeDeletedByEmailAndUsername(email, username);
     }
 
     public void deleteById(Long userId) {

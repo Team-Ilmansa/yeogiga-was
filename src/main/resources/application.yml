@@ -68,6 +68,8 @@ spring:
         auth: true
         starttls:
           enable: true
+mail:
+  password-reset-url: ${PASSWORD_RESET_URL}
 
 --- # map
 map:
