@@ -43,7 +43,7 @@ public class TripMemberLocationCommandService {
         String subKey = TripMemberLocationConstant.tripMemberLocationSubKey(userId);
 
         redisRepository.setHash(key, subKey, location.toStoredFormat(userId));
-        redisRepository.setHashExpire(key, subKey, Duration.ofHours(1));
+        redisRepository.setHashExpire(key, subKey, Duration.ofDays(1));
 
         // TODO : 여행 방장 ID 및 여행 시간을 캐싱하여 DB로의 조회를 최소화
         Trip trip = tripService.readById(tripId)
