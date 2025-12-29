@@ -89,6 +89,9 @@ dependencies {
 
     /* Sentry */
     implementation 'io.sentry:sentry-spring-boot-starter-jakarta:8.21.0'
+
+    /* ULID */
+    implementation 'com.github.f4b6a3:ulid-creator:5.2.3'
 }
 
 tasks.named('test') {
