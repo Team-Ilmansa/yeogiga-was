@@ -1,10 +1,11 @@
 package kr.co.yeogiga.application.auth.service;
 
+import kr.co.yeogiga.application.auth.event.EmailVerificationEvent;
+import kr.co.yeogiga.application.event.publisher.DomainEventPublisher;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
 import kr.co.yeogiga.domain.auth.repository.VerificationCodeCache;
 import kr.co.yeogiga.domain.user.service.UserService;
-import kr.co.yeogiga.infrastructure.mail.VerificationCodeEmailSender;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -31,10 +33,10 @@ public class VerificationCodeServiceTest {
     private VerificationCodeCache verificationCodeCache;
     
     @Mock
-    private VerificationCodeEmailSender verificationCodeEmailSender;
+    private UserService userService;
     
     @Mock
-    private UserService userService;
+    private DomainEventPublisher eventPublisher;
     
     @InjectMocks
     private VerificationCodeService verificationCodeService;
@@ -52,14 +54,14 @@ public class VerificationCodeServiceTest {
             when(userService.existsIncludeDeletedByEmail(anyString())).thenReturn(false);
             doNothing().when(verificationCodeCache).save(anyString(), anyString());
             when(verificationCodeCache.getExpire(anyString())).thenReturn(-1L);
-            doNothing().when(verificationCodeEmailSender).send(anyString(), anyString());
+            doNothing().when(eventPublisher).publish(any(EmailVerificationEvent.class));
             
             // when
             verificationCodeService.issueCode(email);
             
             // then
             verify(verificationCodeCache, times(1)).save(eq(email), anyString());
-            verify(verificationCodeEmailSender, times(1)).send(eq(email), anyString());
+            verify(eventPublisher, times(1)).publish(any(EmailVerificationEvent.class));
         }
         
         @Test
