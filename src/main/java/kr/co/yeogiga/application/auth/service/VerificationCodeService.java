@@ -1,30 +1,34 @@
 package kr.co.yeogiga.application.auth.service;
 
+import kr.co.yeogiga.application.auth.event.EmailVerificationEvent;
+import kr.co.yeogiga.application.event.publisher.DomainEventPublisher;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.common.util.VerificationCodeGenerator;
 import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
 import kr.co.yeogiga.domain.auth.repository.VerificationCodeRepository;
 import kr.co.yeogiga.domain.user.service.UserService;
-import kr.co.yeogiga.infrastructure.mail.VerificationCodeEmailSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
 public class VerificationCodeService {
     private final VerificationCodeRepository verificationCodeRepository;
-    private final VerificationCodeEmailSender verificationCodeEmailSender;
     private final UserService userService;
+    private final DomainEventPublisher eventPublisher;
     
     private final Long VERIFICATION_CODE_SEND_TIME_LIMIT = 2 * 60L;
     
     /**
      * 사용자가 인증 요청한 이메일로 인증 번호를 발송하는 메서드
+     *
      * @throws CustomException AuthErrorType.ALREADY_USED_EMAIL - 이미 사용 중인 이메일일 경우
      * @throws CustomException AuthErrorType.EMAIL_VERIFICATION_TIME_LIMIT - 이메일 인증 시도 횟수 초과 (1분 이내 재요청)
      *
      * @param email 인증 요청 이메일
      */
+    @Transactional
     public void issueCode(String email) {
         if (userService.existsIncludeDeletedByEmail(email)) {
             throw new CustomException(AuthErrorType.ALREADY_USED_EMAIL);
@@ -38,7 +42,8 @@ public class VerificationCodeService {
         }
         
         verificationCodeRepository.save(email, code);
-        verificationCodeEmailSender.send(email, code);
+        
+        eventPublisher.publish(new EmailVerificationEvent(email, code));
     }
     
     /**

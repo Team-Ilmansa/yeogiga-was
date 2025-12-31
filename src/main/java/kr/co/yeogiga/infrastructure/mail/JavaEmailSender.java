@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
 public class JavaEmailSender extends EmailSender {
     private final JavaMailSender javaMailSender;
     
-    @Async
     @Override
     public void send(String to, String subject, String html, Content... contents) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
@@ -32,7 +30,6 @@ public class JavaEmailSender extends EmailSender {
             for (Content content : contents) {
                 helper.addInline(content.contentId(), new ClassPathResource(content.contentLocation()));
             }
-            
             javaMailSender.send(mimeMessage);
         } catch (MessagingException e) {
             log.error("[ERROR] Failed to send mail - to: {} | subject: {} | message: {}", to, subject, e.getMessage());

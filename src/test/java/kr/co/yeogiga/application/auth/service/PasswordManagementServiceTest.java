@@ -1,11 +1,12 @@
 package kr.co.yeogiga.application.auth.service;
 
+import kr.co.yeogiga.application.auth.event.PasswordResetEvent;
+import kr.co.yeogiga.application.event.publisher.DomainEventPublisher;
 import kr.co.yeogiga.common.exception.CustomException;
 import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
 import kr.co.yeogiga.domain.auth.service.PasswordCodeService;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.service.UserService;
-import kr.co.yeogiga.infrastructure.mail.PasswordResetEmailSender;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -36,7 +38,7 @@ public class PasswordManagementServiceTest {
     private PasswordCodeService passwordCodeService;
     
     @Mock
-    private PasswordResetEmailSender passwordResetEmailSender;
+    public DomainEventPublisher eventPublisher;
     
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -57,14 +59,14 @@ public class PasswordManagementServiceTest {
             when(userService.existsIncludeDeletedByEmailAndUsername(email, username)).thenReturn(true);
             when(passwordCodeService.existsCode(email)).thenReturn(false);
             doNothing().when(passwordCodeService).save(eq(email), anyString());
-            doNothing().when(passwordResetEmailSender).send(eq(email), anyString());
+            doNothing().when(eventPublisher).publish(any(PasswordResetEvent.class));
             
             // when
             passwordManagementService.requestPasswordReset(email, username);
             
             // then
             verify(passwordCodeService, times(1)).save(eq(email), anyString());
-            verify(passwordResetEmailSender, times(1)).send(eq(email), anyString());
+            verify(eventPublisher, times(1)).publish(any(PasswordResetEvent.class));
         }
         
         @Test
