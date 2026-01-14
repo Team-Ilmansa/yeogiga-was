@@ -87,3 +87,23 @@ weather:
   num-of-rows: ${WEATHER_NUM}
   data-type: ${WEATHER_DATA_TYPE}
 
+--- # rabbitMQ
+spring:
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username : ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+    publisher-confirm-type: correlated
+
+rabbitmq:
+  password-reset:
+      queue: ${RABBITMQ_PASSWORD_RESET_QUEUE}
+      exchange: ${RABBITMQ_PASSWORD_RESET_EXCHANGE}
+      routing-key: ${RABBITMQ_PASSWORD_RESET_ROUTING_KEY}
+      ttl: ${RABBITMQ_PASSWORD_RESET_TTL}
+  email-verification:
+      queue: ${RABBITMQ_EMAIL_VERIFICATION_QUEUE}
+      exchange: ${RABBITMQ_EMAIL_VERIFICATION_EXCHANGE}
+      routing-key: ${RABBITMQ_EMAIL_VERIFICATION_ROUTING_KEY}
+      ttl: ${RABBITMQ_EMAIL_VERIFICATION_TTL}
