@@ -2,9 +2,12 @@ package kr.co.yeogiga.infrastructure.mail;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import kr.co.yeogiga.infrastructure.mail.exception.FatalEmailException;
+import kr.co.yeogiga.infrastructure.mail.exception.RetryableEmailException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -32,7 +35,9 @@ public class JavaEmailSender extends EmailSender {
             }
             javaMailSender.send(mimeMessage);
         } catch (MessagingException e) {
-            log.error("[ERROR] Failed to send mail - to: {} | subject: {} | message: {}", to, subject, e.getMessage());
+            throw new FatalEmailException("Failed to send email (Fatal)", e);
+        } catch (MailException e) {
+            throw new RetryableEmailException("Failed to send email (Retryable)", e);
         }
     }
 }
