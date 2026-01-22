@@ -1,7 +1,7 @@
 package kr.co.yeogiga.application.auth.event.listener;
 
 import kr.co.yeogiga.application.auth.event.PasswordResetEvent;
-import kr.co.yeogiga.application.event.listener.DomainEventListener;
+import kr.co.yeogiga.application.event.listener.DomainEventListenerLegacy;
 import kr.co.yeogiga.infrastructure.mail.PasswordResetEmailSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
@@ -13,7 +13,7 @@ import static kr.co.yeogiga.infrastructure.config.AsyncConfig.EMAIL_TASK_EXECUTO
 
 @Component
 @RequiredArgsConstructor
-public class PasswordResetEventEmailListener extends DomainEventListener<PasswordResetEvent> {
+public class PasswordResetEventEmailListenerLegacy extends DomainEventListenerLegacy<PasswordResetEvent> {
     private final PasswordResetEmailSender passwordResetEmailSender;
     
     @Override
