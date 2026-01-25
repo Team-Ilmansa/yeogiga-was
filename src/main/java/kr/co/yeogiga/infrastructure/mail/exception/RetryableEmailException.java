@@ -1,6 +1,8 @@
 package kr.co.yeogiga.infrastructure.mail.exception;
 
-public class RetryableEmailException extends EmailException {
+import kr.co.yeogiga.infrastructure.event.exception.RetryableException;
+
+public class RetryableEmailException extends RetryableException {
     public RetryableEmailException(String message, Throwable cause) {
         super(message, cause);
     }

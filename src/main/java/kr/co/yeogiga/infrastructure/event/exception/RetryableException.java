@@ -1,7 +1,7 @@
-package kr.co.yeogiga.infrastructure.mail.exception;
+package kr.co.yeogiga.infrastructure.event.exception;
 
-public abstract class EmailException extends RuntimeException {
-    public EmailException(String message, Throwable cause) {
+public abstract class RetryableException extends RuntimeException {
+    public RetryableException(String message, Throwable cause) {
         super(message, cause);
     }
     
