@@ -33,7 +33,7 @@ public class PasswordResetEmailConsumer extends AbstractRabbitEventConsumer<Pass
         this.DEAD_LETTER_ROUTING_KEY = rabbitMQProperties.getPasswordReset().getRoutingKey() + ".email.dead";
     }
     
-    @RabbitListener(queues = "#{passwordResetRabbitMQConfig.passwordResetEmailWorkQueue.name}", containerFactory = "simpleRabbitListenerContainerFactory")
+    @RabbitListener(queues = "#{passwordResetRabbitMQConfig.passwordResetEmailWorkQueue.name}", containerFactory = "emailRabbitListenerContainerFactory")
     public void handleMessage(@Payload PasswordResetEvent event, @Header(name = "x-death", required = false) List<Map<String, Object>> xDeath) {
         super.handleEvent(event, xDeath);
     }

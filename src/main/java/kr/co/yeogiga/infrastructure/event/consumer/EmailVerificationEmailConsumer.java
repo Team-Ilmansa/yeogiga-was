@@ -33,7 +33,7 @@ public class EmailVerificationEmailConsumer extends AbstractRabbitEventConsumer<
         this.DEAD_LETTER_ROUTING_KEY = rabbitMQProperties.getEmailVerification().getRoutingKey() + ".email.dead";
     }
     
-    @RabbitListener(queues = "#{emailVerificationRabbitMQConfig.emailVerificationEmailWorkQueue.name}", containerFactory = "simpleRabbitListenerContainerFactory")
+    @RabbitListener(queues = "#{emailVerificationRabbitMQConfig.emailVerificationEmailWorkQueue.name}", containerFactory = "emailRabbitListenerContainerFactory")
     public void handleMessage(@Payload EmailVerificationEvent event, @Header(name = "x-death", required = false) List<Map<String, Object>> xDeath) {
         super.handleEvent(event, xDeath);
     }
