@@ -30,7 +30,7 @@ public class RabbitMQPropertyResolver {
         }
         
         if (event instanceof EmailVerificationEvent) {
-            return properties.getEmailVerification().getExchange() + ".requested";
+            return properties.getEmailVerification().getRoutingKey() + ".requested";
         }
         
         throw new IllegalArgumentException("Unsupported event: " + event.getClass().getSimpleName());
