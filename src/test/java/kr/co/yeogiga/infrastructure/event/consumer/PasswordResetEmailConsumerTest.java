@@ -49,7 +49,7 @@ public class PasswordResetEmailConsumerTest {
     
     @BeforeEach
     void setUp() {
-        when(rabbitMQProperties.getEmailVerification()).thenReturn(passwordResetProperties);
+        when(rabbitMQProperties.getPasswordReset()).thenReturn(passwordResetProperties);
         when(passwordResetProperties.getQueue()).thenReturn(WORK_QUEUE);
         when(passwordResetProperties.getExchange()).thenReturn(DLX);
         when(passwordResetProperties.getRoutingKey()).thenReturn(DLK);
