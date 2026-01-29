@@ -27,7 +27,7 @@ public class DomainEventPublishListener implements DomainEventListener {
         eventExternalPublisher.publish(event)
                 .thenAcceptAsync(result -> {
                     if (result.isSuccess()) {
-                        eventOutboxService.updateToDoneByEventId(result.eventId());
+                        eventOutboxService.updateToPublishedByEventId(result.eventId());
                     } else {
                         eventOutboxService.updateToFailedByEventId(result.eventId());
                     }
