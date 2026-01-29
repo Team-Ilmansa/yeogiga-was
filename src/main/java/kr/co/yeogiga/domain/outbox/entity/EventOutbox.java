@@ -60,7 +60,7 @@ public class EventOutbox {
                 .eventId(event.getEventId())
                 .eventType(event.getClass().getName())
                 .payload(payload)
-                .createdAt(event.getCreatedAt())
+                .createdAt(event.getCreatedAt().toLocalDateTime())
                 .build();
     }
 }
