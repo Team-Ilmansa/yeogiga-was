@@ -7,4 +7,5 @@ import java.util.concurrent.CompletableFuture;
 
 public interface DomainEventExternalPublisher {
     CompletableFuture<EventPublishResult> publish(DomainEvent event);
+    CompletableFuture<EventPublishResult> publishRaw(String eventId, String eventType, String payload);
 }
