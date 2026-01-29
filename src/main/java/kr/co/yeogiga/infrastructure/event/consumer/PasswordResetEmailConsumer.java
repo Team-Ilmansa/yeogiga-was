@@ -11,6 +11,8 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +37,10 @@ public class PasswordResetEmailConsumer extends AbstractRabbitEventConsumer<Pass
     
     @RabbitListener(queues = "#{passwordResetRabbitMQConfig.passwordResetEmailWorkQueue.name}", containerFactory = "emailRabbitListenerContainerFactory")
     public void handleMessage(@Payload PasswordResetEvent event, @Header(name = "x-death", required = false) List<Map<String, Object>> xDeath) {
+        if (event.getExpiredAt().isBefore(ZonedDateTime.now(ZoneId.of("Asia/Seoul")))) {
+            log.warn("[EVENT DROPPED] Event \"{}\" expired.", event.getEventId());
+            return;
+        }
         super.handleEvent(event, xDeath);
     }
     
@@ -61,7 +67,7 @@ public class PasswordResetEmailConsumer extends AbstractRabbitEventConsumer<Pass
     
     @Override
     protected void dead(PasswordResetEvent event, RuntimeException e) {
-        log.error("[DEAD-LETTER] Message \"{}\" moved to DLQ. = {}", event.getEventId(), e.getMessage());
+        log.error("[DEAD-LETTER] Message \"{}\" moved to DLQ. - {}", event.getEventId(), e.getMessage());
         rabbitTemplate.convertAndSend(
                 DEAD_LETTER_EXCHANGE,
                 DEAD_LETTER_ROUTING_KEY,
