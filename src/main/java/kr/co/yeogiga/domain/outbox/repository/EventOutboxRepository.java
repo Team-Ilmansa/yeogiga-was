@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-public interface EventOutboxRepository extends JpaRepository<EventOutbox, Long> {
+public interface EventOutboxRepository extends JpaRepository<EventOutbox, Long>, CustomEventOutboxRepository {
     @Modifying
     @Query(value = "UPDATE event_outbox " +
                    "SET status = 'PUBLISHED' " +
