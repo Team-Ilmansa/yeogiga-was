@@ -102,7 +102,7 @@ public class RabbitMQEventPublisherTest {
         EventPublishResult eventPublishResult = result.get();
         assertFalse(eventPublishResult.isSuccess());
         assertThat(eventPublishResult.eventId()).isEqualTo(eventId);
-        assertEquals(eventPublishResult.cause(), "NACK");
+        assertEquals("NACK", eventPublishResult.cause());
     }
     
     @Test
@@ -122,6 +122,6 @@ public class RabbitMQEventPublisherTest {
         EventPublishResult eventPublishResult = result.get();
         assertFalse(eventPublishResult.isSuccess());
         assertThat(eventPublishResult.eventId()).isEqualTo(eventId);
-        assertEquals(eventPublishResult.cause(), "Unexpected Exception");
+        assertEquals("Unexpected Exception", eventPublishResult.cause());
     }
 }
