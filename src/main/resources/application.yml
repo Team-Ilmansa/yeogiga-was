@@ -107,3 +107,9 @@ rabbitmq:
       exchange: ${RABBITMQ_EMAIL_VERIFICATION_EXCHANGE}
       routing-key: ${RABBITMQ_EMAIL_VERIFICATION_ROUTING_KEY}
       ttl: ${RABBITMQ_EMAIL_VERIFICATION_TTL}
+
+--- # auth
+auth:
+  expiration:
+    password-reset: ${PASSWORD_RESET_EXPIRATION}
+    email-verification: ${EMAIL_VERIFICATION_EXPIRATION}
