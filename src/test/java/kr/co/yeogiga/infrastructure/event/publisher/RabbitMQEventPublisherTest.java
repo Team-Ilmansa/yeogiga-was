@@ -42,7 +42,9 @@ public class RabbitMQEventPublisherTest {
     @InjectMocks
     private RabbitMQEventPublisher rabbitMQEventPublisher;
     
-    private DomainEvent event = new PasswordResetEvent("test@test.com", "123456");
+    private final int PASSWORD_RESET_EXPIRATION = 180;
+    
+    private DomainEvent event = new PasswordResetEvent("test@test.com", "123456", PASSWORD_RESET_EXPIRATION);
     private String eventId = "01KFQ007TN82P4155GX1X0T6SJ";
     
     @Captor
