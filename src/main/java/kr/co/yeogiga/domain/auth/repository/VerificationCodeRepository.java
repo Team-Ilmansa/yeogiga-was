@@ -3,7 +3,7 @@ package kr.co.yeogiga.domain.auth.repository;
 import java.util.Optional;
 
 public interface VerificationCodeRepository {
-    void save(String email, String code);
+    void save(String email, String code, int duration);
     
     Optional<String> getCode(String email);
     

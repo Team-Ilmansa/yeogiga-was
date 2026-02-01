@@ -47,6 +47,8 @@ public class EmailVerificationEmailConsumerTest {
     private final String DLX = "x.email-verification";
     private final String DLK = "email-verification";
     
+    private final int EMAIL_VERIFICATION_EXPIRATION = 180;
+    
     @BeforeEach
     void setUp() {
         when(rabbitMQProperties.getEmailVerification()).thenReturn(emailVerificationProperties);
@@ -61,7 +63,7 @@ public class EmailVerificationEmailConsumerTest {
     @DisplayName("성공 - 메시지 수신 후 이메일 발행 성공")
     void success() {
         // given
-        EmailVerificationEvent event = new EmailVerificationEvent("test@test.com", "123456");
+        EmailVerificationEvent event = new EmailVerificationEvent("test@test.com", "123456", EMAIL_VERIFICATION_EXPIRATION);
         
         // when
         consumer.handleMessage(event, null);
@@ -74,7 +76,7 @@ public class EmailVerificationEmailConsumerTest {
     @DisplayName("실패 - 재시도 가능한 예외가 발생한 경우")
     void failRetry() {
         // given
-        EmailVerificationEvent event = new EmailVerificationEvent("test@test.com", "123456");
+        EmailVerificationEvent event = new EmailVerificationEvent("test@test.com", "123456", EMAIL_VERIFICATION_EXPIRATION);
         
         MailException mockMailException = mock(MailException.class);
         doThrow(new RetryableEmailException("Retryable Exception", mockMailException)).when(emailSender)
@@ -92,7 +94,7 @@ public class EmailVerificationEmailConsumerTest {
     @DisplayName("실패 - 재시도 최대 횟수(3회) 초과하여 DLQ로 이동하는 경우")
     void failRetryExceed() {
         // given
-        EmailVerificationEvent event = new EmailVerificationEvent("test@test.com", "123456");
+        EmailVerificationEvent event = new EmailVerificationEvent("test@test.com", "123456", EMAIL_VERIFICATION_EXPIRATION);
         List<Map<String, Object>> xDeath = List.of(Map.of(
                 "reason", "rejected",
                 "queue", WORK_QUEUE + ".email",
@@ -114,7 +116,7 @@ public class EmailVerificationEmailConsumerTest {
     @DisplayName("실패 - 재시도가 불가능한 예외가 발생한 경우")
     void failFatal() {
         // given
-        EmailVerificationEvent event = new EmailVerificationEvent("test@test.com", "123456");
+        EmailVerificationEvent event = new EmailVerificationEvent("test@test.com", "123456", EMAIL_VERIFICATION_EXPIRATION);
         
         MessagingException mockMessagingException = mock(MessagingException.class);
         doThrow((new FatalEmailException("Fatal Exception", mockMessagingException)))

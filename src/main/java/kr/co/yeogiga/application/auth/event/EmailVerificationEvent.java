@@ -11,10 +11,10 @@ public class EmailVerificationEvent extends DomainEvent {
     private final String code;
     private final ZonedDateTime expiredAt;
     
-    public EmailVerificationEvent(String email, String code) {
+    public EmailVerificationEvent(String email, String code, int expiration) {
         super();
         this.email = email;
         this.code = code;
-        this.expiredAt = getCreatedAt().plusMinutes(3);
+        this.expiredAt = getCreatedAt().plusSeconds(expiration);
     }
 }

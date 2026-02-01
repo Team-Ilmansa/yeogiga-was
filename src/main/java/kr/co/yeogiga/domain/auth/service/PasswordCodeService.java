@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 public class PasswordCodeService {
     private final PasswordCodeRepository passwordCodeRepository;
     
-    public void save(String email, String code) {
-        passwordCodeRepository.save(email, code);
+    public void save(String email, String code, int expiration) {
+        passwordCodeRepository.save(email, code, expiration);
     }
     
     public String getCode(String email) {

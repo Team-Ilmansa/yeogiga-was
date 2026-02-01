@@ -9,6 +9,7 @@ import kr.co.yeogiga.domain.auth.service.PasswordCodeService;
 import kr.co.yeogiga.domain.user.entity.User;
 import kr.co.yeogiga.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,9 @@ public class PasswordManagementService {
     private final PasswordCodeService passwordCodeService;
     private final PasswordEncoder passwordEncoder;
     private final DomainEventPublisher eventPublisher;
+    
+    @Value("${auth.expiration.password-reset}")
+    private int passwordResetExpiration;
     
     /**
      * 비밀번호 초기화 요청 메서드
@@ -45,9 +49,9 @@ public class PasswordManagementService {
         }
         
         String code = PasswordCodeGenerator.generate();
-        passwordCodeService.save(email, code);
+        passwordCodeService.save(email, code, passwordResetExpiration);
         
-        eventPublisher.publish(new PasswordResetEvent(email, code));
+        eventPublisher.publish(new PasswordResetEvent(email, code, passwordResetExpiration));
     }
     
     /**
