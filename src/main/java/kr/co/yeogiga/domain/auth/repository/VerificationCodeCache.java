@@ -13,12 +13,10 @@ import java.util.Optional;
 public class VerificationCodeCache implements VerificationCodeRepository {
     private final RedisRepository redisRepository;
     
-    private final Duration DURATION = Duration.ofMinutes(3);
-    
     @Override
-    public void save(String email, String code) {
+    public void save(String email, String code, int duration) {
         String key = MailConstant.formatVerificationCodePrefix(email);
-        redisRepository.set(key, code, DURATION);
+        redisRepository.set(key, code, Duration.ofSeconds(duration));
     }
     
     @Override

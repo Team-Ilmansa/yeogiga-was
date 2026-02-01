@@ -8,6 +8,7 @@ import kr.co.yeogiga.domain.auth.exception.AuthErrorType;
 import kr.co.yeogiga.domain.auth.repository.VerificationCodeRepository;
 import kr.co.yeogiga.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,9 @@ public class VerificationCodeService {
     private final DomainEventPublisher eventPublisher;
     
     private final Long VERIFICATION_CODE_SEND_TIME_LIMIT = 2 * 60L;
+    
+    @Value("${auth.expiration.email-verification}")
+    private int emailVerificationExpiration;
     
     /**
      * 사용자가 인증 요청한 이메일로 인증 번호를 발송하는 메서드
@@ -41,9 +45,9 @@ public class VerificationCodeService {
             throw new CustomException(AuthErrorType.EMAIL_VERIFICATION_TIME_LIMIT);
         }
         
-        verificationCodeRepository.save(email, code);
+        verificationCodeRepository.save(email, code, emailVerificationExpiration);
         
-        eventPublisher.publish(new EmailVerificationEvent(email, code));
+        eventPublisher.publish(new EmailVerificationEvent(email, code, emailVerificationExpiration));
     }
     
     /**
