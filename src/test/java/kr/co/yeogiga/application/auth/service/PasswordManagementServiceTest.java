@@ -22,6 +22,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -58,14 +59,14 @@ public class PasswordManagementServiceTest {
             // given
             when(userService.existsIncludeDeletedByEmailAndUsername(email, username)).thenReturn(true);
             when(passwordCodeService.existsCode(email)).thenReturn(false);
-            doNothing().when(passwordCodeService).save(eq(email), anyString());
+            doNothing().when(passwordCodeService).save(eq(email), anyString(), anyInt());
             doNothing().when(eventPublisher).publish(any(PasswordResetEvent.class));
             
             // when
             passwordManagementService.requestPasswordReset(email, username);
             
             // then
-            verify(passwordCodeService, times(1)).save(eq(email), anyString());
+            verify(passwordCodeService, times(1)).save(eq(email), anyString(), anyInt());
             verify(eventPublisher, times(1)).publish(any(PasswordResetEvent.class));
         }
         

@@ -19,6 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -52,7 +53,7 @@ public class VerificationCodeServiceTest {
         void success() {
             // given
             when(userService.existsIncludeDeletedByEmail(anyString())).thenReturn(false);
-            doNothing().when(verificationCodeCache).save(anyString(), anyString());
+            doNothing().when(verificationCodeCache).save(anyString(), anyString(), anyInt());
             when(verificationCodeCache.getExpire(anyString())).thenReturn(-1L);
             doNothing().when(eventPublisher).publish(any(EmailVerificationEvent.class));
             
@@ -60,7 +61,7 @@ public class VerificationCodeServiceTest {
             verificationCodeService.issueCode(email);
             
             // then
-            verify(verificationCodeCache, times(1)).save(eq(email), anyString());
+            verify(verificationCodeCache, times(1)).save(eq(email), anyString(), anyInt());
             verify(eventPublisher, times(1)).publish(any(EmailVerificationEvent.class));
         }
         
