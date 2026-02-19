@@ -39,6 +39,33 @@ public class CustomEventOutboxRepositoryImpl implements CustomEventOutboxReposit
     }
     
     @Override
+    public List<Long> findIdsByStatusAndCreatedAtBefore(EventOutboxStatus status, LocalDateTime dateTime, long limit) {
+        return jpaQueryFactory
+                .select(eventOutbox.id)
+                .from(eventOutbox)
+                .where(
+                        eventOutbox.status.eq(status),
+                        eventOutbox.createdAt.before(dateTime)
+                )
+                .limit(limit)
+                .fetch();
+    }
+
+    @Override
+    public List<Long> findIdsByStatusAndCreatedAtBeforeAndFailCountGreaterThanEqual(EventOutboxStatus status, int failCount, LocalDateTime dateTime, long limit) {
+        return jpaQueryFactory
+                .select(eventOutbox.id)
+                .from(eventOutbox)
+                .where(
+                        eventOutbox.status.eq(status),
+                        eventOutbox.failCount.goe(failCount),
+                        eventOutbox.createdAt.before(dateTime)
+                )
+                .limit(limit)
+                .fetch();
+    }
+    
+    @Override
     public void updateStatusPublishedInEventIds(List<String> eventIds) {
         if (eventIds.isEmpty()) return;
         
@@ -61,6 +88,13 @@ public class CustomEventOutboxRepositoryImpl implements CustomEventOutboxReposit
                 .execute();
     }
     
+    @Override
+    public void deleteByIds(List<Long> ids) {
+        jpaQueryFactory
+                .delete(eventOutbox)
+                .where(eventOutbox.id.in(ids))
+                .execute();
+    }
     
     private BooleanExpression createdAtBetween(LocalDateTime start, LocalDateTime end) {
         if (start == null && end == null) return null;

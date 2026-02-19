@@ -59,4 +59,25 @@ public class EventOutboxService {
     public void updateToFailedByEventId(String eventId) {
         eventOutboxRepository.updateStatusFailedByEventId(eventId);
     }
+
+    @Transactional(readOnly = true)
+    public List<Long> findOldPublishedEventIds(LocalDateTime dateTime, long limit) {
+        return eventOutboxRepository.findIdsByStatusAndCreatedAtBefore(EventOutboxStatus.PUBLISHED, dateTime, limit);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> findOldFailedEventIds(int failCount, LocalDateTime dateTime, long limit) {
+        return eventOutboxRepository.findIdsByStatusAndCreatedAtBeforeAndFailCountGreaterThanEqual(EventOutboxStatus.FAILED, failCount, dateTime, limit);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> findOldWaitingEventIds(LocalDateTime dateTime, long limit) {
+        return eventOutboxRepository.findIdsByStatusAndCreatedAtBefore(EventOutboxStatus.WAITING, dateTime, limit);
+    }
+
+    @Transactional
+    public void deleteByIds(List<Long> ids) {
+        if (ids.isEmpty()) return;
+        eventOutboxRepository.deleteByIds(ids);
+    }
 }
