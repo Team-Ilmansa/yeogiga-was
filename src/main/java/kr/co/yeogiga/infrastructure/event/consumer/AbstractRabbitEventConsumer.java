@@ -73,7 +73,7 @@ public abstract class AbstractRabbitEventConsumer<T extends DomainEvent> {
      *
      * <p> 해당 이벤트가 만료 기한이 존재하는 {@link ExpirableEvent}이고, 만료 기한이 지난 경우 처리를 진행하지 않는다.
      *
-     * <p> {@link ProcessedEventStore#isProcessed(DomainEvent)}를 호출하여 해당 이벤트가 이미 처리된 경우에는 멱등성을 위하여 처리를 진행하지 않는다.
+     * <p> {@link ProcessedEventStore#isProcessed(String, DomainEvent)}를 호출하여 해당 이벤트가 이미 처리된 경우에는 멱등성을 위하여 처리를 진행하지 않는다.
      *
      * <p> 비즈니스 로직 실행 중 예외 발생 시, 해당 예외에 대한 재시도 가능 여부를 확인한다.
      * <p> 재시도가 가능한 경우, 'x-death' 헤더를 분석하여 현재 재시도 횟수가 최대 허용치({@code getMaxRetryCount()}를 초과했는지 확인한다.
@@ -90,7 +90,7 @@ public abstract class AbstractRabbitEventConsumer<T extends DomainEvent> {
             return;
         }
         
-        if (processedEventStore.isProcessed(event)) {
+        if (processedEventStore.isProcessed(getConsumerId(), event)) {
             log.info("[Event Drop] Event {} is already processed.", event.getEventId());
             return;
         }
@@ -103,7 +103,7 @@ public abstract class AbstractRabbitEventConsumer<T extends DomainEvent> {
                 return;
             }
             
-            processedEventStore.markProcessed(event, duration);
+            processedEventStore.markProcessed(getConsumerId(), event, duration);
         } catch (RuntimeException e) {
             if (e instanceof RetryableException retryable && retryable.isRetryable()) {
                 int deathCount = getDeathCount(xDeath);
@@ -119,6 +119,18 @@ public abstract class AbstractRabbitEventConsumer<T extends DomainEvent> {
                 dead(event, e);
             }
         }
+    }
+    
+    /**
+     * 도메인 이벤트 처리 소비자를 식별할 수 있는 식별자를 반환하는 메서드
+     *
+     * <p> 해당 객체의 클래스명을 반환하도록 한다.
+     * <p> 다형성을 활용하여 구현 객체의 클래스명을 반환하여 각 소비자의 클래스명을 식별자로 사용한다.
+     *
+     * @return 해당 도메인 이벤트 처리 소비자의 식별자
+     */
+    protected String getConsumerId() {
+        return getClass().getSimpleName();
     }
     
     /**
