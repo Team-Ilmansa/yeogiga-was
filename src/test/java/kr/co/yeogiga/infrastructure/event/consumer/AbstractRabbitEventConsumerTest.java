@@ -55,8 +55,8 @@ class AbstractRabbitEventConsumerTest {
 
             // then
             assertThat(consumer.processCount.get()).isZero();
-            verify(processedEventStore, never()).isProcessed(any());
-            verify(processedEventStore, never()).markProcessed(any(), any());
+            verify(processedEventStore, never()).isProcessed(any(), any());
+            verify(processedEventStore, never()).markProcessed(any(), any(), any());
         }
 
         @Test
@@ -83,7 +83,7 @@ class AbstractRabbitEventConsumerTest {
         void alreadyProcessedEvent_isDropped() {
             // given
             StubExpirableEvent event = new StubExpirableEvent(ZonedDateTime.now(ZONE).plusSeconds(120), false);
-            when(processedEventStore.isProcessed(event)).thenReturn(true);
+            when(processedEventStore.isProcessed(eq("TestConsumer"), eq(event))).thenReturn(true);
             TestConsumer consumer = new TestConsumer(processedEventStore, () -> {});
 
             // when
@@ -91,7 +91,7 @@ class AbstractRabbitEventConsumerTest {
 
             // then
             assertThat(consumer.processCount.get()).isZero();
-            verify(processedEventStore, never()).markProcessed(any(), any());
+            verify(processedEventStore, never()).markProcessed(any(), any(), any());
         }
 
         @Test
@@ -107,7 +107,7 @@ class AbstractRabbitEventConsumerTest {
 
             // then
             ArgumentCaptor<Duration> ttlCaptor = ArgumentCaptor.forClass(Duration.class);
-            verify(processedEventStore, times(1)).markProcessed(eq(event), ttlCaptor.capture());
+            verify(processedEventStore, times(1)).markProcessed(eq("TestConsumer"), eq(event), ttlCaptor.capture());
 
             Duration ttl = ttlCaptor.getValue();
             assertThat(ttl).isGreaterThan(Duration.ofSeconds(110))
@@ -125,7 +125,7 @@ class AbstractRabbitEventConsumerTest {
             consumer.handleEvent(event, null);
 
             // then
-            verify(processedEventStore, times(1)).markProcessed(event, Duration.ofDays(1));
+            verify(processedEventStore, times(1)).markProcessed(eq("TestConsumer"), eq(event), eq(Duration.ofDays(1)));
         }
 
         @Test
@@ -141,7 +141,7 @@ class AbstractRabbitEventConsumerTest {
             consumer.handleEvent(event, null);
 
             // then
-            verify(processedEventStore, never()).markProcessed(any(), any());
+            verify(processedEventStore, never()).markProcessed(any(), any(), any());
             assertThat(consumer.deadCount.get()).isEqualTo(1);
         }
 
@@ -157,7 +157,7 @@ class AbstractRabbitEventConsumerTest {
 
             // then
             assertThat(consumer.processCount.get()).isEqualTo(1);
-            verify(processedEventStore, never()).markProcessed(any(), any());
+            verify(processedEventStore, never()).markProcessed(any(), any(), any());
         }
     }
     
