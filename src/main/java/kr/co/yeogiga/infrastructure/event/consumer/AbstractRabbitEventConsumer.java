@@ -1,16 +1,31 @@
 package kr.co.yeogiga.infrastructure.event.consumer;
 
 import kr.co.yeogiga.domain.event.DomainEvent;
+import kr.co.yeogiga.domain.event.ExpirableEvent;
+import kr.co.yeogiga.infrastructure.event.consumer.support.ProcessedEventStore;
 import kr.co.yeogiga.infrastructure.event.exception.RetryableException;
+import lombok.extern.slf4j.Slf4j;
 
+import java.time.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public abstract class AbstractRabbitEventConsumer<T extends DomainEvent> {
-    private final String DEATH_REASON_KEY = "reason";
-    private final String DEATH_QUEUE_KEY = "queue";
-    private final String DEATH_COUNT_KEY = "count";
-    private final String DEATH_REASON_VALUE = "rejected";
+    private final ProcessedEventStore processedEventStore;
+    
+    private static final String DEATH_REASON_KEY = "reason";
+    private static final String DEATH_QUEUE_KEY = "queue";
+    private static final String DEATH_COUNT_KEY = "count";
+    private static final String DEATH_REASON_VALUE = "rejected";
+    private static final String ZONE = "Asia/Seoul";
+    private static final Duration DEFAULT_NON_EXPIRABLE_EVENT_DURATION = Duration.ofDays(1);
+    
+    public AbstractRabbitEventConsumer(ProcessedEventStore processedEventStore) {
+        this.processedEventStore = processedEventStore;
+    }
     
     /**
      * 메인으로 메시지를 소비하는 큐의 이름을 반환하는 메서드
@@ -56,18 +71,39 @@ public abstract class AbstractRabbitEventConsumer<T extends DomainEvent> {
     /**
      * 수신된 이벤트를 처리하고 실패 시 재시도 전략에 따른 제어 메서드
      *
-     * <p> 비즈니스 로직 실행 중 예외 발생 시, 해당 예외에 대한 재시도 가능 여부를 확인
+     * <p> 해당 이벤트가 만료 기한이 존재하는 {@link ExpirableEvent}이고, 만료 기한이 지난 경우 처리를 진행하지 않는다.
      *
-     * <p> 재시도가 가능한 경우, 'x-death' 헤더를 분석하여 현재 재시도 횟수가 최대 허용치({@code getMaxRetryCount()}를 초과했는지 확인
+     * <p> {@link ProcessedEventStore#isProcessed(DomainEvent)}를 호출하여 해당 이벤트가 이미 처리된 경우에는 멱등성을 위하여 처리를 진행하지 않는다.
      *
-     * <p> 최대 재시도 횟수를 초과했거나 재시도가 불가능한 예외가 발생한 경우, 해당 메시지를 Dead Letter 처리
+     * <p> 비즈니스 로직 실행 중 예외 발생 시, 해당 예외에 대한 재시도 가능 여부를 확인한다.
+     * <p> 재시도가 가능한 경우, 'x-death' 헤더를 분석하여 현재 재시도 횟수가 최대 허용치({@code getMaxRetryCount()}를 초과했는지 확인한다.
+     * <p> 최대 재시도 횟수를 초과했거나 재시도가 불가능한 예외가 발생한 경우, 해당 메시지를 Dead Letter 처리한다.
+     *
+     * <p> 이벤트 처리에 성공한 경우 해당 이벤트는 처리 완료 여부를 기록한다.
      *
      * @param event 수신된 도메인 이벤트 객체
      * @param xDeath AMQP 메시지 헤더에서 추출한 메시지 거절 정보
      */
     protected void handleEvent(T event, List<Map<String, Object>> xDeath) {
+        if (event instanceof ExpirableEvent expirableEvent && expirableEvent.isExpired()) {
+            log.info("[Event Drop] Event {} is expired.", event.getEventId());
+            return;
+        }
+        
+        if (processedEventStore.isProcessed(event)) {
+            log.info("[Event Drop] Event {} is already processed.", event.getEventId());
+            return;
+        }
+        
         try {
             process(event);
+            Duration duration = resolveProcessedEventDuration(event);
+            
+            if (duration.isNegative() || duration.isZero()) {
+                return;
+            }
+            
+            processedEventStore.markProcessed(event, duration);
         } catch (RuntimeException e) {
             if (e instanceof RetryableException retryable && retryable.isRetryable()) {
                 int deathCount = getDeathCount(xDeath);
@@ -83,6 +119,26 @@ public abstract class AbstractRabbitEventConsumer<T extends DomainEvent> {
                 dead(event, e);
             }
         }
+    }
+    
+    /**
+     * 처리 성공 이벤트의 성공 여부 기록 보관 기간을 구하는 메서드
+     *
+     * <p> 해당 이벤트가 {@link ExpirableEvent}일 경우, 현재 시간을 기준으로 만료 기한을 계산해서 반환한다.
+     * <p> 그렇지 않을 경우, {@link #DEFAULT_NON_EXPIRABLE_EVENT_DURATION}을 반환한다.
+     *
+     * @param event 도메인 이벤트
+     * @return      이벤트 성공 여부 기록 보관 기간
+     */
+    private Duration resolveProcessedEventDuration(T event) {
+        if (event instanceof ExpirableEvent expirableEvent) {
+            return Duration.between(
+                    ZonedDateTime.now(ZoneId.of(ZONE)),
+                    expirableEvent.getExpiredAt()
+            );
+        }
+        
+        return DEFAULT_NON_EXPIRABLE_EVENT_DURATION;
     }
     
     /**
