@@ -2,6 +2,7 @@ package kr.co.yeogiga.infrastructure.event.consumer;
 
 import jakarta.mail.MessagingException;
 import kr.co.yeogiga.application.auth.event.EmailVerificationEvent;
+import kr.co.yeogiga.infrastructure.event.consumer.support.ProcessedEventStore;
 import kr.co.yeogiga.infrastructure.event.exception.ProcessingFailException;
 import kr.co.yeogiga.infrastructure.mail.VerificationCodeEmailSender;
 import kr.co.yeogiga.infrastructure.mail.exception.FatalEmailException;
@@ -37,6 +38,9 @@ public class EmailVerificationEmailConsumerTest {
     private RabbitTemplate rabbitTemplate;
     
     @Mock
+    private ProcessedEventStore processedEventStore;
+    
+    @Mock
     private RabbitMQProperties rabbitMQProperties;
     
     @Mock
@@ -56,7 +60,7 @@ public class EmailVerificationEmailConsumerTest {
         when(emailVerificationProperties.getExchange()).thenReturn(DLX);
         when(emailVerificationProperties.getRoutingKey()).thenReturn(DLK);
         
-        consumer = new EmailVerificationEmailConsumer(emailSender, rabbitTemplate, rabbitMQProperties);
+        consumer = new EmailVerificationEmailConsumer(emailSender, rabbitTemplate, processedEventStore, rabbitMQProperties);
     }
     
     @Test
