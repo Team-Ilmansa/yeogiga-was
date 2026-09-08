@@ -1,6 +1,7 @@
 package kr.co.yeogiga.infrastructure.event.consumer;
 
 import kr.co.yeogiga.application.auth.event.PasswordResetEvent;
+import kr.co.yeogiga.infrastructure.event.consumer.support.ProcessedEventStore;
 import kr.co.yeogiga.infrastructure.event.exception.ProcessingFailException;
 import kr.co.yeogiga.infrastructure.mail.PasswordResetEmailSender;
 import kr.co.yeogiga.infrastructure.properties.RabbitMQProperties;
@@ -11,8 +12,6 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +26,13 @@ public class PasswordResetEmailConsumer extends AbstractRabbitEventConsumer<Pass
     private final String DEAD_LETTER_ROUTING_KEY;
     private final int MAX_RETRY_COUNT = 3;
     
-    public PasswordResetEmailConsumer(PasswordResetEmailSender passwordResetEmailSender, RabbitTemplate rabbitTemplate, RabbitMQProperties rabbitMQProperties) {
+    public PasswordResetEmailConsumer(
+            PasswordResetEmailSender passwordResetEmailSender,
+            RabbitTemplate rabbitTemplate,
+            ProcessedEventStore processedEventStore,
+            RabbitMQProperties rabbitMQProperties
+    ) {
+        super(processedEventStore);
         this.passwordResetEmailSender = passwordResetEmailSender;
         this.rabbitTemplate = rabbitTemplate;
         this.WORK_QUEUE = rabbitMQProperties.getPasswordReset().getQueue() + ".email";
@@ -37,10 +42,6 @@ public class PasswordResetEmailConsumer extends AbstractRabbitEventConsumer<Pass
     
     @RabbitListener(queues = "#{passwordResetRabbitMQConfig.passwordResetEmailWorkQueue.name}", containerFactory = "emailRabbitListenerContainerFactory")
     public void handleMessage(@Payload PasswordResetEvent event, @Header(name = "x-death", required = false) List<Map<String, Object>> xDeath) {
-        if (event.getExpiredAt().isBefore(ZonedDateTime.now(ZoneId.of("Asia/Seoul")))) {
-            log.warn("[EVENT DROPPED] Event \"{}\" expired.", event.getEventId());
-            return;
-        }
         super.handleEvent(event, xDeath);
     }
     

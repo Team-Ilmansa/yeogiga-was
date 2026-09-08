@@ -2,6 +2,7 @@ package kr.co.yeogiga.infrastructure.event.consumer;
 
 import jakarta.mail.MessagingException;
 import kr.co.yeogiga.application.auth.event.PasswordResetEvent;
+import kr.co.yeogiga.infrastructure.event.consumer.support.ProcessedEventStore;
 import kr.co.yeogiga.infrastructure.event.exception.ProcessingFailException;
 import kr.co.yeogiga.infrastructure.mail.PasswordResetEmailSender;
 import kr.co.yeogiga.infrastructure.mail.exception.FatalEmailException;
@@ -40,6 +41,9 @@ public class PasswordResetEmailConsumerTest {
     private RabbitMQProperties rabbitMQProperties;
     
     @Mock
+    private ProcessedEventStore processedEventStore;
+    
+    @Mock
     private RabbitMQProperties.Attribute passwordResetProperties;
     
     private PasswordResetEmailConsumer consumer;
@@ -56,7 +60,7 @@ public class PasswordResetEmailConsumerTest {
         when(passwordResetProperties.getExchange()).thenReturn(DLX);
         when(passwordResetProperties.getRoutingKey()).thenReturn(DLK);
         
-        consumer = new PasswordResetEmailConsumer(emailSender, rabbitTemplate, rabbitMQProperties);
+        consumer = new PasswordResetEmailConsumer(emailSender, rabbitTemplate, processedEventStore, rabbitMQProperties);
     }
     
     @Test

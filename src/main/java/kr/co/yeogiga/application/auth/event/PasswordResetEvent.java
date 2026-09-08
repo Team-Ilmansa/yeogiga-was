@@ -1,12 +1,13 @@
 package kr.co.yeogiga.application.auth.event;
 
 import kr.co.yeogiga.domain.event.DomainEvent;
+import kr.co.yeogiga.domain.event.ExpirableEvent;
 import lombok.Getter;
 
 import java.time.ZonedDateTime;
 
 @Getter
-public class PasswordResetEvent extends DomainEvent {
+public class PasswordResetEvent extends DomainEvent implements ExpirableEvent {
     private final String email;
     private final String code;
     private final ZonedDateTime expiredAt;
